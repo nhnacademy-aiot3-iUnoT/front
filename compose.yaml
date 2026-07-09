@@ -1,7 +1,7 @@
 services:
   app:
     build: .
-    container_name: front
+    container_name: team1-front
     ports:
       - "10400:8080"
     restart: unless-stopped
