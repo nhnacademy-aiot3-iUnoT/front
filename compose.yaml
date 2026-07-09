@@ -1,0 +1,12 @@
+services:
+  app:
+    build: .
+    container_name: front
+    ports:
+      - "10400:8080"
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
