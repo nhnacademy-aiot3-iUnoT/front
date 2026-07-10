@@ -10,7 +10,7 @@ eureka:
     instance-id: ${spring.application.name}:${server.port}
   client:
     service-url:
-      defaultZone: http://team1-eureka:10401/eureka
+      defaultZone: http://team1-eureka:10402/eureka
 
 management:
   endpoints:
