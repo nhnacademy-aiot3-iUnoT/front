@@ -1,3 +1,22 @@
 spring:
   application:
-    name: front
+    name: team1-front
+
+server:
+  port: 10403
+
+eureka:
+  instance:
+    instance-id: ${spring.application.name}:${server.port}
+  client:
+    service-url:
+      defaultZone: http://team1-eureka:10401/eureka
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never
