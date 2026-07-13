@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/auth-layout}">
+
+<head>
+    <title>로그인</title>
+    <!-- TODO 공통 style 분리 : 자주 쓰이는 색상도 분리 ?-->
+    <!-- TODO dark 모드 구현, 색상 변경 추가-->
+    <style>
+        .login-card{
+            width:100%;
+            max-width:980px;
+            border-radius:28px;
+            overflow:hidden;
+        }
+
+        .brand-section{
+            background: #ededed;
+            height:100%;
+        }
+
+        .brand-character{
+            width:320px;
+            max-width:100%;
+        }
+
+        .form-control,
+        .btn{
+            height:54px;
+        }
+    </style>
+</head>
+<body>
+
+<div layout:fragment="content">
+    <div class="container vh-100 d-flex align-items-center justify-content-center">
+        <div class="card border-0 login-card">
+            <div class="card-body p-0">
+                <div class="row g-0 align-items-center">
+                    <div class="col-lg-5">
+                        <div class="brand-section d-flex flex-column justify-content-center align-items-center text-center pt-4 pb-5">
+                            <img th:src="@{/img/character.png}" class="brand-character mb-3" alt="iUnoT">
+
+                            <h1 class="fw-bold text-dark mb-2">
+                                iUnoT
+                            </h1>
+
+                            <p class="text-secondary mb-0">
+                                의약품 환경 · 재고 관리 시스템
+                            </p>
+
+                            <p class="text-muted small mt-2">
+                                온·습도, 유통기한, 재고를 하나의 플랫폼에서 관리하세요.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-lg-7">
+                        <div class="login-section p-5">
+                            <h1 class="fw-bold mb-2">로그인</h1>
+                            <p class="text-secondary mb-4">
+                                iUnoT 계정으로 로그인하세요.
+                            </p>
+
+                            <form>
+                                <div class="mb-4">
+                                    <label class="form-label">
+                                        아이디
+                                    </label>
+                                    <input class="form-control form-control-lg rounded-3" placeholder="ID">
+                                </div>
+
+                                <div class="mb-4">
+                                    <div>
+                                        <label class="form-label">
+                                            비밀번호
+                                            <span class="form-label-description">
+                                                <a href="/forgot-password" class="text-secondary">I forgot password</a>
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <input type="password" class="form-control form-control-lg rounded-3" placeholder="Password">
+                                </div>
+                                <button class="btn btn-dark btn-lg w-100">
+                                    로그인
+                                </button>
+                                <div class="text-center text-secondary mt-3">
+                                    Don't have account yet?
+                                    <a href="/signup" tabindex="-1" class="text-dark">Sign up</a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
