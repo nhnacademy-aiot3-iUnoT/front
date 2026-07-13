@@ -6,31 +6,7 @@
 
 <head>
     <title>로그인</title>
-    <!-- TODO 공통 style 분리 : 자주 쓰이는 색상도 분리 ?-->
-    <!-- TODO dark 모드 구현, 색상 변경 추가-->
-    <style>
-        .login-card{
-            width:100%;
-            max-width:980px;
-            border-radius:28px;
-            overflow:hidden;
-        }
-
-        .brand-section{
-            background: #ededed;
-            height:100%;
-        }
-
-        .brand-character{
-            width:320px;
-            max-width:100%;
-        }
-
-        .form-control,
-        .btn{
-            height:54px;
-        }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/account.css}">
 </head>
 <body>
 
@@ -43,7 +19,7 @@
                         <div class="brand-section d-flex flex-column justify-content-center align-items-center text-center pt-4 pb-5">
                             <img th:src="@{/img/character.png}" class="brand-character mb-3" alt="iUnoT">
 
-                            <h1 class="fw-bold text-dark mb-2">
+                            <h1 class="fw-bold mb-2">
                                 iUnoT
                             </h1>
 
@@ -70,6 +46,9 @@
                                 <div class="mb-4">
                                     <label class="form-label">
                                         아이디
+                                        <span class="form-label-description">
+                                                <a href="/forgot-id" class="text-secondary">I forgot id</a>
+                                            </span>
                                     </label>
                                     <input class="form-control form-control-lg rounded-3" placeholder="ID">
                                 </div>
@@ -90,7 +69,7 @@
                                 </button>
                                 <div class="text-center text-secondary mt-3">
                                     Don't have account yet?
-                                    <a href="/signup" tabindex="-1" class="text-dark">Sign up</a>
+                                    <a href="/signup" tabindex="-1" class="link-secondary">Sign up</a>
                                 </div>
                             </form>
                         </div>

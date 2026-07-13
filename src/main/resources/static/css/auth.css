@@ -1,0 +1,30 @@
+.theme-toggle{
+    position:fixed;
+    top:24px;
+    right:24px;
+    z-index:9999;
+}
+
+.theme-toggle button{
+    width:48px;
+    height:48px;
+    border-radius:50%;
+}
+
+/* 기본(라이트 모드) */
+.moon-icon {
+    display: inline-block;
+}
+
+.sun-icon {
+    display: none;
+}
+
+/* 다크 모드 */
+[data-bs-theme="dark"] .moon-icon {
+    display: none;
+}
+
+[data-bs-theme="dark"] .sun-icon {
+    display: inline-block;
+}
