@@ -14,15 +14,7 @@ for i in "${!SERVICES[@]}"; do
   SERVICE="${SERVICES[$i]}"
   PORT="${PORTS[$i]}"
 
-  # 유레카 및 라우터에서 해당 인스턴스 제외
-  echo "${SERVICE} 유레카 상태 변경 (OUT_OF_SERVICE)"
-  curl -sf -X POST -H "Content-Type: application/json" \
-    -d '{"status": "OUT_OF_SERVICE"}' \
-    "http://127.0.0.1:${PORT}/actuator/serviceregistry"
-
-  # 유레카에 인스턴스의 상태가 반영될 때까지 대기
-  echo "${SERVICE} 유레카 갱신 대기 (65초)"
-  sleep 65;
+  # nginx가 front를 직접 로드밸런싱(패시브 헬스체크)하므로 Eureka 등록/해제 절차는 더 이상 불필요 (nginx는 max_fails/fail_timeout으로 죽은 인스턴스를 스스로 우회)
 
   # 해당 컨테이너 재빌드 및 구동
   echo "${SERVICE} 재배포"
