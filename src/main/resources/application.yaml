@@ -18,7 +18,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: health
+        include: health, service-registry
   endpoint:
     health:
       show-details: never
