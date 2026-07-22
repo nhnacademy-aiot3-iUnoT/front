@@ -1,4 +1,4 @@
-name: CI/CD
+name: Front CI/CD
 
 on:
   push:
@@ -52,6 +52,4 @@ jobs:
           script: |
             set -e
             cd ~/front
-            git pull origin main
-            docker compose -f compose.yaml up -d --build
-            docker image prune -f
+            ./deploy/front-cd.sh
