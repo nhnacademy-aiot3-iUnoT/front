@@ -22,3 +22,7 @@ management:
   endpoint:
     health:
       show-details: never
+  tracing:
+    export:
+      zipkin:
+        endpoint: http://team1-zipkin:9411/api/v2/spans
