@@ -37,20 +37,13 @@
 
                     <div class="col-lg-7">
                         <div class="login-section p-5">
-                            <h1 class="fw-bold mb-2">로그인</h1>
-                            <p class="text-secondary mb-4">
-                                iUnoT 계정으로 로그인하세요.
-                            </p>
-
+                            <h1 class="fw-bold mb-4">로그인</h1>
                             <form>
                                 <div class="mb-4">
                                     <label class="form-label">
-                                        아이디
-                                        <span class="form-label-description">
-                                                <a href="/forgot-id" class="text-secondary">I forgot id</a>
-                                            </span>
+                                        이메일
                                     </label>
-                                    <input class="form-control form-control-lg rounded-3" placeholder="ID">
+                                    <input type="email" class="form-control form-control-lg rounded-3" placeholder="이메일을 입력하세요." required>
                                 </div>
 
                                 <div class="mb-4">
@@ -58,18 +51,21 @@
                                         <label class="form-label">
                                             비밀번호
                                             <span class="form-label-description">
-                                                <a href="/forgot-password" class="text-secondary">I forgot password</a>
+                                                <a href="/forgot-password" class="text-secondary">비밀번호 찾기</a>
                                             </span>
                                         </label>
                                     </div>
-                                    <input type="password" class="form-control form-control-lg rounded-3" placeholder="Password">
+                                    <input type="password" class="form-control form-control-lg rounded-3" placeholder="비밀번호를 입력하세요." required>
                                 </div>
                                 <button class="btn btn-dark btn-lg w-100">
                                     로그인
                                 </button>
-                                <div class="text-center text-secondary mt-3">
-                                    Don't have account yet?
-                                    <a href="/signup" tabindex="-1" class="link-secondary">Sign up</a>
+
+                                <div class="alert alert-light border mt-4 py-2 px-3">
+                                    <i class="ti ti-info-circle me-2"></i>
+                                    <small>
+                                        회원가입은 조직 관리자가 발송한 초대 링크를 통해서만 가능합니다.
+                                    </small>
                                 </div>
                             </form>
                         </div>
