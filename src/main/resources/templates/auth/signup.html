@@ -1,35 +1,11 @@
 <!DOCTYPE html>
-<html lang="ko"
-      xmlns:th="http://www.thymeleaf.org"
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/auth-layout}">
 
 <head>
     <title>회원가입</title>
-
-    <style>
-        .login-card{
-            width:100%;
-            max-width:980px;
-            border-radius:28px;
-            overflow:hidden;
-        }
-
-        .brand-section{
-            background: #ededed;
-            height:100%;
-        }
-
-        .brand-character{
-            width:320px;
-            max-width:100%;
-        }
-
-        .form-control,
-        .btn{
-            height:54px;
-        }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/auth.css}">
 </head>
 <body>
 
@@ -42,7 +18,7 @@
                         <div class="brand-section d-flex flex-column justify-content-center align-items-center text-center pt-4 pb-5">
                             <img th:src="@{/img/character.png}" class="brand-character mb-3" alt="iUnoT">
 
-                            <h1 class="fw-bold text-dark mb-2">
+                            <h1 class="fw-bold mb-2">
                                 iUnoT
                             </h1>
 
@@ -62,33 +38,56 @@
                             <h1 class="fw-bold mb-4">회원가입</h1>
 
                             <form>
-                                <div class="mb-4">
+                                <div class="mb-3">
                                     <label class="form-label">
-                                        이름
+                                        이메일
                                     </label>
-                                    <input class="form-control form-control-lg rounded-3" placeholder="Name">
+                                    <div class="input-group">
+                                        <input type="email" class="form-control form-control-lg rounded-3" placeholder="이메일을 입력하세요." required>
+                                        <button class="btn btn-outline-secondary">
+                                            중복확인
+                                        </button>
+                                    </div>
                                 </div>
-
-                                <div class="mb-4">
-                                    <label class="form-label">
-                                        아이디
-                                    </label>
-                                    <input class="form-control form-control-lg rounded-3" placeholder="ID">
-                                </div>
-
-                                <div class="mb-4">
+                                <!-- TODO JS로 입력값 일치 확인하기 -->
+                                <div class="mb-3">
                                     <label class="form-label">
                                         비밀번호
                                     </label>
-                                    <input type="password" class="form-control form-control-lg rounded-3" placeholder="Password">
+                                    <input type="password" class="form-control form-control-lg rounded-3" placeholder="비밀번호를 입력하세요." required>
                                 </div>
-                                <button class="btn btn-dark btn-lg w-100">
+
+                                <div class="mb-3">
+                                    <label class="form-label">
+                                        비밀번호 재확인
+                                    </label>
+                                    <input type="password" class="form-control form-control-lg rounded-3" placeholder="비밀번호를 입력하세요." required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">
+                                        이름
+                                    </label>
+                                    <input class="form-control form-control-lg rounded-3" placeholder="이름을 입력하세요." required>
+                                </div>
+
+                                <!--
+                                <div class="form-check mb-4">
+                                    <input class="form-check-input" type="checkbox" id="agree" required>
+                                    <label class="form-check-label" for="agree">
+                                        <a href="/terms">이용약관</a> 및
+                                        <a href="/privacy">개인정보 처리방침</a>에 동의합니다. (필수)
+                                    </label>
+                                </div>
+                                -->
+
+                                <button type="submit" class="btn btn-dark btn-lg w-100">
                                     회원가입
                                 </button>
 
                                 <div class="text-center text-secondary mt-3">
-                                    Already have account?
-                                    <a href="/login" tabindex="-1" class="text-dark">Sign in</a>
+                                    이미 계정이 있으신가요?
+                                    <a href="/login" tabindex="-1" class="link-secondary">로그인</a>
                                 </div>
                             </form>
                         </div>

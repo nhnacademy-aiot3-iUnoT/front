@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main-layout}">
+
+<head>
+    <meta charset="UTF-8">
+    <title>회원탈퇴</title>
+</head>
+
+<body>
+
+<div layout:fragment="content">
+    <div class="row">
+        <div class="col-lg-8 col-xl-7 mx-auto">
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <h3 class="card-title">회원탈퇴</h3>
+                        <p class="card-subtitle">
+                            탈퇴를 진행하려면 비밀번호를 입력해주세요.
+                        </p>
+                    </div>
+                </div>
+
+                <form id="withdraw-form" th:action="@{/}" method="post">
+                    <div class="card-body">
+                        <div class="alert alert-warning">
+                            <div class="d-flex">
+                                <div>
+                                    <i class="ti ti-alert-triangle"></i>
+                                </div>
+                                <div class="ms-2">
+                                    <h4 class="alert-title">
+                                        회원탈퇴 안내
+                                    </h4>
+                                    <div class="text-secondary">
+                                        탈퇴 후에는 계정 정보를 복구할 수 없습니다.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">
+                                비밀번호
+                            </label>
+                            <input type="password" class="form-control" name="password" placeholder="비밀번호를 입력해주세요" required>
+                        </div>
+                    </div>
+
+                    <div class="card-footer text-end">
+                        <a th:href="@{/mypage}" class="btn btn-outline-secondary">취소</a>
+                        <button type="button"
+                                class="btn btn-danger ms-2"
+                                id="withdraw-btn"
+                                onclick="openWithdrawModal()">
+                            탈퇴 진행
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- 탈퇴 확정 Modal -->
+    <div class="modal modal-blur fade" id="withdrawModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-status bg-danger"></div>
+
+                <div class="modal-header">
+                    <h5 class="modal-title">회원탈퇴 확인</h5>
+
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    정말 탈퇴하시겠습니까?
+                    <br>
+                    <span class="text-danger">
+                            탈퇴 후 계정 복구가 불가능합니다.
+                        </span>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">취소</button>
+
+                    <button type="button" class="btn btn-danger" onclick="submitWithdraw()">탈퇴하기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script th:src="@{/js/withdraw.js}"></script>
+</div>
+
+</body>
+</html>

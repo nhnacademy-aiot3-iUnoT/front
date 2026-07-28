@@ -1,6 +1,6 @@
-package com.nhnacademy.front.client;
+package com.nhnacademy.front.global.client;
 
-import com.nhnacademy.front.dto.ApiResponse;
+import com.nhnacademy.front.global.dto.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.ResolvableType;
