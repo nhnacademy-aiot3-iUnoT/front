@@ -79,4 +79,5 @@ jobs:
           script: |
             set -e
             cd ~/front
+            git pull origin main
             IMAGE_TAG=${{ github.sha }} ./deploy/front-cd.sh
