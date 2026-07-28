@@ -11,6 +11,8 @@ eureka:
 
 management:
   tracing:
+    sampling:
+      probability: 1  # 트래픽 봐서 낮추기
     export:
       zipkin:
         endpoint: ${ZIPKIN_ENDPOINT}
