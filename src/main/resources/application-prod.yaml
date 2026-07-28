@@ -1,0 +1,16 @@
+eureka:
+  instance:
+    instance-id: ${spring.application.name}:${server.port}
+  client:
+    # 더 이상 프론트 레지스트리가 필요하지 않음
+    register-with-eureka: false
+    # 하지만 다른 서비스 목록은 필요
+    fetch-registry: true
+    service-url:
+      defaultZone: ${EUREKA_DEFAULT_ZONE}
+
+management:
+  tracing:
+    export:
+      zipkin:
+        endpoint: ${ZIPKIN_ENDPOINT}
