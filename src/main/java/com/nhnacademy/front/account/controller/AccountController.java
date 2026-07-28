@@ -1,14 +1,12 @@
-package com.nhnacademy.front.controller;
+package com.nhnacademy.front.account.controller;
 
-import com.nhnacademy.front.client.GatewayClient;
-import com.nhnacademy.front.dto.ApiResponse;
-import com.nhnacademy.front.dto.auth.LoginRequest;
-import com.nhnacademy.front.dto.auth.LoginResponse;
-import jakarta.servlet.http.HttpServletRequest;
+import com.nhnacademy.front.global.client.GatewayClient;
+import com.nhnacademy.front.account.dto.request.LoginRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,9 +17,9 @@ public class AccountController {
 
     private final GatewayClient gatewayClient;
 
-    // [임시] 담당자가 직접 url 변경하기
     @GetMapping("/login")
-    public String login() {
+    public String login(Model model) {
+        model.addAttribute("loginRequest", new LoginRequest("", ""));
         return "auth/login";
     }
 

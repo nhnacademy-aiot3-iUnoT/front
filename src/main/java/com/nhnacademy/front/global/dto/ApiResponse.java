@@ -1,4 +1,4 @@
-package com.nhnacademy.front.dto;
+package com.nhnacademy.front.global.dto;
 
 import java.time.LocalDateTime;
 
