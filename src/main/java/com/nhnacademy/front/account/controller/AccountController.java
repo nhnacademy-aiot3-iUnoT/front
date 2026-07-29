@@ -72,7 +72,7 @@ public class AccountController {
 
         // SignupResponse response = accountApiClient.signup(request);
 
-        return "auth/signup";
+        return "redirect:/";
     }
 
     @PostMapping("/check-email")
