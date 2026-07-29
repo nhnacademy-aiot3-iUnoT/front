@@ -1,4 +1,4 @@
-package com.nhnacademy.front.config;
+package com.nhnacademy.front.global.config;
 
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
