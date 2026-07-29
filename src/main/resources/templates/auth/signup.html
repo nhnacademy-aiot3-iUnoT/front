@@ -37,7 +37,7 @@
                         <div class="login-section p-5">
                             <h1 class="fw-bold mb-4">회원가입</h1>
 
-                            <form th:action="@{/signup}" th:object="${signupRequest}" method="post">
+                            <form id="signup-form" th:action="@{/signup}" th:object="${signupRequest}" method="post">
 
                                 <input type="hidden" th:field="*{inviteToken}">
 
@@ -50,7 +50,7 @@
                                                id="email"
                                                th:field="*{email}"
                                                class="form-control form-control-lg rounded-3"
-                                               placeholder="이메일을 입력하세요."
+                                               th:classappend="${#fields.hasErrors('email')} ? 'is-invalid'"
                                                required>
 
                                         <button type="button"
@@ -93,7 +93,7 @@
                                            placeholder="재확인 비밀번호를 입력하세요."
                                            required>
                                     <div class="invalid-feedback">
-                                        재확인 비밀번호 오류
+                                        비밀번호가 일치하지 않습니다.
                                     </div>
                                 </div>
 
@@ -116,7 +116,10 @@
                                 </div>
                                 -->
 
-                                <button type="submit" class="btn btn-dark btn-lg w-100">
+                                <button type="submit"
+                                        id="signup-submit"
+                                        class="btn btn-dark btn-lg w-100"
+                                        disabled>
                                     회원가입
                                 </button>
 
@@ -137,7 +140,11 @@
         const emailInput = document.getElementById("email");
         const emailCheckButton = document.getElementById("emailCheck");
         const emailFeedback = document.getElementById("email-feedback");
+        const signupForm = document.getElementById("signup-form");
+        const submitButton = document.getElementById("signup-submit");
         let verifiedEmail = null;
+        let emailCheckPromise = null;
+        let submitApproved = false;
 
         function checkPwdEquals() {
             const isEqual = pwdInput.value === pwdCheckInput.value;
@@ -164,16 +171,22 @@
             emailInput.setCustomValidity(message);
             emailFeedback.textContent = message;
             verifiedEmail = null;
+            submitButton.disabled = true;
         }
 
-        function setEmailValid() {
+        function setEmailValid(checkedEmail) {
             emailInput.classList.remove("is-invalid");
             emailInput.classList.add("is-valid");
             emailInput.setCustomValidity("");
-            verifiedEmail = emailInput.value;
+            verifiedEmail = checkedEmail;
+            submitButton.disabled = false;
         }
 
         async function checkEmail() {
+            const checkedEmail = emailInput.value.trim();
+
+            emailInput.setCustomValidity("");
+
             if (!emailInput.validity.valid) {
                 const message = emailInput.validity.valueMissing
                     ? "이메일을 입력해주세요."
@@ -190,7 +203,7 @@
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
-                        email: emailInput.value
+                        email: checkedEmail
                     })
                 });
 
@@ -200,12 +213,16 @@
 
                 const data = await response.json();
 
+                if (emailInput.value.trim() !== checkedEmail) {
+                    return false;
+                }
+
                 if (!data.check) {
                     setEmailInvalid("이미 사용 중인 이메일입니다.");
                     return false;
                 }
 
-                setEmailValid();
+                setEmailValid(checkedEmail);
                 return true;
             } catch (error) {
                 setEmailInvalid("이메일 중복 확인 중 오류가 발생했습니다.");
@@ -213,18 +230,76 @@
             }
         }
 
-        emailCheckButton.addEventListener("click", checkEmail);
+        async function startEmailCheck() {
+            if (emailCheckPromise) {
+                return emailCheckPromise;
+            }
+
+            verifiedEmail = null;
+            submitButton.disabled = true;
+            emailCheckButton.disabled = true;
+
+            const promise = checkEmail();
+            emailCheckPromise = promise;
+
+            try {
+                return await promise;
+            } finally {
+                if (emailCheckPromise === promise) {
+                    emailCheckPromise = null;
+                }
+                emailCheckButton.disabled = false;
+            }
+        }
+
+        emailCheckButton.addEventListener("click", startEmailCheck);
 
         emailInput.addEventListener("input", () => {
             verifiedEmail = null;
+            submitButton.disabled = true;
             emailInput.classList.remove("is-valid", "is-invalid");
             emailInput.setCustomValidity("");
         });
 
-        form.addEventListener("submit", event => {
-            if (verifiedEmail !== emailInput.value) {
-                event.preventDefault();
-                setEmailInvalid("이메일 중복확인이 필요합니다.");
+        signupForm.addEventListener("submit", async event => {
+            if (submitApproved) {
+                return;
+            }
+
+            event.preventDefault();
+
+            const submitter = event.submitter;
+            submitButton.disabled = true;
+
+            try {
+                if (emailCheckPromise) {
+                    await emailCheckPromise;
+                }
+
+                if (verifiedEmail !== emailInput.value.trim()) {
+                    setEmailInvalid("이메일 중복확인이 필요합니다.");
+                    emailInput.reportValidity();
+                    return;
+                }
+
+                checkPwdEquals();
+
+                if (!signupForm.reportValidity()) {
+                    return;
+                }
+
+                submitApproved = true;
+                submitButton.disabled = false;
+
+                if (submitter) {
+                    signupForm.requestSubmit(submitter);
+                } else {
+                    signupForm.requestSubmit();
+                }
+            } finally {
+                if (!submitApproved && verifiedEmail === emailInput.value.trim()) {
+                    submitButton.disabled = false;
+                }
             }
         });
     </script>
