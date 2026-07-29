@@ -1,7 +1,11 @@
 package com.nhnacademy.front.account.controller;
 
-import com.nhnacademy.front.global.client.GatewayClient;
+import com.nhnacademy.front.account.client.AccountApiClient;
+import com.nhnacademy.front.account.dto.request.CheckEmailRequest;
+import com.nhnacademy.front.account.dto.request.SignupRequest;
 import com.nhnacademy.front.account.dto.request.LoginRequest;
+import com.nhnacademy.front.account.dto.response.CheckEmailResponse;
+import com.nhnacademy.front.account.dto.response.SignupResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class AccountController {
 
-    private final GatewayClient gatewayClient;
+    private final AccountApiClient accountApiClient;
 
     @GetMapping("/login")
     public String login(Model model) {
@@ -24,7 +28,7 @@ public class AccountController {
     }
 
     @PostMapping("/login")
-    public String loginReq(
+    public String loginPost(
             @Valid @ModelAttribute("loginRequest") LoginRequest request,
             BindingResult bindingResult
     ) {
@@ -34,18 +38,54 @@ public class AccountController {
 
         log.info("Login Email: {}", request.email());
         log.info("Login Password: {}", request.password().hashCode());
-//        ApiResponse<?> response = gatewayClient.post("/login", request, LoginResponse.class);
-//        if (!response.success()) {
-//            return "auth/login";
-//        }
+        // LoginResponse response = accountApiClient.login(request);
 
-        return "redirect:/";
+         return "redirect:/";
     }
 
 
     @GetMapping("/signup")
-    public String signup() {
+    public String signup(
+            Model model
+    ) {
+        model.addAttribute(
+                "signupRequest",
+                new SignupRequest("inviteToken", "", "", "")
+        );
+
         return "auth/signup";
+    }
+
+    @PostMapping("/signup")
+    public String signupPost(
+            @Valid @ModelAttribute("signupRequest") SignupRequest request,
+            BindingResult bindingResult
+    ) {
+        if (bindingResult.hasErrors()) {
+            return "auth/signup";
+        }
+
+        log.info("Signup Token: {}", request.inviteToken());
+        log.info("Signup Email: {}", request.email());
+        log.info("Signup Name: {}", request.name());
+        log.info("Signup Password: {}", request.password().hashCode());
+
+        // SignupResponse response = accountApiClient.signup(request);
+
+        return "auth/signup";
+    }
+
+    @PostMapping("/check-email")
+    @ResponseBody
+    public CheckEmailResponse checkEmail(
+            @Valid @RequestBody CheckEmailRequest request
+    ) {
+        log.info("Check Email: {}", request.email());
+
+        CheckEmailResponse response = request.email().contains("test") ? new CheckEmailResponse(true) : new CheckEmailResponse(false);
+        // CheckEmailResponse response = accountApiClient.checkEmail(request);
+
+        return response;
     }
 
     @GetMapping("/forgot-password")

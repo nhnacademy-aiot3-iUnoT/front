@@ -37,38 +37,73 @@
                         <div class="login-section p-5">
                             <h1 class="fw-bold mb-4">회원가입</h1>
 
-                            <form>
+                            <form th:action="@{/signup}" th:object="${signupRequest}" method="post">
+
+                                <input type="hidden" th:field="*{inviteToken}">
+
                                 <div class="mb-3">
                                     <label class="form-label">
                                         이메일
                                     </label>
                                     <div class="input-group">
-                                        <input type="email" class="form-control form-control-lg rounded-3" placeholder="이메일을 입력하세요." required>
-                                        <button class="btn btn-outline-secondary">
+                                        <input type="email"
+                                               id="email"
+                                               th:field="*{email}"
+                                               class="form-control form-control-lg rounded-3"
+                                               placeholder="이메일을 입력하세요."
+                                               required>
+
+                                        <button type="button"
+                                                id="emailCheck"
+                                                class="btn btn-outline-secondary">
                                             중복확인
                                         </button>
+
+                                        <div id="email-feedback" class="invalid-feedback">
+                                            이메일 오류
+                                        </div>
                                     </div>
                                 </div>
-                                <!-- TODO JS로 입력값 일치 확인하기 -->
                                 <div class="mb-3">
                                     <label class="form-label">
                                         비밀번호
                                     </label>
-                                    <input type="password" class="form-control form-control-lg rounded-3" placeholder="비밀번호를 입력하세요." required>
+                                    <input id="pwd"
+                                           type="password"
+                                           th:field="*{password}"
+                                           class="form-control form-control-lg rounded-3"
+                                           th:classappend="${#fields.hasErrors('password')} ? 'is-invalid'"
+                                           placeholder="비밀번호를 입력하세요."
+                                           required>
+
+                                    <div class="invalid-feedback"
+                                         th:if="${#fields.hasErrors('password')}"
+                                         th:errors="*{password}">
+                                        비밀번호 오류
+                                    </div>
                                 </div>
 
                                 <div class="mb-3">
                                     <label class="form-label">
                                         비밀번호 재확인
                                     </label>
-                                    <input type="password" class="form-control form-control-lg rounded-3" placeholder="비밀번호를 입력하세요." required>
+                                    <input id="pwd-check"
+                                           type="password"
+                                           class="form-control form-control-lg rounded-3"
+                                           placeholder="재확인 비밀번호를 입력하세요."
+                                           required>
+                                    <div class="invalid-feedback">
+                                        재확인 비밀번호 오류
+                                    </div>
                                 </div>
 
                                 <div class="mb-3">
                                     <label class="form-label">
                                         이름
                                     </label>
-                                    <input class="form-control form-control-lg rounded-3" placeholder="이름을 입력하세요." required>
+                                    <input class="form-control form-control-lg rounded-3"
+                                           th:field="*{name}"
+                                           placeholder="이름을 입력하세요." required>
                                 </div>
 
                                 <!--
@@ -96,6 +131,103 @@
             </div>
         </div>
     </div>
+    <script>
+        const pwdInput = document.getElementById("pwd");
+        const pwdCheckInput = document.getElementById("pwd-check");
+        const emailInput = document.getElementById("email");
+        const emailCheckButton = document.getElementById("emailCheck");
+        const emailFeedback = document.getElementById("email-feedback");
+        let verifiedEmail = null;
+
+        function checkPwdEquals() {
+            const isEqual = pwdInput.value === pwdCheckInput.value;
+
+            pwdCheckInput.classList.toggle(
+                "is-invalid",
+                !isEqual && pwdInput.value !== "" && pwdCheckInput.value !== ""
+            );
+
+            pwdCheckInput.setCustomValidity(
+                isEqual ? "" : "비밀번호가 일치하지 않습니다."
+            );
+
+            return isEqual;
+        }
+
+        pwdInput.addEventListener("input", checkPwdEquals);
+        pwdCheckInput.addEventListener("input", checkPwdEquals);
+
+
+        function setEmailInvalid(message) {
+            emailInput.classList.add("is-invalid");
+            emailInput.classList.remove("is-valid");
+            emailInput.setCustomValidity(message);
+            emailFeedback.textContent = message;
+            verifiedEmail = null;
+        }
+
+        function setEmailValid() {
+            emailInput.classList.remove("is-invalid");
+            emailInput.classList.add("is-valid");
+            emailInput.setCustomValidity("");
+            verifiedEmail = emailInput.value;
+        }
+
+        async function checkEmail() {
+            if (!emailInput.validity.valid) {
+                const message = emailInput.validity.valueMissing
+                    ? "이메일을 입력해주세요."
+                    : "올바른 이메일 형식으로 입력해주세요.";
+
+                setEmailInvalid(message);
+                return false;
+            }
+
+            try {
+                const response = await fetch("/check-email", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        email: emailInput.value
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error("이메일 중복 확인 요청 실패");
+                }
+
+                const data = await response.json();
+
+                if (!data.check) {
+                    setEmailInvalid("이미 사용 중인 이메일입니다.");
+                    return false;
+                }
+
+                setEmailValid();
+                return true;
+            } catch (error) {
+                setEmailInvalid("이메일 중복 확인 중 오류가 발생했습니다.");
+                return false;
+            }
+        }
+
+        emailCheckButton.addEventListener("click", checkEmail);
+
+        emailInput.addEventListener("input", () => {
+            verifiedEmail = null;
+            emailInput.classList.remove("is-valid", "is-invalid");
+            emailInput.setCustomValidity("");
+        });
+
+        form.addEventListener("submit", event => {
+            if (verifiedEmail !== emailInput.value) {
+                event.preventDefault();
+                setEmailInvalid("이메일 중복확인이 필요합니다.");
+            }
+        });
+    </script>
 </div>
 
 </body>
