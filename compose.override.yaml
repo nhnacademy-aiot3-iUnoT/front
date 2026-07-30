@@ -1,9 +1,5 @@
 services:
   front-1:
     build: .
-    environment:
-      SPRING_PROFILES_ACTIVE: dev
   front-2:
     build: .
-    environment:
-      SPRING_PROFILES_ACTIVE: dev
