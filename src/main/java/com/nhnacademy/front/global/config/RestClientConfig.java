@@ -29,7 +29,7 @@ public class RestClientConfig {
     }
 
     @Bean
-    @Profile("dev")
+    @Profile("!prod")
     public RestClient devRestClient(RestClient.Builder builder) {
         return builder.build();
     }
