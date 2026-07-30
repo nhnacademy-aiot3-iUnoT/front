@@ -5,14 +5,20 @@ import com.nhnacademy.front.account.dto.request.CheckEmailRequest;
 import com.nhnacademy.front.account.dto.request.SignupRequest;
 import com.nhnacademy.front.account.dto.request.LoginRequest;
 import com.nhnacademy.front.account.dto.response.CheckEmailResponse;
+import com.nhnacademy.front.account.dto.response.LoginResponse;
 import com.nhnacademy.front.account.dto.response.SignupResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import jakarta.ws.rs.core.HttpHeaders;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.Duration;
 
 @Slf4j
 @Controller
@@ -30,7 +36,8 @@ public class AccountController {
     @PostMapping("/login")
     public String loginPost(
             @Valid @ModelAttribute("loginRequest") LoginRequest request,
-            BindingResult bindingResult
+            BindingResult bindingResult,
+            HttpServletResponse response
     ) {
         if (bindingResult.hasErrors()) {
             return "auth/login";
@@ -38,7 +45,19 @@ public class AccountController {
 
         log.info("Login Email: {}", request.email());
         log.info("Login Password: {}", request.password().hashCode());
-        // LoginResponse response = accountApiClient.login(request);
+        LoginResponse loginResponse = new  LoginResponse("token");
+
+        // LoginResponse loginResponse = accountApiClient.login(request);
+
+        ResponseCookie cookie = ResponseCookie.from("access_token", loginResponse.accessToken())
+                .httpOnly(true)
+                .secure(false)
+                .sameSite("Lax")
+                .path("/")
+                .maxAge(Duration.ofHours(1))
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
          return "redirect:/";
     }
@@ -73,6 +92,7 @@ public class AccountController {
         // SignupResponse response = accountApiClient.signup(request);
 
         return "redirect:/";
+
     }
 
     @PostMapping("/check-email")
