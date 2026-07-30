@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main-layout}">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="|Zone ${zoneId} 상세 환경 정보|">상세 환경 정보</title>
+    <link rel="stylesheet" th:href="@{/css/sensor-info.css}">
+</head>
+<body>
+<main layout:fragment="content" class="zone-detail">
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb breadcrumb-arrows mb-0">
+            <li class="breadcrumb-item"><a href="/">환경관리</a></li>
+            <li class="breadcrumb-item"><span th:text="|저장소 ${storageId}|">저장소</span></li>
+            <li class="breadcrumb-item active" aria-current="page" th:text="|Zone ${zoneId}|">Zone</li>
+        </ol>
+    </nav>
+
+    <header class="zone-heading">
+        <div>
+            <!-- 센서 데이터 연결상태 보여주는 div -->
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <span class="zone-icon"><i class="ti ti-map-pin"></i></span>
+                <span class="badge bg-green-lt" th:if="${latestSensors != null and !latestSensors.isEmpty()}">
+                    <span class="status-dot status-dot-animated bg-green me-1"></span>연결됨
+                </span>
+                <span class="badge bg-secondary-lt" th:if="${latestSensors == null or latestSensors.isEmpty()}">
+                    <span class="status-dot status-dot-animated bg-secondary me-1"></span>미연결</span>
+            </div>
+
+            <h2 class="page-title" th:text="|Zone ${zoneId} 환경 정보|">Zone 환경 정보</h2>
+        </div>
+
+        <!-- 새로고침 버튼 -->
+        <button type="button" class="btn btn-outline-secondary" id="refresh-button">
+            <i class="ti ti-refresh me-1">새로고침</i>
+        </button>
+
+    </header>
+
+    <!-- 센서별 가장 최근 데이터를 보여주는 Dashboard -->
+    <section class="sensor-summary" aria-labelledby="latest-sensor-title">
+
+        <div class="section-heading">
+            <div>
+                <h3 id="latest-sensor-title">센서 최신 데이터</h3>
+                <p>각 센서별 최신 측정값입니다.</p>
+            </div>
+            <span class="sensor-count" th:text="|${latestSensors == null ? 0 : latestSensors.size()}개 센서|">0개 센서</span>
+        </div>
+
+        <div class="row row-cards" th:if="${latestSensors != null and !latestSensors.isEmpty()}">
+            <div class="col-12 col-sm-6 col-xl-3" th:each="sensor : ${latestSensors}">
+                <article class="card sensor-card h-100" th:attr="data-sensor-type=${sensor.sensorType}">
+                    <div class="card-body">
+                        <div class="d-flex align-items-start justify-content-between">
+                            <div class="sensor-card-icon">
+                                <i class="ti ti-temperature sensor-icon-temperature"></i>
+                                <i class="ti ti-droplet sensor-icon-humidity"></i>
+                                <i class="ti ti-sun sensor-icon-light"></i>
+                                <i class="ti ti-activity sensor-icon-default"></i>
+                            </div>
+                        </div>
+                        <div class="sensor-name" th:text="${sensor.sensorType}">센서 타입</div>
+                        <div class="sensor-value">
+                            <strong th:text="${sensor.value == null ? '-' : #numbers.formatDecimal(sensor.value, 1, 1)}">-</strong>
+                            <span th:text="${sensor.unit}">단위</span>
+                        </div>
+                        <div class="sensor-updated">
+                            <i class="ti ti-clock"></i>
+                            <time th:text="${sensor.measuredAt}" th:datetime="${sensor.measuredAt}">측정 시간</time>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </div>
+
+        <!-- 최근 센서데이터 하나도 없는경우 Dashboard -->
+        <div class="empty-state card" th:if="${latestSensors == null or latestSensors.isEmpty()}">
+            <div class="empty-state-icon"><i class="ti ti-device-desktop-off"></i></div>
+            <h4>수집된 센서 데이터가 없습니다</h4>
+            <p>센서 연결 상태를 확인한 뒤 다시 시도해 주세요.</p>
+        </div>
+    </section>
+
+    <!-- 하루간 센서종류별 그래프 Dashboard -->
+    <section class="card chart-card" aria-labelledby="sensor-chart-title">
+        <div class="card-header chart-header">
+            <div>
+                <div class="chart-title-row">
+                    <h3 class="card-title" id="sensor-chart-title">센서 데이터 그래프</h3>
+                    <span class="badge bg-blue-lt">최근 24시간</span>
+                </div>
+                <p class="text-secondary mb-0">센서를 선택해 시간대별 측정값을 확인할 수 있습니다.</p>
+            </div>
+
+            <!-- 그래프에 표시할 센서 종류 선택 -->
+            <div class="chart-filter">
+                <label for="sensor-select">센서 종류</label>
+                <select class="form-select" id="sensor-select" aria-label="그래프에 표시할 센서 선택">
+                    <option value="">센서를 선택하세요</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="card-body chart-body">
+            <div class="chart-metric" id="chart-metric" hidden>
+                <span class="chart-metric-label">최근 측정값</span>
+                <strong id="chart-latest-value">-</strong>
+                <span class="chart-metric-change" id="chart-change"></span>
+            </div>
+            <div class="chart-wrap" id="chart-wrap">
+                <canvas id="sensor-chart" role="img" aria-label="선택한 센서의 최근 24시간 측정값 그래프"></canvas>
+                <div class="chart-empty" id="chart-empty">
+                    <i class="ti ti-chart-line"></i>
+                    <p>표시할 센서 이력이 없습니다.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 그래프에 사용할 센서 이력 데이터를 JavaScript에 전달 -->
+    <div id="sensor-history-data" hidden aria-hidden="true">
+        <span th:each="history : ${sensorHistory}"
+              th:attr="data-sensor-type=${history.sensorType},
+                       data-unit=${history.unit},
+                       data-time=${history.time},
+                       data-value=${history.value}">
+        </span>
+    </div>
+
+    <!-- 그래프 라이브러리와 페이지 동작에 필요한 JavaScript 로드 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+    <script th:src="@{/js/sensor-info.js}"></script>
+</main>
+</body>
+</html>

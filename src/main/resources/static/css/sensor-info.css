@@ -1,0 +1,363 @@
+:root {
+    /* Tabler 기본 UI 색상 */
+    --tblr-primary: #0ca678;
+    --tblr-primary-rgb: 12, 166, 120;
+    --tblr-secondary-color: #667382;
+    --tblr-border-color: #e6e7e9;
+    --tblr-success: #2fb344;
+    --tblr-success-lt: #eaf7ec;
+    --tblr-body-color: #182433;
+    --tblr-bg-surface-secondary: #f6f8fb;
+
+    /* 센서별 메인 색상 */
+    --sensor-temperature: #e8590c;
+    --sensor-humidity: #206bc4;
+    --sensor-light: #f59f00;
+    --sensor-default: #0ca678;
+}
+
+[data-bs-theme="dark"] {
+    --tblr-secondary-color: #aeb7c2;
+    --tblr-border-color: #2f3b4a;
+    --tblr-body-color: #f6f8fb;
+    --tblr-bg-surface-secondary: #1f2937;
+}
+
+.zone-detail {
+    padding: 1.5rem 0 2rem;
+}
+
+.zone-heading {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.zone-icon {
+    display: inline-grid;
+    width: 2.25rem;
+    height: 2.25rem;
+    place-items: center;
+    border-radius: .65rem;
+    color: var(--tblr-primary);
+    background: rgba(var(--tblr-primary-rgb), .12);
+    font-size: 1.25rem;
+}
+
+.zone-heading .page-title {
+    margin-bottom: .4rem;
+    font-size: 1.75rem;
+    font-weight: 700;
+    letter-spacing: -.035em;
+}
+
+.section-heading {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.section-heading h3 {
+    margin: 0 0 .25rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.section-heading p {
+    margin: 0;
+    color: var(--tblr-secondary-color);
+    font-size: .875rem;
+}
+
+.sensor-count {
+    color: var(--tblr-secondary-color);
+    font-size: .8125rem;
+}
+
+.sensor-summary {
+    margin-bottom: 1.75rem;
+}
+
+/* 센서 카드 */
+.sensor-card {
+    overflow: hidden;
+    border: 1px solid var(--tblr-border-color);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, .035);
+    transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+
+/* 센서 카드 왼쪽 강조선 */
+.sensor-card::before {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 3px;
+    background: var(--sensor-accent, var(--sensor-default));
+    content: "";
+}
+
+/* 카드 hover */
+.sensor-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(var(--tblr-primary-rgb), .35);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, .07);
+}
+
+/* 센서 아이콘 */
+.sensor-card-icon {
+    display: grid;
+    width: 2.75rem;
+    height: 2.75rem;
+    place-items: center;
+    border-radius: .75rem;
+    color: var(--sensor-accent, var(--sensor-default));
+    background: color-mix(
+            in srgb,
+            var(--sensor-accent, var(--sensor-default)) 12%,
+            transparent
+    );
+    font-size: 1.45rem;
+}
+
+.sensor-card-icon i {
+    display: none;
+}
+
+.sensor-card .sensor-icon-default {
+    display: block;
+}
+
+/* 온도, 습도, 조도인 경우 기본 아이콘 비활성화 */
+.sensor-card[data-sensor-category="temperature"] .sensor-icon-default,
+.sensor-card[data-sensor-category="humidity"] .sensor-icon-default,
+.sensor-card[data-sensor-category="light"] .sensor-icon-default {
+    display: none;
+}
+
+/* 센서 종류에 따른 아이콘 표시 */
+.sensor-card[data-sensor-category="temperature"] .sensor-icon-temperature,
+.sensor-card[data-sensor-category="humidity"] .sensor-icon-humidity,
+.sensor-card[data-sensor-category="light"] .sensor-icon-light {
+    display: block;
+}
+
+/* 센서 종류에 따른 강조 색상 */
+.sensor-card[data-sensor-category="temperature"] {
+    --sensor-accent: var(--sensor-temperature);
+}
+
+.sensor-card[data-sensor-category="humidity"] {
+    --sensor-accent: var(--sensor-humidity);
+}
+
+.sensor-card[data-sensor-category="light"] {
+    --sensor-accent: var(--sensor-light);
+}
+
+/* 센서 상태 */
+.sensor-state {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    padding: .2rem .5rem;
+    border-radius: 99px;
+    color: var(--tblr-success);
+    background: var(--tblr-success-lt);
+    font-size: .72rem;
+    font-weight: 600;
+}
+
+.sensor-state span {
+    width: .4rem;
+    height: .4rem;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+/* 센서 이름 */
+.sensor-name {
+    margin-top: 1.25rem;
+    color: var(--tblr-secondary-color);
+    font-size: .78rem;
+    font-weight: 700;
+    letter-spacing: .045em;
+    text-transform: uppercase;
+}
+
+/* 센서 값 */
+.sensor-value {
+    display: flex;
+    align-items: baseline;
+    gap: .35rem;
+    margin: .3rem 0 1rem;
+}
+
+.sensor-value strong {
+    color: var(--tblr-body-color);
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: -.04em;
+}
+
+.sensor-value span {
+    color: var(--tblr-secondary-color);
+    font-size: .95rem;
+}
+
+/* 측정 시간 */
+.sensor-updated {
+    display: flex;
+    align-items: center;
+    gap: .35rem;
+    color: var(--tblr-secondary-color);
+    font-size: .75rem;
+}
+
+/* 데이터 없음 */
+.empty-state {
+    align-items: center;
+    padding: 2.5rem;
+    text-align: center;
+}
+
+.empty-state-icon {
+    display: grid;
+    width: 3.25rem;
+    height: 3.25rem;
+    margin-bottom: .75rem;
+    place-items: center;
+    border-radius: 50%;
+    color: var(--tblr-secondary-color);
+    background: var(--tblr-bg-surface-secondary);
+    font-size: 1.5rem;
+}
+
+.empty-state h4 {
+    margin-bottom: .3rem;
+    font-size: 1rem;
+}
+
+.empty-state p {
+    margin: 0;
+    color: var(--tblr-secondary-color);
+    font-size: .875rem;
+}
+
+/* 그래프 카드 */
+.chart-card {
+    overflow: hidden;
+    border-color: var(--tblr-border-color);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, .035);
+}
+
+.chart-header {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 1rem;
+    min-height: auto;
+    padding: 1.25rem 1.5rem;
+}
+
+.chart-title-row {
+    display: flex;
+    align-items: center;
+    gap: .65rem;
+    margin-bottom: .3rem;
+}
+
+.chart-filter {
+    width: 13rem;
+}
+
+.chart-filter label {
+    display: block;
+    margin-bottom: .35rem;
+    color: var(--tblr-secondary-color);
+    font-size: .75rem;
+    font-weight: 600;
+}
+
+.chart-body {
+    position: relative;
+    padding: 1.5rem;
+}
+
+.chart-metric {
+    display: flex;
+    align-items: baseline;
+    gap: .5rem;
+    margin-bottom: 1rem;
+}
+
+.chart-metric-label {
+    color: var(--tblr-secondary-color);
+    font-size: .8rem;
+}
+
+.chart-metric strong {
+    font-size: 1.35rem;
+}
+
+.chart-metric-change {
+    font-size: .75rem;
+    font-weight: 600;
+}
+
+.chart-wrap {
+    position: relative;
+    height: 21rem;
+}
+
+.chart-wrap canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+/* 그래프 데이터 없음 */
+.chart-empty {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--tblr-secondary-color);
+    background: repeating-linear-gradient(
+            -45deg,
+            transparent,
+            transparent 8px,
+            rgba(98, 105, 118, .025) 8px,
+            rgba(98, 105, 118, .025) 16px
+    );
+}
+
+.chart-empty i {
+    margin-bottom: .4rem;
+    font-size: 2rem;
+}
+
+.chart-empty p {
+    margin: 0;
+    font-size: .875rem;
+}
+
+/* 반응형 */
+@media (max-width: 767.98px) {
+    .zone-heading,
+    .chart-header {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .zone-heading .btn,
+    .chart-filter {
+        width: 100%;
+    }
+
+    .chart-wrap {
+        height: 17rem;
+    }
+}
