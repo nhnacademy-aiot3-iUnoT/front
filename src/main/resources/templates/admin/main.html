@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/auth-layout}">
+
+<head>
+    <title>iUnoT 관리자 페이지</title>
+    <link rel="stylesheet" th:href="@{/css/auth.css}">
+</head>
+
+<body>
+
+<div layout:fragment="content">
+
+    <div class="page">
+        <div class="container-xl">
+            <div class="page-header m-4">
+                <div>
+                    <h2 class="page-title admin-page-title">
+                        iUnoT 관리자 페이지
+                    </h2>
+                </div>
+            </div>
+
+            <div class="row row-cards justify-content-center">
+                <div class="col-md-4">
+                    <a href="/admin/users" class="card card-link card-link-pop admin-card">
+                        <div class="card-body text-center py-5">
+                            <span class="avatar avatar-xl bg-blue-lt mb-4">
+                                <i class="ti ti-users fs-1"></i>
+                            </span>
+
+                            <h3 class="card-title">
+                                회원 관리
+                            </h3>
+
+                            <p class="text-muted">
+                                서비스 가입 회원 조회 및 관리
+                            </p>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="col-md-4">
+                    <a href="/admin/organizations" class="card card-link card-link-pop admin-card">
+                        <div class="card-body text-center py-5">
+                            <span class="avatar avatar-xl bg-green-lt mb-4">
+                                <i class="ti ti-building-community fs-1"></i>
+                            </span>
+
+                            <h3 class="card-title">
+                                조직 관리
+                            </h3>
+
+                            <p class="text-muted">
+                                등록 조직 조회 및 상태 관리
+                            </p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

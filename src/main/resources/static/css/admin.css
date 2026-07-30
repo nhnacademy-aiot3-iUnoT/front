@@ -1,0 +1,19 @@
+.admin-page-title {
+    margin-top: 2rem;
+    margin-bottom: 3rem;
+}
+
+
+.admin-card {
+    transition: all 0.2s ease-in-out;
+}
+
+
+.admin-card:hover {
+    transform: translateY(-5px);
+}
+
+
+.admin-card .avatar {
+    margin-bottom: 1rem;
+}
