@@ -6,3 +6,6 @@ management:
   tracing:
     export:
       enabled: false
+
+gateway:
+  url: http://localhost:10400
