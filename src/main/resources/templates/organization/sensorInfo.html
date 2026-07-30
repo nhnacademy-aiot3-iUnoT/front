@@ -65,8 +65,23 @@
                         </div>
                         <div class="sensor-name" th:text="${sensor.sensorType}">센서 타입</div>
                         <div class="sensor-value">
-                            <strong th:text="${sensor.value == null ? '-' : #numbers.formatDecimal(sensor.value, 1, 1)}">-</strong>
-                            <span th:text="${sensor.unit}">단위</span>
+                            <div class="sensor-value">
+                                <!-- 문 센서 -->
+                                <span th:if="${sensor.sensorType == 'door'}"
+                                      th:class="${sensor.value == 1.0 ? 'text-red' : 'text-blue'}"
+                                      th:text="${sensor.value == 1.0 ? '문 열림' : '문 닫힘'}">
+                                </span>
+
+                                <!-- 일반 센서 -->
+                                <strong th:unless="${sensor.sensorType == 'door'}"
+                                        th:text="${sensor.value == null ? '-' : #numbers.formatDecimal(sensor.value, 1, 1)}">
+                                </strong>
+
+                                <!-- 센서 단위 -->
+                                <span th:if="${sensor.unit != null and !sensor.unit.isEmpty()}"
+                                      th:text="${sensor.unit}">
+                                </span>
+                            </div>
                         </div>
                         <div class="sensor-updated">
                             <i class="ti ti-clock"></i>
