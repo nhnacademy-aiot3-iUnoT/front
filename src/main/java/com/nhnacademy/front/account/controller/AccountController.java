@@ -54,7 +54,7 @@ public class AccountController {
                 .secure(false)
                 .sameSite("Lax")
                 .path("/")
-                .maxAge(Duration.ofHours(1))
+                .maxAge(Duration.ofMinutes(30))
                 .build();
 
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
