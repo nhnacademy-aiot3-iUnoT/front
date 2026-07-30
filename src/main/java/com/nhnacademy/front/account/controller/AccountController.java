@@ -29,7 +29,7 @@ public class AccountController {
 
     @GetMapping("/login")
     public String login(Model model) {
-        model.addAttribute("loginRequest", new LoginRequest("", ""));
+        model.addAttribute(new LoginRequest());
         return "auth/login";
     }
 
@@ -44,10 +44,8 @@ public class AccountController {
         }
 
         log.info("Login Email: {}", request.email());
-        log.info("Login Password: {}", request.password().hashCode());
-        LoginResponse loginResponse = new  LoginResponse("token");
 
-        // LoginResponse loginResponse = accountApiClient.login(request);
+        LoginResponse loginResponse = accountApiClient.login(request);
 
         ResponseCookie cookie = ResponseCookie.from("access_token", loginResponse.accessToken())
                 .httpOnly(true)
@@ -87,9 +85,8 @@ public class AccountController {
         log.info("Signup Token: {}", request.inviteToken());
         log.info("Signup Email: {}", request.email());
         log.info("Signup Name: {}", request.name());
-        log.info("Signup Password: {}", request.password().hashCode());
 
-        // SignupResponse response = accountApiClient.signup(request);
+        SignupResponse response = accountApiClient.signup(request);
 
         return "redirect:/";
 
@@ -102,10 +99,7 @@ public class AccountController {
     ) {
         log.info("Check Email: {}", request.email());
 
-        CheckEmailResponse response = request.email().contains("test") ? new CheckEmailResponse(true) : new CheckEmailResponse(false);
-        // CheckEmailResponse response = accountApiClient.checkEmail(request);
-
-        return response;
+        return accountApiClient.checkEmail(request);
     }
 
     @GetMapping("/forgot-password")

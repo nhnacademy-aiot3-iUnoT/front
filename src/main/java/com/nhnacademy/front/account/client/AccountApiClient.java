@@ -15,14 +15,15 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class AccountApiClient {
     private final GatewayClient backendApiClient;
-    private static final String ACCOUNT_SERVICE = "/api/account"; // 담당자가 수정
+    private static final String ACCOUNT_SERVICE = "/api/accounts";
+    private static final String AUTH_SERVICE = "/api/auth";
 
     public LoginResponse login(@Valid LoginRequest request) {
-        return backendApiClient.post(ACCOUNT_SERVICE + "/login", request, LoginResponse.class);
+        return backendApiClient.post(AUTH_SERVICE + "/login", request, LoginResponse.class);
     }
 
     public SignupResponse signup(@Valid SignupRequest request) {
-        return backendApiClient.post(ACCOUNT_SERVICE + "/signup", request, SignupResponse.class);
+        return backendApiClient.post(ACCOUNT_SERVICE, request, SignupResponse.class);
     }
 
     public CheckEmailResponse checkEmail(@Valid CheckEmailRequest request) {
