@@ -2,6 +2,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const SENSOR_LABELS = {
         temperature: "온도",
         humidity: "습도",
+        door: "문 상태",
         illumination: "조도"
     };
 
@@ -19,6 +20,10 @@ document.addEventListener("DOMContentLoaded", () => {
         if (["light", "illumination", "illuminance"].some((key) => normalized.includes(key))) return "light";
         return "default";
     };
+
+    const isDoorSensor = (type) => normalizeType(type) === "door";
+
+    const normalizeDoorValue = (value) => Number(value) >= 0.5 ? 1 : 0;
 
     const formatDateTime = (value) => {
         if (!value) return "측정 시간 없음";
@@ -41,6 +46,8 @@ document.addEventListener("DOMContentLoaded", () => {
             maximumFractionDigits
         });
     };
+
+    const displayUnit = (unit) => (unit || "").trim();
 
     document.querySelectorAll(".sensor-card").forEach((card) => {
         const type = card.dataset.sensorType || "센서";
@@ -79,10 +86,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const change = document.getElementById("chart-change");
     let chart;
 
+    // 그래프 선택 목록에는 문 센서를 포함하지 않는다 (문 센서는 열림 기록 섹션에서 별도 표시)
     groupedHistory.forEach((items, type) => {
+        if (isDoorSensor(type)) return;
+
         const option = document.createElement("option");
+        const unit = displayUnit(items[0]?.unit);
         option.value = type;
-        option.textContent = `${sensorLabel(type)}${items[0]?.unit ? ` (${items[0].unit})` : ""}`;
+        option.textContent = `${sensorLabel(type)}${unit ? ` (${unit})` : ""}`;
         select.append(option);
     });
 
@@ -102,13 +113,16 @@ document.addEventListener("DOMContentLoaded", () => {
         canvas.style.display = "block";
         metric.hidden = false;
 
-        const unit = items[items.length - 1].unit;
+        const unit = displayUnit(items[items.length - 1].unit);
         const current = items[items.length - 1].value;
         const previous = items.length > 1 ? items[items.length - 2].value : current;
         const difference = current - previous;
 
         latestValue.textContent = `${formatSensorValue(current)}${unit ? ` ${unit}` : ""}`;
-        change.textContent = Math.abs(difference) < 0.05 ? "변화 없음" : `${difference > 0 ? "+" : ""}${formatSensorValue(difference)} ${unit}`;
+
+        change.textContent = Math.abs(difference) < 0.05
+            ? "변화 없음"
+            : `${difference > 0 ? "+" : ""}${formatSensorValue(difference)} ${unit}`;
         change.className = `chart-metric-change ${difference > 0 ? "text-red" : difference < 0 ? "text-blue" : "text-secondary"}`;
 
         const styles = getComputedStyle(document.documentElement);
@@ -184,12 +198,113 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     };
 
+    // 문 센서 이력에서 "닫힘 -> 열림 -> 닫힘" 구간만 추출하여 열림 이벤트 목록을 만든다.
+    const buildDoorOpenEvents = (items) => {
+        const events = [];
+        let prevState = null;
+        let openStart = null;
+
+        items.forEach((item) => {
+            const state = normalizeDoorValue(item.value);
+
+            if (state === 1 && prevState !== 1) {
+                openStart = item.time; // 열림 시작
+            }
+            if (state === 0 && prevState === 1 && openStart) {
+                events.push({ start: openStart, end: item.time });
+                openStart = null;
+            }
+
+            prevState = state;
+        });
+
+        // 마지막까지 열려있는 상태로 끝난 경우
+        if (openStart) {
+            events.push({ start: openStart, end: null });
+        }
+
+        return events.reverse(); // 최신순
+    };
+
+    // 문 센서 데이터가 있는 경우에만 문 열림 기록 섹션을 표시한다.
+    const DOOR_HISTORY_PAGE_SIZE = 10;
+    let doorHistoryEvents = [];
+    let doorHistoryPage = 1;
+
+    const doorHistoryListEl = document.getElementById("door-history-list");
+    const doorHistoryPaginationEl = document.getElementById("door-history-pagination");
+    const doorHistoryPageInfoEl = document.getElementById("door-history-page-info");
+    const doorHistoryPrevBtn = document.getElementById("door-history-prev");
+    const doorHistoryNextBtn = document.getElementById("door-history-next");
+
+    const renderDoorHistoryPage = () => {
+        const totalPages = Math.max(1, Math.ceil(doorHistoryEvents.length / DOOR_HISTORY_PAGE_SIZE));
+        doorHistoryPage = Math.min(Math.max(1, doorHistoryPage), totalPages);
+
+        const start = (doorHistoryPage - 1) * DOOR_HISTORY_PAGE_SIZE;
+        const pageEvents = doorHistoryEvents.slice(start, start + DOOR_HISTORY_PAGE_SIZE);
+
+        if (!doorHistoryEvents.length) {
+            doorHistoryListEl.innerHTML = `<p class="text-secondary mb-0">최근 24시간 동안 문 열림 기록이 없습니다.</p>`;
+            doorHistoryPaginationEl.hidden = true;
+            return;
+        }
+
+        doorHistoryListEl.innerHTML = pageEvents.map((event) => `
+            <div class="door-history-item">
+                <i class="ti ti-door"></i>
+                <span>${formatDateTime(event.start)}</span>
+                ${event.end
+            ? `<span class="text-secondary"> ~ ${formatDateTime(event.end)}</span>`
+            : `<span class="badge bg-red-lt ms-1">열림 중</span>`}
+            </div>
+        `).join("");
+
+        doorHistoryPaginationEl.hidden = totalPages <= 1;
+        doorHistoryPageInfoEl.textContent = `${doorHistoryPage} / ${totalPages}`;
+        doorHistoryPrevBtn.disabled = doorHistoryPage <= 1;
+        doorHistoryNextBtn.disabled = doorHistoryPage >= totalPages;
+    };
+
+    doorHistoryPrevBtn?.addEventListener("click", () => {
+        doorHistoryPage -= 1;
+        renderDoorHistoryPage();
+    });
+
+    doorHistoryNextBtn?.addEventListener("click", () => {
+        doorHistoryPage += 1;
+        renderDoorHistoryPage();
+    });
+
+    const renderDoorHistory = () => {
+        const doorType = [...groupedHistory.keys()].find((type) => isDoorSensor(type));
+        const section = document.getElementById("door-history-section");
+
+        if (!doorType) {
+            section.hidden = true;
+            return;
+        }
+
+        doorHistoryEvents = buildDoorOpenEvents(groupedHistory.get(doorType));
+        doorHistoryPage = 1;
+
+        const countBadge = document.getElementById("door-history-count");
+        section.hidden = false;
+        countBadge.textContent = `${doorHistoryEvents.length}건`;
+
+        renderDoorHistoryPage();
+    };
+
     select.addEventListener("change", (event) => renderChart(event.target.value));
 
-    if (groupedHistory.size) {
-        select.value = groupedHistory.keys().next().value;
-        renderChart(select.value);
+    const firstNonDoorType = [...groupedHistory.keys()].find((type) => !isDoorSensor(type));
+
+    if (firstNonDoorType) {
+        select.value = firstNonDoorType;
+        renderChart(firstNonDoorType);
     } else {
         renderChart("");
     }
+
+    renderDoorHistory();
 });
