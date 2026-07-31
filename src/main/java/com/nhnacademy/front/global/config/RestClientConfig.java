@@ -24,13 +24,21 @@ public class RestClientConfig {
 
     @Bean
     @Profile("prod")
-    public RestClient restClient(@LoadBalanced RestClient.Builder builder) {
-        return builder.build();
+    public RestClient restClient(
+            @LoadBalanced RestClient.Builder builder,
+            AccessTokenInterceptor accessTokenInterceptor) {
+        return builder
+                .requestInterceptor(accessTokenInterceptor)
+                .build();
     }
 
     @Bean
     @Profile("!prod")
-    public RestClient devRestClient(RestClient.Builder builder) {
-        return builder.build();
+    public RestClient devRestClient(
+            RestClient.Builder builder,
+            AccessTokenInterceptor accessTokenInterceptor) {
+        return builder
+                .requestInterceptor(accessTokenInterceptor)
+                .build();
     }
 }
