@@ -1,0 +1,23 @@
+package com.nhnacademy.front.global.error;
+
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.servlet.ModelAndView;
+
+@ControllerAdvice
+public class GlobalExceptionHandler {
+
+    private static final String VIEW = "error/error";
+    private static final String ATTRIBUTE_NAME = "errorMessage";
+
+    @ExceptionHandler(ApiException.class)
+    public ModelAndView handle(ApiException e) {
+
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName(VIEW);
+
+        mav.addObject(ATTRIBUTE_NAME, e.getMessage());
+
+        return mav;
+    }
+}

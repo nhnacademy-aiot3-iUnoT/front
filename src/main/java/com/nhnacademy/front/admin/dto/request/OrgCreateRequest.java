@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 public record OrgCreateRequest(
         @NotBlank(message = "사업자 번호는 필수 입력입니다.")
         @Pattern(
-                regexp = "\\d{10}",
+                regexp = "^$|\\d{10}",
                 message = "사업자 번호는 숫자 10자리입니다."
         )
         String businessNumber,
@@ -23,4 +23,7 @@ public record OrgCreateRequest(
         @Size(max = 50, message = "조직명은 50자 이내로 입력해야 합니다.")
         String name
 ){
+    public static OrgCreateRequest empty() {
+        return new OrgCreateRequest("", "", "");
+    }
 }

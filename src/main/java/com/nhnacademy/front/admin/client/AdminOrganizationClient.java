@@ -3,18 +3,22 @@ package com.nhnacademy.front.admin.client;
 import com.nhnacademy.front.admin.dto.request.OrgCreateRequest;
 import com.nhnacademy.front.admin.dto.request.OrgSearchRequest;
 import com.nhnacademy.front.admin.dto.response.OrgCreateResponse;
+import com.nhnacademy.front.admin.dto.response.OrgDetailResponse;
 import com.nhnacademy.front.admin.dto.response.OrgSearchResponse;
 import com.nhnacademy.front.global.client.GatewayClient;
+import com.nhnacademy.front.global.dto.ApiResponse;
 import com.nhnacademy.front.global.dto.PageResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class AdminOrganizationClient {
-    private final GatewayClient backendApiClient;
+    private final GatewayClient gatewayClient;
     private static final String CORE_SERVICE = "/api/core";
 
     /**
@@ -32,20 +36,37 @@ public class AdminOrganizationClient {
         }
 
         if (request.name() != null && !request.name().isBlank()) {
-            builder.queryParam("name", request.status());
+            builder.queryParam("name", request.name());
         }
 
         String uri = builder.toUriString();
 
-        return backendApiClient.get(uri, new ParameterizedTypeReference<>(){});
+        return gatewayClient.get(uri, new ParameterizedTypeReference<>(){});
     }
 
     /**
      * 조직 생성
      */
     public OrgCreateResponse createOrg(OrgCreateRequest request) {
-        return backendApiClient.post(
+        return gatewayClient.post(
                 CORE_SERVICE + "/admin/organizations", request, OrgCreateResponse.class
         );
+    }
+
+    /**
+     * 조직 상세 조회
+     */
+    public OrgDetailResponse getOrgDetail(Long id) {
+        return gatewayClient.get(
+                CORE_SERVICE + "/admin/organizations/" + id,
+                OrgDetailResponse.class
+        );
+    }
+
+    /**
+     * 조직 삭제
+     */
+    public void deleteOrg(Long id) {
+        gatewayClient.delete(CORE_SERVICE + "/admin/organizations/" + id);
     }
 }
