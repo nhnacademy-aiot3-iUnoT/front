@@ -1,22 +1,20 @@
 package com.nhnacademy.front.account.controller;
 
 import com.nhnacademy.front.account.client.AccountApiClient;
-import com.nhnacademy.front.account.dto.request.CheckEmailRequest;
-import com.nhnacademy.front.account.dto.request.SignupRequest;
-import com.nhnacademy.front.account.dto.request.LoginRequest;
-import com.nhnacademy.front.account.dto.response.CheckEmailResponse;
-import com.nhnacademy.front.account.dto.response.LoginResponse;
-import com.nhnacademy.front.account.dto.response.SignupResponse;
+import com.nhnacademy.front.account.dto.request.*;
+import com.nhnacademy.front.account.dto.response.*;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.core.HttpHeaders;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseCookie;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.Duration;
 
@@ -88,7 +86,7 @@ public class AccountController {
 
         SignupResponse response = accountApiClient.signup(request);
 
-        return "redirect:/";
+        return "redirect:/login";
 
     }
 
@@ -108,8 +106,25 @@ public class AccountController {
     }
 
     @GetMapping("/mypage")
-    public String info() {
+    public String info(
+            Model model
+    ) {
+
+        AccountInfoResponse response = accountApiClient.getAccountInfo();
+        model.addAttribute("accountInfoResponse", response);
+
         return "account/account_info";
+    }
+
+    @PutMapping("/mypage")
+    public String changeName(
+            @Valid @ModelAttribute UpdateAccountNameRequest request,
+            RedirectAttributes redirectAttributes
+    ) {
+
+        accountApiClient.changeName(request);
+        redirectAttributes.addFlashAttribute("successMessage", "회원정보가 수정되었습니다.");
+        return "redirect:/mypage";
     }
 
     @GetMapping("/mypage/change-password")
@@ -117,8 +132,24 @@ public class AccountController {
         return "account/change_password";
     }
 
+    @PutMapping("/mypage/change-password")
+    public String changePassword(
+            @Valid @ModelAttribute UpdateAccountPasswordRequest request
+    ) {
+
+        accountApiClient.changePassword(request);
+        return "redirect:/mypage";
+    }
+
     @GetMapping("/withdraw")
     public String withdraw() {
         return "account/withdraw";
+    }
+
+    @DeleteMapping("withdraw")
+    public WithdrawAccountResponse deleteAccount(
+            @Valid @ModelAttribute WithdrawAccountRequest request
+    ) {
+        return accountApiClient.withdraw(request);
     }
 }

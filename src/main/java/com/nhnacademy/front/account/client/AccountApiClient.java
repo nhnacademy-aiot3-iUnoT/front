@@ -1,11 +1,7 @@
 package com.nhnacademy.front.account.client;
 
-import com.nhnacademy.front.account.dto.request.CheckEmailRequest;
-import com.nhnacademy.front.account.dto.request.LoginRequest;
-import com.nhnacademy.front.account.dto.request.SignupRequest;
-import com.nhnacademy.front.account.dto.response.CheckEmailResponse;
-import com.nhnacademy.front.account.dto.response.LoginResponse;
-import com.nhnacademy.front.account.dto.response.SignupResponse;
+import com.nhnacademy.front.account.dto.request.*;
+import com.nhnacademy.front.account.dto.response.*;
 import com.nhnacademy.front.global.client.GatewayClient;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +24,22 @@ public class AccountApiClient {
 
     public CheckEmailResponse checkEmail(@Valid CheckEmailRequest request) {
         return backendApiClient.post(ACCOUNT_SERVICE + "/check-email", request, CheckEmailResponse.class);
+    }
+
+    public AccountInfoResponse getAccountInfo() {
+        return backendApiClient.get(ACCOUNT_SERVICE + "/me", AccountInfoResponse.class);
+    }
+
+    public WithdrawAccountResponse withdraw(@Valid WithdrawAccountRequest request) {
+        return backendApiClient.delete(ACCOUNT_SERVICE + "/me", null);
+    }
+
+    public UpdateAccountResponse changeName(@Valid UpdateAccountNameRequest request) {
+        return backendApiClient.put(ACCOUNT_SERVICE + "/me", request, UpdateAccountResponse.class);
+    }
+
+    public UpdateAccountResponse changePassword(@Valid UpdateAccountPasswordRequest request) {
+        return backendApiClient.put(ACCOUNT_SERVICE + "/me/pwd", request, UpdateAccountResponse.class);
     }
 }
 

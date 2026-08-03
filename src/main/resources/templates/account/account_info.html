@@ -22,21 +22,23 @@
                     </div>
                 </div>
 
-                <form th:action="@{/}" method="post">
+                <form th:action="@{/mypage}" th:method="put">
                     <div class="list-group list-group-flush">
                         <div class="list-group-item">
                             <div class="text-secondary">이메일</div>
-                            <div class="fw-semibold">user@example.com</div>
+                            <div class="fw-semibold" th:text="${accountInfoResponse.email}"></div>
                         </div>
 
                         <div class="list-group-item">
                             <label class="text-secondary mb-2">이름</label>
-                            <input type="text" class="form-control" name="name" value="홍길동">
+                            <input type="text" class="form-control" name="name"
+                                   th:value="${accountInfoResponse.name}">
                         </div>
 
                         <div class="list-group-item">
                             <div class="text-secondary">가입일</div>
-                            <div class="fw-semibold">2026-07-27</div>
+                            <div class="fw-semibold"
+                                 th:text="${#temporals.format(accountInfoResponse.createdAt, 'yyyy-MM-dd')}"></div>
                         </div>
                     </div>
 
@@ -49,6 +51,15 @@
             </div>
         </div>
     </div>
+    <div id="success-message" th:if="${successMessage}"
+         th:data-message="${successMessage}" hidden></div>
+    <script>
+        const successMessage = document.getElementById("success-message");
+
+        if (successMessage) {
+            alert(successMessage.dataset.message);
+        }
+    </script>
 </div>
 </body>
 </html>
