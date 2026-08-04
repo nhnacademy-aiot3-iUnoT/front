@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.front.global.dto.ApiResponse;
 import com.nhnacademy.front.global.error.ApiException;
 import com.nhnacademy.front.global.error.ErrorCode;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.ResolvableType;
@@ -14,6 +15,7 @@ import org.springframework.web.client.RestClient;
 import java.util.function.Supplier;
 
 // 추후 리팩토링 할 예정 (임시 진행)
+@Slf4j
 @Component
 public class GatewayClient {
     private final String baseUrl;
@@ -118,6 +120,15 @@ public class GatewayClient {
     }
 
     private ApiException convertApiException(HttpStatusCodeException e) {
+        String responseBody = e.getResponseBodyAsString();
+
+        log.error(
+                "Gateway request failed. status={}, body={}",
+                e.getStatusCode(),
+                responseBody
+        );
+
+
         try {
             ApiResponse<Void> response = objectMapper.readValue(
                     e.getResponseBodyAsString(),

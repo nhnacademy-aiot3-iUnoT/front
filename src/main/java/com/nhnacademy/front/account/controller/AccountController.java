@@ -3,11 +3,13 @@ package com.nhnacademy.front.account.controller;
 import com.nhnacademy.front.account.client.AccountApiClient;
 import com.nhnacademy.front.account.dto.request.*;
 import com.nhnacademy.front.account.dto.response.*;
+import com.nhnacademy.front.global.dto.ApiResponse;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.core.HttpHeaders;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -24,6 +26,9 @@ import java.time.Duration;
 public class AccountController {
 
     private final AccountApiClient accountApiClient;
+
+    @Value("${cookie.secure:false}")
+    private boolean secure;
 
     @GetMapping("/login")
     public String login(Model model) {
@@ -47,7 +52,7 @@ public class AccountController {
 
         ResponseCookie cookie = ResponseCookie.from("access_token", loginResponse.accessToken())
                 .httpOnly(true)
-                .secure(false)
+                .secure(secure)
                 .sameSite("Lax")
                 .path("/")
                 .maxAge(Duration.ofMinutes(30))
@@ -56,6 +61,23 @@ public class AccountController {
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
          return "redirect:/";
+    }
+
+    @PostMapping("/logout")
+    public String logout(
+            HttpServletResponse response
+    ) {
+        ResponseCookie cookie = ResponseCookie.from("access_token", "")
+                .httpOnly(true)
+                .secure(secure)
+                .sameSite("Lax")
+                .path("/")
+                .maxAge(Duration.ZERO)
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+
+        return "redirect:/login";
     }
 
 
@@ -92,12 +114,17 @@ public class AccountController {
 
     @PostMapping("/check-email")
     @ResponseBody
-    public CheckEmailResponse checkEmail(
-            @Valid @RequestBody CheckEmailRequest request
+    public ResponseEntity<?> checkEmail(
+            @Valid @RequestBody CheckEmailRequest request,
+            BindingResult bindingResult
     ) {
+        if (bindingResult.hasErrors()) {
+            return validationError(bindingResult);
+        }
+
         log.info("Check Email: {}", request.email());
 
-        return accountApiClient.checkEmail(request);
+        return ResponseEntity.ok(accountApiClient.checkEmail(request));
     }
 
     @GetMapping("/forgot-password")
@@ -119,8 +146,12 @@ public class AccountController {
     @PutMapping("/mypage")
     public String changeName(
             @Valid @ModelAttribute UpdateAccountNameRequest request,
+            BindingResult bindingResult,
             RedirectAttributes redirectAttributes
     ) {
+        if (bindingResult.hasErrors()) {
+            return "redirect:/mypage";
+        }
 
         accountApiClient.changeName(request);
         redirectAttributes.addFlashAttribute("successMessage", "회원정보가 수정되었습니다.");
@@ -128,16 +159,40 @@ public class AccountController {
     }
 
     @GetMapping("/mypage/change-password")
-    public String password() {
+    public String password(Model model) {
+        model.addAttribute("changePasswordForm", new ChangePasswordFormRequest());
         return "account/change_password";
     }
 
     @PutMapping("/mypage/change-password")
     public String changePassword(
-            @Valid @ModelAttribute UpdateAccountPasswordRequest request
+            @Valid @ModelAttribute("changePasswordForm") ChangePasswordFormRequest request,
+            BindingResult bindingResult
     ) {
+        if (hasText(request.currentPassword())
+                && request.currentPassword().equals(request.newPassword())) {
+            bindingResult.rejectValue(
+                    "newPassword",
+                    "sameAsCurrentPassword",
+                    "새 비밀번호는 기존 비밀번호와 달라야 합니다."
+            );
+        }
 
-        accountApiClient.changePassword(request);
+        if (hasText(request.newPassword())
+                && hasText(request.confirmPassword())
+                && !request.newPassword().equals(request.confirmPassword())) {
+            bindingResult.rejectValue(
+                    "confirmPassword",
+                    "passwordMismatch",
+                    "새 비밀번호가 일치하지 않습니다."
+            );
+        }
+
+        if (bindingResult.hasErrors()) {
+            return "account/change_password";
+        }
+
+        accountApiClient.changePassword(new UpdateAccountPasswordRequest(request.newPassword()));
         return "redirect:/mypage";
     }
 
@@ -146,10 +201,43 @@ public class AccountController {
         return "account/withdraw";
     }
 
-    @DeleteMapping("withdraw")
-    public WithdrawAccountResponse deleteAccount(
-            @Valid @ModelAttribute WithdrawAccountRequest request
+    @DeleteMapping("/withdraw")
+    @ResponseBody
+    public String deleteAccount(
+            @Valid @RequestBody WithdrawAccountRequest request,
+            BindingResult bindingResult,
+            HttpServletResponse response
     ) {
-        return accountApiClient.withdraw(request);
+        if (bindingResult.hasErrors()) {
+            return "redirect:/withdraw";
+        }
+
+        accountApiClient.withdraw(request);
+
+        ResponseCookie cookie = ResponseCookie.from("access_token", "")
+                .httpOnly(true)
+                .secure(secure)
+                .sameSite("Lax")
+                .path("/")
+                .maxAge(Duration.ZERO)
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+
+        return "redirect:/login";
+    }
+
+    private ResponseEntity<ApiResponse<Void>> validationError(BindingResult bindingResult) {
+        String message = bindingResult.getFieldErrors().stream()
+                .findFirst()
+                .map(error -> error.getDefaultMessage())
+                .orElse("입력값을 확인해주세요.");
+
+        return ResponseEntity.badRequest()
+                .body(ApiResponse.error("VALIDATION_ERROR", message));
+    }
+
+    private boolean hasText(String value) {
+        return value != null && !value.isBlank();
     }
 }

@@ -21,3 +21,6 @@ management:
 
 gateway:
   url: lb://team1-gateway
+
+cookie:
+  secure: true
