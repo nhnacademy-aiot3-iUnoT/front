@@ -6,23 +6,18 @@ document.addEventListener("DOMContentLoaded", () => {
         illumination: "조도"
     };
 
-    const normalizeType = (type) => (type || "unknown").trim().toLowerCase();
+    const sensorLabel = (type) => SENSOR_LABELS[type] || type.replaceAll("_", " ");
 
-    const sensorLabel = (type) => {
-        const normalized = normalizeType(type);
-        return SENSOR_LABELS[normalized] || type.replaceAll("_", " ");
+    const SENSOR_CATEGORIES = {
+        temperature: "temperature",
+        humidity: "humidity",
+        illumination: "light",
+        door: "door"
     };
 
-    const sensorCategory = (type) => {
-        const normalized = normalizeType(type);
-        if (normalized.includes("temp")) return "temperature";
-        if (normalized.includes("humid")) return "humidity";
-        if (["light", "illumination", "illuminance"].some((key) => normalized.includes(key))) return "light";
-        if (normalized === "door") return "door";
-        return "default";
-    };
+    const sensorCategory = (type) => SENSOR_CATEGORIES[type] || "default";
 
-    const isDoorSensor = (type) => normalizeType(type) === "door";
+    const isDoorSensor = (type) => type === "door";
 
     const normalizeDoorValue = (value) => Number(value) >= 0.5 ? 1 : 0;
 
