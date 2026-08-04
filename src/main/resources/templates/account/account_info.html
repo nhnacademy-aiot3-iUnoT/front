@@ -32,7 +32,9 @@
                         <div class="list-group-item">
                             <label class="text-secondary mb-2">이름</label>
                             <input type="text" class="form-control" name="name"
-                                   th:value="${accountInfoResponse.name}">
+                                   th:value="${accountInfoResponse.name}"
+                                   maxlength="100"
+                                   required>
                         </div>
 
                         <div class="list-group-item">
