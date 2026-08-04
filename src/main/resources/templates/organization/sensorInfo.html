@@ -40,6 +40,14 @@
 
     </header>
 
+    <!-- API 오류 안내 -->
+    <div class="alert alert-danger" role="alert" th:if="${latestSensorsErrorMessage != null}">
+        <div th:text="${latestSensorsErrorMessage}">최신 센서 데이터를 불러오지 못했습니다.</div>
+    </div>
+    <div class="alert alert-danger" role="alert" th:if="${sensorHistoryErrorMessage != null}">
+        <div th:text="${sensorHistoryErrorMessage}">센서 이력 데이터를 불러오지 못했습니다.</div>
+    </div>
+
     <!-- 센서별 가장 최근 데이터를 보여주는 Dashboard -->
     <section class="sensor-summary" aria-labelledby="latest-sensor-title">
 

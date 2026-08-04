@@ -18,6 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (normalized.includes("temp")) return "temperature";
         if (normalized.includes("humid")) return "humidity";
         if (["light", "illumination", "illuminance"].some((key) => normalized.includes(key))) return "light";
+        if (normalized === "door") return "door";
         return "default";
     };
 

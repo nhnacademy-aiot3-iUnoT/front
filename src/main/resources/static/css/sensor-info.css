@@ -4,8 +4,6 @@
     --tblr-primary-rgb: 12, 166, 120;
     --tblr-secondary-color: #667382;
     --tblr-border-color: #e6e7e9;
-    --tblr-success: #2fb344;
-    --tblr-success-lt: #eaf7ec;
     --tblr-body-color: #182433;
     --tblr-bg-surface-secondary: #f6f8fb;
 
@@ -13,6 +11,7 @@
     --sensor-temperature: #e8590c;
     --sensor-humidity: #206bc4;
     --sensor-light: #f59f00;
+    --sensor-door: #d63384;
     --sensor-default: #0ca678;
 }
 
@@ -129,17 +128,19 @@
     display: block;
 }
 
-/* 온도, 습도, 조도인 경우 기본 아이콘 비활성화 */
+/* 온도, 습도, 조도, 문인 경우 기본 아이콘 비활성화 */
 .sensor-card[data-sensor-category="temperature"] .sensor-icon-default,
 .sensor-card[data-sensor-category="humidity"] .sensor-icon-default,
-.sensor-card[data-sensor-category="light"] .sensor-icon-default {
+.sensor-card[data-sensor-category="light"] .sensor-icon-default,
+.sensor-card[data-sensor-category="door"] .sensor-icon-default {
     display: none;
 }
 
 /* 센서 종류에 따른 아이콘 표시 */
 .sensor-card[data-sensor-category="temperature"] .sensor-icon-temperature,
 .sensor-card[data-sensor-category="humidity"] .sensor-icon-humidity,
-.sensor-card[data-sensor-category="light"] .sensor-icon-light {
+.sensor-card[data-sensor-category="light"] .sensor-icon-light,
+.sensor-card[data-sensor-category="door"] .sensor-icon-door {
     display: block;
 }
 
@@ -156,24 +157,8 @@
     --sensor-accent: var(--sensor-light);
 }
 
-/* 센서 상태 */
-.sensor-state {
-    display: inline-flex;
-    align-items: center;
-    gap: .35rem;
-    padding: .2rem .5rem;
-    border-radius: 99px;
-    color: var(--tblr-success);
-    background: var(--tblr-success-lt);
-    font-size: .72rem;
-    font-weight: 600;
-}
-
-.sensor-state span {
-    width: .4rem;
-    height: .4rem;
-    border-radius: 50%;
-    background: currentColor;
+.sensor-card[data-sensor-category="door"] {
+    --sensor-accent: var(--sensor-door);
 }
 
 /* 센서 이름 */

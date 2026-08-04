@@ -1,5 +1,6 @@
 package com.nhnacademy.front.organization.controller;
 
+import com.nhnacademy.front.global.error.ApiException;
 import com.nhnacademy.front.organization.client.RuleEngineApiClient;
 import com.nhnacademy.front.organization.dto.response.SensorHistoryResponse;
 import com.nhnacademy.front.organization.dto.response.SensorLatestResponse;
@@ -29,17 +30,32 @@ public class ZoneController {
             @PathVariable("storageId") Long storageId,
             @PathVariable("zoneId") Long zoneId,
             Model model
-
     ) {
-
-        List<SensorLatestResponse> latestSensors = ruleEngineApiClient.getLatestSensors(zoneId);
-        List<SensorHistoryResponse> sensorHistoryResponseList = ruleEngineApiClient.getSensorHistory(zoneId);
-
-        model.addAttribute("latestSensors", latestSensors);
-        model.addAttribute("sensorHistory", sensorHistoryResponseList);
         model.addAttribute("zoneId", zoneId);
         model.addAttribute("storageId", storageId);
         model.addAttribute("organizationId", organizationId);
+
+        try {
+            List<SensorLatestResponse> latestSensors =
+                    ruleEngineApiClient.getLatestSensors(zoneId);
+
+            model.addAttribute("latestSensors", latestSensors);
+
+        } catch (ApiException e) {
+            model.addAttribute("latestSensors", List.of());
+            model.addAttribute("latestSensorsErrorMessage", e.getMessage());
+        }
+
+        try {
+            List<SensorHistoryResponse> sensorHistory =
+                    ruleEngineApiClient.getSensorHistory(zoneId);
+
+            model.addAttribute("sensorHistory", sensorHistory);
+
+        } catch (ApiException e) {
+            model.addAttribute("sensorHistory", List.of());
+            model.addAttribute("sensorHistoryErrorMessage", e.getMessage());
+        }
 
         return "organization/sensorInfo";
     }
