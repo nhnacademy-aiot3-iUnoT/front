@@ -128,8 +128,9 @@ public class AccountController {
     }
 
     @GetMapping("/forgot-password")
-    public String forgotPassword() {
-        return "auth/forgot-password";
+    public String forgotPassword(Model model) {
+        model.addAttribute("resetPasswordTokenRequest", new ResetPasswordTokenRequest(""));
+        return "auth/forgot_password";
     }
 
     @GetMapping("/mypage")
@@ -224,6 +225,59 @@ public class AccountController {
 
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
+        return "redirect:/login";
+    }
+
+    @PostMapping("/pwd")
+    public String passwordResetToken(
+            @Valid ResetPasswordTokenRequest request,
+            BindingResult bindingResult
+    ) {
+        if (bindingResult.hasErrors()) {
+            return "redirect:/forgot-password";
+        }
+
+        accountApiClient.passwordResetToken(request);
+
+        return "redirect:/login";
+    }
+
+    @GetMapping("/pwd/{token}")
+    public String resetPassword(
+            @PathVariable("token") String token,
+            Model model
+    ) {
+        model.addAttribute("token", token);
+        model.addAttribute("resetPasswordForm", new ResetPasswordFormRequest());
+        return "auth/reset_password";
+    }
+
+    @PostMapping("/pwd/{token}")
+    public String resetPassword(
+            @PathVariable("token") String token,
+            @Valid @ModelAttribute("resetPasswordForm") ResetPasswordFormRequest request,
+            BindingResult bindingResult,
+            Model model
+    ) {
+        if (hasText(request.newPassword())
+                && hasText(request.confirmPassword())
+                && !request.newPassword().equals(request.confirmPassword())) {
+            bindingResult.rejectValue(
+                    "confirmPassword",
+                    "passwordMismatch",
+                    "새 비밀번호가 일치하지 않습니다."
+            );
+        }
+
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("token", token);
+            return "auth/reset_password";
+        }
+
+        accountApiClient.resetPassword(
+                new UpdateAccountPasswordRequest(request.newPassword()),
+                token
+        );
         return "redirect:/login";
     }
 

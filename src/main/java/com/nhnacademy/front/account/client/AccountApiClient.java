@@ -41,5 +41,14 @@ public class AccountApiClient {
     public UpdateAccountResponse changePassword(@Valid UpdateAccountPasswordRequest request) {
         return backendApiClient.put(ACCOUNT_SERVICE + "/me/pwd", request, UpdateAccountResponse.class);
     }
-}
 
+    public ResetPasswordTokenResponse passwordResetToken(@Valid ResetPasswordTokenRequest request) {
+        return backendApiClient.post(ACCOUNT_SERVICE + "/pwd", request, ResetPasswordTokenResponse.class);
+    }
+
+    public UpdateAccountResponse resetPassword(@Valid UpdateAccountPasswordRequest request, String token) {
+        return backendApiClient.post(
+                ACCOUNT_SERVICE + "/pwd/reset/" + token, request, UpdateAccountResponse.class
+        );
+    }
+}
