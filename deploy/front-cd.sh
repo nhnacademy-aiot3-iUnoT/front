@@ -18,7 +18,7 @@ PORTS=("10404" "10405")
 deploy_tag() {
   local tag="$1"
   export IMAGE_TAG="$tag"
-  docker compose pull
+  docker compose -f compose.yaml pull
 
   for i in "${!SERVICES[@]}"; do
     SERVICE="${SERVICES[$i]}"
@@ -27,7 +27,7 @@ deploy_tag() {
     # nginx가 front를 직접 로드밸런싱(패시브 헬스체크)하므로 Eureka 등록/해제 절차는 더 이상 불필요 (nginx는 max_fails/fail_timeout으로 죽은 인스턴스를 스스로 우회)
 
     echo "${SERVICE} 재배포 (tag=${tag})"
-    docker compose up -d --force-recreate "$SERVICE"
+    docker compose -f compose.yaml up -d --force-recreate "$SERVICE"
 
     for attempt in {1..30}; do
       if curl -sf "http://127.0.0.1:${PORT}/actuator/health" 2>/dev/null | grep -q '"status":"UP"'; then

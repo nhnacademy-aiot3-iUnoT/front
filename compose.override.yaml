@@ -1,0 +1,5 @@
+services:
+  front-1:
+    build: .
+  front-2:
+    build: .

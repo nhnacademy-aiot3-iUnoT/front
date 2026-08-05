@@ -5,7 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.front.global.dto.ApiResponse;
 import com.nhnacademy.front.global.error.ApiException;
 import com.nhnacademy.front.global.error.ErrorCode;
-import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.ResolvableType;
 import org.springframework.stereotype.Component;
@@ -14,18 +15,28 @@ import org.springframework.web.client.RestClient;
 import java.util.function.Supplier;
 
 // 추후 리팩토링 할 예정 (임시 진행)
+@Slf4j
 @Component
-@RequiredArgsConstructor
 public class GatewayClient {
-    private static final String BASE_URL = "lb://team1-gateway";
+    private final String baseUrl;
     private final RestClient restClient;
     private final ObjectMapper objectMapper;
+
+    public GatewayClient(
+            @Value("${gateway.url}") String baseUrl,
+            RestClient restClient,
+            ObjectMapper objectMapper
+    ) {
+        this.baseUrl = baseUrl;
+        this.restClient = restClient;
+        this.objectMapper = objectMapper;
+    }
 
     // 단건 DTO
     public <T> T get(String path, Class<T> dataType) {
         return execute(() ->
                 restClient.get()
-                        .uri(BASE_URL + path)
+                        .uri(baseUrl + path)
                         .retrieve()
                         .body(responseTypeOf(dataType)));
     }
@@ -34,7 +45,7 @@ public class GatewayClient {
     public <T> T get(String path, ParameterizedTypeReference<ApiResponse<T>> responseType) {
         return execute(() ->
                 restClient.get()
-                        .uri(BASE_URL + path)
+                        .uri(baseUrl + path)
                         .retrieve()
                         .body(responseType));
     }
@@ -42,7 +53,7 @@ public class GatewayClient {
     public <T> T post(String path, Object body, Class<T> dataType) {
         return execute(() ->
                 restClient.post()
-                        .uri(BASE_URL + path)
+                        .uri(baseUrl + path)
                         .body(body)
                         .retrieve()
                         .body(responseTypeOf(dataType)));
@@ -51,7 +62,7 @@ public class GatewayClient {
     public <T> T post(String path, Object body, ParameterizedTypeReference<ApiResponse<T>> responseType) {
         return execute(() ->
                 restClient.post()
-                        .uri(BASE_URL + path)
+                        .uri(baseUrl + path)
                         .body(body)
                         .retrieve()
                         .body(responseType));
@@ -60,7 +71,7 @@ public class GatewayClient {
     public <T> T put(String path, Object body, Class<T> dataType) {
         return execute(() ->
                 restClient.put()
-                        .uri(BASE_URL + path)
+                        .uri(baseUrl + path)
                         .body(body)
                         .retrieve()
                         .body(responseTypeOf(dataType)));
@@ -69,7 +80,7 @@ public class GatewayClient {
     public <T> T put(String path, Object body, ParameterizedTypeReference<ApiResponse<T>> responseType) {
         return execute(() ->
                 restClient.put()
-                        .uri(BASE_URL + path)
+                        .uri(baseUrl + path)
                         .body(body)
                         .retrieve()
                         .body(responseType));
@@ -78,7 +89,7 @@ public class GatewayClient {
     public <T> T delete(String path, ParameterizedTypeReference<ApiResponse<T>> responseType) {
         return execute(() ->
                 restClient.delete()
-                        .uri(BASE_URL + path)
+                        .uri(baseUrl + path)
                         .retrieve()
                         .body(responseType));
     }
@@ -109,6 +120,15 @@ public class GatewayClient {
     }
 
     private ApiException convertApiException(HttpStatusCodeException e) {
+        String responseBody = e.getResponseBodyAsString();
+
+        log.error(
+                "Gateway request failed. status={}, body={}",
+                e.getStatusCode(),
+                responseBody
+        );
+
+
         try {
             ApiResponse<Void> response = objectMapper.readValue(
                     e.getResponseBodyAsString(),
