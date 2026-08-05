@@ -88,6 +88,19 @@ public class GatewayClient {
                         .body(responseType));
     }
 
+    public void put(String path, Object body) {
+        try {
+            restClient.put()
+                    .uri(baseUrl + path)
+                    .body(body)
+                    .retrieve()
+                    .toBodilessEntity();
+
+        } catch (HttpStatusCodeException e) {
+            throw convertApiException(e);
+        }
+    }
+
     public <T> T delete(String path, ParameterizedTypeReference<ApiResponse<T>> responseType) {
         return execute(() ->
                 restClient.delete()

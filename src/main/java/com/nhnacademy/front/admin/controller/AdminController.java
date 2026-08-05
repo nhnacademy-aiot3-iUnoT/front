@@ -1,14 +1,12 @@
 package com.nhnacademy.front.admin.controller;
 
-import com.nhnacademy.front.admin.client.AdminOrganizationClient;
+import com.nhnacademy.front.admin.client.AdminOrganizationApiClient;
 import com.nhnacademy.front.admin.dto.OrganizationStatus;
 import com.nhnacademy.front.admin.dto.request.OrgCreateRequest;
 import com.nhnacademy.front.admin.dto.request.OrgSearchRequest;
-import com.nhnacademy.front.admin.dto.response.OrgCreateResponse;
-import com.nhnacademy.front.admin.dto.response.OrgDetailResponse;
+import com.nhnacademy.front.admin.dto.response.AdminOrgDetailResponse;
 import com.nhnacademy.front.admin.dto.response.OrgSearchResponse;
 import com.nhnacademy.front.global.dto.PageResponse;
-import com.nhnacademy.front.organization.client.OrganizationApiClient;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/admin")
 public class AdminController {
 
-    private final AdminOrganizationClient adminOrganizationClient;
+    private final AdminOrganizationApiClient adminOrganizationApiClient;
 
     /**
      * 조직 관리
@@ -33,7 +31,7 @@ public class AdminController {
                                    @RequestParam(name = "page", defaultValue = "0") int page,
                                    @RequestParam(name = "size", defaultValue = "10") int size,
                                    Model model) {
-        PageResponse<OrgSearchResponse> orgList = adminOrganizationClient.getOrgList(request, page, size);
+        PageResponse<OrgSearchResponse> orgList = adminOrganizationApiClient.getOrgList(request, page, size);
 
         model.addAttribute("searchTypes", OrganizationStatus.values());
         model.addAttribute("organizations", orgList);
@@ -47,20 +45,20 @@ public class AdminController {
            return "admin/organization-create";
         }
 
-        adminOrganizationClient.createOrg(request);
+        adminOrganizationApiClient.createOrg(request);
 
         return "redirect:/admin/organizations";
     }
 
     @GetMapping("/organizations/new")
     public String createOrganizationForm(Model model) {
-        model.addAttribute("orgCreateRequest", OrgCreateRequest.empty());
+        model.addAttribute("orgCreateRequest", new OrgCreateRequest());
         return "admin/organization-create";
     }
 
     @GetMapping("/organizations/{id}")
     public String organizationDetail(@PathVariable Long id, Model model) {
-        OrgDetailResponse organization = adminOrganizationClient.getOrgDetail(id);
+        AdminOrgDetailResponse organization = adminOrganizationApiClient.getOrgDetail(id);
 
         model.addAttribute("organization", organization);
 
@@ -69,7 +67,7 @@ public class AdminController {
 
     @DeleteMapping("/organizations/{id}")
     public String deleteOrganization(@PathVariable Long id) {
-        adminOrganizationClient.deleteOrg(id);
+        adminOrganizationApiClient.deleteOrg(id);
 
         return "redirect:/admin/organizations";
     }

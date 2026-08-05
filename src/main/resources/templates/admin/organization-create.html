@@ -22,20 +22,14 @@
 
                 <div class="card mt-3">
                     <div class="card-body">
-                        <form th:action="@{/admin/organizations}"
-                              th:object="${orgCreateRequest}"
-                              method="post"
-                              novalidate>
-
+                        <form th:action="@{/admin/organizations}" th:object="${orgCreateRequest}" method="post" id="orgCreateForm">
                             <div class="mb-3">
                                 <label class="form-label">
                                     사업자번호
                                 </label>
 
-                                <input type="text"
-                                       class="form-control"
-                                       th:field="*{businessNumber}"
-                                       id="businessNumber">
+                                <input type="text" class="form-control" maxlength="10"
+                                       th:field="*{businessNumber}" placeholder="숫자만 입력하세요" required>
 
                                 <div class="invalid-feedback"></div>
 
@@ -49,10 +43,8 @@
                                     조직명
                                 </label>
 
-                                <input type="text"
-                                       class="form-control"
-                                       th:field="*{name}"
-                                       id="orgName">
+                                <input type="text" class="form-control" maxlength="50"
+                                       th:field="*{name}" placeholder="조직명을 입력해주세요" required>
 
                                 <div class="invalid-feedback"></div>
 
@@ -65,10 +57,9 @@
                                 <label class="form-label">
                                     Owner 이메일
                                 </label>
-                                <input type="email"
-                                       class="form-control"
-                                       th:field="*{email}"
-                                       id="email">
+                                <input type="email" class="form-control" maxlength="255"
+                                       th:field="*{email}" placeholder="Owner의 이메일을 입력해주세요" required>
+
                                 <div class="invalid-feedback"></div>
 
                                 <div class="text-danger"
@@ -81,7 +72,7 @@
                                    class="btn btn-secondary">
                                     취소
                                 </a>
-                                <button class="btn btn-primary">
+                                <button type="submit" class="btn btn-primary">
                                     생성
                                 </button>
                             </div>
@@ -94,7 +85,12 @@
     </div>
 </div>
 <th:block layout:fragment="script">
+
+    <script th:src="@{/js/common/validation.js}"></script>
+    <script th:src="@{/js/common/form.js}"></script>
+
     <script th:src="@{/js/admin/organization-create.js}"></script>
+
 </th:block>
 </body>
 </html>

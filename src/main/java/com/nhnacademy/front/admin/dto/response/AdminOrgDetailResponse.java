@@ -4,7 +4,7 @@ import com.nhnacademy.front.admin.dto.OrganizationStatus;
 
 import java.time.LocalDateTime;
 
-public record OrgDetailResponse(
+public record AdminOrgDetailResponse(
         Long id,
         String businessNumber,
         String name,

@@ -3,21 +3,18 @@ package com.nhnacademy.front.admin.client;
 import com.nhnacademy.front.admin.dto.request.OrgCreateRequest;
 import com.nhnacademy.front.admin.dto.request.OrgSearchRequest;
 import com.nhnacademy.front.admin.dto.response.OrgCreateResponse;
-import com.nhnacademy.front.admin.dto.response.OrgDetailResponse;
+import com.nhnacademy.front.admin.dto.response.AdminOrgDetailResponse;
 import com.nhnacademy.front.admin.dto.response.OrgSearchResponse;
 import com.nhnacademy.front.global.client.GatewayClient;
-import com.nhnacademy.front.global.dto.ApiResponse;
 import com.nhnacademy.front.global.dto.PageResponse;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
-@Slf4j
 @Component
 @RequiredArgsConstructor
-public class AdminOrganizationClient {
+public class AdminOrganizationApiClient {
     private final GatewayClient gatewayClient;
     private static final String CORE_SERVICE = "/api/core";
 
@@ -27,9 +24,9 @@ public class AdminOrganizationClient {
     public PageResponse<OrgSearchResponse> getOrgList(OrgSearchRequest request, int page, int size) {
 
         UriComponentsBuilder builder = UriComponentsBuilder
-        .fromPath(CORE_SERVICE + "/admin/organizations")
-        .queryParam("page", page)
-        .queryParam("size", size);
+            .fromPath(CORE_SERVICE + "/admin/organizations")
+            .queryParam("page", page)
+            .queryParam("size", size);
 
         if (request.status() != null) {
             builder.queryParam("status", request.status());
@@ -48,19 +45,14 @@ public class AdminOrganizationClient {
      * 조직 생성
      */
     public OrgCreateResponse createOrg(OrgCreateRequest request) {
-        return gatewayClient.post(
-                CORE_SERVICE + "/admin/organizations", request, OrgCreateResponse.class
-        );
+        return gatewayClient.post(CORE_SERVICE + "/admin/organizations", request, OrgCreateResponse.class);
     }
 
     /**
      * 조직 상세 조회
      */
-    public OrgDetailResponse getOrgDetail(Long id) {
-        return gatewayClient.get(
-                CORE_SERVICE + "/admin/organizations/" + id,
-                OrgDetailResponse.class
-        );
+    public AdminOrgDetailResponse getOrgDetail(Long id) {
+        return gatewayClient.get(CORE_SERVICE + "/admin/organizations/" + id, AdminOrgDetailResponse.class);
     }
 
     /**

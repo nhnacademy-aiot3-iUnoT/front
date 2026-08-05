@@ -23,7 +23,7 @@ public record OrgCreateRequest(
         @Size(max = 50, message = "조직명은 50자 이내로 입력해야 합니다.")
         String name
 ){
-    public static OrgCreateRequest empty() {
-        return new OrgCreateRequest("", "", "");
+    public  OrgCreateRequest() {
+        this("", "", "");
     }
 }
