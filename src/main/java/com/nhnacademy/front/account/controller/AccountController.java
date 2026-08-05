@@ -203,7 +203,6 @@ public class AccountController {
     }
 
     @DeleteMapping("/withdraw")
-    @ResponseBody
     public String deleteAccount(
             @Valid @RequestBody WithdrawAccountRequest request,
             BindingResult bindingResult,
