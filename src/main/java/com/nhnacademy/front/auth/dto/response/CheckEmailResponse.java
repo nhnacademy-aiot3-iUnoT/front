@@ -1,4 +1,4 @@
-package com.nhnacademy.front.account.dto.response;
+package com.nhnacademy.front.auth.dto.response;
 
 public record CheckEmailResponse(
         boolean available
