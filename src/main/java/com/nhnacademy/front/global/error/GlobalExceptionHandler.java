@@ -16,7 +16,7 @@ public class GlobalExceptionHandler {
         ModelAndView mav = new ModelAndView();
         mav.setViewName(VIEW);
 
-        mav.addObject(ATTRIBUTE_NAME, e.getMessage());
+        mav.addObject(ATTRIBUTE_NAME, e.getMessage() != null ? e.getMessage() : "오류가 발생했습니다.");
 
         return mav;
     }

@@ -8,7 +8,7 @@
 
 <div th:text="${errorMessage}"></div>
 
-<script th:inline="javascript" th:if="${errorMessage != null}">
+<script th:inline="javascript">
     alert('[[${errorMessage}]]');
     history.back();
 </script>
