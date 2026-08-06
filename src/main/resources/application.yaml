@@ -1,6 +1,10 @@
 spring:
   application:
     name: team1-front
+  mvc:
+    hiddenmethod:
+      filter:
+        enabled: true
 
 server:
   port: ${SERVER_PORT:10404}

@@ -1,4 +1,4 @@
-package com.nhnacademy.front.account.dto.request;
+package com.nhnacademy.front.auth.dto.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -18,4 +18,8 @@ public record LoginRequest(
                 message = "비밀번호는 6자 이상 64자 이하여야 합니다."
         )
         String password
-) { }
+) {
+    public LoginRequest() {
+        this("", "");
+    }
+}
