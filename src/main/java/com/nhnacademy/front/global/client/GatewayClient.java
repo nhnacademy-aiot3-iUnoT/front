@@ -12,6 +12,8 @@ import org.springframework.core.ResolvableType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClient;
+
+import java.net.URI;
 import java.util.function.Supplier;
 
 // 추후 리팩토링 할 예정 (임시 진행)
@@ -45,7 +47,7 @@ public class GatewayClient {
     public <T> T get(String path, ParameterizedTypeReference<ApiResponse<T>> responseType) {
         return execute(() ->
                 restClient.get()
-                        .uri(baseUrl + path)
+                        .uri(URI.create(baseUrl + path))
                         .retrieve()
                         .body(responseType));
     }
@@ -86,12 +88,37 @@ public class GatewayClient {
                         .body(responseType));
     }
 
+    public void put(String path, Object body) {
+        try {
+            restClient.put()
+                    .uri(baseUrl + path)
+                    .body(body)
+                    .retrieve()
+                    .toBodilessEntity();
+
+        } catch (HttpStatusCodeException e) {
+            throw convertApiException(e);
+        }
+    }
+
     public <T> T delete(String path, ParameterizedTypeReference<ApiResponse<T>> responseType) {
         return execute(() ->
                 restClient.delete()
                         .uri(baseUrl + path)
                         .retrieve()
                         .body(responseType));
+    }
+
+    public void delete(String path) {
+        try {
+            restClient.delete()
+                    .uri(baseUrl + path)
+                    .retrieve()
+                    .toBodilessEntity();
+
+        } catch (HttpStatusCodeException e) {
+            throw convertApiException(e);
+        }
     }
 
     private <T> T execute(Supplier<ApiResponse<T>> supplier) {
@@ -153,9 +180,4 @@ public class GatewayClient {
         return ParameterizedTypeReference.forType(type.getType());
     }
 
-//    private <T> ParameterizedTypeReference<ApiResponse<List<T>>> listResponseTypeOf(Class<T> dataType) {
-//        ResolvableType listType = ResolvableType.forClassWithGenerics(List.class, dataType);
-//        ResolvableType type = ResolvableType.forClassWithGenerics(ApiResponse.class, listType);
-//        return ParameterizedTypeReference.forType(type.getType());
-//    }
 }
