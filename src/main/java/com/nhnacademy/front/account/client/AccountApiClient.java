@@ -21,8 +21,8 @@ public class AccountApiClient {
         return backendApiClient.get(ACCOUNT_SERVICE + "/me", AccountInfoResponse.class);
     }
 
-    public WithdrawAccountResponse withdraw(@Valid WithdrawAccountRequest request) {
-        return backendApiClient.delete(ACCOUNT_SERVICE + "/me", null);
+    public void withdraw(@Valid WithdrawAccountRequest request) {
+        backendApiClient.delete(ACCOUNT_SERVICE + "/me");
     }
 
     public UpdateAccountResponse changeName(@Valid UpdateAccountNameRequest request) {

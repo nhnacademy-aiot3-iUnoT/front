@@ -138,10 +138,10 @@ public class SecurityConfig {
 
         validators.add(this::validateUuidSubject);
 
-        validators.add(jwt -> jwt.getAudience().stream()
-                .anyMatch(properties.getAudiences()::contains)
-                ? OAuth2TokenValidatorResult.success()
-                : validationFailure("JWT audience is not allowed"));
+//        validators.add(jwt -> jwt.getAudience().stream()
+//                .anyMatch(properties.getAudiences()::contains)
+//                ? OAuth2TokenValidatorResult.success()
+//                : validationFailure("JWT audience is not allowed"));
 
         return new DelegatingOAuth2TokenValidator<>(validators);
     }
