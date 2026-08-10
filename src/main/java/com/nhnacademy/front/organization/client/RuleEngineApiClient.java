@@ -15,7 +15,7 @@ import java.util.List;
 public class RuleEngineApiClient {
 
     private static final String CORE_SERVICE =
-            "/api/core/rule-engine";
+            "/api/rule-engine";
 
     private final GatewayClient gatewayClient;
 
