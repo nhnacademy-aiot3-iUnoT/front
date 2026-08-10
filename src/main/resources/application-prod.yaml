@@ -12,6 +12,10 @@ eureka:
       enable: false
 
 management:
+  endpoints:
+    web:
+      exposure:
+        include: health, service-registry, prometheus
   tracing:
     sampling:
       probability: 1  # 트래픽 봐서 낮추기
