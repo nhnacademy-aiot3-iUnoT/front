@@ -1,7 +1,6 @@
 package com.nhnacademy.front.global.config;
 
-import com.nimbusds.jose.jwk.source.JWKSource;
-import com.nimbusds.jose.proc.SecurityContext;
+import jakarta.servlet.http.Cookie;
 import org.springframework.boot.security.autoconfigure.actuate.web.servlet.EndpointRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,8 +15,11 @@ import org.springframework.security.oauth2.core.OAuth2TokenValidatorResult;
 import org.springframework.security.oauth2.jwt.*;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
+import org.springframework.security.oauth2.server.resource.web.BearerTokenResolver;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
+import org.springframework.web.util.WebUtils;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -30,7 +32,9 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http,
-            JwtDecoder jwtDecoder
+            JwtDecoder jwtDecoder,
+            JwtAuthenticationConverter converter,
+            BearerTokenResolver bearerTokenResolver
     ) throws Exception {
 
         http
@@ -49,17 +53,28 @@ public class SecurityConfig {
                 )
 
                 .oauth2ResourceServer(resourceServer -> resourceServer
+                        .bearerTokenResolver(bearerTokenResolver)
                         .jwt(jwt -> jwt
                                 .decoder(jwtDecoder)
+                                .jwtAuthenticationConverter(converter)
                         )
                 )
 
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(EndpointRequest.toAnyEndpoint()).permitAll()
                         .requestMatchers(
-                                "/**"
+                                EndpointRequest.to("health", "serviceregistry")
                         ).permitAll()
 
+                        .requestMatchers(
+                                "/login",
+                                "/signup",
+                                "/forgot-password",
+                                "/pwd/**",
+                                "/css/**",
+                                "/js/**",
+                                "/images/**"
+                        ).permitAll()
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 );
 
@@ -146,4 +161,15 @@ public class SecurityConfig {
                 new OAuth2Error("invalid_token", description, null)
         );
     }
+
+    @Bean
+    public BearerTokenResolver bearerTokenResolver() {
+        return request -> {
+            Cookie cookie = WebUtils.getCookie(request, "access_token");
+            return cookie != null && StringUtils.hasText(cookie.getValue())
+                    ? cookie.getValue()
+                    : null;
+        };
+    }
+
 }
