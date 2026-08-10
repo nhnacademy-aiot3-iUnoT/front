@@ -21,12 +21,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
 import java.time.Clock;
@@ -63,17 +58,12 @@ public class AuthController {
 
         LoginResponse loginResponse = authApiClient.login(request);
 
-        Duration maxAge = Duration.between(clock.instant(), loginResponse.expiresAt()).minusSeconds(5);
-        if (maxAge.isZero() || maxAge.isNegative()) {
-            throw new IllegalStateException("로그인 토큰 만료");
-        }
-
         ResponseCookie cookie = ResponseCookie.from("access_token", loginResponse.accessToken())
                 .httpOnly(true)
                 .secure(secure)
                 .sameSite("Lax")
                 .path("/")
-                .maxAge(maxAge)
+                .maxAge(Duration.ofMinutes(30))
                 .build();
 
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
@@ -97,10 +87,13 @@ public class AuthController {
     }
 
     @GetMapping("/signup")
-    public String signup(Model model) {
+    public String signup(
+            @RequestParam("token") String token,
+            Model model
+    ) {
         model.addAttribute(
                 "signupRequest",
-                new SignupRequest("inviteToken", "", "", "")
+                new SignupRequest(token, "", "", "")
         );
 
         return "auth/signup";
