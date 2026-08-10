@@ -31,7 +31,6 @@ security:
     access-token-ttl: ${JWT_ACCESS_TOKEN_TTL:30m}
     allowed-algorithms:
       - rs256
-    jwk-set-uri: ${localhost:10413/.well-known/jwks.json}
-    key-id: ${JWT_KEY_ID:account-key-001}
+    jwk-set-uri: ${localhost:10413/.well-known/jwks.json}]
     audiences:
       - front

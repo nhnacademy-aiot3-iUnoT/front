@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.time.Duration;
+import java.time.Clock;
 
 @Slf4j
 @Controller
@@ -37,6 +38,7 @@ public class AuthController {
 
     private final AuthApiClient authApiClient;
     private final PasswordResetFormValidator passwordResetFormValidator;
+    private final Clock clock;
 
     @Value("${cookie.secure:false}")
     private boolean secure;
@@ -61,12 +63,17 @@ public class AuthController {
 
         LoginResponse loginResponse = authApiClient.login(request);
 
+        Duration maxAge = Duration.between(clock.instant(), loginResponse.expiresAt()).minusSeconds(5);
+        if (maxAge.isZero() || maxAge.isNegative()) {
+            throw new IllegalStateException("로그인 토큰 만료");
+        }
+
         ResponseCookie cookie = ResponseCookie.from("access_token", loginResponse.accessToken())
                 .httpOnly(true)
                 .secure(secure)
                 .sameSite("Lax")
                 .path("/")
-                .maxAge(Duration.ofMinutes(30))
+                .maxAge(maxAge)
                 .build();
 
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());

@@ -17,6 +17,5 @@ security:
     allowed-algorithms:
       - rs256
     jwk-set-uri: ${JWK_SET_URI:http://localhost:10413/.well-known/jwks.json}
-    key-id: ${JWT_KEY_ID:account-key-001}
     audiences:
       - front

@@ -21,6 +21,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.web.util.WebUtils;
 
+import java.time.Clock;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -172,4 +173,8 @@ public class SecurityConfig {
         };
     }
 
+    @Bean
+    public Clock clock() {
+        return Clock.systemUTC();
+    }
 }

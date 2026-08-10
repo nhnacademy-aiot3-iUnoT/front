@@ -30,12 +30,7 @@ public class JwtProperties {
 
     @Setter
     @NotBlank
-    private String keyId;
-
-    @Setter
-    @NotBlank
     private String jwkSetUri;
-
 
     @Setter
     private Set<SignatureAlgorithm> allowedAlgorithms =
