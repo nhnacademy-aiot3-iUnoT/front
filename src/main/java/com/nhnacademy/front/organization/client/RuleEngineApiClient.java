@@ -14,8 +14,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RuleEngineApiClient {
 
-    private static final String RULE_ENGINE_API =
-            "/api/rule-engine";
+    private static final String CORE_SERVICE =
+            "/api/core/rule-engine";
 
     private final GatewayClient gatewayClient;
 
@@ -23,7 +23,7 @@ public class RuleEngineApiClient {
     public List<SensorLatestResponse> getLatestSensors(
             Long zoneId
     ) {
-        String path = RULE_ENGINE_API
+        String path = CORE_SERVICE
                 + "/zones/" + zoneId
                 + "/sensor-data/latest";
 
@@ -40,7 +40,7 @@ public class RuleEngineApiClient {
     public List<SensorHistoryResponse> getSensorHistory(
             Long zoneId
     ) {
-        String path = RULE_ENGINE_API
+        String path = CORE_SERVICE
                 + "/zones/" + zoneId
                 + "/sensor-data/history";
         return gatewayClient.get(path,

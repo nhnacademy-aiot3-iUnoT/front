@@ -40,12 +40,9 @@
 
     </header>
 
-    <!-- API 오류 안내 -->
+    <!-- 센서 정보 조회오류 -->
     <div class="alert alert-danger" role="alert" th:if="${latestSensorsErrorMessage != null}">
         <div th:text="${latestSensorsErrorMessage}">최신 센서 데이터를 불러오지 못했습니다.</div>
-    </div>
-    <div class="alert alert-danger" role="alert" th:if="${sensorHistoryErrorMessage != null}">
-        <div th:text="${sensorHistoryErrorMessage}">센서 이력 데이터를 불러오지 못했습니다.</div>
     </div>
 
     <!-- 센서별 가장 최근 데이터를 보여주는 Dashboard -->
@@ -106,6 +103,11 @@
             <p>센서 연결 상태를 확인한 뒤 다시 시도해 주세요.</p>
         </div>
     </section>
+
+    <!-- 센서 이력 정보 오류 -->
+    <div class="alert alert-danger" role="alert" th:if="${sensorHistoryErrorMessage != null}">
+        <div th:text="${sensorHistoryErrorMessage}">센서 이력 데이터를 불러오지 못했습니다.</div>
+    </div>
 
     <!-- 하루간 센서종류별 그래프 Dashboard (문 센서는 평균 집계가 의미 없어 그래프 대상에서 제외됨, JS에서 처리) -->
     <section class="card chart-card" aria-labelledby="sensor-chart-title">
@@ -180,7 +182,7 @@
 
     <!-- 그래프 라이브러리와 페이지 동작에 필요한 JavaScript 로드 -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
-    <script th:src="@{/js/sensor-info.js}"></script>
+    <script th:src="@{/js/organization/sensor-info.js}"></script>
 </main>
 </body>
 </html>
