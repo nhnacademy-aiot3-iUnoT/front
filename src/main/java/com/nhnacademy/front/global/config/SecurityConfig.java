@@ -1,6 +1,7 @@
 package com.nhnacademy.front.global.config;
 
 import com.nhnacademy.front.global.security.CookieAuthenticationEntryPoint;
+import com.nhnacademy.front.global.security.PageAccessDeniedHandler;
 import jakarta.servlet.http.Cookie;
 import org.springframework.boot.security.autoconfigure.actuate.web.servlet.EndpointRequest;
 import org.springframework.context.annotation.Bean;
@@ -37,7 +38,8 @@ public class SecurityConfig {
             JwtDecoder jwtDecoder,
             JwtAuthenticationConverter converter,
             BearerTokenResolver bearerTokenResolver,
-            CookieAuthenticationEntryPoint authenticationEntryPoint
+            CookieAuthenticationEntryPoint authenticationEntryPoint,
+            PageAccessDeniedHandler accessDeniedHandler
     ) throws Exception {
 
         http
@@ -66,6 +68,7 @@ public class SecurityConfig {
 
                 .exceptionHandling(exceptions -> exceptions
                         .authenticationEntryPoint(authenticationEntryPoint)
+                        .accessDeniedHandler(accessDeniedHandler)
                 )
 
                 .authorizeHttpRequests(auth -> auth
@@ -78,6 +81,7 @@ public class SecurityConfig {
                                 "/signup",
                                 "/forgot-password",
                                 "/pwd/**",
+                                "/403",
                                 "/css/**",
                                 "/js/**",
                                 "/images/**"
