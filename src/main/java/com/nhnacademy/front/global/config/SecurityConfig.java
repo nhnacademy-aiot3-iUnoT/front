@@ -1,5 +1,6 @@
 package com.nhnacademy.front.global.config;
 
+import com.nhnacademy.front.global.security.CookieAuthenticationEntryPoint;
 import jakarta.servlet.http.Cookie;
 import org.springframework.boot.security.autoconfigure.actuate.web.servlet.EndpointRequest;
 import org.springframework.context.annotation.Bean;
@@ -35,7 +36,8 @@ public class SecurityConfig {
             HttpSecurity http,
             JwtDecoder jwtDecoder,
             JwtAuthenticationConverter converter,
-            BearerTokenResolver bearerTokenResolver
+            BearerTokenResolver bearerTokenResolver,
+            CookieAuthenticationEntryPoint authenticationEntryPoint
     ) throws Exception {
 
         http
@@ -55,10 +57,15 @@ public class SecurityConfig {
 
                 .oauth2ResourceServer(resourceServer -> resourceServer
                         .bearerTokenResolver(bearerTokenResolver)
+                        .authenticationEntryPoint(authenticationEntryPoint)
                         .jwt(jwt -> jwt
                                 .decoder(jwtDecoder)
                                 .jwtAuthenticationConverter(converter)
                         )
+                )
+
+                .exceptionHandling(exceptions -> exceptions
+                        .authenticationEntryPoint(authenticationEntryPoint)
                 )
 
                 .authorizeHttpRequests(auth -> auth

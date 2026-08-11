@@ -6,6 +6,7 @@ import com.nhnacademy.front.account.dto.request.UpdateAccountNameRequest;
 import com.nhnacademy.front.account.dto.request.UpdateAccountPasswordRequest;
 import com.nhnacademy.front.account.dto.response.AccountInfoResponse;
 import com.nhnacademy.front.account.validator.PasswordFormValidator;
+import com.nhnacademy.front.global.security.AccessTokenCookieManager;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -31,6 +32,9 @@ class AccountControllerTest {
 
     @MockitoBean
     private AccountApiClient accountApiClient;
+
+    @MockitoBean
+    private AccessTokenCookieManager cookieManager;
 
     private PasswordFormValidator passwordFormValidator;
 

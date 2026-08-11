@@ -7,6 +7,7 @@ import com.nhnacademy.front.auth.dto.request.ResetPasswordRequest;
 import com.nhnacademy.front.auth.dto.request.ResetPasswordTokenRequest;
 import com.nhnacademy.front.auth.dto.response.CheckEmailResponse;
 import com.nhnacademy.front.auth.validator.PasswordResetFormValidator;
+import com.nhnacademy.front.global.security.AccessTokenCookieManager;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -31,6 +32,9 @@ class AuthControllerTest {
 
     @MockitoBean
     AuthApiClient authApiClient;
+
+    @MockitoBean
+    AccessTokenCookieManager cookieManager;
 
     PasswordResetFormValidator passwordResetFormValidator;
 

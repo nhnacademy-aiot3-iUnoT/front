@@ -10,21 +10,16 @@ import com.nhnacademy.front.auth.dto.request.SignupRequest;
 import com.nhnacademy.front.auth.dto.response.LoginResponse;
 import com.nhnacademy.front.auth.validator.PasswordResetFormValidator;
 import com.nhnacademy.front.global.dto.ApiResponse;
+import com.nhnacademy.front.global.security.AccessTokenCookieManager;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import jakarta.ws.rs.core.HttpHeaders;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.Duration;
-import java.time.Clock;
 
 @Slf4j
 @Controller
@@ -33,10 +28,7 @@ public class AuthController {
 
     private final AuthApiClient authApiClient;
     private final PasswordResetFormValidator passwordResetFormValidator;
-    private final Clock clock;
-
-    @Value("${cookie.secure:false}")
-    private boolean secure;
+    private final AccessTokenCookieManager cookieManager;
 
     @GetMapping("/login")
     public String login(Model model) {
@@ -58,30 +50,14 @@ public class AuthController {
 
         LoginResponse loginResponse = authApiClient.login(request);
 
-        ResponseCookie cookie = ResponseCookie.from("access_token", loginResponse.accessToken())
-                .httpOnly(true)
-                .secure(secure)
-                .sameSite("Lax")
-                .path("/")
-                .maxAge(Duration.ofMinutes(30))
-                .build();
-
-        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+        cookieManager.add(response, loginResponse.accessToken());
 
         return "redirect:/";
     }
 
     @PostMapping("/logout")
     public String logout(HttpServletResponse response) {
-        ResponseCookie cookie = ResponseCookie.from("access_token", "")
-                .httpOnly(true)
-                .secure(secure)
-                .sameSite("Lax")
-                .path("/")
-                .maxAge(Duration.ZERO)
-                .build();
-
-        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+        cookieManager.delete(response);
 
         return "redirect:/login";
     }
