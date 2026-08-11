@@ -9,6 +9,9 @@ public enum ErrorCode {
     // Organization
     O001,
 
+    // Rule Engine
+    R009,
+
     // Inventory
 
     // Medicine

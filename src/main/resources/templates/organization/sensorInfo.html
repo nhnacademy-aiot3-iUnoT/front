@@ -33,10 +33,21 @@
             <h2 class="page-title" th:text="|Zone ${zoneId} 환경 정보|">Zone 환경 정보</h2>
         </div>
 
-        <!-- 새로고침 버튼 -->
-        <button type="button" class="btn btn-outline-secondary" id="refresh-button">
-            <i class="ti ti-refresh me-1">새로고침</i>
-        </button>
+        <div class="d-flex gap-2">
+            <!-- 가상 센서 설정 화면 -->
+            <a class="btn btn-outline-secondary"
+               th:href="@{/organizations/{organizationId}/storages/{storageId}/zones/{zoneId}/virtual-sensors(
+                       organizationId=${organizationId},
+                       storageId=${storageId},
+                       zoneId=${zoneId})}">
+                <i class="ti ti-cpu me-1"></i>가상 센서
+            </a>
+
+            <!-- 새로고침 버튼 -->
+            <button type="button" class="btn btn-outline-secondary" id="refresh-button">
+                <i class="ti ti-refresh me-1">새로고침</i>
+            </button>
+        </div>
 
     </header>
 
