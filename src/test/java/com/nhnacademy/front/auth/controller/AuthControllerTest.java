@@ -2,24 +2,29 @@ package com.nhnacademy.front.auth.controller;
 
 import com.nhnacademy.front.auth.client.AuthApiClient;
 import com.nhnacademy.front.auth.dto.request.CheckEmailRequest;
+import com.nhnacademy.front.auth.dto.request.LoginRequest;
 import com.nhnacademy.front.auth.dto.request.ResetPasswordFormRequest;
 import com.nhnacademy.front.auth.dto.request.ResetPasswordRequest;
 import com.nhnacademy.front.auth.dto.request.ResetPasswordTokenRequest;
+import com.nhnacademy.front.auth.dto.request.SignupRequest;
 import com.nhnacademy.front.auth.dto.response.CheckEmailResponse;
+import com.nhnacademy.front.auth.dto.response.LoginResponse;
+import com.nhnacademy.front.auth.dto.response.SignupResponse;
 import com.nhnacademy.front.auth.validator.PasswordResetFormValidator;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(AuthController.class)
@@ -32,26 +37,126 @@ class AuthControllerTest {
     @MockitoBean
     AuthApiClient authApiClient;
 
-    PasswordResetFormValidator passwordResetFormValidator;
-
     @Test
-    void login() {
+    void login() throws Exception {
+        mockMvc.perform(get("/login"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("auth/login"))
+                .andExpect(model().attribute("loginRequest", new LoginRequest()));
     }
 
     @Test
-    void loginPost() {
+    void loginPost() throws Exception {
+        LoginRequest request = new LoginRequest("test@test.com", "password");
+        LoginResponse response = new LoginResponse("access-token");
+
+        given(authApiClient.login(request)).willReturn(response);
+
+        mockMvc.perform(post("/login")
+                        .param("email", request.email())
+                        .param("password", request.password()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name("redirect:/"))
+                .andExpect(redirectedUrl("/"))
+                .andExpect(header().string(
+                        HttpHeaders.SET_COOKIE,
+                        containsString("access_token=access-token")))
+                .andExpect(header().string(
+                        HttpHeaders.SET_COOKIE,
+                        containsString("HttpOnly")))
+                .andExpect(header().string(
+                        HttpHeaders.SET_COOKIE,
+                        containsString("SameSite=Lax")));
+
+        then(authApiClient).should().login(request);
     }
 
     @Test
-    void logout() {
+    void logout() throws Exception {
+        mockMvc.perform(post("/logout"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name("redirect:/login"))
+                .andExpect(redirectedUrl("/login"))
+                .andExpect(header().string(
+                        HttpHeaders.SET_COOKIE,
+                        containsString("access_token=")))
+                .andExpect(header().string(
+                        HttpHeaders.SET_COOKIE,
+                        containsString("Max-Age=0")));
     }
 
     @Test
-    void signup() {
+    void signup() throws Exception {
+        mockMvc.perform(get("/signup"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("auth/signup"))
+                .andExpect(model().attribute(
+                        "signupRequest",
+                        new SignupRequest("inviteToken", "", "", "")));
     }
 
     @Test
-    void signupPost() {
+    void signupPostForOwner() throws Exception {
+        SignupRequest request = new SignupRequest(
+                "invite-token",
+                "owner@test.com",
+                "owner",
+                "password"
+        );
+
+        given(authApiClient.signup(request)).willReturn(new SignupResponse(true));
+
+        mockMvc.perform(post("/signup")
+                        .param("inviteToken", request.inviteToken())
+                        .param("email", request.email())
+                        .param("name", request.name())
+                        .param("password", request.password()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name("redirect:/organizations/me/setup"))
+                .andExpect(redirectedUrl("/organizations/me/setup"));
+
+        then(authApiClient).should().signup(request);
+    }
+
+    @Test
+    void signupPostForMember() throws Exception {
+        SignupRequest request = new SignupRequest(
+                "invite-token",
+                "member@test.com",
+                "member",
+                "password"
+        );
+
+        given(authApiClient.signup(request)).willReturn(new SignupResponse(false));
+
+        mockMvc.perform(post("/signup")
+                        .param("inviteToken", request.inviteToken())
+                        .param("email", request.email())
+                        .param("name", request.name())
+                        .param("password", request.password()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name("redirect:/login"))
+                .andExpect(redirectedUrl("/login"));
+
+        then(authApiClient).should().signup(request);
+    }
+
+    @Test
+    void signupPostWithValidationError() throws Exception {
+        mockMvc.perform(post("/signup")
+                        .param("inviteToken", "invite-token")
+                        .param("email", "invalid-email")
+                        .param("name", "")
+                        .param("password", "12345"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("auth/signup"))
+                .andExpect(model().attributeHasFieldErrors(
+                        "signupRequest",
+                        "email",
+                        "name",
+                        "password"));
+
+        then(authApiClient).shouldHaveNoInteractions();
     }
 
     @Test

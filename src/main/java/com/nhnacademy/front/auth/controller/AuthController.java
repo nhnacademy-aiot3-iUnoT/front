@@ -8,6 +8,7 @@ import com.nhnacademy.front.auth.dto.request.ResetPasswordRequest;
 import com.nhnacademy.front.auth.dto.request.ResetPasswordTokenRequest;
 import com.nhnacademy.front.auth.dto.request.SignupRequest;
 import com.nhnacademy.front.auth.dto.response.LoginResponse;
+import com.nhnacademy.front.auth.dto.response.SignupResponse;
 import com.nhnacademy.front.auth.validator.PasswordResetFormValidator;
 import com.nhnacademy.front.global.dto.ApiResponse;
 import jakarta.servlet.http.HttpServletResponse;
@@ -112,7 +113,11 @@ public class AuthController {
         log.info("Signup Email: {}", request.email());
         log.info("Signup Name: {}", request.name());
 
-        authApiClient.signup(request);
+        SignupResponse response = authApiClient.signup(request);
+
+        if (response.isOwner()) {
+            return "redirect:/organizations/me/setup";
+        }
 
         return "redirect:/login";
     }
