@@ -14,7 +14,7 @@
     <div class="page">
         <div class="page-wrapper">
             <div class="container-xl">
-                <div class="page-header mt-3">
+                <div class="page-header d-print-none mt-3">
                     <div class="row align-items-center">
                         <div class="col">
                             <h2 class="page-title">
@@ -28,9 +28,9 @@
                     </div>
                 </div>
 
-                <div class="row row-cards">
+                <div class="row row-cards mt-3">
                     <div class="col-12">
-                        <form th:action="@{/organizations/me/setup}" th:object="${orgSetupRequest}" th:method="put" id="orgSetupForm">
+                        <form th:action="@{/organizations/me/setup}" th:object="${orgSetupRequest}" th:method="post" id="orgSetupForm">
                             <div class="card">
                                 <div class="card-header">
                                     <h3 class="card-title">
@@ -40,31 +40,32 @@
 
                                 <div class="card-body">
                                     <div class="mb-3">
-                                        <label class="form-label">
+                                        <label for="zipCode" class="form-label">
                                             우편번호
                                         </label>
 
-                                        <input type="text" class="form-control" maxlength="5"
-                                               th:field="*{zipCode}" placeholder="우편번호를 입력하세요" required>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="zipCode"
+                                                   th:field="*{zipCode}" placeholder="우편번호를 입력하세요" readonly>
 
+                                            <button type="button" class="btn btn-outline-primary" onclick="goPopup()">
+                                                <i class="ti ti-search me-1"></i>
+                                                주소 검색
+                                            </button>
+                                        </div>
                                         <div class="invalid-feedback"></div>
 
                                         <div class="text-danger" th:errors="*{zipCode}"></div>
                                     </div>
 
                                     <div class="mb-3">
-                                        <label class="form-label">
+                                        <label for="address" class="form-label">
                                             도로명 주소
                                         </label>
 
-                                        <div class="input-group">
-                                            <input type="text" class="form-control" maxlength="255"
-                                                   th:field="*{roadAddress}" placeholder="도로명 주소를 입력하세요" required>
+                                        <input type="text" class="form-control" maxlength="255" id="address"
+                                               th:field="*{roadAddress}" placeholder="도로명 주소를 입력하세요" readonly>
 
-                                            <button type="button" class="btn btn-outline-primary">
-                                                주소 검색
-                                            </button>
-                                        </div>
 
                                         <div class="invalid-feedback"></div>
 
@@ -72,11 +73,11 @@
                                     </div>
 
                                     <div class="mb-3">
-                                        <label class="form-label">
+                                        <label for="detailAddress" class="form-label">
                                             상세 주소
                                         </label>
 
-                                        <input type="text" class="form-control" maxlength="255"
+                                        <input type="text" class="form-control" maxlength="255" id="detailAddress"
                                                th:field="*{addressDetail}" placeholder="상세 주소를 입력하세요">
 
                                         <div class="invalid-feedback"></div>
@@ -122,9 +123,39 @@
 
     <script th:src="@{/js/common/validation.js}"></script>
     <script th:src="@{/js/common/form.js}"></script>
-
     <script th:src="@{/js/organization/org-setup.js}"></script>
 
+    <script>
+        function goPopup() {
+            const width = 570;
+            const height = 420;
+
+            const left =
+                Math.floor((window.screen.width - width) / 2);
+
+            const top =
+                Math.floor((window.screen.height - height) / 2);
+
+            window.open(
+                "/juso/popup",
+                "jusoPopup",
+                `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes`
+            );
+        }
+
+        // juso-popup에서 호출
+        function jusoCallBack(
+            roadAddrPart1,
+            addrDetail,
+            zipNo
+        ) {
+            document.getElementById("zipCode").value = zipNo;
+            document.getElementById("address").value = roadAddrPart1;
+            document.getElementById("detailAddress").value = addrDetail || "";
+        }
+    </script>
+
 </th:block>
+
 </body>
 </html>

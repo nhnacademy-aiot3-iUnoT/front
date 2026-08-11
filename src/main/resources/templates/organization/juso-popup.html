@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>주소 검색</title>
+
+    <script th:inline="javascript">
+        function init() {
+
+            const inputYn = /*[[${inputYn}]]*/ "";
+
+            // 최초 진입
+            if (inputYn !== "Y") {
+
+                const confmKey = /*[[${jusoConfirmKey}]]*/ "";
+
+                const returnUrl =
+                    location.origin + "/juso/popup";
+
+                document.form.returnUrl.value = returnUrl;
+                document.form.confmKey.value = confmKey;
+                document.form.resultType.value = "4";
+
+                document.form.action =
+                    "https://business.juso.go.kr/addrlink/addrLinkUrl.do";
+
+                document.form.submit();
+
+                return;
+            }
+
+            // 주소 선택 후
+            if (inputYn === "Y") {
+
+                if (window.opener && !window.opener.closed) {
+
+                    window.opener.jusoCallBack(
+                        /*[[${roadAddrPart1}]]*/ "",
+                        /*[[${addrDetail}]]*/ "",
+                        /*[[${zipNo}]]*/ ""
+                    );
+                }
+
+                window.close();
+            }
+        }
+    </script>
+</head>
+
+<body onload="init()">
+
+<form name="form" method="post">
+    <input type="hidden" name="confmKey">
+    <input type="hidden" name="returnUrl">
+    <input type="hidden" name="resultType" value="4">
+    <input type="hidden" name="encodingType" value="UTF-8">
+</form>
+
+</body>
+</html>

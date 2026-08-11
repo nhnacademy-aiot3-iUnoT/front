@@ -11,10 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @Controller
@@ -75,7 +72,7 @@ public class OrganizationController {
         return "redirect:/organizations/me";
     }
 
-    @PutMapping("/me/setup")
+    @PostMapping("/me/setup")
     public String setupOrganization(@Valid @ModelAttribute("orgSetupRequest") OrganizationSetupRequest request,
                                     BindingResult bindingResult) {
 

@@ -11,6 +11,7 @@ import com.nhnacademy.front.auth.dto.response.LoginResponse;
 import com.nhnacademy.front.auth.dto.response.SignupResponse;
 import com.nhnacademy.front.auth.validator.PasswordResetFormValidator;
 import com.nhnacademy.front.global.dto.ApiResponse;
+import com.nhnacademy.front.organization.client.InvitationApiClient;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.core.HttpHeaders;
@@ -22,12 +23,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
 
@@ -37,6 +33,7 @@ import java.time.Duration;
 public class AuthController {
 
     private final AuthApiClient authApiClient;
+    private final InvitationApiClient invitationApiClient;
     private final PasswordResetFormValidator passwordResetFormValidator;
 
     @Value("${cookie.secure:false}")
@@ -91,10 +88,12 @@ public class AuthController {
     }
 
     @GetMapping("/signup")
-    public String signup(Model model) {
+    public String signup(@RequestParam String token, Model model) {
+        invitationApiClient.verifyToken(token);
+
         model.addAttribute(
                 "signupRequest",
-                new SignupRequest("inviteToken", "", "", "")
+                new SignupRequest(token, "", "", "")
         );
 
         return "auth/signup";
@@ -113,11 +112,12 @@ public class AuthController {
         log.info("Signup Email: {}", request.email());
         log.info("Signup Name: {}", request.name());
 
-        SignupResponse response = authApiClient.signup(request);
+        authApiClient.signup(request);
+//        SignupResponse response = authApiClient.signup(request);
 
-        if (response.isOwner()) {
-            return "redirect:/organizations/me/setup";
-        }
+//        if (response.isOwner()) {
+//            return "redirect:/organizations/me/setup";
+//        }
 
         return "redirect:/login";
     }
