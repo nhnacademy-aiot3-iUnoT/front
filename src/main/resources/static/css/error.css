@@ -8,30 +8,31 @@
 
 .error-card {
     width: 100%;
-    max-width: 1000px;
-    overflow: hidden;
-    background: none;
+    max-width: 1100px;
+}
+
+.error-card .card-body {
+    padding: 3rem;
+}
+
+.error-image {
+    max-width: 420px;
+    width: 100%;
 }
 
 .error-code {
-    font-size: 6rem;
+    color: var(--teal);
+    font-size: 5rem;
     font-weight: 800;
     line-height: 1;
-    color: #325eaa;
 }
 
 .error-title {
     font-size: 2rem;
-    font-weight: 700;
-    margin-top: 1rem;
+    color: var(--ink);
 }
 
 .error-message {
-    font-size: 1.1rem;
-    line-height: 1.8;
-}
-
-.error-image {
-    width: 100%;
-    max-width: 400px;
+    font-size: 1rem;
+    color: var(--ink-soft) !important;
 }

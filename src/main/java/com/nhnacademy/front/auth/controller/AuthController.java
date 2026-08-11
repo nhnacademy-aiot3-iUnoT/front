@@ -88,7 +88,11 @@ public class AuthController {
     }
 
     @GetMapping("/signup")
-    public String signup(@RequestParam String token, Model model) {
+    public String signup(@RequestParam(required = false) String token, Model model) {
+        if(token == null || token.isBlank()) {
+            return "redirect:/login?error=invite";
+        }
+
         invitationApiClient.verifyToken(token);
 
         model.addAttribute(
@@ -113,11 +117,6 @@ public class AuthController {
         log.info("Signup Name: {}", request.name());
 
         authApiClient.signup(request);
-//        SignupResponse response = authApiClient.signup(request);
-
-//        if (response.isOwner()) {
-//            return "redirect:/organizations/me/setup";
-//        }
 
         return "redirect:/login";
     }

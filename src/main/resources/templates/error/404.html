@@ -9,6 +9,7 @@
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@latest/dist/css/tabler.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+    <link rel="stylesheet" th:href="@{/css/theme.css}">
     <link rel="stylesheet" th:href="@{/css/error.css}">
 </head>
 
@@ -18,7 +19,13 @@
         <div class="card-body">
             <div class="row align-items-center">
 
-                <div class="col-md-5 text-center text-md-start">
+                <div class="col-md-6 text-center">
+                    <img th:src="@{/img/notfound.png}"
+                         alt="페이지를 찾을 수 없음"
+                         class="error-image">
+                </div>
+
+                <div class="col-md-6 text-center text-md-start">
 
                     <div class="error-code">404</div>
 
@@ -47,13 +54,6 @@
                         </button>
                     </div>
                 </div>
-
-                <div class="col-md-7 text-center">
-                    <img th:src="@{/img/notfound.png}"
-                         alt="페이지를 찾을 수 없음"
-                         class="error-image">
-                </div>
-
             </div>
 
         </div>
@@ -63,5 +63,4 @@
 </div>
 
 </body>
-
 </html>

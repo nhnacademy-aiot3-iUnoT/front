@@ -1,154 +1,165 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/admin-layout}">>
+      layout:decorate="~{layout/admin-layout}">
 
 <head>
     <meta charset="UTF-8">
     <title>조직 관리</title>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
 </head>
 
 <body>
 <div layout:fragment="content">
 
-<div class="page">
-    <div class="page-wrapper">
-        <div class="container-xl">
-            <div class="page-header d-print-none mt-3">
-                <div class="row align-items-center">
-                    <div class="col">
-                        <h2 class="page-title">
-                            조직 관리
-                        </h2>
+    <div class="page">
+        <div class="page-wrapper">
+            <div class="container-xl">
+                <div class="page-header d-print-none mt-3">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h2 class="page-title">
+                                조직 관리
+                            </h2>
 
-                        <div class="text-muted">
-                            서비스에 가입된 조직을 관리합니다.
+                            <div class="text-secondary">
+                                서비스에 가입된 조직을 관리합니다.
+                            </div>
+                        </div>
+
+                        <div class="col-auto ms-auto">
+                            <a class="btn btn-primary"
+                               th:href="@{/admin/organizations/new}">
+                                <i class="ti ti-plus me-1"></i>
+                                조직 생성
+                            </a>
                         </div>
                     </div>
+                </div>
 
-                    <div class="col-auto ms-auto">
-                        <a class="btn btn-primary" th:href="@{/admin/organizations/new}">조직 생성</a>
+                <div class="mt-4">
+                    <form class="row g-2 align-items-center" th:action="@{/admin/organizations}" method="get">
+                        <div class="col-md-5">
+                            <input type="text" name="name" class="form-control" placeholder="조직명 검색">
+                        </div>
+
+                        <div class="col-md-3">
+                            <select class="form-select" name="status">
+                                <option value="">전체 상태</option>
+                                <option th:each="status : ${searchTypes}"
+                                        th:value="${status}"
+                                        th:text="${status.getKo()}"></option>
+                            </select>
+                        </div>
+
+                        <div class="col d-flex justify-content-end">
+                            <button type="submit" class="btn btn-outline-primary">
+                                <i class="ti ti-search me-1"></i>
+                                검색
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card mt-4">
+                    <div class="table-responsive">
+                        <table class="table table-vcenter table-hover card-table">
+                            <thead>
+                            <tr>
+                                <th>조직명</th>
+                                <th>상태</th>
+                                <th>생성일</th>
+                                <th class="text-end">관리</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:if="${#lists.isEmpty(organizations.content)}">
+                                <td colspan="5"
+                                    class="text-center text-secondary py-5">
+                                    <div class="mb-2">
+                                        <i class="ti ti-building-community fs-1"></i>
+                                    </div>
+                                    등록된 조직이 없습니다.
+                                </td>
+                            </tr>
+                            <tr th:each="organization : ${organizations.content}">
+                                <td>
+                                    <span class="fw-medium"
+                                          th:text="${organization.name}">
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge status-badge status-pending"
+                                          th:if="${organization.status.name() == 'PENDING'}">
+                                        진행중
+                                    </span>
+
+                                    <span class="badge status-badge status-active"
+                                          th:if="${organization.status.name() == 'ACTIVE'}">
+                                        활성
+                                    </span>
+
+                                    <span class="badge status-badge status-inactive"
+                                          th:if="${organization.status.name() == 'INACTIVE'}">
+                                        비활성
+                                    </span>
+
+                                    <span class="badge status-badge status-suspended"
+                                          th:if="${organization.status.name() == 'SUSPENDED'}">
+                                        종료
+                                    </span>
+                                </td>
+                                <td class="text-secondary"
+                                    th:text="${#temporals.format(organization.createdAt, 'yyyy-MM-dd HH:mm')}">
+                                </td>
+                                <td class="text-end">
+                                    <a th:href="@{/admin/organizations/{id}(id=${organization.id})}"
+                                       class="btn btn-sm btn-outline-secondary">
+                                        상세
+                                    </a>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
                     </div>
-                </div>
-            </div>
-
-            <div class="card mt-3">
-                <div class="card-body">
-                        <form class="row g-2" th:action="@{/admin/organizations}" method="get">
-                            <div class="col-md-4">
-                                <input type="text" name="name" class="form-control" placeholder="조직명 검색">
-                            </div>
-
-                            <div class="col-md-3">
-                                <select class="form-select" name="status">
-                                    <option value="">전체</option>
-                                    <option th:each="status : ${searchTypes}"
-                                            th:value="${status}"
-                                            th:text="${status.getKo()}"></option>
-                                </select>
-                            </div>
-
-                            <div class="col-auto">
-                                <button type="submit" class="btn btn-outline-primary">
-                                    검색
-                                </button>
-                            </div>
-                        </form>
-                </div>
-            </div>
-
-            <div class="card mt-3">
-                <div class="table-responsive">
-                    <table class="table table-vcenter card-table">
-                        <thead>
-                        <tr>
-                            <th>조직명</th>
-                            <th>상태</th>
-                            <th>생성일</th>
-                            <th>관리</th>
-                        </tr>
-
-                        </thead>
-                        <tbody>
-                        <tr th:if="${#lists.isEmpty(organizations.content())}">
-                            <td colspan="5"
-                                class="text-center text-muted py-5">
-                                등록된 조직이 없습니다.
-                            </td>
-                        </tr>
-
-                        <tr th:each="organization : ${organizations.content}">
-                            <input type="hidden" th:value="${organization.id}">
-                            <td th:text="${organization.name}"></td>
-                            <td>
-                                <span class="badge bg-azure-lt"
-                                      th:if="${organization.status.name() == 'PENDING'}">
-                                    진행중
-                                </span>
-
-                                <span class="badge bg-green-lt"
-                                      th:if="${organization.status.name() == 'ACTIVE'}">
-                                    활성
-                                </span>
-
-
-                                <span class="badge bg-yellow-lt"
-                                      th:if="${organization.status.name() == 'INACTIVE'}">
-                                    비활성
-                                </span>
-
-
-                                <span class="badge bg-red-lt"
-                                      th:if="${organization.status.name() == 'SUSPENDED'}">
-                                    종료
-                                </span>
-                            </td>
-                            <td th:text="${#temporals.format(organization.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
-                            <td>
-                                <a th:href="@{/admin/organizations/{id}(id=${organization.id})}"
-                                   class="btn btn-sm btn-outline-secondary">
-                                    상세
+                    <div class="card-footer py-3" th:if="${organizations.totalPages > 0}">
+                        <ul class="pagination m-0 justify-content-center">
+                            <li class="page-item"
+                                th:classappend="${organizations.page == 0} ? 'disabled'">
+                                <a class="page-link"
+                                   th:href="@{/admin/organizations(page=${organizations.page - 1},size=${organizations.size},
+                                               name=${param.name}, status=${param.status})}">
+                                    이전
                                 </a>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-                </div>
+                            </li>
 
-                <div class="card-footer" th:if="${organizations.totalPages > 0}">
-                    <ul class="pagination m-0 justify-content-end">
-                        <li class="page-item"
-                            th:classappend="${organizations.page == 0} ? 'disabled'">
-                            <a class="page-link"
-                               th:href="@{/admin/organizations(page=${organizations.page - 1})}">
-                                이전
-                            </a>
-                        </li>
+                            <li class="page-item"
+                                th:each="num : ${#numbers.sequence(0, organizations.totalPages - 1)}"
+                                th:classappend="${num == organizations.page} ? 'active'">
 
-                        <li class="page-item"
-                            th:each="num : ${#numbers.sequence(0, organizations.totalPages - 1)}"
-                            th:classappend="${num == organizations.page} ? 'active'">
+                                <a class="page-link"
+                                   th:href="@{/admin/organizations(page=${num},size=${organizations.size},
+                                               name=${param.name},status=${param.status})}"
+                                   th:text="${num + 1}">
+                                </a>
+                            </li>
 
-                            <a class="page-link"
-                               th:href="@{/admin/organizations(page=${num})}"
-                               th:text="${num + 1}">
-                            </a>
-                        </li>
+                            <li class="page-item"
+                                th:classappend="${organizations.last} ? 'disabled'">
 
-                        <li class="page-item"
-                            th:classappend="${organizations.last} ? 'disabled'">
-
-                            <a class="page-link"
-                               th:href="@{/admin/organizations(page=${organizations.page + 1})}">
-                                다음
-                            </a>
-                        </li>
-                    </ul>
+                                <a class="page-link"
+                                   th:href="@{/admin/organizations(page=${organizations.page + 1},size=${organizations.size},
+                                               name=${param.name}, status=${param.status})}">
+                                    다음
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 </div>
 </body>
 </html>
