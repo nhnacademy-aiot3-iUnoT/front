@@ -1,4 +1,4 @@
-package com.nhnacademy.front.organization.dto.response;
+package com.nhnacademy.front.engine.dto.response;
 
 
 public record VirtualSensorCreateResponse(

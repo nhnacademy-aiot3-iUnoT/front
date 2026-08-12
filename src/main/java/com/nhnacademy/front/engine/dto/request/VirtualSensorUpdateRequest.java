@@ -1,4 +1,4 @@
-package com.nhnacademy.front.organization.dto.request;
+package com.nhnacademy.front.engine.dto.request;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMax;

@@ -1,4 +1,4 @@
-package com.nhnacademy.front.organization.dto;
+package com.nhnacademy.front.engine.dto;
 
 public enum VirtualSensorStatus {
     ACTIVE,

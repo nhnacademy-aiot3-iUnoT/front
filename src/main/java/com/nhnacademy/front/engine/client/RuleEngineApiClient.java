@@ -1,15 +1,15 @@
-package com.nhnacademy.front.organization.client;
+package com.nhnacademy.front.engine.client;
 
 import com.nhnacademy.front.global.client.GatewayClient;
 import com.nhnacademy.front.global.dto.ApiResponse;
-import com.nhnacademy.front.organization.dto.request.VirtualSensorCreateRequest;
-import com.nhnacademy.front.organization.dto.request.VirtualSensorStatusRequest;
-import com.nhnacademy.front.organization.dto.request.VirtualSensorUpdateRequest;
-import com.nhnacademy.front.organization.dto.response.SensorHistoryResponse;
-import com.nhnacademy.front.organization.dto.response.SensorLatestResponse;
-import com.nhnacademy.front.organization.dto.response.VirtualSensorCreateResponse;
-import com.nhnacademy.front.organization.dto.response.VirtualSensorInfoResponse;
-import com.nhnacademy.front.organization.dto.response.VirtualSensorUpdateResponse;
+import com.nhnacademy.front.engine.dto.request.VirtualSensorCreateRequest;
+import com.nhnacademy.front.engine.dto.request.VirtualSensorStatusRequest;
+import com.nhnacademy.front.engine.dto.request.VirtualSensorUpdateRequest;
+import com.nhnacademy.front.engine.dto.response.SensorHistoryResponse;
+import com.nhnacademy.front.engine.dto.response.SensorLatestResponse;
+import com.nhnacademy.front.engine.dto.response.VirtualSensorCreateResponse;
+import com.nhnacademy.front.engine.dto.response.VirtualSensorInfoResponse;
+import com.nhnacademy.front.engine.dto.response.VirtualSensorUpdateResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;

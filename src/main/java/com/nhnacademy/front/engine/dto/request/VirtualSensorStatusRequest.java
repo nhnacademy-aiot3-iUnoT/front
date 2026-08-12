@@ -1,6 +1,6 @@
-package com.nhnacademy.front.organization.dto.request;
+package com.nhnacademy.front.engine.dto.request;
 
-import com.nhnacademy.front.organization.dto.VirtualSensorStatus;
+import com.nhnacademy.front.engine.dto.VirtualSensorStatus;
 import jakarta.validation.constraints.NotNull;
 
 public record VirtualSensorStatusRequest(

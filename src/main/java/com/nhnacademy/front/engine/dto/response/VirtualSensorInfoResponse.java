@@ -1,6 +1,6 @@
-package com.nhnacademy.front.organization.dto.response;
+package com.nhnacademy.front.engine.dto.response;
 
-import com.nhnacademy.front.organization.dto.VirtualSensorStatus;
+import com.nhnacademy.front.engine.dto.VirtualSensorStatus;
 
 public record VirtualSensorInfoResponse(
 

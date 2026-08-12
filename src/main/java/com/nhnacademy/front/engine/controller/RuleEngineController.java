@@ -1,14 +1,14 @@
-package com.nhnacademy.front.organization.controller;
+package com.nhnacademy.front.engine.controller;
 
 import com.nhnacademy.front.global.error.ApiException;
 import com.nhnacademy.front.global.error.ErrorCode;
-import com.nhnacademy.front.organization.client.RuleEngineApiClient;
-import com.nhnacademy.front.organization.dto.request.VirtualSensorCreateRequest;
-import com.nhnacademy.front.organization.dto.request.VirtualSensorStatusRequest;
-import com.nhnacademy.front.organization.dto.request.VirtualSensorUpdateRequest;
-import com.nhnacademy.front.organization.dto.response.SensorHistoryResponse;
-import com.nhnacademy.front.organization.dto.response.SensorLatestResponse;
-import com.nhnacademy.front.organization.dto.response.VirtualSensorInfoResponse;
+import com.nhnacademy.front.engine.client.RuleEngineApiClient;
+import com.nhnacademy.front.engine.dto.request.VirtualSensorCreateRequest;
+import com.nhnacademy.front.engine.dto.request.VirtualSensorStatusRequest;
+import com.nhnacademy.front.engine.dto.request.VirtualSensorUpdateRequest;
+import com.nhnacademy.front.engine.dto.response.SensorHistoryResponse;
+import com.nhnacademy.front.engine.dto.response.SensorLatestResponse;
+import com.nhnacademy.front.engine.dto.response.VirtualSensorInfoResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
