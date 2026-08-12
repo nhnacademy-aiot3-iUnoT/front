@@ -16,7 +16,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 @RequiredArgsConstructor
 public class AdminOrganizationApiClient {
     private final GatewayClient gatewayClient;
-    private static final String CORE_SERVICE = "/api/core";
+    private static final String CORE_SERVICE_ADMIN = "/api/core/admin/organizations";
 
     /**
      * 조직 목록 조회 (status, name)
@@ -24,7 +24,7 @@ public class AdminOrganizationApiClient {
     public PageResponse<OrgSearchResponse> getOrgList(OrgSearchRequest request, int page, int size) {
 
         UriComponentsBuilder builder = UriComponentsBuilder
-            .fromPath(CORE_SERVICE + "/admin/organizations")
+            .fromPath(CORE_SERVICE_ADMIN)
             .queryParam("page", page)
             .queryParam("size", size);
 
@@ -45,20 +45,35 @@ public class AdminOrganizationApiClient {
      * 조직 생성
      */
     public OrgCreateResponse createOrg(OrgCreateRequest request) {
-        return gatewayClient.post(CORE_SERVICE + "/admin/organizations", request, OrgCreateResponse.class);
+        return gatewayClient.post(CORE_SERVICE_ADMIN, request, OrgCreateResponse.class);
     }
 
     /**
      * 조직 상세 조회
      */
     public AdminOrgDetailResponse getOrgDetail(Long id) {
-        return gatewayClient.get(CORE_SERVICE + "/admin/organizations/" + id, AdminOrgDetailResponse.class);
+        return gatewayClient.get(CORE_SERVICE_ADMIN + "/" + id, AdminOrgDetailResponse.class);
     }
 
     /**
      * 조직 삭제
      */
     public void deleteOrg(Long id) {
-        gatewayClient.delete(CORE_SERVICE + "/admin/organizations/" + id);
+        gatewayClient.delete(CORE_SERVICE_ADMIN + "/" + id);
+    }
+
+    /**
+     * Owner 초대 재전송
+     */
+    public void resendInvitation(Long organizationId, Long invitationId) {
+        gatewayClient.post(CORE_SERVICE_ADMIN + "/" + organizationId + "/invitations/" + invitationId + "/resend");
+    }
+
+    public void cancelInvitation(Long organizationId, Long invitationId) {
+        gatewayClient.delete(CORE_SERVICE_ADMIN + "/" + organizationId + "/invitations/" + invitationId);
+    }
+
+    public void reissueInvitation(Long organizationId, Long invitationId) {
+        gatewayClient.post(CORE_SERVICE_ADMIN + "/" + organizationId + "/invitations/" + invitationId + "/reissue");
     }
 }

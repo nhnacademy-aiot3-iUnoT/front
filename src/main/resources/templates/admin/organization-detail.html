@@ -150,6 +150,121 @@
                         </button>
                     </form>
                 </div>
+
+                <div class="card mt-4" th:if="${organization.invitation == null}">
+                    <div class="card-body text-secondary">
+                        초대 정보가 없습니다.
+                    </div>
+                </div>
+
+                <div class="card mt-4" th:if="${organization.invitation != null}">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            초대 정보
+                        </h3>
+                    </div>
+
+                    <div class="card-body">
+
+                        <div class="row mb-4">
+                            <div class="col-md-3 text-secondary">
+                                Owner 이메일
+                            </div>
+
+                            <div class="col-md-9 fw-medium"
+                                 th:text="${organization.invitation.email}">
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-3 text-secondary">
+                                초대 상태
+                            </div>
+
+                            <div class="col-md-9">
+
+                            <span class="badge status-badge status-pending"
+                                  th:if="${organization.invitation.status.name() == 'ACTIVE'}">
+                                초대 진행중
+                            </span>
+
+                            <span class="badge status-badge status-active"
+                                  th:if="${organization.invitation.status.name() == 'USED'}">
+                                가입 완료
+                            </span>
+
+                            <span class="badge status-badge status-inactive"
+                                  th:if="${organization.invitation.status.name() == 'EXPIRED'}">
+                                만료
+                            </span>
+
+                            <span class="badge status-badge status-suspended"
+                                  th:if="${organization.invitation.status.name() == 'CANCELED'}">
+                                취소됨
+                            </span>
+
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-3 text-secondary">
+                                메일 발송일시
+                            </div>
+
+                            <div class="col-md-9"
+                                 th:text="${#temporals.format(organization.invitation.emailSentAt, 'yyyy-MM-dd HH:mm')}">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-3 text-secondary">
+                                초대 만료일시
+                            </div>
+
+                            <div class="col-md-9"
+                                 th:text="${#temporals.format(organization.invitation.expiredAt, 'yyyy-MM-dd HH:mm')}">
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="card-footer d-flex justify-content-end gap-2"
+                         th:if="${organization.invitation.status.name() != 'USED'}">
+
+                        <form th:if="${organization.invitation.status.name() == 'ACTIVE'}"
+                              th:action="@{/admin/organizations/{organizationId}/invitations/{invitationId}/resend(
+                                  organizationId=${organization.id},
+                                  invitationId=${organization.invitation.id}
+                              )}"
+                              method="post">
+                            <button type="submit" class="btn btn-outline-primary">
+                                메일 재전송
+                            </button>
+                        </form>
+
+                        <form th:action="@{/admin/organizations/{organizationId}/invitations/{invitationId}/reissue(
+                                  organizationId=${organization.id},
+                                  invitationId=${organization.invitation.id}
+                              )}"
+                              method="post">
+                            <button type="submit" class="btn btn-primary">
+                                초대 재발급
+                            </button>
+                        </form>
+
+                        <form th:if="${organization.invitation.status.name() == 'ACTIVE'}"
+                              th:action="@{/admin/organizations/{organizationId}/invitations/{invitationId}/cancel(
+                                  organizationId=${organization.id},
+                                  invitationId=${organization.invitation.id}
+                              )}"
+                              method="post">
+                            <button type="submit" class="btn btn-outline-danger">
+                                초대 취소
+                            </button>
+                        </form>
+
+                    </div>
+                </div>
             </div>
         </div>
     </div>

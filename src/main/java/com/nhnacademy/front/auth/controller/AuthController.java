@@ -1,5 +1,9 @@
 package com.nhnacademy.front.auth.controller;
 
+import com.nhnacademy.front.account.client.AccountApiClient;
+import com.nhnacademy.front.account.dto.AccountRole;
+import com.nhnacademy.front.account.dto.response.AccountInfoResponse;
+import com.nhnacademy.front.admin.dto.OrganizationStatus;
 import com.nhnacademy.front.auth.client.AuthApiClient;
 import com.nhnacademy.front.auth.dto.request.CheckEmailRequest;
 import com.nhnacademy.front.auth.dto.request.LoginRequest;
@@ -12,6 +16,8 @@ import com.nhnacademy.front.auth.dto.response.SignupResponse;
 import com.nhnacademy.front.auth.validator.PasswordResetFormValidator;
 import com.nhnacademy.front.global.dto.ApiResponse;
 import com.nhnacademy.front.organization.client.InvitationApiClient;
+import com.nhnacademy.front.organization.client.OrganizationApiClient;
+import com.nhnacademy.front.organization.dto.response.OrgDetailResponse;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.core.HttpHeaders;
@@ -33,6 +39,9 @@ import java.time.Duration;
 public class AuthController {
 
     private final AuthApiClient authApiClient;
+    private final AccountApiClient accountApiClient;
+    private final OrganizationApiClient organizationApiClient;
+
     private final InvitationApiClient invitationApiClient;
     private final PasswordResetFormValidator passwordResetFormValidator;
 
@@ -43,6 +52,24 @@ public class AuthController {
     public String login(Model model) {
         model.addAttribute(new LoginRequest());
         return "auth/login";
+    }
+
+    // 임시
+    @GetMapping("/login/success")
+    public String loginSuccess() {
+        AccountInfoResponse account = accountApiClient.getAccountInfo();
+
+        if (account.accountRole() == AccountRole.ADMIN) {
+            return "redirect:/admin";
+        }
+
+        OrgDetailResponse organization = organizationApiClient.getOrgInfo();
+
+        if (organization.status() == OrganizationStatus.PENDING) {
+            return "redirect:/organizations/me/setup";
+        }
+
+        return "redirect:/";
     }
 
     @PostMapping("/login")
@@ -69,7 +96,7 @@ public class AuthController {
 
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
-        return "redirect:/";
+        return "redirect:/login/success";
     }
 
     @PostMapping("/logout")

@@ -59,11 +59,11 @@
                                     </div>
 
                                     <div class="mb-3">
-                                        <label for="address" class="form-label">
+                                        <label for="roadAddress" class="form-label">
                                             도로명 주소
                                         </label>
 
-                                        <input type="text" class="form-control" maxlength="255" id="address"
+                                        <input type="text" class="form-control" maxlength="255" id="roadAddress"
                                                th:field="*{roadAddress}" placeholder="도로명 주소를 입력하세요" readonly>
 
 
@@ -73,11 +73,11 @@
                                     </div>
 
                                     <div class="mb-3">
-                                        <label for="detailAddress" class="form-label">
+                                        <label for="addressDetail" class="form-label">
                                             상세 주소
                                         </label>
 
-                                        <input type="text" class="form-control" maxlength="255" id="detailAddress"
+                                        <input type="text" class="form-control" maxlength="255" id="addressDetail"
                                                th:field="*{addressDetail}" placeholder="상세 주소를 입력하세요">
 
                                         <div class="invalid-feedback"></div>
@@ -87,11 +87,11 @@
                                     </div>
 
                                     <div class="mb-3">
-                                        <label class="form-label">
+                                        <label for="org-description" class="form-label">
                                             조직 설명
                                         </label>
 
-                                        <textarea class="form-control" rows="5" maxlength="255"
+                                        <textarea class="form-control" rows="5" maxlength="255" id="org-description"
                                                   th:field="*{description}" placeholder="조직 설명을 입력하세요"></textarea>
 
                                         <div class="invalid-feedback"></div>
@@ -123,37 +123,8 @@
 
     <script th:src="@{/js/common/validation.js}"></script>
     <script th:src="@{/js/common/form.js}"></script>
+    <script th:src="@{/js/organization/address-search.js}"></script>
     <script th:src="@{/js/organization/org-setup.js}"></script>
-
-    <script>
-        function goPopup() {
-            const width = 570;
-            const height = 420;
-
-            const left =
-                Math.floor((window.screen.width - width) / 2);
-
-            const top =
-                Math.floor((window.screen.height - height) / 2);
-
-            window.open(
-                "/juso/popup",
-                "jusoPopup",
-                `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes`
-            );
-        }
-
-        // juso-popup에서 호출
-        function jusoCallBack(
-            roadAddrPart1,
-            addrDetail,
-            zipNo
-        ) {
-            document.getElementById("zipCode").value = zipNo;
-            document.getElementById("address").value = roadAddrPart1;
-            document.getElementById("detailAddress").value = addrDetail || "";
-        }
-    </script>
 
 </th:block>
 

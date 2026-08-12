@@ -1,6 +1,7 @@
 package com.nhnacademy.front.account.controller;
 
 import com.nhnacademy.front.account.client.AccountApiClient;
+import com.nhnacademy.front.account.dto.AccountRole;
 import com.nhnacademy.front.account.dto.request.ChangePasswordFormRequest;
 import com.nhnacademy.front.account.dto.request.UpdateAccountNameRequest;
 import com.nhnacademy.front.account.dto.request.UpdateAccountPasswordRequest;
@@ -39,7 +40,7 @@ class AccountControllerTest {
     void info() throws Exception {
         LocalDateTime createdAt = LocalDateTime.of(2026, 8, 5, 12, 0);
         AccountInfoResponse response =
-                new AccountInfoResponse("test@test.com", "test", createdAt);
+                new AccountInfoResponse("test@test.com", "test", AccountRole.USER, createdAt);
 
         given(accountApiClient.getAccountInfo())
                 .willReturn(response);
