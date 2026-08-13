@@ -24,4 +24,4 @@ gateway:
   url: http://localhost:10400
 
 juso:
-  confirm-key: ${JUSO_CONFIRM_KEY}
+  confirm-key: ${JUSO_CONFIRM_KEY:}

@@ -28,3 +28,6 @@ gateway:
 
 cookie:
   secure: true
+
+juso:
+  confirm-key: ${JUSO_CONFIRM_KEY}
