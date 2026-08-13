@@ -1,17 +1,192 @@
-/* 라이트 */
-.moon-icon{
-    display:inline-block;
+/* 기본 색상 */
+
+:root {
+    /* iUnoT 색상 */
+    --ink: #1f2d29;
+    --ink-soft: #68756f;
+
+    --canvas: #f5f2eb;
+    --surface: #fffdfa;
+
+    --line: #e4e0d7;
+    --line-strong: #d1ccc1;
+
+    --teal: #176f60;
+    --teal-dark: #10594d;
+    --teal-soft: #edf7f3;
+    --mint: #d9efe7;
+
+    --danger: #b54742;
+    --danger-soft: #fff0ee;
+
+    --warning: #94630a;
+    --warning-soft: #fff7df;
+
+    --shadow: 0 16px 50px #30403b14;
+
+
+    /* Bootstrap / Tabler에 iUnoT 색상 적용 */
+    --bs-primary: var(--teal);
+    --bs-primary-rgb: 23, 111, 96;
+
+    --bs-danger: var(--danger);
+    --bs-danger-rgb: 181, 71, 66;
+
+    --bs-warning: var(--warning);
+    --bs-warning-rgb: 148, 99, 10;
+
+    --bs-body-bg: var(--canvas);
+    --bs-body-color: var(--ink);
+
+    --bs-border-color: var(--line);
+    --bs-secondary-color: var(--ink-soft);
 }
 
-.sun-icon{
-    display:none;
+/* 다크모드 색상 */
+
+[data-bs-theme="dark"] {
+    /* Text */
+    --ink: #edf2ef;
+    --ink-soft: #a5b0ab;
+
+    /* Background */
+    --canvas: #111412;
+    --surface: #1a1e1c;
+
+    /* Border */
+    --line: #2a302d;
+    --line-strong: #3a423e;
+
+    /* Brand */
+    --teal: #4b9a87;
+    --teal-dark: #3c806f;
+    --teal-soft: #1d2c27;
+    --mint: #243b33;
+
+    /* Status */
+    --danger: #d8756f;
+    --danger-soft: #33211f;
+
+    --warning: #d1a75a;
+    --warning-soft: #30291b;
+
+    /* Shadow */
+    --shadow: 0 18px 50px rgb(0 0 0 / 35%);
+
+    /* Bootstrap / Tabler */
+    --bs-primary: var(--teal);
+    --bs-primary-rgb: 75, 154, 135;
+
+    --bs-danger: var(--danger);
+    --bs-danger-rgb: 216, 117, 111;
+
+    --bs-warning: var(--warning);
+    --bs-warning-rgb: 209, 167, 90;
+
+    --bs-body-bg: var(--canvas);
+    --bs-body-color: var(--ink);
+
+    --bs-border-color: var(--line);
+    --bs-secondary-color: var(--ink-soft);
 }
 
-/* 다크 */
-[data-bs-theme="dark"] .moon-icon{
-    display:none;
+
+/* 테마 아이콘 */
+
+.moon-icon {
+    display: inline-block;
 }
 
-[data-bs-theme="dark"] .sun-icon{
-    display:inline-block;
+.sun-icon {
+    display: none;
+}
+
+[data-bs-theme="dark"] .moon-icon {
+    display: none;
+}
+
+[data-bs-theme="dark"] .sun-icon {
+    display: inline-block;
+}
+
+/* 중복 컴포넌트 */
+
+body {
+    background-color: var(--canvas);
+    color: var(--ink);
+}
+
+.navbar {
+    background-color: var(--surface);
+    border-bottom: 1px solid var(--line);
+}
+
+.card {
+    background-color: var(--surface);
+    border-color: var(--line);
+}
+
+.card-header,
+.card-footer {
+    background-color: var(--surface);
+    border-color: var(--line);
+}
+
+.form-control {
+    background-color: var(--surface);
+    border-color: var(--line);
+    color: var(--ink);
+}
+
+.form-control:focus {
+    border-color: var(--teal);
+}
+
+a {
+    color: var(--teal);
+}
+
+a:hover {
+    color: var(--teal-dark);
+}
+
+/* 버튼 */
+
+.btn-primary {
+    --tblr-btn-color: #fff;
+    --tblr-btn-bg: var(--teal);
+    --tblr-btn-border-color: var(--teal);
+
+    background-color: var(--teal);
+    border-color: var(--teal);
+    color: #fff;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+    background-color: var(--teal-dark);
+    border-color: var(--teal-dark);
+    color: #fff;
+}
+
+.btn-danger {
+    --tblr-btn-color: #fff;
+    --tblr-btn-bg: var(--danger);
+    --tblr-btn-border-color: var(--danger);
+
+    background-color: var(--danger);
+    border-color: var(--danger);
+    color: #fff;
+}
+
+.btn-danger:hover,
+.btn-danger:focus {
+    background-color: #963c38;
+    border-color: #963c38;
+    color: #fff;
+}
+.alert-warning {
+    --tblr-alert-color: var(--warning);
+    --tblr-alert-bg: var(--warning-soft);
+    --tblr-alert-border-color: var(--line-strong);
 }

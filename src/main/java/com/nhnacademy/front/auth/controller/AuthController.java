@@ -1,5 +1,9 @@
 package com.nhnacademy.front.auth.controller;
 
+import com.nhnacademy.front.account.client.AccountApiClient;
+import com.nhnacademy.front.account.dto.AccountRole;
+import com.nhnacademy.front.account.dto.response.AccountInfoResponse;
+import com.nhnacademy.front.admin.dto.OrganizationStatus;
 import com.nhnacademy.front.auth.client.AuthApiClient;
 import com.nhnacademy.front.auth.dto.request.CheckEmailRequest;
 import com.nhnacademy.front.auth.dto.request.LoginRequest;
@@ -11,6 +15,9 @@ import com.nhnacademy.front.auth.dto.response.LoginResponse;
 import com.nhnacademy.front.auth.dto.response.SignupResponse;
 import com.nhnacademy.front.auth.validator.PasswordResetFormValidator;
 import com.nhnacademy.front.global.dto.ApiResponse;
+import com.nhnacademy.front.organization.client.InvitationApiClient;
+import com.nhnacademy.front.organization.client.OrganizationApiClient;
+import com.nhnacademy.front.organization.dto.response.OrgDetailResponse;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.core.HttpHeaders;
@@ -22,12 +29,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
 
@@ -37,6 +39,10 @@ import java.time.Duration;
 public class AuthController {
 
     private final AuthApiClient authApiClient;
+    private final AccountApiClient accountApiClient;
+    private final OrganizationApiClient organizationApiClient;
+
+    private final InvitationApiClient invitationApiClient;
     private final PasswordResetFormValidator passwordResetFormValidator;
 
     @Value("${cookie.secure:false}")
@@ -46,6 +52,24 @@ public class AuthController {
     public String login(Model model) {
         model.addAttribute(new LoginRequest());
         return "auth/login";
+    }
+
+    // 임시
+    @GetMapping("/login/success")
+    public String loginSuccess() {
+        AccountInfoResponse account = accountApiClient.getAccountInfo();
+
+        if (account.accountRole() == AccountRole.ADMIN) {
+            return "redirect:/admin";
+        }
+
+        OrgDetailResponse organization = organizationApiClient.getOrgInfo();
+
+        if (organization.status() == OrganizationStatus.PENDING) {
+            return "redirect:/organizations/me/setup";
+        }
+
+        return "redirect:/";
     }
 
     @PostMapping("/login")
@@ -72,7 +96,7 @@ public class AuthController {
 
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
-        return "redirect:/";
+        return "redirect:/login/success";
     }
 
     @PostMapping("/logout")
@@ -91,10 +115,16 @@ public class AuthController {
     }
 
     @GetMapping("/signup")
-    public String signup(Model model) {
+    public String signup(@RequestParam(required = false) String token, Model model) {
+        if(token == null || token.isBlank()) {
+            return "redirect:/login?error=invite";
+        }
+
+        invitationApiClient.verifyToken(token);
+
         model.addAttribute(
                 "signupRequest",
-                new SignupRequest("inviteToken", "", "", "")
+                new SignupRequest(token, "", "", "")
         );
 
         return "auth/signup";
@@ -113,11 +143,7 @@ public class AuthController {
         log.info("Signup Email: {}", request.email());
         log.info("Signup Name: {}", request.name());
 
-        SignupResponse response = authApiClient.signup(request);
-
-        if (response.isOwner()) {
-            return "redirect:/organizations/me/setup";
-        }
+        authApiClient.signup(request);
 
         return "redirect:/login";
     }

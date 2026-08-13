@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="ko"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
@@ -7,54 +8,165 @@
 <head>
     <meta charset="UTF-8">
     <title>회원정보</title>
+    <link rel="stylesheet" th:href="@{/css/account.css}">
 </head>
 
 <body>
-
 <div layout:fragment="content">
-    <div class="row">
-        <div class="col-lg-8 col-xl-7 mx-auto">
-            <div class="card">
-                <div class="card-header">
-                    <div>
-                        <h3 class="card-title">회원정보</h3>
-                        <p class="card-subtitle">계정 정보를 확인합니다.</p>
-                    </div>
+
+    <div class="account-page">
+
+        <div class="account-page-header">
+            <h1>회원정보</h1>
+            <p>계정 정보를 확인하고 관리하세요.</p>
+        </div>
+
+        <div class="account-container">
+            <div class="account-grid">
+                <div class="account-main">
+
+                    <section class="account-section">
+
+                        <h2 class="account-section-title">
+                            기본 정보
+                        </h2>
+
+                        <form th:action="@{/mypage}" th:method="put">
+                            <div class="account-panel">
+                                <div class="account-row">
+                                    <div class="account-label">
+                                        이메일
+                                    </div>
+                                    <div class="account-value"
+                                         th:text="${accountInfoResponse.email}">
+                                    </div>
+                                </div>
+
+                                <div class="account-row">
+                                    <label class="account-label"
+                                           for="name">
+                                        이름
+                                    </label>
+                                    <div class="account-value">
+                                        <input type="text"
+                                               id="name"
+                                               name="name"
+                                               class="form-control"
+                                               th:value="${accountInfoResponse.name}"
+                                               maxlength="100"
+                                               required>
+                                    </div>
+                                </div>
+
+                                <div class="account-row">
+                                    <div class="account-label">
+                                        가입일
+                                    </div>
+                                    <div class="account-value"
+                                         th:text="${#temporals.format(accountInfoResponse.createdAt, 'yyyy-MM-dd')}">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="text-end mt-3">
+                                <button type="submit"
+                                        class="btn btn-primary">
+                                    변경사항 저장
+                                </button>
+                            </div>
+                        </form>
+                    </section>
+
+                    <section class="account-section">
+                        <h2 class="account-section-title">
+                            소속 조직
+                        </h2>
+
+                        <div class="account-panel">
+                            <div class="account-action-row">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="organization-icon">
+                                        <i class="ti ti-building-community"></i>
+                                    </div>
+
+                                    <div>
+                                        <div class="account-action-title">
+                                            소속 조직
+                                        </div>
+                                        <p class="account-action-description">
+                                            현재 소속된 조직의 정보를 확인하고 관리할 수 있습니다.
+                                        </p>
+                                    </div>
+                                </div>
+                                <a th:href="@{/organizations/me}"
+                                   class="btn btn-outline-secondary">
+                                    조직관리
+                                </a>
+                            </div>
+                        </div>
+                    </section>
                 </div>
 
-                <form th:action="@{/mypage}" th:method="put">
-                    <div class="list-group list-group-flush">
-                        <div class="list-group-item">
-                            <div class="text-secondary">이메일</div>
-                            <div class="fw-semibold" th:text="${accountInfoResponse.email}"></div>
-                        </div>
+                <div class="account-side">
+                    <section class="account-section">
+                        <h2 class="account-section-title">
+                            보안
+                        </h2>
 
-                        <div class="list-group-item">
-                            <label class="text-secondary mb-2">이름</label>
-                            <input type="text" class="form-control" name="name"
-                                   th:value="${accountInfoResponse.name}"
-                                   maxlength="100"
-                                   required>
-                        </div>
+                        <div class="account-panel">
+                            <div class="account-action-row">
+                                <div>
+                                    <div class="account-action-title">
+                                        비밀번호
+                                    </div>
 
-                        <div class="list-group-item">
-                            <div class="text-secondary">가입일</div>
-                            <div class="fw-semibold"
-                                 th:text="${#temporals.format(accountInfoResponse.createdAt, 'yyyy-MM-dd')}"></div>
-                        </div>
-                    </div>
+                                    <p class="account-action-description">
+                                        계정 비밀번호를 변경할 수 있습니다.
+                                    </p>
+                                </div>
 
-                    <div class="card-footer text-end">
-                        <button type="submit" class="btn btn-dark">저장</button>
-                        <a th:href="@{/mypage/change-password}" class="btn btn-outline-secondary ms-2">비밀번호 변경</a>
-                        <a th:href="@{/withdraw}" class="btn btn-outline-danger ms-2">회원탈퇴</a>
-                    </div>
-                </form>
+                                <a th:href="@{/mypage/change-password}"
+                                   class="btn btn-outline-secondary">
+                                    변경하기
+                                </a>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="account-section">
+                        <h2 class="account-section-title">
+                            위험 영역
+                        </h2>
+
+                        <div class="account-panel account-danger">
+                            <div class="account-action-row">
+                                <div>
+                                    <div class="account-action-title">
+                                        회원탈퇴
+                                    </div>
+
+                                    <p class="account-action-description">
+                                        탈퇴하면 계정 정보를 복구할 수 없습니다.
+                                    </p>
+                                </div>
+                                <a th:href="@{/withdraw}"
+                                   class="btn btn-outline-danger">
+                                    회원탈퇴
+                                </a>
+                            </div>
+                        </div>
+                    </section>
+                </div>
             </div>
         </div>
     </div>
-    <div id="success-message" th:if="${successMessage}"
-         th:data-message="${successMessage}" hidden></div>
+
+    <div id="success-message"
+         th:if="${successMessage}"
+         th:data-message="${successMessage}"
+         hidden>
+    </div>
+
     <script>
         const successMessage = document.getElementById("success-message");
 
