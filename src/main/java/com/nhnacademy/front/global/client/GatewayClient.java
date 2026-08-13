@@ -52,6 +52,26 @@ public class GatewayClient {
                         .body(responseType));
     }
 
+    public <T> T getRaw(String path, ParameterizedTypeReference<T> responseType) {
+        try {
+            T response = restClient.get()
+                    .uri(URI.create(baseUrl + path))
+                    .retrieve()
+                    .body(responseType);
+
+            if (response == null) {
+                throw new ApiException(
+                        ErrorCode.UNKNOWN,
+                        "응답이 없습니다."
+                );
+            }
+
+            return response;
+        } catch (HttpStatusCodeException e) {
+            throw convertApiException(e);
+        }
+    }
+
     public void get(String path) {
         try {
             restClient.get()
