@@ -23,6 +23,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
+import java.util.Map;
+
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -55,6 +58,30 @@ class AuthControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name("auth/login"))
                 .andExpect(model().attribute("loginRequest", new LoginRequest()));
+    }
+
+    @Test
+    void jwks() throws Exception {
+        Map<String, Object> jwks = Map.of(
+                "keys",
+                List.of(Map.of(
+                        "kty", "RSA",
+                        "kid", "test-key",
+                        "n", "modulus",
+                        "e", "AQAB"
+                ))
+        );
+        given(authApiClient.jwks()).willReturn(jwks);
+
+        mockMvc.perform(get("/.well-known/jwks.json"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.keys[0].kty").value("RSA"))
+                .andExpect(jsonPath("$.keys[0].kid").value("test-key"))
+                .andExpect(jsonPath("$.keys[0].n").value("modulus"))
+                .andExpect(jsonPath("$.keys[0].e").value("AQAB"));
+
+        then(authApiClient).should().jwks();
     }
 
     @Test

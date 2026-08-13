@@ -32,6 +32,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
+import java.util.Map;
 
 @Slf4j
 @Controller
@@ -52,6 +53,12 @@ public class AuthController {
     public String login(Model model) {
         model.addAttribute(new LoginRequest());
         return "auth/login";
+    }
+
+    @GetMapping("/.well-known/jwks.json")
+    @ResponseBody
+    public Map<String, Object> jwks() {
+        return authApiClient.jwks();
     }
 
     // 임시
