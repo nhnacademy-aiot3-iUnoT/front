@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main-layout}">
+
+<head>
+    <meta charset="UTF-8">
+    <title>조직 정보</title>
+    <link rel="stylesheet" th:href="@{/css/status.css}">
+</head>
+
+<body>
+
+<div layout:fragment="content">
+    <div class="page">
+        <div class="page-wrapper">
+            <div class="container-xl">
+                <div class="page-header mt-3">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h2 class="page-title">
+                                조직 정보
+                            </h2>
+                            <div class="text-muted">
+                                소속 조직 정보를 확인합니다.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            기본 정보
+                        </h3>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-md-3 text-muted">
+                                조직명
+                            </div>
+
+                            <div class="col-md-9"
+                                 th:text="${organization.name}">
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-3 text-muted">
+                                상태
+                            </div>
+
+                            <div class="col-md-9">
+                                <span class="badge status-badge"
+                                      th:classappend="' status-' + ${organization.status.name().toLowerCase()}"
+                                      th:text="${organization.status.ko}">
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-3 text-muted">
+                                생성일
+                            </div>
+
+                            <div class="col-md-9"
+                                 th:text="${#temporals.format(organization.createdAt, 'yyyy-MM-dd HH:mm')}">
+                            </div>
+                        </div>
+
+                        <div class="row mb-0">
+                            <div class="col-md-3 text-muted">
+                                설명
+                            </div>
+
+                            <div class="col-md-9"
+                                 th:text="${organization.description ?: '-'}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            주소 정보
+                        </h3>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-md-3 text-muted">
+                                우편번호
+                            </div>
+
+                            <div class="col-md-9"
+                                 th:text="${organization.zipCode}">
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-3 text-muted">
+                                도로명 주소
+                            </div>
+
+                            <div class="col-md-9"
+                                 th:text="${organization.roadAddress}">
+                            </div>
+                        </div>
+
+                        <div class="row mb-0">
+                            <div class="col-md-3 text-muted">
+                                상세 주소
+                            </div>
+
+                            <div class="col-md-9"
+                                 th:text="${organization.addressDetail ?: '-'}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-3"
+                     th:if="${organization.organizationRole.name() == 'ORG_OWNER' and (organization.status.name() == 'ACTIVE' or organization.status.name() == 'INACTIVE')}">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            조직 상태 관리
+                        </h3>
+                    </div>
+
+                    <div class="card-body">
+                        <form th:action="@{/organizations/me/status}" th:method="put">
+                            <input type="hidden" name="status"
+                                   th:if="${organization.status.name() == 'ACTIVE'}" value="INACTIVE">
+                            <input type="hidden" name="status"
+                                   th:if="${organization.status.name() == 'INACTIVE'}" value="ACTIVE">
+
+                            <button type="submit" class="btn btn-outline-danger"
+                                    th:if="${organization.status.name() == 'ACTIVE'}">
+                                비활성화
+                            </button>
+
+                            <button type="submit" class="btn btn-success"
+                                    th:if="${organization.status.name() == 'INACTIVE'}">
+                                활성화
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="mt-3 d-flex justify-content-end gap-2" th:if="${organization.organizationRole.name() == 'ORG_OWNER'}">
+                    <a th:if="${organization.status.name() == 'ACTIVE'}" th:href="@{/organizations/me/invitations}" class="btn btn-outline-primary">
+                        초대 관리
+                    </a>
+
+                    <a th:href="${organization.status.name() == 'PENDING'} ? @{/organizations/me/setup} : @{/organizations/me/edit}"
+                       class="btn btn-primary">
+                        <span th:text="${organization.status.name() == 'PENDING'} ? '조직 설정 시작' : '조직 정보 수정'">
+                            조직 정보 수정
+                        </span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

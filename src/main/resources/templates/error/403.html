@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>접근 권한 없음</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@latest/dist/css/tabler.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+    <link rel="stylesheet" th:href="@{/css/theme.css}">
+    <link rel="stylesheet" th:href="@{/css/error.css}">
+</head>
+
+<body>
+
+<div class="error-container">
+
+    <div class="error-card">
+        <div class="card-body">
+            <div class="row align-items-center">
+                <div class="col-md-6 text-center">
+                    <img th:src="@{/img/forbidden.png}"
+                         alt="접근 권한 없음"
+                         class="error-image">
+                </div>
+
+                <div class="col-md-6 text-center text-md-start">
+                    <div class="error-code">403</div>
+
+                    <h1 class="error-title">
+                        접근 권한이 없습니다
+                    </h1>
+
+                    <p class="text-muted error-message">
+                        해당 페이지에 접근할 수 있는 권한이 없습니다.<br>
+                        권한이 필요하다면 관리자에게 문의해주세요.
+                    </p>
+
+                    <div class="mt-5">
+                        <a th:href="@{/}"
+                           class="btn btn-primary me-2">
+                            <i class="ti ti-home me-1"></i>
+                            메인으로
+                        </a>
+
+                        <button type="button"
+                                class="btn btn-outline-secondary"
+                                onclick="history.back()">
+                            <i class="ti ti-arrow-left me-1"></i>
+                            이전 페이지
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+
+</html>

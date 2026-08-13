@@ -1,0 +1,38 @@
+.error-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.error-card {
+    width: 100%;
+    max-width: 1100px;
+}
+
+.error-card .card-body {
+    padding: 3rem;
+}
+
+.error-image {
+    max-width: 420px;
+    width: 100%;
+}
+
+.error-code {
+    color: var(--teal);
+    font-size: 5rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.error-title {
+    font-size: 2rem;
+    color: var(--ink);
+}
+
+.error-message {
+    font-size: 1rem;
+    color: var(--ink-soft) !important;
+}

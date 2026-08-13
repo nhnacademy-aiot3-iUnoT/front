@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main-layout}">
+
+<head>
+    <meta charset="UTF-8">
+    <title>조직 정보 수정</title>
+</head>
+
+<body>
+
+<div layout:fragment="content">
+    <div class="container-xl">
+        <div class="page-header d-print-none mb-4">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h2 class="page-title">
+                        <i class="ti ti-building me-2"></i>
+                        조직 정보 수정
+                    </h2>
+                    <div class="text-muted mt-1">
+                        조직 주소 및 상세 정보를 수정합니다.
+                    </div>
+                </div>
+
+                <div class="col-auto ms-auto">
+                    <a th:href="@{/organizations/me}"
+                       class="btn btn-outline-secondary">
+                        <i class="ti ti-arrow-left me-1"></i>
+                        돌아가기
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <form th:action="@{/organizations/me/edit}" th:object="${orgUpdateRequest}" th:method="put" id="orgEditForm">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="ti ti-edit me-2"></i>
+                                기본 정보 수정
+                            </h3>
+                        </div>
+
+                        <div class="card-body">
+                            <h4 class="subheader mb-3">
+                                <i class="ti ti-map-pin me-1"></i>
+                                주소 정보
+                            </h4>
+
+                            <div class="mb-4">
+                                <label for="roadAddress" class="form-label required">
+                                    도로명 주소
+                                </label>
+
+                                <div class="input-group">
+                                    <input type="text" class="form-control" maxlength="100" id="roadAddress"
+                                           th:field="*{roadAddress}" placeholder="도로명 주소를 입력하세요" readonly>
+
+                                    <button class="btn btn-outline-secondary" type="button" onclick="goPopup()">
+                                        <i class="ti ti-search me-1"></i>
+                                        주소 검색
+                                    </button>
+                                </div>
+
+                                <div class="form-hint">
+                                    주소 검색을 이용하면 정확한 도로명 주소를 입력할 수 있습니다.
+                                </div>
+
+                                <div class="invalid-feedback"></div>
+
+                                <div class="text-danger"
+                                    th:errors="*{roadAddress}">
+                                </div>
+                            </div>
+
+
+                            <div class="mb-4">
+                                <label for="zipCode" class="form-label required">
+                                    우편번호
+                                </label>
+
+                                <input type="text" class="form-control" maxlength="5" id="zipCode"
+                                       th:field="*{zipCode}" placeholder="예: 12345" readonly>
+
+                                <div class="invalid-feedback"></div>
+
+                                <div class="text-danger"
+                                     th:errors="*{zipCode}">
+                                </div>
+                            </div>
+
+
+                            <div class="mb-4">
+                                <label for="addressDetail" class="form-label">
+                                    상세 주소
+                                </label>
+
+                                <input type="text" class="form-control" maxlength="255" id="addressDetail"
+                                       th:field="*{addressDetail}" placeholder="건물명, 층수, 호수 등을 입력하세요">
+
+                                <div class="invalid-feedback"></div>
+                                 <div class="text-danger"
+                                     th:errors="*{addressDetail}">
+                                </div>
+                            </div>
+
+
+                            <div class="hr-text">추가 정보</div>
+
+
+                            <div class="mb-3">
+                                <label for="org-description" class="form-label">
+                                    조직 설명
+                                </label>
+
+                                <textarea class="form-control" rows="6" maxlength="255" id="org-description"
+                                          th:field="*{description}" placeholder="조직에 대한 간단한 설명을 입력하세요">
+                                </textarea>
+
+                                <div class="d-flex justify-content-between mt-2">
+                                    <div class="form-hint">
+                                        조직 소개, 운영 목적, 주요 업무 등을 작성할 수 있습니다.
+                                    </div>
+                                    <small class="text-muted">
+                                        최대 255자
+                                    </small>
+                                </div>
+
+                                <div class="invalid-feedback"></div>
+                                <div class="text-danger"
+                                     th:errors="*{description}">
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="card-footer bg-transparent">
+                            <div class="d-flex justify-content-end gap-2">
+                                <a th:href="@{/organizations/me}"
+                                   class="btn btn-outline-secondary">
+                                    취소
+                                </a>
+
+                                <button type="submit"
+                                        class="btn btn-primary">
+                                    <i class="ti ti-device-floppy me-1"></i>
+                                    저장
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<th:block layout:fragment="script">
+    <script th:src="@{/js/common/validation.js}"></script>
+    <script th:src="@{/js/common/form.js}"></script>
+    <script th:src="@{/js/organization/address-search.js}"></script>
+    <script th:src="@{/js/organization/org-setup.js}"></script>
+</th:block>
+</body>
+</html>

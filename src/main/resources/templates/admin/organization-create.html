@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/admin-layout}">
+
+<body>
+<div layout:fragment="content">
+
+    <div class="page">
+        <div class="page-wrapper">
+            <div class="container-xl">
+                <div class="page-header d-print-none mt-3">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h2 class="page-title">
+                                조직 생성
+                            </h2>
+                            <div class="text-secondary mt-1">
+                                새로운 조직과 Owner 계정을 생성합니다.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row justify-content-center mt-4">
+                    <div class="col-lg-8 col-xl-7">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">
+                                    조직 정보
+                                </h3>
+                            </div>
+
+                            <form th:action="@{/admin/organizations}" th:object="${orgCreateRequest}" method="post" id="orgCreateForm">
+                                <div class="card-body">
+                                    <div class="mb-4">
+                                        <label class="form-label" for="businessNumber">
+                                            사업자번호
+                                        </label>
+                                        <input type="text" id="businessNumber" class="form-control" maxlength="10"
+                                               th:field="*{businessNumber}" placeholder="숫자만 입력하세요" required>
+
+                                        <div class="invalid-feedback"></div>
+
+                                        <div class="text-danger"
+                                             th:errors="*{businessNumber}">
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <label class="form-label" for="name">
+                                            조직명
+                                        </label>
+
+                                        <input type="text" id="name" class="form-control" maxlength="50"
+                                               th:field="*{name}" placeholder="조직명을 입력해주세요" required>
+
+                                        <div class="invalid-feedback"></div>
+
+                                        <div class="text-danger"
+                                             th:errors="*{name}">
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-0">
+                                        <label class="form-label" for="email">
+                                            Owner 이메일
+                                        </label>
+
+                                        <input type="email" id="email" class="form-control" maxlength="255"
+                                               th:field="*{email}" placeholder="Owner의 이메일을 입력해주세요" required>
+
+                                        <div class="invalid-feedback"></div>
+
+                                        <div class="text-danger"
+                                             th:errors="*{email}">
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <div class="card-footer d-flex justify-content-end gap-2">
+                                    <a th:href="@{/admin/organizations}"
+                                       class="btn btn-outline-secondary">
+                                        취소
+                                    </a>
+                                    <button type="submit"
+                                            class="btn btn-primary">
+                                        생성
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<th:block layout:fragment="script">
+
+    <script th:src="@{/js/common/validation.js}"></script>
+    <script th:src="@{/js/common/form.js}"></script>
+
+    <script th:src="@{/js/admin/organization-create.js}"></script>
+
+</th:block>
+</body>
+</html>

@@ -1,6 +1,12 @@
 spring:
   application:
     name: team1-front
+  mvc:
+    hiddenmethod:
+      filter:
+        enabled: true
+  config:
+    import: optional:file:.env[.properties]
 
 server:
   port: ${SERVER_PORT:10404}
@@ -16,3 +22,6 @@ management:
 
 gateway:
   url: http://localhost:10400
+
+juso:
+  confirm-key: ${JUSO_CONFIRM_KEY:}

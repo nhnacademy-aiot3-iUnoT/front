@@ -12,6 +12,10 @@ eureka:
       enable: false
 
 management:
+  endpoints:
+    web:
+      exposure:
+        include: health, service-registry, prometheus
   tracing:
     sampling:
       probability: 1  # 트래픽 봐서 낮추기
@@ -21,3 +25,9 @@ management:
 
 gateway:
   url: lb://team1-gateway
+
+cookie:
+  secure: true
+
+juso:
+  confirm-key: ${JUSO_CONFIRM_KEY}

@@ -17,7 +17,7 @@
                 <div class="row g-0 align-items-center">
                     <div class="col-lg-5">
                         <div class="brand-section d-flex flex-column justify-content-center align-items-center text-center pt-4 pb-5">
-                            <img th:src="@{/img/character.png}" class="brand-character mb-3" alt="iUnoT">
+                            <img th:src="@{/img/profile.png}" class="brand-character mb-3" alt="iUnoT">
 
                             <h1 class="fw-bold mb-2">
                                 iUnoT
@@ -36,7 +36,7 @@
                     </div>
 
                     <div class="col-lg-7">
-                        <div class="login-section p-5">
+                        <div class="login-section">
                             <h1 class="fw-bold mb-4">로그인</h1>
                             <form th:action="@{/login}" th:object="${loginRequest}" method="post">
                                 <div class="mb-4">
@@ -48,13 +48,13 @@
                                            th:field="*{email}"
                                            class="form-control form-control-lg rounded-3"
                                            th:classappend="${#fields.hasErrors('email')} ? 'is-invalid'"
-                                           placeholder="이메일을 입력하세요."
+                                           placeholder="test@example.com"
                                             required>
 
                                     <div class="invalid-feedback"
                                          th:if="${#fields.hasErrors('email')}"
                                          th:errors="*{email}">
-                                        이메일 오류
+                                        이메일을 입력해주세요.
                                     </div>
                                 </div>
 
@@ -62,7 +62,7 @@
                                     <label class="form-label">
                                         비밀번호
                                         <span class="form-label-description">
-                                            <a href="/forgot-password" class="text-secondary">비밀번호 찾기</a>
+                                            <a th:href="@{/forgot-password}" class="text-secondary">비밀번호 찾기</a>
                                         </span>
                                     </label>
                                     <input type="password"
@@ -70,16 +70,16 @@
                                            name="password"
                                            class="form-control form-control-lg rounded-3"
                                            th:classappend="${#fields.hasErrors('password')} ? 'is-invalid'"
-                                           placeholder="비밀번호를 입력하세요."
+                                           placeholder="********"
                                         required>
 
                                     <div class="invalid-feedback"
                                          th:if="${#fields.hasErrors('password')}"
                                          th:errors="*{password}">
-                                        비밀번호 오류
+                                        비밀번호를 입력해주세요.
                                     </div>
                                 </div>
-                                <button type="submit" class="btn btn-dark btn-lg w-100">
+                                <button type="submit" class="btn btn-primary btn-lg w-100">
                                     로그인
                                 </button>
 
@@ -96,7 +96,10 @@
             </div>
         </div>
     </div>
+    <script th:if="${param.error != null and param.error[0] == 'invite'}">
+        alert('초대 링크가 없습니다.' + '\n' +
+            '조직 관리자가 발송한 초대 링크를 통해 회원가입해주세요.');
+    </script>
 </div>
-
 </body>
 </html>

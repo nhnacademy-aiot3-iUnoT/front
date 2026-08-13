@@ -1,0 +1,190 @@
+.account-page {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2rem 0;
+}
+
+.account-page-header {
+    margin-bottom: 1.75rem;
+}
+
+.account-page-header h1 {
+    margin: 0;
+    color: var(--ink);
+    font-size: 1.75rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+.account-page-header p {
+    margin: 0.5rem 0 0;
+    color: var(--ink-soft);
+}
+
+.account-container {
+    padding: 2rem;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    box-shadow: 0 4px 20px #30403b0a;
+}
+
+.account-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.5fr) minmax(320px, 1fr);
+    gap: 2.5rem;
+}
+
+.account-section + .account-section {
+    margin-top: 2rem;
+}
+
+.account-section-title {
+    margin: 0 0 0.75rem;
+    color: var(--ink);
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.account-panel {
+    overflow: hidden;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+}
+
+.account-row {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    min-height: 72px;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--line);
+}
+
+.account-row:last-child {
+    border-bottom: 0;
+}
+
+.account-label {
+    flex: 0 0 90px;
+    color: var(--ink-soft);
+    font-size: 0.9rem;
+}
+
+.account-value {
+    flex: 1;
+    min-width: 0;
+}
+
+.account-value .form-control {
+    max-width: 420px;
+}
+
+.account-action-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding: 1.25rem;
+}
+
+.account-action-title {
+    color: var(--ink);
+    font-weight: 600;
+}
+
+.account-action-description {
+    margin: 0.3rem 0 0;
+    color: var(--ink-soft);
+    font-size: 0.875rem;
+}
+
+.organization-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 44px;
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: var(--teal-soft);
+    color: var(--teal);
+    font-size: 1.4rem;
+}
+
+.account-danger {
+    background: var(--danger-soft);
+    border-color: color-mix(in srgb, var(--danger) 30%, var(--line));
+}
+
+.withdraw-page .card-header,
+.password-page .card-header {
+    padding: 1.5rem 1.75rem;
+}
+
+.withdraw-page .card-body {
+    padding: 1.75rem;
+}
+
+.withdraw-page .card-footer,
+.password-page .card-footer {
+    padding: 1.25rem 1.75rem;
+    background-color: var(--surface);
+    border-top-color: var(--line);
+}
+
+.account-form-label {
+    display: block;
+    color: var(--ink-soft);
+    font-weight: 500;
+}
+
+@media (max-width: 900px) {
+    .account-page {
+        padding: 2rem 1rem;
+    }
+
+    .account-container {
+    padding: 1.5rem;
+}
+
+    .account-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+}
+
+@media (max-width: 576px) {
+    .account-page {
+        padding: 1.5rem 1rem;
+    }
+
+    .account-container {
+    padding: 1rem;
+    border-radius: 14px;
+}
+
+    .account-row {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .account-label {
+        flex: none;
+    }
+
+    .account-value,
+    .account-value .form-control {
+        width: 100%;
+        max-width: none;
+    }
+
+    .account-action-row {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+}

@@ -9,6 +9,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class AdminApiClient {
     private final GatewayClient backendApiClient;
-    private static final String ACCOUNT_SERVICE = "/api/account";
+    private static final String ACCOUNT_SERVICE = "/api/accounts/admin";
     private static final String CORE_SERVICE = "/api/core";
 }
