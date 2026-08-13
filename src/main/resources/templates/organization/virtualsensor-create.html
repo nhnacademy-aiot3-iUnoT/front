@@ -20,7 +20,7 @@
                 </h2>
 
                 <div class="text-muted">
-                    실제 센서 없이 측정값을 생성해 전송합니다. 설정한 주기마다 온도·습도·밝기가 발행되고,
+                    실제 센서 없이 측정값을 생성해 전송합니다. 선택한 센서 타입만 설정한 주기에 맞춰 발행되며,
                     문 상태는 값이 바뀔 때만 발행됩니다.
                 </div>
             </div>
@@ -99,9 +99,56 @@
 
                     <div class="card-body">
                         <div class="text-muted mb-3">
-                            매 주기마다 아래 범위 안에서 무작위 값이 생성됩니다.
+                            <span th:if="${!edit}">센서 타입을 하나 이상 선택하고 생성 범위를 입력하세요.</span>
+                            <span th:if="${edit}">매 주기마다 아래 범위 안에서 무작위 값이 생성됩니다.</span>
                         </div>
 
+                        <div class="mb-4" th:if="${!edit}" id="sensorTypeSelection">
+                            <label class="form-label required">생성할 센서 타입</label>
+
+                            <div class="d-flex flex-wrap gap-3">
+                                <label class="form-check">
+                                    <input class="form-check-input sensor-type-checkbox" type="checkbox"
+                                           name="enabledSensorTypes" value="TEMPERATURE"
+                                           data-sensor-type="TEMPERATURE"
+                                           th:checked="${param.enabledSensorTypes != null
+                                                       and #arrays.contains(param.enabledSensorTypes, 'TEMPERATURE')}">
+                                    <span class="form-check-label">온도</span>
+                                </label>
+
+                                <label class="form-check">
+                                    <input class="form-check-input sensor-type-checkbox" type="checkbox"
+                                           name="enabledSensorTypes" value="HUMIDITY"
+                                           data-sensor-type="HUMIDITY"
+                                           th:checked="${param.enabledSensorTypes != null
+                                                       and #arrays.contains(param.enabledSensorTypes, 'HUMIDITY')}">
+                                    <span class="form-check-label">습도</span>
+                                </label>
+
+                                <label class="form-check">
+                                    <input class="form-check-input sensor-type-checkbox" type="checkbox"
+                                           name="enabledSensorTypes" value="ILLUMINATION"
+                                           data-sensor-type="ILLUMINATION"
+                                           th:checked="${param.enabledSensorTypes != null
+                                                       and #arrays.contains(param.enabledSensorTypes, 'ILLUMINATION')}">
+                                    <span class="form-check-label">밝기</span>
+                                </label>
+
+                                <label class="form-check">
+                                    <input class="form-check-input sensor-type-checkbox" type="checkbox"
+                                           name="enabledSensorTypes" value="DOOR"
+                                           data-sensor-type="DOOR"
+                                           th:checked="${param.enabledSensorTypes != null
+                                                       and #arrays.contains(param.enabledSensorTypes, 'DOOR')}">
+                                    <span class="form-check-label">문 열림</span>
+                                </label>
+                            </div>
+
+                            <div class="invalid-feedback d-block" id="sensorTypeFeedback" hidden></div>
+                        </div>
+
+                        <div data-sensor-fields="TEMPERATURE"
+                             th:if="${!edit or virtualSensor.temperature != null}">
                         <label class="form-label required">온도 (°C)</label>
 
                         <div class="row">
@@ -112,7 +159,8 @@
 
                                         <input type="number" class="form-control" id="temperatureMin"
                                                name="temperature.min" step="0.1" required
-                                               th:value="${virtualSensor != null ? virtualSensor.temperature.min : 20}">
+                                               th:value="${virtualSensor != null and virtualSensor.temperature != null
+                                                           ? virtualSensor.temperature.min : 20}">
                                     </div>
 
                                     <div class="invalid-feedback"></div>
@@ -126,14 +174,18 @@
 
                                         <input type="number" class="form-control" id="temperatureMax"
                                                name="temperature.max" step="0.1" required
-                                               th:value="${virtualSensor != null ? virtualSensor.temperature.max : 30}">
+                                               th:value="${virtualSensor != null and virtualSensor.temperature != null
+                                                           ? virtualSensor.temperature.max : 30}">
                                     </div>
 
                                     <div class="invalid-feedback"></div>
                                 </div>
                             </div>
                         </div>
+                        </div>
 
+                        <div data-sensor-fields="HUMIDITY"
+                             th:if="${!edit or virtualSensor.humidity != null}">
                         <label class="form-label required">습도 (%)</label>
 
                         <div class="row">
@@ -144,7 +196,8 @@
 
                                         <input type="number" class="form-control" id="humidityMin"
                                                name="humidity.min" step="0.1" required
-                                               th:value="${virtualSensor != null ? virtualSensor.humidity.min : 40}">
+                                               th:value="${virtualSensor != null and virtualSensor.humidity != null
+                                                           ? virtualSensor.humidity.min : 40}">
                                     </div>
 
                                     <div class="invalid-feedback"></div>
@@ -158,14 +211,18 @@
 
                                         <input type="number" class="form-control" id="humidityMax"
                                                name="humidity.max" step="0.1" required
-                                               th:value="${virtualSensor != null ? virtualSensor.humidity.max : 60}">
+                                               th:value="${virtualSensor != null and virtualSensor.humidity != null
+                                                           ? virtualSensor.humidity.max : 60}">
                                     </div>
 
                                     <div class="invalid-feedback"></div>
                                 </div>
                             </div>
                         </div>
+                        </div>
 
+                        <div data-sensor-fields="ILLUMINATION"
+                             th:if="${!edit or virtualSensor.illumination != null}">
                         <label class="form-label required">밝기 (lux)</label>
 
                         <div class="row">
@@ -176,7 +233,8 @@
 
                                         <input type="number" class="form-control" id="illuminationMin"
                                                name="illumination.min" step="1" required
-                                               th:value="${virtualSensor != null ? virtualSensor.illumination.min : 100}">
+                                               th:value="${virtualSensor != null and virtualSensor.illumination != null
+                                                           ? virtualSensor.illumination.min : 100}">
                                     </div>
 
                                     <div class="invalid-feedback"></div>
@@ -190,16 +248,19 @@
 
                                         <input type="number" class="form-control" id="illuminationMax"
                                                name="illumination.max" step="1" required
-                                               th:value="${virtualSensor != null ? virtualSensor.illumination.max : 150}">
+                                               th:value="${virtualSensor != null and virtualSensor.illumination != null
+                                                           ? virtualSensor.illumination.max : 150}">
                                     </div>
 
                                     <div class="invalid-feedback"></div>
                                 </div>
                             </div>
                         </div>
+                        </div>
 
-                        <div class="row">
-                            <div class="col-md-6">
+                        <div class="row" data-sensor-fields="DOOR"
+                             th:if="${!edit or virtualSensor.doorOpenProbability != null}">
+                            <div class="">
                                 <div class="mb-3">
                                     <label class="form-label required" for="doorOpenProbability">
                                         문 열림 확률
@@ -207,7 +268,8 @@
 
                                     <input type="number" class="form-control" id="doorOpenProbability"
                                            name="doorOpenProbability" min="0" max="1" step="0.01" required
-                                           th:value="${virtualSensor != null ? virtualSensor.doorOpenProbability : 0.01}">
+                                           th:value="${virtualSensor != null and virtualSensor.doorOpenProbability != null
+                                                       ? virtualSensor.doorOpenProbability : 0.01}">
 
                                     <div class="invalid-feedback"></div>
 

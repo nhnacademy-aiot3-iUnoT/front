@@ -119,27 +119,36 @@
                     <div class="row mb-3">
                         <div class="col-md-3 text-muted">온도 (°C)</div>
                         <div class="col-md-9"
-                             th:text="|${virtualSensor.temperature.min} ~ ${virtualSensor.temperature.max}|">-
+                             th:text="${virtualSensor.temperature == null
+                                       ? '-'
+                                       : virtualSensor.temperature.min + ' ~ ' + virtualSensor.temperature.max}">-
                         </div>
                     </div>
 
                     <div class="row mb-3">
                         <div class="col-md-3 text-muted">습도 (%)</div>
                         <div class="col-md-9"
-                             th:text="|${virtualSensor.humidity.min} ~ ${virtualSensor.humidity.max}|">-
+                             th:text="${virtualSensor.humidity == null
+                                       ? '-'
+                                       : virtualSensor.humidity.min + ' ~ ' + virtualSensor.humidity.max}">-
                         </div>
                     </div>
 
                     <div class="row mb-3">
                         <div class="col-md-3 text-muted">밝기 (lux)</div>
                         <div class="col-md-9"
-                             th:text="|${virtualSensor.illumination.min} ~ ${virtualSensor.illumination.max}|">-
+                             th:text="${virtualSensor.illumination == null
+                                       ? '-'
+                                       : virtualSensor.illumination.min + ' ~ ' + virtualSensor.illumination.max}">-
                         </div>
                     </div>
 
                     <div class="row mb-0">
                         <div class="col-md-3 text-muted">문 열림 확률</div>
-                        <div class="col-md-9" th:text="${virtualSensor.doorOpenProbability}">-</div>
+                        <div class="col-md-9"
+                             th:text="${virtualSensor.doorOpenProbability == null
+                                       ? '-'
+                                       : virtualSensor.doorOpenProbability}">-</div>
                     </div>
                 </div>
 
