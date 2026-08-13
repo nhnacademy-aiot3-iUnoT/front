@@ -47,31 +47,6 @@
     color: var(--ink);
 }
 
-.status-badge {
-    font-weight: 500;
-    padding: 0.4rem 0.65rem;
-}
-
-.status-pending {
-    color: var(--warning);
-    background-color: var(--warning-soft);
-}
-
-.status-active {
-    color: var(--teal-dark);
-    background-color: var(--mint);
-}
-
-.status-inactive {
-    color: var(--ink-soft);
-    background-color: var(--line);
-}
-
-.status-suspended {
-    color: var(--danger);
-    background-color: var(--danger-soft);
-}
-
 /* 관리자 페이지 */
 .btn-outline-primary {
     --tblr-btn-color: var(--teal);

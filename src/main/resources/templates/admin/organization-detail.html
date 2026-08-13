@@ -8,6 +8,7 @@
     <meta charset="UTF-8">
     <title>조직 상세</title>
     <link rel="stylesheet" th:href="@{/css/admin.css}">
+    <link rel="stylesheet" th:href="@{/css/status.css}">
 </head>
 
 <body>
@@ -64,24 +65,9 @@
                             </div>
 
                             <div class="col-md-9">
-                                <span class="badge status-badge status-pending"
-                                      th:if="${organization.status.name() == 'PENDING'}">
-                                    진행중
-                                </span>
-
-                                <span class="badge status-badge status-active"
-                                      th:if="${organization.status.name() == 'ACTIVE'}">
-                                    활성
-                                </span>
-
-                                <span class="badge status-badge status-inactive"
-                                      th:if="${organization.status.name() == 'INACTIVE'}">
-                                    비활성
-                                </span>
-
-                                <span class="badge status-badge status-suspended"
-                                      th:if="${organization.status.name() == 'SUSPENDED'}">
-                                    종료
+                                <span class="badge status-badge"
+                                      th:classappend="' status-' + ${organization.status.name().toLowerCase()}"
+                                      th:text="${organization.status.ko}">
                                 </span>
                             </div>
                         </div>
@@ -183,24 +169,9 @@
 
                             <div class="col-md-9">
 
-                            <span class="badge status-badge status-pending"
-                                  th:if="${organization.invitation.status.name() == 'ACTIVE'}">
-                                초대 진행중
-                            </span>
-
-                            <span class="badge status-badge status-active"
-                                  th:if="${organization.invitation.status.name() == 'USED'}">
-                                가입 완료
-                            </span>
-
-                            <span class="badge status-badge status-inactive"
-                                  th:if="${organization.invitation.status.name() == 'EXPIRED'}">
-                                만료
-                            </span>
-
-                            <span class="badge status-badge status-suspended"
-                                  th:if="${organization.invitation.status.name() == 'CANCELED'}">
-                                취소됨
+                            <span class="badge status-badge"
+                                  th:classappend="' status-' + ${organization.invitation.status.name().toLowerCase()}"
+                                  th:text="${organization.invitation.status.ko}">
                             </span>
 
                             </div>

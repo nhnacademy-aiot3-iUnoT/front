@@ -7,6 +7,8 @@
 <head>
     <meta charset="UTF-8">
     <title>초대 관리</title>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+    <link rel="stylesheet" th:href="@{/css/status.css}">
 </head>
 
 <body>
@@ -78,8 +80,7 @@
                                     <option th:each="status : ${invitationStatuses}"
                                             th:value="${status}"
                                             th:text="${status}"
-                                            th:selected="${param.status != null
-                                                and param.status[0] == status.name()}">
+                                            th:selected="${param.status != null and param.status[0] == status.name}">
                                     </option>
                                 </select>
                             </div>
@@ -117,7 +118,12 @@
 
                             <tr th:each="invitation : ${invitations.content}">
                                 <td th:text="${invitation.email}"></td>
-                                <td th:text="${invitation.status}"></td>
+                                <td>
+                                    <span class="badge status-badge"
+                                          th:classappend="' status-' + ${invitation.status.name().toLowerCase()}"
+                                          th:text="${invitation.status.ko}">
+                                    </span>
+                                </td>
                                 <td th:text="${#temporals.format(invitation.createdAt, 'yyyy-MM-dd HH:mm' )}"></td>
                                 <td th:text="${#temporals.format(invitation.expiredAt,  'yyyy-MM-dd HH:mm')}"></td>
                                 <td class="text-end">
