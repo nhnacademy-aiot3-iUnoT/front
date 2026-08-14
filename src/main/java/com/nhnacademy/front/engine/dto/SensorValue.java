@@ -1,7 +1,11 @@
 package com.nhnacademy.front.engine.dto;
 
+import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.NotNull;
+
 public record SensorValue(
 
+        @NotNull(message = "생성 모드는 필수입니다.")
         GenerationMode mode,
 
         Double min,
@@ -13,23 +17,23 @@ public record SensorValue(
         Double probability
 
 ) {
-    public SensorValue {
-        if (mode == GenerationMode.RANGE
-                && (min != null && max != null)
-                && min > max)
-        {
-            throw new IllegalArgumentException(
-                    "최솟값은 최댓값보다 클 수 없습니다."
-            );
+
+    @AssertTrue(message = "생성 모드에 맞는 값을 입력해야 합니다.")
+    public boolean isConfigurationValid() {
+        if (mode == null) {
+            return true;
         }
 
-        if (mode == GenerationMode.PROBABILITY
-                && probability != null
-                && (probability >= 0.0 && probability <= 1.0 ))
-        {
-            throw new IllegalArgumentException(
-                    "확률은 0 - 1 사이값이어야 합니다."
-            );
-        }
+        return switch (mode) {
+            case RANGE -> isFinite(min) && isFinite(max) && min <= max;
+            case FIXED -> isFinite(fixedValue);
+            case PROBABILITY -> isFinite(probability)
+                    && probability >= 0.0
+                    && probability <= 1.0;
+        };
+    }
+
+    private static boolean isFinite(Double value) {
+        return value != null && Double.isFinite(value);
     }
 }
