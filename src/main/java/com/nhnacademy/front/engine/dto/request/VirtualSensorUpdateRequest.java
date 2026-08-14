@@ -1,5 +1,6 @@
 package com.nhnacademy.front.engine.dto.request;
 
+import com.nhnacademy.front.engine.dto.SensorValueRange;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
@@ -11,13 +12,13 @@ public record VirtualSensorUpdateRequest(
         Integer measurementIntervalSeconds,
 
         @Valid
-        VirtualSensorCreateRequest.SensorValueRange temperature,
+        SensorValueRange temperature,
 
         @Valid
-        VirtualSensorCreateRequest.SensorValueRange humidity,
+        SensorValueRange humidity,
 
         @Valid
-        VirtualSensorCreateRequest.SensorValueRange illumination,
+        SensorValueRange illumination,
 
         @DecimalMin(value = "0.0", message = "문 열림 확률은 0 이상이어야 합니다.")
         @DecimalMax(value = "1.0", message = "문 열림 확률은 1 이하여야 합니다.")

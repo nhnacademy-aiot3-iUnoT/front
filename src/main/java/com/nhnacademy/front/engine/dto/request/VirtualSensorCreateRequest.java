@@ -1,9 +1,12 @@
 package com.nhnacademy.front.engine.dto.request;
 
 import com.nhnacademy.front.engine.dto.SensorType;
+import com.nhnacademy.front.engine.dto.SensorValueRange;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 
+import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 public record VirtualSensorCreateRequest(
@@ -16,16 +19,9 @@ public record VirtualSensorCreateRequest(
         Integer measurementIntervalSeconds,
 
         @NotEmpty(message = "센서 타입을 하나 이상 선택해야 합니다.")
-        Set<SensorType> enabledSensorTypes,
-
-        @Valid
-        SensorValueRange temperature,
-
-        @Valid
-        SensorValueRange humidity,
-
-        @Valid
-        SensorValueRange illumination,
+        Map<@NotNull SensorType,
+              @Valid SensorValueRange
+        > virtualSensorValueRanges,
 
 
         @DecimalMin(value = "0.0", message = "문 열림 확률은 0 이상이어야 합니다.")
@@ -35,36 +31,10 @@ public record VirtualSensorCreateRequest(
 
     @AssertTrue(message = "선택한 센서 타입의 설정값을 입력해야 합니다.")
     public boolean isSelectedSensorConfigurationValid() {
-        if (enabledSensorTypes == null || enabledSensorTypes.isEmpty()) {
+        if (virtualSensorValueRanges == null || virtualSensorValueRanges.isEmpty()) {
             return true; // 비어 있는 검증은 @NotEmpty에서 예외 처리
         }
 
-        return (!enabledSensorTypes.contains(SensorType.TEMPERATURE)
-                || temperature != null)
-                && (!enabledSensorTypes.contains(SensorType.HUMIDITY)
-                || humidity != null)
-                && (!enabledSensorTypes.contains(SensorType.ILLUMINATION)
-                || illumination != null)
-                && (!enabledSensorTypes.contains(SensorType.DOOR)
-                || doorOpenProbability != null);
+        return virtualSensorValueRanges.values().stream().noneMatch(Objects::isNull);
     }
-
-    public record SensorValueRange(
-
-            @NotNull(message = "최솟값은 필수입니다.")
-            Double min,
-
-            @NotNull(message = "최댓값은 필수입니다.")
-            Double max
-
-    ) {
-        public SensorValueRange {
-            if (min != null && max != null && min > max) {
-                throw new IllegalArgumentException(
-                        "최솟값은 최댓값보다 클 수 없습니다."
-                );
-            }
-        }
-    }
-
 }
