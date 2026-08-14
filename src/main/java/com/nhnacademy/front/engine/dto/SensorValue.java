@@ -1,15 +1,11 @@
 package com.nhnacademy.front.engine.dto;
 
-import jakarta.validation.constraints.NotNull;
-
 public record SensorValue(
 
         GenerationMode mode,
 
-        @NotNull(message = "최솟값은 필수입니다.")
         Double min,
 
-        @NotNull(message = "최댓값은 필수입니다.")
         Double max,
 
         Double fixedValue,
@@ -18,9 +14,21 @@ public record SensorValue(
 
 ) {
     public SensorValue {
-        if (min != null && max != null && min > max) {
+        if (mode == GenerationMode.RANGE
+                && (min != null && max != null)
+                && min > max)
+        {
             throw new IllegalArgumentException(
                     "최솟값은 최댓값보다 클 수 없습니다."
+            );
+        }
+
+        if (mode == GenerationMode.PROBABILITY
+                && probability != null
+                && (probability >= 0.0 && probability <= 1.0 ))
+        {
+            throw new IllegalArgumentException(
+                    "확률은 0 - 1 사이값이어야 합니다."
             );
         }
     }
