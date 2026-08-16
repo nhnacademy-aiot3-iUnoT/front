@@ -100,7 +100,7 @@
                                     th:text="${#temporals.format(organization.createdAt, 'yyyy-MM-dd HH:mm')}">
                                 </td>
                                 <td class="text-end">
-                                    <a th:href="@{/admin/organizations/{id}(id=${organization.id})}"
+                                    <a th:href="@{/admin/organizations/{organization-id}(organization-id=${organization.id})}"
                                        class="btn btn-sm btn-outline-secondary">
                                         상세
                                     </a>

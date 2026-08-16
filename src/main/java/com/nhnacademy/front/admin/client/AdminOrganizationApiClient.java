@@ -2,7 +2,6 @@ package com.nhnacademy.front.admin.client;
 
 import com.nhnacademy.front.admin.dto.request.OrgCreateRequest;
 import com.nhnacademy.front.admin.dto.request.OrgSearchRequest;
-import com.nhnacademy.front.admin.dto.response.OrgCreateResponse;
 import com.nhnacademy.front.admin.dto.response.AdminOrgDetailResponse;
 import com.nhnacademy.front.admin.dto.response.OrgSearchResponse;
 import com.nhnacademy.front.global.client.GatewayClient;
@@ -44,8 +43,8 @@ public class AdminOrganizationApiClient {
     /**
      * 조직 생성
      */
-    public OrgCreateResponse createOrg(OrgCreateRequest request) {
-        return gatewayClient.post(CORE_SERVICE_ADMIN, request, OrgCreateResponse.class);
+    public void createOrg(OrgCreateRequest request) {
+        gatewayClient.post(CORE_SERVICE_ADMIN, request);
     }
 
     /**

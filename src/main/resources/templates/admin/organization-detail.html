@@ -130,7 +130,7 @@
                         목록
                     </a>
 
-                    <form th:action="@{/admin/organizations/{id}(id=${organization.id})}" th:method="delete" class="m-0">
+                    <form th:action="@{/admin/organizations/{organization-id}(organization-id=${organization.id})}" th:method="delete" class="m-0">
                         <button type="submit" class="btn btn-danger">
                             삭제
                         </button>
@@ -203,9 +203,9 @@
                          th:if="${organization.invitation.status.name() != 'USED'}">
 
                         <form th:if="${organization.invitation.status.name() == 'ACTIVE'}"
-                              th:action="@{/admin/organizations/{organizationId}/invitations/{invitationId}/resend(
-                                  organizationId=${organization.id},
-                                  invitationId=${organization.invitation.id}
+                              th:action="@{/admin/organizations/{organization-id}/invitations/{invitation-id}/resend(
+                                  organization-id=${organization.id},
+                                  invitation-id=${organization.invitation.id}
                               )}"
                               method="post">
                             <button type="submit" class="btn btn-outline-primary">
@@ -213,9 +213,9 @@
                             </button>
                         </form>
 
-                        <form th:action="@{/admin/organizations/{organizationId}/invitations/{invitationId}/reissue(
-                                  organizationId=${organization.id},
-                                  invitationId=${organization.invitation.id}
+                        <form th:action="@{/admin/organizations/{organization-id}/invitations/{invitation-id}/reissue(
+                                  organization-id=${organization.id},
+                                  invitation-id=${organization.invitation.id}
                               )}"
                               method="post">
                             <button type="submit" class="btn btn-primary">
@@ -224,9 +224,9 @@
                         </form>
 
                         <form th:if="${organization.invitation.status.name() == 'ACTIVE'}"
-                              th:action="@{/admin/organizations/{organizationId}/invitations/{invitationId}/cancel(
-                                  organizationId=${organization.id},
-                                  invitationId=${organization.invitation.id}
+                              th:action="@{/admin/organizations/{organization-id}/invitations/{invitation-id}/cancel(
+                                  organization-id=${organization.id},
+                                  invitation-id=${organization.invitation.id}
                               )}"
                               method="post">
                             <button type="submit" class="btn btn-outline-danger">
