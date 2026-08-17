@@ -7,7 +7,6 @@
 <head>
     <meta charset="UTF-8">
     <title>초대 관리</title>
-    <link rel="stylesheet" th:href="@{/css/admin.css}">
     <link rel="stylesheet" th:href="@{/css/status.css}">
 </head>
 
@@ -79,7 +78,7 @@
                                     <option value="">전체 상태</option>
                                     <option th:each="status : ${invitationStatuses}"
                                             th:value="${status}"
-                                            th:text="${status}"
+                                            th:text="${status.ko}"
                                             th:selected="${param.status != null and param.status[0] == status.name}">
                                     </option>
                                 </select>

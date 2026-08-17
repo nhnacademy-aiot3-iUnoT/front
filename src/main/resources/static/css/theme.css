@@ -185,6 +185,39 @@ a:hover {
     border-color: #963c38;
     color: #fff;
 }
+
+.btn-outline-primary {
+    --tblr-btn-color: var(--teal);
+    --tblr-btn-border-color: var(--teal);
+    --tblr-btn-hover-color: #fff;
+    --tblr-btn-hover-bg: var(--teal);
+    --tblr-btn-hover-border-color: var(--teal);
+
+    color: var(--teal);
+    border-color: var(--teal);
+}
+
+.btn-outline-primary:hover,
+.btn-outline-primary:focus {
+    color: #fff;
+    background-color: var(--teal);
+    border-color: var(--teal);
+}
+
+.pagination .page-link {
+    color: var(--teal);
+}
+
+.pagination .page-item.active .page-link {
+    color: #fff;
+    background-color: var(--teal);
+    border-color: var(--teal);
+}
+
+.pagination .page-link:hover {
+    color: var(--teal-dark);
+    background-color: var(--teal-soft);
+}
 .alert-warning {
     --tblr-alert-color: var(--warning);
     --tblr-alert-bg: var(--warning-soft);

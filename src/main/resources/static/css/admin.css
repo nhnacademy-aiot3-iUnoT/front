@@ -46,37 +46,3 @@
 .admin-card .card-title {
     color: var(--ink);
 }
-
-/* 관리자 페이지 */
-.btn-outline-primary {
-    --tblr-btn-color: var(--teal);
-    --tblr-btn-border-color: var(--teal);
-    --tblr-btn-hover-color: #fff;
-    --tblr-btn-hover-bg: var(--teal);
-    --tblr-btn-hover-border-color: var(--teal);
-
-    color: var(--teal);
-    border-color: var(--teal);
-}
-
-.btn-outline-primary:hover,
-.btn-outline-primary:focus {
-    color: #fff;
-    background-color: var(--teal);
-    border-color: var(--teal);
-}
-
-.pagination .page-link {
-    color: var(--teal);
-}
-
-.pagination .page-item.active .page-link {
-    color: #fff;
-    background-color: var(--teal);
-    border-color: var(--teal);
-}
-
-.pagination .page-link:hover {
-    color: var(--teal-dark);
-    background-color: var(--teal-soft);
-}

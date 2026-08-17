@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main-layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>부서 목록</title>
+    <link rel="stylesheet" th:href="@{/css/department.css}">
+    <link rel="stylesheet" th:href="@{/css/status.css}">
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container-xl department-page">
+        <div class="page-header d-print-none mb-4">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h2 class="page-title">부서 관리</h2>
+                    <div class="text-muted mt-1">조직의 부서를 관리합니다.</div>
+                </div>
+                <div class="col-auto">
+                    <a th:href="@{/organizations/me}" class="btn btn-outline-secondary">
+                        조직 정보
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="row row-cards">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header"><h3 class="card-title">부서 목록</h3></div>
+                    <div class="table-responsive">
+                        <table class="table table-vcenter card-table">
+                            <thead>
+                                <tr>
+                                    <th>부서명</th>
+                                    <th>상태</th>
+                                    <th class="department-action-column"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:if="${#lists.isEmpty(departments)}">
+                                <td colspan="3" class="text-center text-muted py-4">등록된 부서가 없습니다.</td>
+                            </tr>
+                            <tr th:each="department : ${departments}">
+                                <td th:text="${department.name}">부서명</td>
+                                <td>
+                                    <span class="badge status-badge"
+                                          th:classappend="' status-' + ${department.status.name().toLowerCase()}"
+                                          th:text="${department.status.ko}">활성</span>
+                                </td>
+                                <td class="department-action-column"><a class="btn btn-outline-primary btn-sm" th:href="@{/departments/{id}(id=${department.id})}">상세</a></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <form th:action="@{/departments}" th:object="${departmentCreateRequest}" method="post">
+                    <div class="card">
+                        <div class="card-header"><h3 class="card-title">부서 등록</h3></div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label for="name" class="form-label required">부서명</label>
+                                <input id="name" class="form-control" th:field="*{name}" maxlength="30" placeholder="부서명을 입력하세요">
+                                <div class="text-danger" th:errors="*{name}"></div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="description" class="form-label">설명</label>
+                                <textarea id="description" class="form-control" th:field="*{description}" maxlength="255" rows="5" placeholder="부서 설명을 입력하세요"></textarea>
+                                <div class="text-danger" th:errors="*{description}"></div>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent text-end">
+                            <button class="btn btn-primary" type="submit">등록</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -38,7 +38,7 @@ public class InvitationApiClient {
     }
 
     public void createInvitation(InvitationCreateRequest request) {
-        gatewayClient.post(CORE_SERVICE + "/organizations/me/invitations", request, Object.class);
+        gatewayClient.post(CORE_SERVICE + "/organizations/me/invitations", request);
     }
 
     public void resendInvitation(Long invitationId) {

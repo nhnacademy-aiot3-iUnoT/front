@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main-layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>부서 정보</title>
+    <link rel="stylesheet" th:href="@{/css/department.css}">
+    <link rel="stylesheet" th:href="@{/css/status.css}">
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container-xl department-page">
+        <div class="page-header d-print-none mb-4">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h2 class="page-title" th:text="${department.name}"> 정보</h2>
+                    <div class="text-muted mt-1">부서 정보를 수정하거나 상태를 변경합니다.</div>
+                </div>
+                <div class="col-auto"><a class="btn btn-outline-secondary" th:href="@{/departments}">목록으로</a></div>
+            </div>
+        </div>
+
+        <div class="row row-cards">
+            <div class="col-lg-8">
+                <form th:action="@{/departments/{id}(id=${department.id})}" th:object="${departmentUpdateRequest}" th:method="put">
+                    <div class="card">
+                        <div class="card-header"><h3 class="card-title">기본 정보</h3></div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label for="name" class="form-label required">부서명</label>
+                                <input id="name" class="form-control" th:field="*{name}" maxlength="30">
+                                <div class="text-danger" th:errors="*{name}"></div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="description" class="form-label">설명</label>
+                                <textarea id="description" class="form-control" th:field="*{description}" maxlength="255" rows="5"></textarea>
+                                <div class="text-danger" th:errors="*{description}"></div>
+                            </div>
+                            <div class="row"><div class="col-sm-3 text-muted">생성일</div><div class="col-sm-9" th:text="${#temporals.format(department.createdAt, 'yyyy-MM-dd HH:mm')}"></div></div>
+                        </div>
+                        <div class="card-footer bg-transparent text-end"><button class="btn btn-primary" type="submit">저장</button></div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header"><h3 class="card-title">부서 상태</h3></div>
+                    <div class="card-body">
+                        <span class="badge status-badge"
+                              th:classappend="' status-' + ${department.status.name().toLowerCase()}"
+                              th:text="${department.status.ko}">활성</span>
+                    </div>
+                    <div class="card-footer bg-transparent">
+                        <form th:action="@{/departments/{id}/status(id=${department.id})}" th:method="put">
+                            <input type="hidden" name="status" th:value="${department.status.name() == 'ACTIVE' ? 'INACTIVE' : 'ACTIVE'}">
+                            <button class="btn w-100"
+                                    th:classappend="${department.status.name() == 'ACTIVE'} ? 'btn-outline-danger' : 'btn-success'"
+                                    th:text="${department.status.name() == 'ACTIVE'} ? '비활성화' : '활성화'">상태 변경</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card mt-3 department-danger-card">
+                    <div class="card-body">
+                        <form th:action="@{/departments/{id}(id=${department.id})}" th:method="delete"
+                              onsubmit="return confirm('부서를 삭제하시겠습니까? 연결된 부서 정보도 함께 삭제됩니다.');">
+                            <button class="btn btn-outline-danger w-100" type="submit">부서 삭제</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
