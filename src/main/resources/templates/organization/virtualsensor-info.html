@@ -15,8 +15,7 @@
             <li class="breadcrumb-item"><a href="/">환경관리</a></li>
             <li class="breadcrumb-item"><span th:text="|저장소 ${storageId}|">저장소</span></li>
             <li class="breadcrumb-item">
-                <a th:href="@{/organizations/{organizationId}/storages/{storageId}/zones/{zoneId}/sensorInfo(
-                           organizationId=${organizationId},
+                <a th:href="@{/organizations/me/storages/{storageId}/zones/{zoneId}/sensorInfo(
                            storageId=${storageId},
                            zoneId=${zoneId})}"
                    th:text="|Zone ${zoneId}|">Zone</a>
@@ -49,8 +48,7 @@
 
             <div class="col-auto">
                 <a class="btn btn-outline-secondary"
-                   th:href="@{/organizations/{organizationId}/storages/{storageId}/zones/{zoneId}/sensorInfo(
-                           organizationId=${organizationId},
+                   th:href="@{/organizations/me/storages/{storageId}/zones/{zoneId}/sensorInfo(
                            storageId=${storageId},
                            zoneId=${zoneId})}">
                     센서 데이터 보기
@@ -77,8 +75,7 @@
 
             <div class="mt-3">
                 <a class="btn btn-primary"
-                   th:href="@{/organizations/{organizationId}/storages/{storageId}/zones/{zoneId}/virtual-sensors/create(
-                           organizationId=${organizationId},
+                   th:href="@{/organizations/me/storages/{storageId}/zones/{zoneId}/virtual-sensors/create(
                            storageId=${storageId},
                            zoneId=${zoneId})}">
                     가상 센서 생성
@@ -156,8 +153,7 @@
                     <!-- 가상 센서 삭제 -->
                     <form class="m-0"
                           th:method="delete"
-                          th:action="@{/organizations/{organizationId}/storages/{storageId}/zones/{zoneId}/virtual-sensors(
-                                  organizationId=${organizationId},
+                          th:action="@{/organizations/me/storages/{storageId}/zones/{zoneId}/virtual-sensors(
                                   storageId=${storageId},
                                   zoneId=${zoneId})}">
                         <button type="submit" class="btn btn-outline-danger">
@@ -167,8 +163,7 @@
 
                     <!-- 생성 폼을 수정 모드로 재사용한다 -->
                     <a class="btn btn-primary"
-                       th:href="@{/organizations/{organizationId}/storages/{storageId}/zones/{zoneId}/virtual-sensors/edit(
-                               organizationId=${organizationId},
+                       th:href="@{/organizations/me/storages/{storageId}/zones/{zoneId}/virtual-sensors/edit(
                                storageId=${storageId},
                                zoneId=${zoneId})}">
                         설정 수정
@@ -187,8 +182,7 @@
                     </div>
 
                     <form th:method="put"
-                          th:action="@{/organizations/{organizationId}/storages/{storageId}/zones/{zoneId}/virtual-sensors/status(
-                                  organizationId=${organizationId},
+                          th:action="@{/organizations/me/storages/{storageId}/zones/{zoneId}/virtual-sensors/status(
                                   storageId=${storageId},
                                   zoneId=${zoneId})}">
 

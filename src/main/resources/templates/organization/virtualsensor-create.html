@@ -33,8 +33,7 @@
     <div class="row row-cards">
         <div class="col-12">
             <form id="virtualSensorCreateForm" th:method="${edit} ? 'put' : 'post'"
-                  th:action="@{/organizations/{organizationId}/storages/{storageId}/zones/{zoneId}/virtual-sensors(
-                          organizationId=${organizationId},
+                  th:action="@{/organizations/me/storages/{storageId}/zones/{zoneId}/virtual-sensors(
                           storageId=${storageId},
                           zoneId=${zoneId})}">
 
@@ -285,16 +284,14 @@
                     <div class="card-footer d-flex justify-content-end gap-2">
                         <!-- 수정 모드는 가상 센서 정보 화면으로, 생성 모드는 센서 데이터 화면으로 돌아간다 -->
                         <a class="btn btn-outline-secondary" th:if="${edit}"
-                           th:href="@{/organizations/{organizationId}/storages/{storageId}/zones/{zoneId}/virtual-sensors(
-                                   organizationId=${organizationId},
+                           th:href="@{/organizations/me/storages/{storageId}/zones/{zoneId}/virtual-sensors(
                                    storageId=${storageId},
                                    zoneId=${zoneId})}">
                             취소
                         </a>
 
                         <a class="btn btn-outline-secondary" th:if="${!edit}"
-                           th:href="@{/organizations/{organizationId}/storages/{storageId}/zones/{zoneId}/sensorInfo(
-                                   organizationId=${organizationId},
+                           th:href="@{/organizations/me/storages/{storageId}/zones/{zoneId}/sensorInfo(
                                    storageId=${storageId},
                                    zoneId=${zoneId})}">
                             취소
