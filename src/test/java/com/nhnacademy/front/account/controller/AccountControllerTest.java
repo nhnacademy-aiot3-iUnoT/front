@@ -13,7 +13,6 @@ import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.validation.BindingResult;
 
 import java.time.LocalDateTime;
 
@@ -47,7 +46,7 @@ class AccountControllerTest {
 
         mockMvc.perform(get("/mypage"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("account/account_info"))
+                .andExpect(view().name("account/account-info"))
                 .andExpect(model().attribute("accountInfoResponse", response));
 
         then(accountApiClient).should().getAccountInfo();
@@ -85,7 +84,7 @@ class AccountControllerTest {
 
         mockMvc.perform(get("/mypage/change-password"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("account/change_password"))
+                .andExpect(view().name("account/change-password"))
                 .andExpect(model().attribute("changePasswordForm", new ChangePasswordFormRequest()));
     }
 
@@ -127,7 +126,7 @@ class AccountControllerTest {
                         .param("newPassword", formRequest.newPassword())
                         .param("confirmPassword", formRequest.confirmPassword()))
                 .andExpect(status().isOk())
-                .andExpect(view().name("account/change_password"))
+                .andExpect(view().name("account/change-password"))
                 .andExpect(model().attributeHasFieldErrors(
                         "changePasswordForm",
                         "newPassword"
@@ -152,7 +151,7 @@ class AccountControllerTest {
                         .param("newPassword", formRequest.newPassword())
                         .param("confirmPassword", formRequest.confirmPassword()))
                 .andExpect(status().isOk())
-                .andExpect(view().name("account/change_password"))
+                .andExpect(view().name("account/change-password"))
                 .andExpect(model().attributeHasFieldErrors(
                         "changePasswordForm",
                         "confirmPassword"
@@ -177,7 +176,7 @@ class AccountControllerTest {
                         .param("newPassword", formRequest.newPassword())
                         .param("confirmPassword", formRequest.confirmPassword()))
                 .andExpect(status().isOk())
-                .andExpect(view().name("account/change_password"));
+                .andExpect(view().name("account/change-password"));
 
         then(accountApiClient).shouldHaveNoInteractions();
     }
