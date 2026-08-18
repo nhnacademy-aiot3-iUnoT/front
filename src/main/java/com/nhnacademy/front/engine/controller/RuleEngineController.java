@@ -38,10 +38,10 @@ public class RuleEngineController {
     /*
         가상 센서데이터 생성 화면
      */
-    @GetMapping("/me/storages/{storageId}/zones/{zoneId}/virtual-sensors/create")
+    @GetMapping("/me/storages/{storage-id}/zones/{zone-id}/virtual-sensors/create")
     public String showCreateVirtualSensorForm(
-            @PathVariable("storageId") Long storageId,
-            @PathVariable("zoneId") Long zoneId,
+            @PathVariable("storage-id") Long storageId,
+            @PathVariable("zone-id") Long zoneId,
             Model model
     ) {
         addZoneAttributes(model, storageId, zoneId);
@@ -53,10 +53,10 @@ public class RuleEngineController {
     /*
         가상 센서데이터 수정 화면
      */
-    @GetMapping("/me/storages/{storageId}/zones/{zoneId}/virtual-sensors/edit")
+    @GetMapping("/me/storages/{storage-id}/zones/{zone-id}/virtual-sensors/edit")
     public String showUpdateVirtualSensorForm(
-            @PathVariable("storageId") Long storageId,
-            @PathVariable("zoneId") Long zoneId,
+            @PathVariable("storage-id") Long storageId,
+            @PathVariable("zone-id") Long zoneId,
             Model model
     ) {
         addZoneAttributes(model, storageId, zoneId);
@@ -73,10 +73,10 @@ public class RuleEngineController {
     /*
         가상 센서데이터 생성
      */
-    @PostMapping("/me/storages/{storageId}/zones/{zoneId}/virtual-sensors")
+    @PostMapping("/me/storages/{storage-id}/zones/{zone-id}/virtual-sensors")
     public String createVirtualSensor(
-            @PathVariable("storageId") Long storageId,
-            @PathVariable("zoneId") Long zoneId,
+            @PathVariable("storage-id") Long storageId,
+            @PathVariable("zone-id") Long zoneId,
             @Valid @ModelAttribute VirtualSensorCreateRequest request,
             BindingResult result,
             Model model
@@ -98,10 +98,10 @@ public class RuleEngineController {
     /*
         가상 센서 데이터 업데이트
      */
-    @PutMapping("/me/storages/{storageId}/zones/{zoneId}/virtual-sensors")
+    @PutMapping("/me/storages/{storage-id}/zones/{zone-id}/virtual-sensors")
     public String updateVirtualSensor(
-            @PathVariable("storageId") Long storageId,
-            @PathVariable("zoneId") Long zoneId,
+            @PathVariable("storage-id") Long storageId,
+            @PathVariable("zone-id") Long zoneId,
             @Valid @ModelAttribute VirtualSensorUpdateRequest request,
             BindingResult result,
             Model model
@@ -127,10 +127,10 @@ public class RuleEngineController {
     /*
         가상 센서 삭제
      */
-    @DeleteMapping("/me/storages/{storageId}/zones/{zoneId}/virtual-sensors")
+    @DeleteMapping("/me/storages/{storage-id}/zones/{zone-id}/virtual-sensors")
     public String deleteVirtualSensor(
-            @PathVariable("storageId") Long storageId,
-            @PathVariable("zoneId") Long zoneId
+            @PathVariable("storage-id") Long storageId,
+            @PathVariable("zone-id") Long zoneId
     ) {
         ruleEngineApiClient.deleteVirtualSensorData(currentOrganizationId(), storageId, zoneId);
 
@@ -140,10 +140,10 @@ public class RuleEngineController {
     /*
         가상 센서데이터 설정 정보 화면
      */
-    @GetMapping("/me/storages/{storageId}/zones/{zoneId}/virtual-sensors")
+    @GetMapping("/me/storages/{storage-id}/zones/{zone-id}/virtual-sensors")
     public String virtualSensorInfo(
-            @PathVariable("storageId") Long storageId,
-            @PathVariable("zoneId") Long zoneId,
+            @PathVariable("storage-id") Long storageId,
+            @PathVariable("zone-id") Long zoneId,
             Model model
     ) {
         addZoneAttributes(model, storageId, zoneId);
@@ -168,10 +168,10 @@ public class RuleEngineController {
     /*
         가상 센서 활성화 / 비활성화
      */
-    @PutMapping("/me/storages/{storageId}/zones/{zoneId}/virtual-sensors/status")
+    @PutMapping("/me/storages/{storage-id}/zones/{zone-id}/virtual-sensors/status")
     public String changeVirtualSensorStatus(
-            @PathVariable("storageId") Long storageId,
-            @PathVariable("zoneId") Long zoneId,
+            @PathVariable("storage-id") Long storageId,
+            @PathVariable("zone-id") Long zoneId,
             @Valid @ModelAttribute VirtualSensorStatusRequest request,
             BindingResult result
     ) {
@@ -190,10 +190,10 @@ public class RuleEngineController {
         zone의 센서의 상세 데이터 정보 화면
         (센서 데이터 조회는 zoneId만 필요하므로 조직 정보를 따로 조회하지 않는다)
      */
-    @GetMapping("/me/storages/{storageId}/zones/{zoneId}/sensorInfo")
+    @GetMapping("/me/storages/{storage-id}/zones/{zone-id}/sensorInfo")
     public String info(
-            @PathVariable("storageId") Long storageId,
-            @PathVariable("zoneId") Long zoneId,
+            @PathVariable("storage-id") Long storageId,
+            @PathVariable("zone-id") Long zoneId,
             Model model
     ) {
         addZoneAttributes(model, storageId, zoneId);
