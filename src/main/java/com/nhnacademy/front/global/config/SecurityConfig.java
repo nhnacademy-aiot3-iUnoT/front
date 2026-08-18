@@ -84,7 +84,7 @@ public class SecurityConfig {
                                 "/403",
                                 "/css/**",
                                 "/js/**",
-                                "/images/**"
+                                "/img/**"
                         ).permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
@@ -148,11 +148,6 @@ public class SecurityConfig {
 
 
         validators.add(this::validateUuidSubject);
-
-//        validators.add(jwt -> jwt.getAudience().stream()
-//                .anyMatch(properties.getAudiences()::contains)
-//                ? OAuth2TokenValidatorResult.success()
-//                : validationFailure("JWT audience is not allowed"));
 
         return new DelegatingOAuth2TokenValidator<>(validators);
     }

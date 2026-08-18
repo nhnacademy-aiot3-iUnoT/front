@@ -39,7 +39,18 @@ class AuthControllerTest {
     PasswordResetFormValidator passwordResetFormValidator;
 
     @Test
-    void login() {
+    void login() throws Exception {
+        mockMvc.perform(get("/login"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("auth/login"));
+    }
+
+    @Test
+    void authenticatedUserIsRedirectedFromLoginToHome() throws Exception {
+        mockMvc.perform(get("/login").principal(() -> "account"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name("redirect:/"))
+                .andExpect(redirectedUrl("/"));
     }
 
     @Test

@@ -21,6 +21,8 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
+
 @Slf4j
 @Controller
 @RequiredArgsConstructor
@@ -31,7 +33,11 @@ public class AuthController {
     private final AccessTokenCookieManager cookieManager;
 
     @GetMapping("/login")
-    public String login(Model model) {
+    public String login(Model model, Principal principal) {
+        if (principal != null) {
+            return "redirect:/";
+        }
+
         model.addAttribute(new LoginRequest());
         return "auth/login";
     }
