@@ -14,7 +14,6 @@ public record AdminOrgDetailResponse(
         String addressDetail,
         OrganizationStatus status,
         LocalDateTime createdAt,
-        AdminInvitationResponse invitation,
-        List<AdminOwnerResponse> owners
+        AdminInvitationResponse invitation
 ) {
 }

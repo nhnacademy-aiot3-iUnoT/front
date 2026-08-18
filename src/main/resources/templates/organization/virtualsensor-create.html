@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main-layout}">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${edit} ? |Zone ${zoneId} 가상 센서 수정| : |Zone ${zoneId} 가상 센서 생성|">가상 센서 생성</title>
+</head>
+<body>
+<!-- 생성 / 수정을 같은 폼으로 처리한다. edit=true 이면 수정 모드 -->
+<main layout:fragment="content">
+
+    <div class="page-header mt-3">
+        <div class="row align-items-center">
+            <div class="col">
+                <h2 class="page-title"
+                    th:text="${edit} ? |Zone ${zoneId} 가상 센서 수정| : |Zone ${zoneId} 가상 센서 생성|">
+                    가상 센서 생성
+                </h2>
+
+                <div class="text-muted">
+                    실제 센서 없이 측정값을 생성해 전송합니다. 선택한 센서 타입만 설정한 주기에 맞춰 발행되며,
+                    문 상태는 값이 바뀔 때만 발행됩니다.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="alert alert-danger" role="alert"
+         th:if="${errorMessage}" th:text="${errorMessage}"></div>
+
+    <div class="row row-cards">
+        <div class="col-12">
+            <form id="virtualSensorCreateForm" th:method="${edit} ? 'put' : 'post'"
+                  th:action="@{/organizations/me/storages/{storageId}/zones/{zoneId}/virtual-sensors(
+                          storageId=${storageId},
+                          zoneId=${zoneId})}">
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            기본 정보
+                        </h3>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label required" for="deviceEui">
+                                        디바이스 EUI
+                                    </label>
+
+                                    <!-- 수정 모드에서는 디바이스 EUI를 바꿀 수 없다 -->
+                                    <input type="text" class="form-control" id="deviceEui" name="deviceEui"
+                                           maxlength="64" placeholder="예: device-eui-virtual-21" required
+                                           th:value="${virtualSensor != null ? virtualSensor.deviceEui : ''}"
+                                           th:readonly="${edit}">
+
+                                    <div class="invalid-feedback"></div>
+
+                                    <small class="form-hint" th:if="${!edit}">
+                                        영문·숫자와 <code>-</code>, <code>_</code> 만 사용할 수 있습니다.
+                                    </small>
+
+                                    <small class="form-hint" th:if="${edit}">
+                                        디바이스 EUI는 수정할 수 없습니다.
+                                    </small>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label required" for="measurementIntervalSeconds">
+                                        측정 주기 (초)
+                                    </label>
+
+                                    <input type="number" class="form-control" id="measurementIntervalSeconds"
+                                           name="measurementIntervalSeconds" min="1" step="1" required
+                                           th:value="${virtualSensor != null ? virtualSensor.measurementIntervalSeconds : 60}">
+
+                                    <div class="invalid-feedback"></div>
+
+                                    <small class="form-hint">
+                                        1초 이상. 너무 짧으면 데이터가 빠르게 쌓입니다.
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            측정값 범위
+                        </h3>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="text-muted mb-3">
+                            <span th:if="${!edit}">센서 타입을 하나 이상 선택하고 생성 범위를 입력하세요.</span>
+                            <span th:if="${edit}">매 주기마다 아래 범위 안에서 무작위 값이 생성됩니다.</span>
+                        </div>
+
+                        <div class="mb-4" th:if="${!edit}" id="sensorTypeSelection">
+                            <label class="form-label required">생성할 센서 타입</label>
+
+                            <div class="d-flex flex-wrap gap-3">
+                                <label class="form-check">
+                                    <input class="form-check-input sensor-type-checkbox" type="checkbox"
+                                           name="enabledSensorTypes" value="TEMPERATURE"
+                                           data-sensor-type="TEMPERATURE"
+                                           th:checked="${param.enabledSensorTypes != null
+                                                       and #arrays.contains(param.enabledSensorTypes, 'TEMPERATURE')}">
+                                    <span class="form-check-label">온도</span>
+                                </label>
+
+                                <label class="form-check">
+                                    <input class="form-check-input sensor-type-checkbox" type="checkbox"
+                                           name="enabledSensorTypes" value="HUMIDITY"
+                                           data-sensor-type="HUMIDITY"
+                                           th:checked="${param.enabledSensorTypes != null
+                                                       and #arrays.contains(param.enabledSensorTypes, 'HUMIDITY')}">
+                                    <span class="form-check-label">습도</span>
+                                </label>
+
+                                <label class="form-check">
+                                    <input class="form-check-input sensor-type-checkbox" type="checkbox"
+                                           name="enabledSensorTypes" value="ILLUMINATION"
+                                           data-sensor-type="ILLUMINATION"
+                                           th:checked="${param.enabledSensorTypes != null
+                                                       and #arrays.contains(param.enabledSensorTypes, 'ILLUMINATION')}">
+                                    <span class="form-check-label">밝기</span>
+                                </label>
+
+                                <label class="form-check">
+                                    <input class="form-check-input sensor-type-checkbox" type="checkbox"
+                                           name="enabledSensorTypes" value="DOOR"
+                                           data-sensor-type="DOOR"
+                                           th:checked="${param.enabledSensorTypes != null
+                                                       and #arrays.contains(param.enabledSensorTypes, 'DOOR')}">
+                                    <span class="form-check-label">문 열림</span>
+                                </label>
+                            </div>
+
+                            <div class="invalid-feedback d-block" id="sensorTypeFeedback" hidden></div>
+                        </div>
+
+                        <div data-sensor-fields="TEMPERATURE"
+                             th:if="${!edit or virtualSensor.temperature != null}">
+                        <label class="form-label required">온도 (°C)</label>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <div class="input-group">
+                                        <span class="input-group-text">최소</span>
+
+                                        <input type="number" class="form-control" id="temperatureMin"
+                                               name="temperature.min" step="0.1" required
+                                               th:value="${virtualSensor != null and virtualSensor.temperature != null
+                                                           ? virtualSensor.temperature.min : 20}">
+                                    </div>
+
+                                    <div class="invalid-feedback"></div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <div class="input-group">
+                                        <span class="input-group-text">최대</span>
+
+                                        <input type="number" class="form-control" id="temperatureMax"
+                                               name="temperature.max" step="0.1" required
+                                               th:value="${virtualSensor != null and virtualSensor.temperature != null
+                                                           ? virtualSensor.temperature.max : 30}">
+                                    </div>
+
+                                    <div class="invalid-feedback"></div>
+                                </div>
+                            </div>
+                        </div>
+                        </div>
+
+                        <div data-sensor-fields="HUMIDITY"
+                             th:if="${!edit or virtualSensor.humidity != null}">
+                        <label class="form-label required">습도 (%)</label>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <div class="input-group">
+                                        <span class="input-group-text">최소</span>
+
+                                        <input type="number" class="form-control" id="humidityMin"
+                                               name="humidity.min" step="0.1" required
+                                               th:value="${virtualSensor != null and virtualSensor.humidity != null
+                                                           ? virtualSensor.humidity.min : 40}">
+                                    </div>
+
+                                    <div class="invalid-feedback"></div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <div class="input-group">
+                                        <span class="input-group-text">최대</span>
+
+                                        <input type="number" class="form-control" id="humidityMax"
+                                               name="humidity.max" step="0.1" required
+                                               th:value="${virtualSensor != null and virtualSensor.humidity != null
+                                                           ? virtualSensor.humidity.max : 60}">
+                                    </div>
+
+                                    <div class="invalid-feedback"></div>
+                                </div>
+                            </div>
+                        </div>
+                        </div>
+
+                        <div data-sensor-fields="ILLUMINATION"
+                             th:if="${!edit or virtualSensor.illumination != null}">
+                        <label class="form-label required">밝기 (lux)</label>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <div class="input-group">
+                                        <span class="input-group-text">최소</span>
+
+                                        <input type="number" class="form-control" id="illuminationMin"
+                                               name="illumination.min" step="1" required
+                                               th:value="${virtualSensor != null and virtualSensor.illumination != null
+                                                           ? virtualSensor.illumination.min : 100}">
+                                    </div>
+
+                                    <div class="invalid-feedback"></div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <div class="input-group">
+                                        <span class="input-group-text">최대</span>
+
+                                        <input type="number" class="form-control" id="illuminationMax"
+                                               name="illumination.max" step="1" required
+                                               th:value="${virtualSensor != null and virtualSensor.illumination != null
+                                                           ? virtualSensor.illumination.max : 150}">
+                                    </div>
+
+                                    <div class="invalid-feedback"></div>
+                                </div>
+                            </div>
+                        </div>
+                        </div>
+
+                        <div class="row" data-sensor-fields="DOOR"
+                             th:if="${!edit or virtualSensor.doorOpenProbability != null}">
+                            <div class="">
+                                <div class="mb-3">
+                                    <label class="form-label required" for="doorOpenProbability">
+                                        문 열림 확률
+                                    </label>
+
+                                    <input type="number" class="form-control" id="doorOpenProbability"
+                                           name="doorOpenProbability" min="0" max="1" step="0.01" required
+                                           th:value="${virtualSensor != null and virtualSensor.doorOpenProbability != null
+                                                       ? virtualSensor.doorOpenProbability : 0.01}">
+
+                                    <div class="invalid-feedback"></div>
+
+                                    <small class="form-hint">
+                                        0 ~ 1 사이. 매 주기마다 이 확률로 문 상태를 다시 뽑고,
+                                        직전과 달라졌을 때만 전송합니다.
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-footer d-flex justify-content-end gap-2">
+                        <!-- 수정 모드는 가상 센서 정보 화면으로, 생성 모드는 센서 데이터 화면으로 돌아간다 -->
+                        <a class="btn btn-outline-secondary" th:if="${edit}"
+                           th:href="@{/organizations/me/storages/{storageId}/zones/{zoneId}/virtual-sensors(
+                                   storageId=${storageId},
+                                   zoneId=${zoneId})}">
+                            취소
+                        </a>
+
+                        <a class="btn btn-outline-secondary" th:if="${!edit}"
+                           th:href="@{/organizations/me/storages/{storageId}/zones/{zoneId}/sensorInfo(
+                                   storageId=${storageId},
+                                   zoneId=${zoneId})}">
+                            취소
+                        </a>
+
+                        <button type="submit" class="btn btn-primary" th:text="${edit} ? '수정' : '생성'">
+                            생성
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</main>
+
+<th:block layout:fragment="script">
+    <script th:src="@{/js/common/validation.js}"></script>
+
+    <script th:src="@{/js/common/form.js}"></script>
+
+    <script th:src="@{/js/common/field-validator.js}"></script>
+
+    <script th:src="@{/js/organization/virtualsensor-create.js}"></script>
+
+</th:block>
+</body>
+</html>

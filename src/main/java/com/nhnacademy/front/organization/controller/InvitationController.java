@@ -52,22 +52,22 @@ public class InvitationController {
         return "redirect:/organizations/me/invitations";
     }
 
-    @PostMapping("/{invitationId}/resend")
-    public String resendInvitation(@PathVariable Long invitationId) {
+    @PostMapping("/{invitation-id}/resend")
+    public String resendInvitation(@PathVariable(name = "invitation-id") Long invitationId) {
         invitationApiClient.resendInvitation(invitationId);
 
         return "redirect:/organizations/me/invitations";
     }
 
-    @PostMapping("/{invitationId}/cancel")
-    public String cancelInvitation(@PathVariable Long invitationId) {
+    @PostMapping("/{invitation-id}/cancel")
+    public String cancelInvitation(@PathVariable(name = "invitation-id") Long invitationId) {
         invitationApiClient.cancelInvitation(invitationId);
 
         return "redirect:/organizations/me/invitations";
     }
 
-    @PostMapping("/{invitationId}/reissue")
-    public String reissueInvitation(@PathVariable Long invitationId) {
+    @PostMapping("/{invitation-id}/reissue")
+    public String reissueInvitation(@PathVariable(name = "invitation-id") Long invitationId) {
         invitationApiClient.reissueInvitation(invitationId);
 
         return "redirect:/organizations/me/invitations";

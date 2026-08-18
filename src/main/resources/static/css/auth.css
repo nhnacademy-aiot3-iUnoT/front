@@ -35,8 +35,8 @@ body {
     max-width: 100%;
 }
 
-.form-control,
-.btn {
+.login-section .form-control,
+.login-section .btn {
     height: 54px;
 }
 

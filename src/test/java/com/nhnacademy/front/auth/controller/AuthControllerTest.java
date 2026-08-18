@@ -250,7 +250,7 @@ class AuthControllerTest {
     void forgotPassword() throws Exception {
         mockMvc.perform(get("/forgot-password"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("auth/forgot_password"))
+                .andExpect(view().name("auth/forgot-password"))
                 .andExpect(model().attribute("resetPasswordTokenRequest", new ResetPasswordTokenRequest("")));
     }
 
@@ -289,7 +289,7 @@ class AuthControllerTest {
 
         mockMvc.perform(get("/pwd/{token}", token))
                 .andExpect(status().isOk())
-                .andExpect(view().name("auth/reset_password"))
+                .andExpect(view().name("auth/reset-password"))
                 .andExpect(model().attribute("resetPasswordForm", new ResetPasswordFormRequest()))
                 .andExpect(model().attribute("token", token));
 
@@ -321,7 +321,7 @@ class AuthControllerTest {
                         .param("newPassword", formRequest.newPassword())
                         .param("confirmPassword", formRequest.confirmPassword()))
                 .andExpect(status().isOk())
-                .andExpect(view().name("auth/reset_password"))
+                .andExpect(view().name("auth/reset-password"))
                 .andExpect(model().attributeHasFieldErrorCode(
                         "resetPasswordForm", "newPassword", "Size"))
                 .andExpect(model().attribute("token", token));
@@ -338,7 +338,7 @@ class AuthControllerTest {
                         .param("newPassword", formRequest.newPassword())
                         .param("confirmPassword", formRequest.confirmPassword()))
                 .andExpect(status().isOk())
-                .andExpect(view().name("auth/reset_password"))
+                .andExpect(view().name("auth/reset-password"))
                 .andExpect(model().attributeHasFieldErrorCode(
                         "resetPasswordForm", "confirmPassword", "passwordMismatch"))
                 .andExpect(model().attribute("token", token));

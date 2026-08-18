@@ -12,7 +12,6 @@ import com.nhnacademy.front.auth.dto.request.ResetPasswordRequest;
 import com.nhnacademy.front.auth.dto.request.ResetPasswordTokenRequest;
 import com.nhnacademy.front.auth.dto.request.SignupRequest;
 import com.nhnacademy.front.auth.dto.response.LoginResponse;
-import com.nhnacademy.front.auth.dto.response.SignupResponse;
 import com.nhnacademy.front.auth.validator.PasswordResetFormValidator;
 import com.nhnacademy.front.global.dto.ApiResponse;
 import com.nhnacademy.front.organization.client.InvitationApiClient;
@@ -173,7 +172,7 @@ public class AuthController {
     @GetMapping("/forgot-password")
     public String forgotPassword(Model model) {
         model.addAttribute("resetPasswordTokenRequest", new ResetPasswordTokenRequest(""));
-        return "auth/forgot_password";
+        return "auth/forgot-password";
     }
 
     @PostMapping("/pwd")
@@ -197,7 +196,7 @@ public class AuthController {
     ) {
         model.addAttribute("token", token);
         model.addAttribute("resetPasswordForm", new ResetPasswordFormRequest());
-        return "auth/reset_password";
+        return "auth/reset-password";
     }
 
     @PostMapping("/pwd/{token}")
@@ -211,7 +210,7 @@ public class AuthController {
 
         if (bindingResult.hasErrors()) {
             model.addAttribute("token", token);
-            return "auth/reset_password";
+            return "auth/reset-password";
         }
 
         authApiClient.resetPassword(

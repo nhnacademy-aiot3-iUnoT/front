@@ -102,3 +102,85 @@ function validateDescription(input) {
 
     return true;
 }
+
+// 디바이스 EUI 필드 검증
+function validateDeviceEuiField(input) {
+    const value = input.value.trim();
+
+    if (!isRequired(value)) {
+        setError(input, "디바이스 EUI는 필수 입력입니다.");
+        return false;
+    }
+
+    if (!isMaxLength(value, 64)) {
+        setError(input, "디바이스 EUI는 64자 이내로 작성해야 합니다.");
+        return false;
+    }
+
+    if (!isDeviceEui(value)) {
+        setError(input, "디바이스 EUI는 영문, 숫자, -, _ 만 사용할 수 있습니다.");
+        return false;
+    }
+
+    return true;
+}
+
+// 측정 주기 필드 검증
+function validateMeasurementIntervalField(input) {
+    const value = input.value.trim();
+
+    if (!isRequired(value)) {
+        setError(input, "측정 주기는 필수 입력입니다.");
+        return false;
+    }
+
+    if (!isPositiveInteger(value)) {
+        setError(input, "측정 주기는 1초 이상의 정수여야 합니다.");
+        return false;
+    }
+
+    return true;
+}
+
+// 최솟값/최댓값 한 쌍을 검증한다. 범위 오류는 최댓값 쪽에 표시한다.
+function validateRangeFields(minInput, maxInput, label) {
+    let valid = true;
+
+    if (!isNumber(minInput.value)) {
+        setError(minInput, label + " 최솟값을 숫자로 입력하세요.");
+        valid = false;
+    }
+
+    if (!isNumber(maxInput.value)) {
+        setError(maxInput, label + " 최댓값을 숫자로 입력하세요.");
+        valid = false;
+    }
+
+    if (!valid) {
+        return false;
+    }
+
+    if (Number(minInput.value) > Number(maxInput.value)) {
+        setError(maxInput, label + " 최솟값은 최댓값보다 클 수 없습니다.");
+        return false;
+    }
+
+    return true;
+}
+
+// 문 열림 확률 필드 검증
+function validateDoorOpenProbabilityField(input) {
+    const value = input.value.trim();
+
+    if (!isRequired(value)) {
+        setError(input, "문 열림 확률은 필수 입력입니다.");
+        return false;
+    }
+
+    if (!isInRange(value, 0, 1)) {
+        setError(input, "문 열림 확률은 0 이상 1 이하여야 합니다.");
+        return false;
+    }
+
+    return true;
+}

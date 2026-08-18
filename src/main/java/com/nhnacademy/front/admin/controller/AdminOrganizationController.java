@@ -56,17 +56,17 @@ public class AdminOrganizationController {
         return "admin/organization-create";
     }
 
-    @GetMapping("/{id}")
-    public String organizationDetail(@PathVariable Long id, Model model) {
-        AdminOrgDetailResponse organization = adminOrganizationApiClient.getOrgDetail(id);
+    @GetMapping("/{organization-id}")
+    public String organizationDetail(@PathVariable(name = "organization-id") Long organizationId, Model model) {
+        AdminOrgDetailResponse organization = adminOrganizationApiClient.getOrgDetail(organizationId);
 
         model.addAttribute("organization", organization);
 
         return "admin/organization-detail";
     }
 
-    @DeleteMapping("/{id}")
-    public String deleteOrganization(@PathVariable Long id) {
+    @DeleteMapping("/{organization-id}")
+    public String deleteOrganization(@PathVariable("organization-id") Long id) {
         adminOrganizationApiClient.deleteOrg(id);
 
         return "redirect:/admin/organizations";
@@ -75,22 +75,25 @@ public class AdminOrganizationController {
     /**
      * Owner 초대 관리
      */
-    @PostMapping("/{organizationId}/invitations/{invitationId}/resend")
-    public String resendInvitation(@PathVariable Long organizationId, @PathVariable Long invitationId) {
+    @PostMapping("/{organization-id}/invitations/{invitation-id}/resend")
+    public String resendInvitation(@PathVariable(name = "organization-id") Long organizationId,
+                                   @PathVariable(name = "invitation-id") Long invitationId) {
         adminOrganizationApiClient.resendInvitation(organizationId, invitationId);
 
         return "redirect:/admin/organizations/" + organizationId;
     }
 
-    @PostMapping("/{organizationId}/invitations/{invitationId}/cancel")
-    public String cancelInvitation(@PathVariable Long organizationId, @PathVariable Long invitationId) {
+    @PostMapping("/{organization-id}/invitations/{invitation-id}/cancel")
+    public String cancelInvitation(@PathVariable(name = "organization-id") Long organizationId,
+                                   @PathVariable(name = "invitation-id") Long invitationId) {
         adminOrganizationApiClient.cancelInvitation(organizationId, invitationId);
 
         return "redirect:/admin/organizations/" + organizationId;
     }
 
-    @PostMapping("/{organizationId}/invitations/{invitationId}/reissue")
-    public String reissueInvitation(@PathVariable Long organizationId, @PathVariable Long invitationId) {
+    @PostMapping("/{organization-id}/invitations/{invitation-id}/reissue")
+    public String reissueInvitation(@PathVariable(name = "organization-id") Long organizationId,
+                                    @PathVariable(name = "invitation-id") Long invitationId) {
         adminOrganizationApiClient.reissueInvitation(organizationId, invitationId);
 
         return "redirect:/admin/organizations/" + organizationId;
