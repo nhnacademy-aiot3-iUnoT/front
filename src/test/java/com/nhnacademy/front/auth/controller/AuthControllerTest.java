@@ -1,5 +1,6 @@
 package com.nhnacademy.front.auth.controller;
 
+import com.nhnacademy.front.account.client.AccountApiClient;
 import com.nhnacademy.front.auth.client.AuthApiClient;
 import com.nhnacademy.front.auth.dto.request.CheckEmailRequest;
 import com.nhnacademy.front.auth.dto.request.LoginRequest;
@@ -11,6 +12,8 @@ import com.nhnacademy.front.auth.dto.response.CheckEmailResponse;
 import com.nhnacademy.front.auth.dto.response.LoginResponse;
 import com.nhnacademy.front.auth.dto.response.SignupResponse;
 import com.nhnacademy.front.auth.validator.PasswordResetFormValidator;
+import com.nhnacademy.front.organization.client.InvitationApiClient;
+import com.nhnacademy.front.organization.client.OrganizationApiClient;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -19,6 +22,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.List;
+import java.util.Map;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.BDDMockito.given;
@@ -37,12 +43,45 @@ class AuthControllerTest {
     @MockitoBean
     AuthApiClient authApiClient;
 
+    @MockitoBean
+    AccountApiClient accountApiClient;
+
+    @MockitoBean
+    OrganizationApiClient organizationApiClient;
+
+    @MockitoBean
+    InvitationApiClient invitationApiClient;
+
     @Test
     void login() throws Exception {
         mockMvc.perform(get("/login"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("auth/login"))
                 .andExpect(model().attribute("loginRequest", new LoginRequest()));
+    }
+
+    @Test
+    void jwks() throws Exception {
+        Map<String, Object> jwks = Map.of(
+                "keys",
+                List.of(Map.of(
+                        "kty", "RSA",
+                        "kid", "test-key",
+                        "n", "modulus",
+                        "e", "AQAB"
+                ))
+        );
+        given(authApiClient.jwks()).willReturn(jwks);
+
+        mockMvc.perform(get("/.well-known/jwks.json"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.keys[0].kty").value("RSA"))
+                .andExpect(jsonPath("$.keys[0].kid").value("test-key"))
+                .andExpect(jsonPath("$.keys[0].n").value("modulus"))
+                .andExpect(jsonPath("$.keys[0].e").value("AQAB"));
+
+        then(authApiClient).should().jwks();
     }
 
     @Test
@@ -56,8 +95,8 @@ class AuthControllerTest {
                         .param("email", request.email())
                         .param("password", request.password()))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(view().name("redirect:/"))
-                .andExpect(redirectedUrl("/"))
+                .andExpect(view().name("redirect:/login/success"))
+                .andExpect(redirectedUrl("/login/success"))
                 .andExpect(header().string(
                         HttpHeaders.SET_COOKIE,
                         containsString("access_token=access-token")))
@@ -87,12 +126,25 @@ class AuthControllerTest {
 
     @Test
     void signup() throws Exception {
-        mockMvc.perform(get("/signup"))
+        mockMvc.perform(get("/signup")
+                        .param("token", "inviteToken"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("auth/signup"))
                 .andExpect(model().attribute(
                         "signupRequest",
                         new SignupRequest("inviteToken", "", "", "")));
+
+        then(invitationApiClient).should().verifyToken("inviteToken");
+    }
+
+    @Test
+    void signupWithoutToken() throws Exception {
+        mockMvc.perform(get("/signup"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name("redirect:/login?error=invite"))
+                .andExpect(redirectedUrl("/login?error=invite"));
+
+        then(invitationApiClient).shouldHaveNoInteractions();
     }
 
     @Test
@@ -112,8 +164,8 @@ class AuthControllerTest {
                         .param("name", request.name())
                         .param("password", request.password()))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(view().name("redirect:/organizations/me/setup"))
-                .andExpect(redirectedUrl("/organizations/me/setup"));
+                .andExpect(view().name("redirect:/login"))
+                .andExpect(redirectedUrl("/login"));
 
         then(authApiClient).should().signup(request);
     }

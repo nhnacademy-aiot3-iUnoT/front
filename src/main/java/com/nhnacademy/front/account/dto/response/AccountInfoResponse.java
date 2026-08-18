@@ -1,5 +1,6 @@
 package com.nhnacademy.front.account.dto.response;
 
+import com.nhnacademy.front.account.dto.AccountRole;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -14,6 +15,9 @@ public record AccountInfoResponse(
 
         @NotBlank
         String name,
+
+        @NotNull
+        AccountRole accountRole,
 
         @NotNull
         LocalDateTime createdAt

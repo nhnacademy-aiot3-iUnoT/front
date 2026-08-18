@@ -38,7 +38,7 @@ public class GatewayClient {
     public <T> T get(String path, Class<T> dataType) {
         return execute(() ->
                 restClient.get()
-                        .uri(baseUrl + path)
+                        .uri(URI.create(baseUrl + path))
                         .retrieve()
                         .body(responseTypeOf(dataType)));
     }
@@ -50,6 +50,37 @@ public class GatewayClient {
                         .uri(URI.create(baseUrl + path))
                         .retrieve()
                         .body(responseType));
+    }
+
+    public <T> T getRaw(String path, ParameterizedTypeReference<T> responseType) {
+        try {
+            T response = restClient.get()
+                    .uri(URI.create(baseUrl + path))
+                    .retrieve()
+                    .body(responseType);
+
+            if (response == null) {
+                throw new ApiException(
+                        ErrorCode.UNKNOWN,
+                        "응답이 없습니다."
+                );
+            }
+
+            return response;
+        } catch (HttpStatusCodeException e) {
+            throw convertApiException(e);
+        }
+    }
+
+    public void get(String path) {
+        try {
+            restClient.get()
+                    .uri(URI.create(baseUrl + path))
+                    .retrieve()
+                    .toBodilessEntity();
+        } catch (HttpStatusCodeException e) {
+            throw convertApiException(e);
+        }
     }
 
     public <T> T post(String path, Object body, Class<T> dataType) {
@@ -68,6 +99,17 @@ public class GatewayClient {
                         .body(body)
                         .retrieve()
                         .body(responseType));
+    }
+
+    public void post(String path) {
+        try {
+            restClient.post()
+                    .uri(URI.create(baseUrl + path))
+                    .retrieve()
+                    .toBodilessEntity();
+        } catch (HttpStatusCodeException e) {
+            throw convertApiException(e);
+        }
     }
 
     public <T> T put(String path, Object body, Class<T> dataType) {

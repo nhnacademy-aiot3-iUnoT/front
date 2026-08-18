@@ -1,5 +1,6 @@
 package com.nhnacademy.front.organization.controller;
 
+import com.nhnacademy.front.admin.dto.OrganizationStatus;
 import com.nhnacademy.front.organization.client.OrganizationApiClient;
 import com.nhnacademy.front.organization.dto.request.OrgStatusUpdateRequest;
 import com.nhnacademy.front.organization.dto.request.OrgUpdateRequest;
@@ -11,10 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @Controller
@@ -34,6 +32,10 @@ public class OrganizationController {
     public String organizationEditForm(Model model) {
         OrgDetailResponse orgInfo = orgApiClient.getOrgInfo();
 
+        if (orgInfo.status() == OrganizationStatus.PENDING) {
+            return "redirect:/organizations/me/setup";
+        }
+
         OrgUpdateRequest request = new OrgUpdateRequest(
                 orgInfo.roadAddress(),
                 orgInfo.zipCode(),
@@ -48,6 +50,12 @@ public class OrganizationController {
 
     @GetMapping("/me/setup")
     public String organizationSetupForm(Model model) {
+        OrgDetailResponse orgInfo = orgApiClient.getOrgInfo();
+
+        if (orgInfo.status() != OrganizationStatus.PENDING) {
+            return "redirect:/organizations/me/edit";
+        }
+
         model.addAttribute("orgSetupRequest", new OrganizationSetupRequest());
         return "organization/org-setup";
     }
@@ -64,8 +72,14 @@ public class OrganizationController {
     }
 
     @PutMapping("/me/edit")
-    public String updateOrganization(@Valid @ModelAttribute("orgEditRequest") OrgUpdateRequest request,
+    public String updateOrganization(@Valid @ModelAttribute("orgUpdateRequest") OrgUpdateRequest request,
                                      BindingResult bindingResult) {
+        OrgDetailResponse orgInfo = orgApiClient.getOrgInfo();
+
+        if (orgInfo.status() == OrganizationStatus.PENDING) {
+            return "redirect:/organizations/me/setup";
+        }
+
         if(bindingResult.hasErrors()) {
             return "organization/org-edit";
         }
@@ -75,7 +89,7 @@ public class OrganizationController {
         return "redirect:/organizations/me";
     }
 
-    @PutMapping("/me/setup")
+    @PostMapping("/me/setup")
     public String setupOrganization(@Valid @ModelAttribute("orgSetupRequest") OrganizationSetupRequest request,
                                     BindingResult bindingResult) {
 

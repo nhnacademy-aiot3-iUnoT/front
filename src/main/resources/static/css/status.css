@@ -1,0 +1,24 @@
+.status-badge {
+    font-weight: 500;
+    padding: 0.4rem 0.65rem;
+}
+
+.status-pending, .status-used {
+    color: var(--warning);
+    background-color: var(--warning-soft);
+}
+
+.status-active {
+    color: var(--teal-dark);
+    background-color: var(--mint);
+}
+
+.status-inactive, .status-reissued {
+    color: var(--ink-soft);
+    background-color: var(--line);
+}
+
+.status-suspended, .status-canceled {
+    color: var(--danger);
+    background-color: var(--danger-soft);
+}

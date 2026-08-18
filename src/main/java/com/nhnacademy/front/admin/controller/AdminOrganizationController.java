@@ -18,15 +18,15 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/admin")
-public class AdminController {
+@RequestMapping("/admin/organizations")
+public class AdminOrganizationController {
 
     private final AdminOrganizationApiClient adminOrganizationApiClient;
 
     /**
      * 조직 관리
      */
-    @GetMapping("/organizations")
+    @GetMapping
     public String organizationList(@ModelAttribute OrgSearchRequest request,
                                    @RequestParam(name = "page", defaultValue = "0") int page,
                                    @RequestParam(name = "size", defaultValue = "10") int size,
@@ -38,7 +38,7 @@ public class AdminController {
         return "admin/organization-list";
     }
 
-    @PostMapping("/organizations")
+    @PostMapping
     public String createOrganization(@Valid @ModelAttribute OrgCreateRequest request,
                                      BindingResult bindingResult) {
         if(bindingResult.hasErrors()) {
@@ -50,13 +50,13 @@ public class AdminController {
         return "redirect:/admin/organizations";
     }
 
-    @GetMapping("/organizations/new")
+    @GetMapping("/new")
     public String createOrganizationForm(Model model) {
         model.addAttribute("orgCreateRequest", new OrgCreateRequest());
         return "admin/organization-create";
     }
 
-    @GetMapping("/organizations/{id}")
+    @GetMapping("/{id}")
     public String organizationDetail(@PathVariable Long id, Model model) {
         AdminOrgDetailResponse organization = adminOrganizationApiClient.getOrgDetail(id);
 
@@ -65,7 +65,7 @@ public class AdminController {
         return "admin/organization-detail";
     }
 
-    @DeleteMapping("/organizations/{id}")
+    @DeleteMapping("/{id}")
     public String deleteOrganization(@PathVariable Long id) {
         adminOrganizationApiClient.deleteOrg(id);
 
@@ -73,10 +73,26 @@ public class AdminController {
     }
 
     /**
-     * 회원 관리
+     * Owner 초대 관리
      */
-    @GetMapping("/users")
-    public String userList() {
-        return "/admin/user-list";
+    @PostMapping("/{organizationId}/invitations/{invitationId}/resend")
+    public String resendInvitation(@PathVariable Long organizationId, @PathVariable Long invitationId) {
+        adminOrganizationApiClient.resendInvitation(organizationId, invitationId);
+
+        return "redirect:/admin/organizations/" + organizationId;
+    }
+
+    @PostMapping("/{organizationId}/invitations/{invitationId}/cancel")
+    public String cancelInvitation(@PathVariable Long organizationId, @PathVariable Long invitationId) {
+        adminOrganizationApiClient.cancelInvitation(organizationId, invitationId);
+
+        return "redirect:/admin/organizations/" + organizationId;
+    }
+
+    @PostMapping("/{organizationId}/invitations/{invitationId}/reissue")
+    public String reissueInvitation(@PathVariable Long organizationId, @PathVariable Long invitationId) {
+        adminOrganizationApiClient.reissueInvitation(organizationId, invitationId);
+
+        return "redirect:/admin/organizations/" + organizationId;
     }
 }
