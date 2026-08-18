@@ -6,7 +6,7 @@
     <header class="navbar navbar-expand-md">
         <div class="container">
             <h1 class="navbar-brand pe-3">
-                <a href="/" class="text-decoration-none">
+                <a th:href="@{/}" class="text-decoration-none">
                     iUnoT
                 </a>
             </h1>
@@ -14,7 +14,7 @@
             <div class="collapse navbar-collapse">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link active">조직관리</a>
+                        <a th:href="@{/organizations/me}" class="nav-link active">조직관리</a>
                     </li>
 
                     <li class="nav-item">
@@ -47,8 +47,11 @@
                         </a>
 
                         <div class="dropdown-menu dropdown-menu-end">
-                            <a class="dropdown-item" href="/mypage">
+                            <a class="dropdown-item" th:href="@{/mypage}">
                                 회원정보
+                            </a>
+                            <a class="dropdown-item" th:href="@{/organizations/me}">
+                                나의조직
                             </a>
                             <form th:action="@{/logout}" method="post">
                                 <button type="submit" class="dropdown-item">

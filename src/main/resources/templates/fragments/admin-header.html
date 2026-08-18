@@ -6,7 +6,7 @@
     <header class="navbar navbar-expand-md">
         <div class="container">
             <h1 class="navbar-brand pe-3">
-                <a href="/admin" class="text-decoration-none">
+                <a th:href="@{/admin}" class="text-decoration-none">
                     iUnoT 관리자 페이지
                 </a>
             </h1>
@@ -14,24 +14,32 @@
             <div class="collapse navbar-collapse">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a href="/admin/users" class="nav-link active">회원관리</a>
+                        <a th:href="@{/admin/users}" class="nav-link active">회원관리</a>
                     </li>
 
                     <li class="nav-item">
-                        <a href="/admin/organizations" class="nav-link">조직관리</a>
+                        <a th:href="@{/admin/organizations}" class="nav-link">조직관리</a>
                     </li>
                 </ul>
 
-                <div class="navbar-nav flex-row order-md-last">
+                <div class="navbar-nav flex-row order-md-last align-items-center">
                     <div class="nav-item me-2">
-                        <button type="button" class="btn btn-icon btn-ghost-secondary" id="theme-toggle">
+                        <button type="button"
+                                class="btn btn-icon btn-ghost-secondary"
+                                id="theme-toggle">
                             <i class="ti ti-moon fs-2 moon-icon"></i>
                             <i class="ti ti-sun fs-2 sun-icon"></i>
                         </button>
                     </div>
-                    <a class="btn">
-                        로그아웃
-                    </a>
+
+                    <div class="nav-item">
+                        <form th:action="@{/logout}" method="post" class="m-0">
+                            <button type="submit"
+                                    class="btn btn-ghost-secondary">
+                                로그아웃
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>

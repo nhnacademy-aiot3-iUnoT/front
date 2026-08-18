@@ -9,6 +9,7 @@ import com.nhnacademy.front.engine.dto.request.VirtualSensorUpdateRequest;
 import com.nhnacademy.front.engine.dto.response.SensorHistoryResponse;
 import com.nhnacademy.front.engine.dto.response.SensorLatestResponse;
 import com.nhnacademy.front.engine.dto.response.VirtualSensorInfoResponse;
+import com.nhnacademy.front.organization.client.OrganizationApiClient;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -19,31 +20,31 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/*
+    조직 ID는 URL로 받지 않고 로그인한 사용자의 조직을 서버에서 해석한다.
+ */
 @Controller
 @RequiredArgsConstructor
-@RequestMapping(
-        "/organizations/{organizationId}" +
-                "/storages/{storageId}" +
-                "/zones"
-)
+@RequestMapping("/organizations")
 public class RuleEngineController {
 
     private static final String VIRTUAL_SENSOR_FORM_VIEW = "organization/virtualsensor-create";
     private static final String VIRTUAL_SENSOR_INFO_VIEW = "organization/virtualsensor-info";
+    private static final String SENSOR_INFO_VIEW = "organization/sensorInfo";
 
     private final RuleEngineApiClient ruleEngineApiClient;
+    private final OrganizationApiClient orgApiClient;
 
     /*
         가상 센서데이터 생성 화면
      */
-    @GetMapping("/{zoneId}/virtual-sensors/create")
+    @GetMapping("/me/storages/{storageId}/zones/{zoneId}/virtual-sensors/create")
     public String showCreateVirtualSensorForm(
-            @PathVariable("organizationId") Long organizationId,
             @PathVariable("storageId") Long storageId,
             @PathVariable("zoneId") Long zoneId,
             Model model
     ) {
-        addZoneAttributes(model, organizationId, storageId, zoneId);
+        addZoneAttributes(model, storageId, zoneId);
         model.addAttribute("edit", false);
 
         return VIRTUAL_SENSOR_FORM_VIEW;
@@ -52,18 +53,17 @@ public class RuleEngineController {
     /*
         가상 센서데이터 수정 화면
      */
-    @GetMapping("/{zoneId}/virtual-sensors/edit")
+    @GetMapping("/me/storages/{storageId}/zones/{zoneId}/virtual-sensors/edit")
     public String showUpdateVirtualSensorForm(
-            @PathVariable("organizationId") Long organizationId,
             @PathVariable("storageId") Long storageId,
             @PathVariable("zoneId") Long zoneId,
             Model model
     ) {
-        addZoneAttributes(model, organizationId, storageId, zoneId);
+        addZoneAttributes(model, storageId, zoneId);
         model.addAttribute("edit", true); // 수정모드
 
         VirtualSensorInfoResponse virtualSensor =
-                ruleEngineApiClient.getVirtualSensorData(organizationId, storageId, zoneId);
+                ruleEngineApiClient.getVirtualSensorData(currentOrganizationId(), storageId, zoneId);
 
         model.addAttribute("virtualSensor", virtualSensor);
 
@@ -73,9 +73,8 @@ public class RuleEngineController {
     /*
         가상 센서데이터 생성
      */
-    @PostMapping("/{zoneId}/virtual-sensors")
+    @PostMapping("/me/storages/{storageId}/zones/{zoneId}/virtual-sensors")
     public String createVirtualSensor(
-            @PathVariable("organizationId") Long organizationId,
             @PathVariable("storageId") Long storageId,
             @PathVariable("zoneId") Long zoneId,
             @Valid @ModelAttribute VirtualSensorCreateRequest request,
@@ -83,31 +82,34 @@ public class RuleEngineController {
             Model model
     ) {
         if (result.hasErrors()) {
-            addZoneAttributes(model, organizationId, storageId, zoneId);
+            addZoneAttributes(model, storageId, zoneId);
             model.addAttribute("edit", false); // 생성모드
 
             return VIRTUAL_SENSOR_FORM_VIEW;
         }
 
-        ruleEngineApiClient.createVirtualSensorData(organizationId, storageId, zoneId, request);
+        ruleEngineApiClient.createVirtualSensorData(
+                currentOrganizationId(), storageId, zoneId, request
+        );
 
-        return redirectToVirtualSensorInfo(organizationId, storageId, zoneId);
+        return redirectToVirtualSensorInfo(storageId, zoneId);
     }
 
     /*
         가상 센서 데이터 업데이트
      */
-    @PutMapping("/{zoneId}/virtual-sensors")
+    @PutMapping("/me/storages/{storageId}/zones/{zoneId}/virtual-sensors")
     public String updateVirtualSensor(
-            @PathVariable("organizationId") Long organizationId,
             @PathVariable("storageId") Long storageId,
             @PathVariable("zoneId") Long zoneId,
             @Valid @ModelAttribute VirtualSensorUpdateRequest request,
             BindingResult result,
             Model model
     ) {
+        Long organizationId = currentOrganizationId();
+
         if (result.hasErrors()) {
-            addZoneAttributes(model, organizationId, storageId, zoneId);
+            addZoneAttributes(model, storageId, zoneId);
             model.addAttribute("edit", true); // 수정모드
             model.addAttribute(
                     "virtualSensor",
@@ -119,39 +121,36 @@ public class RuleEngineController {
 
         ruleEngineApiClient.updateVirtualSensorData(organizationId, storageId, zoneId, request);
 
-        return redirectToVirtualSensorInfo(organizationId, storageId, zoneId);
+        return redirectToVirtualSensorInfo(storageId, zoneId);
     }
 
     /*
         가상 센서 삭제
      */
-    @DeleteMapping("/{zoneId}/virtual-sensors")
+    @DeleteMapping("/me/storages/{storageId}/zones/{zoneId}/virtual-sensors")
     public String deleteVirtualSensor(
-            @PathVariable("organizationId") Long organizationId,
             @PathVariable("storageId") Long storageId,
             @PathVariable("zoneId") Long zoneId
     ) {
+        ruleEngineApiClient.deleteVirtualSensorData(currentOrganizationId(), storageId, zoneId);
 
-        ruleEngineApiClient.deleteVirtualSensorData(organizationId, storageId, zoneId);
-
-        return "redirect:/organizations/" + organizationId + "/storages/" + storageId + "/zones/" + zoneId + "/sensorInfo";
+        return "redirect:" + zoneBasePath(storageId, zoneId) + "/sensorInfo";
     }
 
     /*
         가상 센서데이터 설정 정보 화면
      */
-    @GetMapping("/{zoneId}/virtual-sensors")
+    @GetMapping("/me/storages/{storageId}/zones/{zoneId}/virtual-sensors")
     public String virtualSensorInfo(
-            @PathVariable("organizationId") Long organizationId,
             @PathVariable("storageId") Long storageId,
             @PathVariable("zoneId") Long zoneId,
             Model model
     ) {
-        addZoneAttributes(model, organizationId, storageId, zoneId);
+        addZoneAttributes(model, storageId, zoneId);
 
         try {
             VirtualSensorInfoResponse virtualSensor =
-                    ruleEngineApiClient.getVirtualSensorData(organizationId, storageId, zoneId);
+                    ruleEngineApiClient.getVirtualSensorData(currentOrganizationId(), storageId, zoneId);
 
             model.addAttribute("virtualSensor", virtualSensor);
 
@@ -169,48 +168,46 @@ public class RuleEngineController {
     /*
         가상 센서 활성화 / 비활성화
      */
-    @PutMapping("/{zoneId}/virtual-sensors/status")
+    @PutMapping("/me/storages/{storageId}/zones/{zoneId}/virtual-sensors/status")
     public String changeVirtualSensorStatus(
-            @PathVariable("organizationId") Long organizationId,
             @PathVariable("storageId") Long storageId,
             @PathVariable("zoneId") Long zoneId,
             @Valid @ModelAttribute VirtualSensorStatusRequest request,
             BindingResult result
     ) {
         if (result.hasErrors()) {
-            return redirectToVirtualSensorInfo(organizationId, storageId, zoneId);
+            return redirectToVirtualSensorInfo(storageId, zoneId);
         }
 
-        ruleEngineApiClient.changeVirtualSensorStatus(organizationId, storageId, zoneId, request);
+        ruleEngineApiClient.changeVirtualSensorStatus(
+                currentOrganizationId(), storageId, zoneId, request
+        );
 
-        return redirectToVirtualSensorInfo(organizationId, storageId, zoneId);
+        return redirectToVirtualSensorInfo(storageId, zoneId);
     }
 
     /*
         zone의 센서의 상세 데이터 정보 화면
+        (센서 데이터 조회는 zoneId만 필요하므로 조직 정보를 따로 조회하지 않는다)
      */
-    @GetMapping("/{zoneId}/sensorInfo")
+    @GetMapping("/me/storages/{storageId}/zones/{zoneId}/sensorInfo")
     public String info(
-            @PathVariable("organizationId") Long organizationId,
             @PathVariable("storageId") Long storageId,
             @PathVariable("zoneId") Long zoneId,
             Model model
     ) {
-        model.addAttribute("zoneId", zoneId);
-        model.addAttribute("storageId", storageId);
-        model.addAttribute("organizationId", organizationId);
-
-        List<SensorLatestResponse> latestSensors = List.of();
+        addZoneAttributes(model, storageId, zoneId);
 
         try {
-            latestSensors = ruleEngineApiClient.getLatestSensors(zoneId);
+            List<SensorLatestResponse> latestSensors =
+                    ruleEngineApiClient.getLatestSensors(zoneId);
+
             model.addAttribute("latestSensors", latestSensors);
 
         } catch (ApiException e) {
             model.addAttribute("latestSensors", List.of());
             model.addAttribute("latestSensorsErrorMessage", e.getMessage());
         }
-
 
 
         try {
@@ -224,28 +221,38 @@ public class RuleEngineController {
             model.addAttribute("sensorHistoryErrorMessage", e.getMessage());
         }
 
-        return "organization/sensorInfo";
+        return SENSOR_INFO_VIEW;
+    }
+
+    /*
+        로그인한 사용자가 속한 조직의 ID
+     */
+    private Long currentOrganizationId() {
+        return orgApiClient.getOrgInfo().id();
     }
 
     private void addZoneAttributes(
             Model model,
-            Long organizationId,
             Long storageId,
             Long zoneId
     ) {
-        model.addAttribute("organizationId", organizationId);
         model.addAttribute("storageId", storageId);
         model.addAttribute("zoneId", zoneId);
     }
 
     private String redirectToVirtualSensorInfo(
-            Long organizationId,
             Long storageId,
             Long zoneId
     ) {
-        return "redirect:/organizations/" + organizationId
+        return "redirect:" + zoneBasePath(storageId, zoneId) + "/virtual-sensors";
+    }
+
+    private String zoneBasePath(
+            Long storageId,
+            Long zoneId
+    ) {
+        return "/organizations/me"
                 + "/storages/" + storageId
-                + "/zones/" + zoneId
-                + "/virtual-sensors";
+                + "/zones/" + zoneId;
     }
 }

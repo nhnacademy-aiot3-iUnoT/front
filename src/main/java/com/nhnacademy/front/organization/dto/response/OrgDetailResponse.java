@@ -1,6 +1,7 @@
 package com.nhnacademy.front.organization.dto.response;
 
 import com.nhnacademy.front.admin.dto.OrganizationStatus;
+import com.nhnacademy.front.organization.dto.OrganizationRole;
 
 import java.time.LocalDateTime;
 
@@ -12,11 +13,10 @@ public record OrgDetailResponse(
         String addressDetail,
         String description,
         OrganizationStatus status,
-        LocalDateTime createdAt
+        LocalDateTime createdAt,
+        OrganizationRole organizationRole
 ) {
     public String description() {
-        return description == null || description.isBlank()
-                ? ""
-                : description;
+        return description == null || description.isBlank() ? "" : description;
     }
 }

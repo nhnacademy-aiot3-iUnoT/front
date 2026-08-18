@@ -36,8 +36,7 @@
         <div class="d-flex gap-2">
             <!-- 가상 센서 설정 화면 -->
             <a class="btn btn-outline-secondary"
-               th:href="@{/organizations/{organizationId}/storages/{storageId}/zones/{zoneId}/virtual-sensors(
-                       organizationId=${organizationId},
+               th:href="@{/organizations/me/storages/{storageId}/zones/{zoneId}/virtual-sensors(
                        storageId=${storageId},
                        zoneId=${zoneId})}">
                 <i class="ti ti-cpu me-1"></i>가상 센서

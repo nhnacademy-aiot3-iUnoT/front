@@ -43,7 +43,7 @@ public class AccountController {
         AccountInfoResponse response = accountApiClient.getAccountInfo();
         model.addAttribute("accountInfoResponse", response);
 
-        return "account/account_info";
+        return "account/account-info";
     }
 
     @PutMapping("/mypage")
@@ -64,7 +64,7 @@ public class AccountController {
     @GetMapping("/mypage/change-password")
     public String password(Model model) {
         model.addAttribute("changePasswordForm", new ChangePasswordFormRequest());
-        return "account/change_password";
+        return "account/change-password";
     }
 
     @PutMapping("/mypage/change-password")
@@ -75,7 +75,7 @@ public class AccountController {
         passwordFormValidator.validate(request, bindingResult);
 
         if (bindingResult.hasErrors()) {
-            return "account/change_password";
+            return "account/change-password";
         }
 
         accountApiClient.changePassword(new UpdateAccountPasswordRequest(request.newPassword()));
