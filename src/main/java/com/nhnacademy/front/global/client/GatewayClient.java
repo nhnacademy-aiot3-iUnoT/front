@@ -38,7 +38,7 @@ public class GatewayClient {
     public <T> T get(String path, Class<T> dataType) {
         return execute(() ->
                 restClient.get()
-                        .uri(URI.create(baseUrl + path))
+                        .uri(baseUrl + path)
                         .retrieve()
                         .body(responseTypeOf(dataType)));
     }
@@ -101,16 +101,20 @@ public class GatewayClient {
                         .body(responseType));
     }
 
-    public void post(String path, Object body) {
-        try {
+
+    public void post(String path, Object body){
+
+        try{
             restClient.post()
-                    .uri(URI.create(baseUrl + path))
+                    .uri(baseUrl + path)
                     .body(body)
                     .retrieve()
                     .toBodilessEntity();
-        } catch (HttpStatusCodeException e) {
+
+        }catch(HttpStatusCodeException e){
             throw convertApiException(e);
         }
+
     }
 
     public void post(String path) {
