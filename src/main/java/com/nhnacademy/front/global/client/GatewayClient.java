@@ -101,6 +101,18 @@ public class GatewayClient {
                         .body(responseType));
     }
 
+    public void post(String path, Object body) {
+        try {
+            restClient.post()
+                    .uri(URI.create(baseUrl + path))
+                    .body(body)
+                    .retrieve()
+                    .toBodilessEntity();
+        } catch (HttpStatusCodeException e) {
+            throw convertApiException(e);
+        }
+    }
+
     public void post(String path) {
         try {
             restClient.post()

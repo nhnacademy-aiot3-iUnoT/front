@@ -35,6 +35,10 @@
     gap: 2.5rem;
 }
 
+.account-grid.account-grid-single {
+    grid-template-columns: minmax(0, 1fr);
+}
+
 .account-section + .account-section {
     margin-top: 2rem;
 }

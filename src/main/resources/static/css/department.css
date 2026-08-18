@@ -1,0 +1,18 @@
+.department-page {
+    padding: 1rem 0 2rem;
+}
+
+.department-action-column {
+    width: 90px;
+    text-align: right;
+}
+
+.department-danger-card {
+    border-color: color-mix(in srgb, var(--danger) 30%, var(--line));
+}
+
+@media (max-width: 576px) {
+    .department-page {
+        padding: 1rem 0;
+    }
+}
