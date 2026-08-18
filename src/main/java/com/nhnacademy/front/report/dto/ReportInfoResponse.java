@@ -11,6 +11,7 @@ public record ReportInfoResponse(
         LocalDate periodStart,
         LocalDate periodEnd,
         String aiSummary,
+        AiSummaryStatus aiSummaryStatus,
         LocalDateTime createdAt,
         List<ReportItemResponse> items
 ) {}

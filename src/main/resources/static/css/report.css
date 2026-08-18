@@ -1,0 +1,18 @@
+.week-picker-container {
+    min-width: 260px;
+}
+
+.week-picker-container input {
+    cursor: pointer;
+    background-color: var(--tblr-bg-surface);
+    font-weight: 500;
+}
+
+.flatpickr-calendar.hasWeeks {
+    width: auto;
+}
+
+.ai-summary-text {
+    white-space: pre-line;
+    line-height: 1.6;
+}

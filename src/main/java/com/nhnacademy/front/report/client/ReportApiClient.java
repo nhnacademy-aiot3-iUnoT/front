@@ -15,6 +15,13 @@ public class ReportApiClient {
     private final GatewayClient gatewayClient;
     private static final String CORE_SERVICE = "/api/core";
 
+    public ReportInfoResponse getWeeklyReport(LocalDate periodStart) {
+        return gatewayClient.get(
+                CORE_SERVICE + "/reports/weekly?periodStart=" + periodStart,
+                ReportInfoResponse.class
+        );
+    }
+
     public ReportInfoResponse createWeeklyReport(LocalDate periodStart) {
         return gatewayClient.post(
                 CORE_SERVICE + "/reports/weekly",
@@ -25,5 +32,13 @@ public class ReportApiClient {
 
     public ReportInfoResponse getReport(Long reportId) {
         return gatewayClient.get(CORE_SERVICE + "/reports/" + reportId, ReportInfoResponse.class);
+    }
+
+    public ReportInfoResponse retryAiSummary(Long reportId) {
+        return gatewayClient.post(
+                CORE_SERVICE + "/reports/" + reportId + "/ai-summary/retry",
+                null,
+                ReportInfoResponse.class
+        );
     }
 }

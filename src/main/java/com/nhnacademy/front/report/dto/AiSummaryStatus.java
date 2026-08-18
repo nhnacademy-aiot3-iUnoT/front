@@ -5,9 +5,10 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum ReportItemType {
-    USAGE("출고"),
-    DISPOSAL("폐기");
+public enum AiSummaryStatus {
+    PENDING("생성 중"),
+    COMPLETED("생성 완료"),
+    FAILED("생성 실패");
 
     private final String description;
 }
