@@ -50,8 +50,8 @@ public class DepartmentController {
         return "redirect:/departments";
     }
 
-    @GetMapping("/{departmentId}")
-    public String departmentInfo(@PathVariable Long departmentId, Model model) {
+    @GetMapping("/{department-id}")
+    public String departmentInfo(@PathVariable(name = "department-id") Long departmentId, Model model) {
         DepartmentInfoResponse department = departmentApiClient.getDepartment(departmentId);
 
         model.addAttribute("department", department);
@@ -59,8 +59,8 @@ public class DepartmentController {
         return "organization/department-info";
     }
 
-    @PutMapping("/{departmentId}")
-    public String updateDepartment(@PathVariable Long departmentId,
+    @PutMapping("/{department-id}")
+    public String updateDepartment(@PathVariable(name = "department-id") Long departmentId,
                                    @Valid @ModelAttribute("departmentUpdateRequest") DepartmentUpdateRequest request,
                                    BindingResult bindingResult,
                                    Model model) {
@@ -73,8 +73,8 @@ public class DepartmentController {
         return "redirect:/departments/" + departmentId;
     }
 
-    @PutMapping("/{departmentId}/status")
-    public String updateDepartmentStatus(@PathVariable Long departmentId,
+    @PutMapping("/{department-id}/status")
+    public String updateDepartmentStatus(@PathVariable(name = "department-id") Long departmentId,
                                          @Valid @ModelAttribute DepartmentStatusUpdateRequest request,
                                          BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
@@ -85,8 +85,8 @@ public class DepartmentController {
         return "redirect:/departments/" + departmentId;
     }
 
-    @DeleteMapping("/{departmentId}")
-    public String deleteDepartment(@PathVariable Long departmentId) {
+    @DeleteMapping("/{department-id}")
+    public String deleteDepartment(@PathVariable(name = "department-id") Long departmentId) {
         departmentApiClient.deleteDepartment(departmentId);
         return "redirect:/departments";
     }

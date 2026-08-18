@@ -35,7 +35,6 @@ public class OrganizationMemberController {
     private final OrganizationApiClient organizationApiClient;
     private final DepartmentApiClient departmentApiClient;
 
-    // TODO Account API 구현 후 재확인 필요
     @GetMapping
     public String memberList(@ModelAttribute OrganizationMemberSearchRequest request,
                              @RequestParam(defaultValue = "false") boolean withoutDepartment,
@@ -54,8 +53,8 @@ public class OrganizationMemberController {
         return "organization/member-list";
     }
 
-    @PutMapping("/{memberId}/role")
-    public String updateRole(@PathVariable Long memberId,
+    @PutMapping("/{member-id}/role")
+    public String updateRole(@PathVariable(name = "member-id") Long memberId,
                              @Valid @ModelAttribute OrganizationRoleUpdateRequest request,
                              BindingResult bindingResult,
                              @RequestParam(defaultValue = "false") boolean withoutDepartment) {
@@ -66,8 +65,8 @@ public class OrganizationMemberController {
         return "redirect:/organizations/me/members?withoutDepartment=" + withoutDepartment;
     }
 
-    @DeleteMapping("/{memberId}")
-    public String deleteMember(@PathVariable Long memberId,
+    @DeleteMapping("/{member-id}")
+    public String deleteMember(@PathVariable(name = "member-id") Long memberId,
                                @RequestParam(defaultValue = "false") boolean withoutDepartment) {
         organizationMemberApiClient.deleteMember(memberId);
         return "redirect:/organizations/me/members?withoutDepartment=" + withoutDepartment;
@@ -81,9 +80,9 @@ public class OrganizationMemberController {
         return "redirect:/organizations/me/members?withoutDepartment=" + withoutDepartment;
     }
 
-    @GetMapping("/{memberId}/departments")
+    @GetMapping("/{member-id}/departments")
     @ResponseBody
-    public List<DepartmentListResponse> getMemberDepartments(@PathVariable Long memberId) {
+    public List<DepartmentListResponse> getMemberDepartments(@PathVariable(name = "member-id") Long memberId) {
         return organizationMemberApiClient.getMemberDepartments(memberId);
     }
 
