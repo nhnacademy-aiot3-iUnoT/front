@@ -40,15 +40,15 @@
 
                         <div class="col-auto ms-auto d-print-none d-flex align-items-center gap-2">
                             <div class="btn-group">
-                                <a th:href="@{/reports/weekly(periodStart=${prevMonday})}" class="btn btn-outline-secondary btn-icon" title="이전 주">
+                                <a th:href="@{/storages/{storageId}/reports/weekly(storageId=${storageId}, periodStart=${prevMonday})}" class="btn btn-outline-secondary btn-icon" title="이전 주">
                                     <i class="ti ti-chevron-left"></i>
                                 </a>
-                                <a th:href="@{/reports/weekly(periodStart=${lastMonday})}"
+                                <a th:href="@{/storages/{storageId}/reports/weekly(storageId=${storageId}, periodStart=${lastMonday})}"
                                    class="btn btn-outline-secondary"
                                    th:classappend="${isLatestWeek} ? 'active' : ''">
                                     최근 주차
                                 </a>
-                                <a th:href="@{/reports/weekly(periodStart=${nextMonday})}"
+                                <a th:href="@{/storages/{storageId}/reports/weekly(storageId=${storageId}, periodStart=${nextMonday})}"
                                    class="btn btn-outline-secondary btn-icon"
                                    th:classappend="${!hasFuture} ? 'disabled' : ''"
                                    th:attr="aria-disabled=${!hasFuture} ? 'true' : 'false'"
@@ -64,6 +64,7 @@
                                 <input type="text" id="week-picker" class="form-control form-control-sm"
                                        th:data-current-start="${currentMonday}"
                                        th:data-max-date="${lastSunday}"
+                                       th:data-storage-id="${storageId}"
                                        placeholder="주차 선택" readonly>
                             </div>
                         </div>
@@ -89,7 +90,7 @@
                             해당 주간(<span class="fw-bold text-dark" th:text="${currentMonday + ' ~ ' + currentMonday.plusDays(6)}"></span>)의 의약품 입고, 사용 및 폐기 데이터를 집계하고 AI 분석을 시작합니다.
                         </p>
                         <div class="empty-action mt-4">
-                            <form th:action="@{/reports/weekly}" method="post">
+                            <form th:action="@{/storages/{storageId}/reports/weekly(storageId=${storageId})}" method="post">
                                 <input type="hidden" name="periodStart" th:value="${currentMonday}">
                                 <button type="submit" class="btn btn-primary btn-lg shadow-sm">
                                     <i class="ti ti-sparkles me-2"></i>이 주차의 리포트 생성하기
@@ -107,7 +108,7 @@
                                 <h3 class="card-title text-primary d-flex align-items-center mb-0">
                                     <i class="ti ti-sparkles me-2 fs-2"></i>AI 주간 재고 분석 요약
                                 </h3>
-                                <form th:action="@{/reports/{id}/ai-summary/retry(id=${report.reportId})}" method="post" class="d-inline">
+                                <form th:action="@{/storages/{storageId}/reports/{id}/ai-summary/retry(storageId=${storageId}, id=${report.reportId})}" method="post" class="d-inline">
                                     <input type="hidden" name="periodStart" th:value="${currentMonday}">
                                     <button type="submit" class="btn btn-sm btn-outline-primary" title="AI 요약 재생성">
                                         <i class="ti ti-refresh me-1"></i>재생성
@@ -146,7 +147,7 @@
                                         <div class="small text-muted">일시적인 API 오류 또는 네트워크 지연일 수 있습니다.</div>
                                     </div>
                                 </div>
-                                <form th:action="@{/reports/{id}/ai-summary/retry(id=${report.reportId})}" method="post" class="d-inline">
+                                <form th:action="@{/storages/{storageId}/reports/{id}/ai-summary/retry(storageId=${storageId}, id=${report.reportId})}" method="post" class="d-inline">
                                     <input type="hidden" name="periodStart" th:value="${currentMonday}">
                                     <button type="submit" class="btn btn-sm btn-danger">
                                         <i class="ti ti-rotate-clockwise me-1"></i>AI 요약 다시 시도

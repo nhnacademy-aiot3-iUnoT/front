@@ -14,7 +14,7 @@ import java.time.LocalDate;
 
 @Slf4j
 @Controller
-@RequestMapping("/reports")
+@RequestMapping("/storages/{storageId}/reports")
 @RequiredArgsConstructor
 public class ReportController {
 
@@ -22,6 +22,7 @@ public class ReportController {
 
     @GetMapping("/weekly")
     public String weeklyReport(
+            @PathVariable Long storageId,
             @RequestParam(name = "periodStart", required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate periodStart,
             Model model
@@ -37,14 +38,15 @@ public class ReportController {
         }
 
         try {
-            ReportInfoResponse report = reportApiClient.getWeeklyReport(periodStart);
+            ReportInfoResponse report = reportApiClient.getWeeklyReport(storageId, periodStart);
             model.addAttribute("report", report);
         } catch (Exception e) {
             // 리포트가 아직 생성되지 않은 상태 -> report = null로 뷰 전달
-            log.info("주간 리포트가 아직 생성되지 않았습니다 (periodStart={})", periodStart);
+            log.info("주간 리포트가 아직 생성되지 않았습니다 (storageId={}, periodStart={})", storageId, periodStart);
             model.addAttribute("report", null);
         }
 
+        model.addAttribute("storageId", storageId);
         model.addAttribute("currentMonday", periodStart);
         model.addAttribute("lastMonday", lastMonday);
         model.addAttribute("lastSunday", lastMonday.plusDays(6));
@@ -58,33 +60,35 @@ public class ReportController {
 
     @PostMapping("/weekly")
     public String createWeeklyReport(
+            @PathVariable Long storageId,
             @RequestParam(name = "periodStart")
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate periodStart
     ) {
         try {
-            reportApiClient.createWeeklyReport(periodStart);
+            reportApiClient.createWeeklyReport(storageId, periodStart);
         } catch (Exception e) {
-            log.error("주간 리포트 생성 실패: periodStart={}", periodStart, e);
+            log.error("주간 리포트 생성 실패: storageId={}, periodStart={}", storageId, periodStart, e);
         }
 
-        return "redirect:/reports/weekly?periodStart=" + periodStart;
+        return "redirect:/storages/" + storageId + "/reports/weekly?periodStart=" + periodStart;
     }
 
     @PostMapping("/{reportId}/ai-summary/retry")
     public String retryAiSummary(
+            @PathVariable Long storageId,
             @PathVariable Long reportId,
             @RequestParam(name = "periodStart", required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate periodStart
     ) {
         try {
-            reportApiClient.retryAiSummary(reportId);
+            reportApiClient.retryAiSummary(storageId, reportId);
         } catch (Exception e) {
             log.error("AI 요약 생성을 재시도하는 도중 오류가 발생했습니다: {}", reportId, e);
         }
 
         if (periodStart != null) {
-            return "redirect:/reports/weekly?periodStart=" + periodStart;
+            return "redirect:/storages/" + storageId + "/reports/weekly?periodStart=" + periodStart;
         }
-        return "redirect:/reports/weekly";
+        return "redirect:/storages/" + storageId + "/reports/weekly";
     }
 }

@@ -35,6 +35,7 @@ document.addEventListener("DOMContentLoaded", function () {
         return `${mYear}.${mMonth}.${mDate} (월) ~ ${sYear}.${sMonth}.${sDate} (일)`;
     }
 
+    const storageId = weekPickerInput.dataset.storageId || "1";
     const maxDate = weekPickerInput.dataset.maxDate || "today";
 
     flatpickr(weekPickerInput, {
@@ -63,7 +64,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 const formattedMonday = `${year}-${month}-${d}`;
 
                 if (formattedMonday !== currentStart) {
-                    window.location.href = `/reports/weekly?periodStart=${formattedMonday}`;
+                    window.location.href = `/storages/${storageId}/reports/weekly?periodStart=${formattedMonday}`;
                 }
             }
         }

@@ -7,6 +7,7 @@ import java.util.List;
 public record ReportInfoResponse(
         Long reportId,
         Long organizationId,
+        Long storageId,
         ReportType reportType,
         LocalDate periodStart,
         LocalDate periodEnd,

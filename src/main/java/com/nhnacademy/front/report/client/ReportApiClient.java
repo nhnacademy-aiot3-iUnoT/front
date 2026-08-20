@@ -15,30 +15,33 @@ public class ReportApiClient {
     private final GatewayClient gatewayClient;
     private static final String CORE_SERVICE = "/api/core";
 
-    public ReportInfoResponse getWeeklyReport(LocalDate periodStart) {
+    public ReportInfoResponse getWeeklyReport(Long storageId, LocalDate periodStart) {
         return gatewayClient.get(
-                CORE_SERVICE + "/reports/weekly?periodStart=" + periodStart,
+                CORE_SERVICE + "/storages/" + storageId + "/reports/weekly?periodStart=" + periodStart,
                 ReportInfoResponse.class
         );
     }
 
-    public ReportInfoResponse createWeeklyReport(LocalDate periodStart) {
+    public ReportInfoResponse createWeeklyReport(Long storageId, LocalDate periodStart) {
         return gatewayClient.post(
-                CORE_SERVICE + "/reports/weekly",
+                CORE_SERVICE + "/storages/" + storageId + "/reports/weekly",
                 new ReportCreateRequest(periodStart),
                 ReportInfoResponse.class
         );
     }
 
-    public ReportInfoResponse getReport(Long reportId) {
-        return gatewayClient.get(CORE_SERVICE + "/reports/" + reportId, ReportInfoResponse.class);
+    public ReportInfoResponse getReport(Long storageId, Long reportId) {
+        return gatewayClient.get(
+                CORE_SERVICE + "/storages/" + storageId + "/reports/" + reportId,
+                ReportInfoResponse.class
+        );
     }
 
-    public ReportInfoResponse retryAiSummary(Long reportId) {
-        return gatewayClient.post(
-                CORE_SERVICE + "/reports/" + reportId + "/ai-summary/retry",
+    public void retryAiSummary(Long storageId, Long reportId) {
+        gatewayClient.post(
+                CORE_SERVICE + "/storages/" + storageId + "/reports/" + reportId + "/ai-summary/retry",
                 null,
-                ReportInfoResponse.class
+                Void.class
         );
     }
 }
