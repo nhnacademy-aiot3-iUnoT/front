@@ -109,43 +109,57 @@
                 </div>
 
                 <div class="card-header">
-                    <h3 class="card-title">측정값 범위</h3>
+                    <h3 class="card-title">측정값 생성 설정</h3>
                 </div>
 
                 <div class="card-body">
-                    <div class="row mb-3">
+                    <div class="row mb-3" th:with="sensor=${virtualSensor.virtualSensorValues.temperature}">
                         <div class="col-md-3 text-muted">온도 (°C)</div>
-                        <div class="col-md-9"
-                             th:text="${virtualSensor.temperature == null
-                                       ? '-'
-                                       : virtualSensor.temperature.min + ' ~ ' + virtualSensor.temperature.max}">-
+                        <div class="col-md-9">
+                            <span th:if="${sensor == null}">-</span>
+                            <th:block th:if="${sensor != null}" th:switch="${sensor.mode.name()}">
+                                <span th:case="'RANGE'" th:text="|${sensor.min} ~ ${sensor.max} (무작위)|">-</span>
+                                <span th:case="'FIXED'" th:text="|${sensor.fixedValue} (고정)|">-</span>
+                                <span th:case="*">-</span>
+                            </th:block>
                         </div>
                     </div>
 
-                    <div class="row mb-3">
+                    <div class="row mb-3" th:with="sensor=${virtualSensor.virtualSensorValues.humidity}">
                         <div class="col-md-3 text-muted">습도 (%)</div>
-                        <div class="col-md-9"
-                             th:text="${virtualSensor.humidity == null
-                                       ? '-'
-                                       : virtualSensor.humidity.min + ' ~ ' + virtualSensor.humidity.max}">-
+                        <div class="col-md-9">
+                            <span th:if="${sensor == null}">-</span>
+                            <th:block th:if="${sensor != null}" th:switch="${sensor.mode.name()}">
+                                <span th:case="'RANGE'" th:text="|${sensor.min} ~ ${sensor.max} (무작위)|">-</span>
+                                <span th:case="'FIXED'" th:text="|${sensor.fixedValue} (고정)|">-</span>
+                                <span th:case="*">-</span>
+                            </th:block>
                         </div>
                     </div>
 
-                    <div class="row mb-3">
+                    <div class="row mb-3" th:with="sensor=${virtualSensor.virtualSensorValues.illumination}">
                         <div class="col-md-3 text-muted">밝기 (lux)</div>
-                        <div class="col-md-9"
-                             th:text="${virtualSensor.illumination == null
-                                       ? '-'
-                                       : virtualSensor.illumination.min + ' ~ ' + virtualSensor.illumination.max}">-
+                        <div class="col-md-9">
+                            <span th:if="${sensor == null}">-</span>
+                            <th:block th:if="${sensor != null}" th:switch="${sensor.mode.name()}">
+                                <span th:case="'RANGE'" th:text="|${sensor.min} ~ ${sensor.max} (무작위)|">-</span>
+                                <span th:case="'FIXED'" th:text="|${sensor.fixedValue} (고정)|">-</span>
+                                <span th:case="*">-</span>
+                            </th:block>
                         </div>
                     </div>
 
-                    <div class="row mb-0">
-                        <div class="col-md-3 text-muted">문 열림 확률</div>
-                        <div class="col-md-9"
-                             th:text="${virtualSensor.doorOpenProbability == null
-                                       ? '-'
-                                       : virtualSensor.doorOpenProbability}">-</div>
+                    <div class="row mb-0" th:with="sensor=${virtualSensor.virtualSensorValues.door}">
+                        <div class="col-md-3 text-muted">문 상태</div>
+                        <div class="col-md-9">
+                            <span th:if="${sensor == null}">-</span>
+                            <th:block th:if="${sensor != null}" th:switch="${sensor.mode.name()}">
+                                <span th:case="'PROBABILITY'" th:text="|열림 확률 ${sensor.probability}|">-</span>
+                                <span th:case="'FIXED'"
+                                      th:text="${sensor.fixedValue == 1 ? '열림 (고정)' : '닫힘 (고정)'}">-</span>
+                                <span th:case="*">-</span>
+                            </th:block>
+                        </div>
                     </div>
                 </div>
 

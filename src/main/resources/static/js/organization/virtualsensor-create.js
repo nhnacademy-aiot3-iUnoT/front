@@ -11,6 +11,47 @@ document.addEventListener("DOMContentLoaded", function () {
         form.querySelectorAll(".sensor-type-checkbox")
     );
     const sensorTypeFeedback = form.querySelector("#sensorTypeFeedback");
+    const selectedSensorCount = form.querySelector("#selectedSensorCount");
+    const sensorConfigEmpty = form.querySelector("#sensorConfigEmpty");
+    const sensorConfigList = form.querySelector("#sensorConfigList");
+
+    function updateSelectionSummary() {
+        const selectedCount = sensorTypeCheckboxes.filter(checkbox => checkbox.checked).length;
+
+        if (selectedSensorCount) {
+            selectedSensorCount.textContent = selectedCount + "개 선택";
+            selectedSensorCount.classList.toggle("bg-primary-lt", selectedCount > 0);
+            selectedSensorCount.classList.toggle("bg-secondary-lt", selectedCount === 0);
+        }
+
+        if (sensorConfigEmpty) {
+            sensorConfigEmpty.classList.toggle("d-none", selectedCount > 0);
+        }
+
+        if (sensorConfigList) {
+            sensorConfigList.classList.toggle("d-none", selectedCount === 0);
+        }
+    }
+
+    function updateGenerationModeFields(sensorFields) {
+        const modeSelect = sensorFields.querySelector(".generation-mode-select");
+
+        if (!modeSelect) {
+            return;
+        }
+
+        const sensorEnabled = !modeSelect.disabled;
+
+        sensorFields.querySelectorAll("[data-mode-fields]").forEach(modeFields => {
+            const active = sensorEnabled
+                && modeFields.dataset.modeFields === modeSelect.value;
+
+            modeFields.querySelectorAll("input, select").forEach(control => {
+                control.disabled = !active;
+            });
+            modeFields.classList.toggle("d-none", !active);
+        });
+    }
 
     function updateSensorTypeFields(checkbox) {
         const sensorType = checkbox.dataset.sensorType;
@@ -20,22 +61,32 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
-        fields.querySelectorAll("input").forEach(input => {
-            input.disabled = !checkbox.checked;
+        fields.querySelectorAll("input, select").forEach(control => {
+            control.disabled = !checkbox.checked;
         });
 
-        fields.classList.toggle("opacity-50", !checkbox.checked);
+        fields.classList.toggle("d-none", !checkbox.checked);
+        updateGenerationModeFields(fields);
     }
 
     sensorTypeCheckboxes.forEach(checkbox => {
         updateSensorTypeFields(checkbox);
         checkbox.addEventListener("change", function () {
             updateSensorTypeFields(checkbox);
+            updateSelectionSummary();
 
             if (sensorTypeCheckboxes.some(item => item.checked)) {
                 sensorTypeFeedback.hidden = true;
                 sensorTypeFeedback.textContent = "";
             }
+        });
+    });
+
+    updateSelectionSummary();
+
+    form.querySelectorAll(".generation-mode-select").forEach(modeSelect => {
+        modeSelect.addEventListener("change", function () {
+            updateGenerationModeFields(modeSelect.closest("[data-sensor-fields]"));
         });
     });
 
@@ -70,10 +121,22 @@ document.addEventListener("DOMContentLoaded", function () {
             "#illuminationMin", "#illuminationMax", "밝기"
         );
 
-        const doorOpenProbabilityInput = form.querySelector("#doorOpenProbability");
-        const doorOpenProbabilityValid = !doorOpenProbabilityInput
-            || doorOpenProbabilityInput.disabled
-            || validateDoorOpenProbabilityField(doorOpenProbabilityInput);
+        const temperatureFixedValid = validateSelectedNumber(
+            "#temperatureFixedValue", "온도 고정값"
+        );
+
+        const humidityFixedValid = validateSelectedNumber(
+            "#humidityFixedValue", "습도 고정값"
+        );
+
+        const illuminationFixedValid = validateSelectedNumber(
+            "#illuminationFixedValue", "밝기 고정값"
+        );
+
+        const doorProbabilityInput = form.querySelector("#doorProbability");
+        const doorProbabilityValid = !doorProbabilityInput
+            || doorProbabilityInput.disabled
+            || validateDoorOpenProbabilityField(doorProbabilityInput);
 
         if (!(deviceEuiValid
             && intervalValid
@@ -81,7 +144,10 @@ document.addEventListener("DOMContentLoaded", function () {
             && temperatureValid
             && humidityValid
             && illuminationValid
-            && doorOpenProbabilityValid)) {
+            && temperatureFixedValid
+            && humidityFixedValid
+            && illuminationFixedValid
+            && doorProbabilityValid)) {
             event.preventDefault();
         }
     });
@@ -95,5 +161,20 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         return validateRangeFields(minInput, maxInput, label);
+    }
+
+    function validateSelectedNumber(selector, label) {
+        const input = form.querySelector(selector);
+
+        if (!input || input.disabled) {
+            return true;
+        }
+
+        if (!isNumber(input.value)) {
+            setError(input, label + "을 숫자로 입력하세요.");
+            return false;
+        }
+
+        return true;
     }
 });

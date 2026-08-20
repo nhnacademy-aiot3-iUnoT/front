@@ -1,6 +1,7 @@
 package com.nhnacademy.front.engine.dto.response;
 
 import com.nhnacademy.front.engine.dto.VirtualSensorStatus;
+import com.nhnacademy.front.engine.dto.VirtualSensorValues;
 
 public record VirtualSensorInfoResponse(
 
@@ -8,22 +9,10 @@ public record VirtualSensorInfoResponse(
 
         Long measurementIntervalSeconds,
 
-        SensorValueRange temperature,
-
-        SensorValueRange humidity,
-
-        SensorValueRange illumination,
-
-        Double doorOpenProbability,
+        VirtualSensorValues virtualSensorValues,
 
         VirtualSensorStatus status
 ) {
-
-    public record SensorValueRange(
-            Double min,
-            Double max
-    ) {
-    }
 
     public boolean isActive() {
         return status == VirtualSensorStatus.ACTIVE;
