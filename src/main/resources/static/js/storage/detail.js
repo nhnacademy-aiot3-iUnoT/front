@@ -1,5 +1,5 @@
 // 💡 API 서버(또는 게이트웨이) 주소와 포트
-const API_BASE_URL = 'http://localhost:10400';
+const API_BASE_URL = 'https://iunot.cloud';
 
 // --- 저장소 수정 모달 제어 ---
 function openEditModal() {

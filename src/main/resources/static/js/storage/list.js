@@ -1,5 +1,5 @@
 // 💡 API Gateway 서버의 주소와 포트 (예: 10400)
-const GATEWAY_URL = 'http://localhost:10400';
+const GATEWAY_URL = 'https://iunot.cloud';
 
 // 모달 열기
 function openCreateModal() {
