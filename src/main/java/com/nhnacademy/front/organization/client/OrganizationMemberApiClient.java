@@ -7,6 +7,7 @@ import com.nhnacademy.front.organization.dto.request.MemberDepartmentUpdateReque
 import com.nhnacademy.front.organization.dto.request.OrganizationRoleUpdateRequest;
 import com.nhnacademy.front.organization.dto.response.DepartmentListResponse;
 import com.nhnacademy.front.organization.dto.response.OrganizationMemberResponse;
+import com.nhnacademy.front.organization.dto.response.OrganizationMemberRoleResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
@@ -40,6 +41,12 @@ public class OrganizationMemberApiClient {
 
         String uri = builder.toUriString();
         return gatewayClient.get(uri, new ParameterizedTypeReference<>() {});
+    }
+
+    public OrganizationMemberRoleResponse getRole(){
+        String uri = String.format("%s/me/role", CORE_SERVICE);
+
+        return gatewayClient.get(uri, OrganizationMemberRoleResponse.class);
     }
 
     /**

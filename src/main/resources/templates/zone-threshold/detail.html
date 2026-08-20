@@ -18,7 +18,7 @@
                 <span class="path-prefix" th:text="${threshold.organizationName + ' > ' + threshold.storageName + ' > ' + threshold.zoneName + ' > '}">조직이름 &gt; 저장소이름 &gt; 구역이름 &gt; </span>
                 <span th:text="${threshold.sensorTypeName}">센서 타입 이름</span>
             </h2>
-            <div class="action-buttons">
+            <div class="action-buttons" th:if="${canManage}">
                 <button type="button" th:onclick="'deleteZoneThreshold(' + ${threshold.zoneId} + ', ' + ${threshold.zoneThresholdId} + ')'" class="btn-danger">삭제</button>
             </div>
         </div>
