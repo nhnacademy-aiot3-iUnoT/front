@@ -1,4 +1,4 @@
-const GATEWAY_URL = 'http://localhost:10400';
+const GATEWAY_URL = 'https://iunot.cloud';
 
 // 모달 열기
 function openUpdateModal() {

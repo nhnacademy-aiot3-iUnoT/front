@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:10400';
+const API_BASE_URL = 'https://iunot.cloud';
 
 // --- 모달 제어 ---
 function openEditZoneModal() { document.getElementById('edit-zone-modal').style.display = 'flex'; }
