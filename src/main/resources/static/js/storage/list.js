@@ -45,6 +45,7 @@ function createStorage() {
         headers: {
             'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({
             name: name,
             description: description === '' ? null : description

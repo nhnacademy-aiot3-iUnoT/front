@@ -43,6 +43,7 @@ function updateZoneSensor() {
         headers: {
             'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({
             name: name,
             description: description === '' ? null : description
@@ -71,7 +72,8 @@ function deleteZoneSensor(zoneId, sensorId) {
     }
 
     fetch(`${GATEWAY_URL}/api/core/zones/${zoneId}/zone-sensors/${sensorId}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        credentials: 'include'
     })
         .then(response => {
             if (response.ok || response.status === 204) {
