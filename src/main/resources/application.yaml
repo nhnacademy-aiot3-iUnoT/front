@@ -25,3 +25,13 @@ gateway:
 
 juso:
   confirm-key: ${JUSO_CONFIRM_KEY:}
+
+security:
+  jwt:
+    issuer: ${JWT_ISSUER:account-api}
+    audiences:
+      - account-api
+    access-token-ttl: ${JWT_ACCESS_TOKEN_TTL:30m}
+    allowed-algorithms:
+      - rs256
+    jwk-set-uri: ${JWK_SET_URI:http://localhost:10413/.well-known/jwks.json}

@@ -1,0 +1,49 @@
+package com.nhnacademy.front.global.security;
+
+import com.nhnacademy.front.global.config.JwtProperties;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
+import org.springframework.stereotype.Component;
+
+import java.time.Duration;
+
+@Component
+public class AccessTokenCookieManager {
+
+    public static final String COOKIE_NAME = "access_token";
+
+    private final boolean secure;
+    private final Duration accessTokenTtl;
+
+    public AccessTokenCookieManager(
+            @Value("${cookie.secure:false}") boolean secure,
+            JwtProperties jwtProperties
+    ) {
+        this.secure = secure;
+        this.accessTokenTtl = jwtProperties.getAccessTokenTtl();
+    }
+
+    public void add(HttpServletResponse response, String accessToken) {
+        response.addHeader(
+                HttpHeaders.SET_COOKIE,
+                baseCookie(accessToken).maxAge(accessTokenTtl).build().toString()
+        );
+    }
+
+    public void delete(HttpServletResponse response) {
+        response.addHeader(
+                HttpHeaders.SET_COOKIE,
+                baseCookie("").maxAge(Duration.ZERO).build().toString()
+        );
+    }
+
+    private ResponseCookie.ResponseCookieBuilder baseCookie(String value) {
+        return ResponseCookie.from(COOKIE_NAME, value)
+                .httpOnly(true)
+                .secure(secure)
+                .sameSite("Lax")
+                .path("/");
+    }
+}
