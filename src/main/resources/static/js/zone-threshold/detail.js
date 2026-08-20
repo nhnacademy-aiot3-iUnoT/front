@@ -8,7 +8,8 @@ function deleteZoneThreshold(zoneId, zoneThresholdId) {
 
     // API 명세에 맞는 엔드포인트로 DELETE 요청
     fetch(`${GATEWAY_URL}/api/core/zones/${zoneId}/zone-thresholds/${zoneThresholdId}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        credentials: 'include'
     })
         .then(response => {
             if (response.ok || response.status === 204) {
