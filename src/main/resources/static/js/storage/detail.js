@@ -40,6 +40,7 @@ function updateStorage(storageId) {
     fetch(`${API_BASE_URL}/api/core/storages/${storageId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ name: name, description: description === '' ? null : description })
     })
         .then(response => {
@@ -66,6 +67,7 @@ function toggleStorageStatus(storageId, currentStatus) {
     fetch(`${API_BASE_URL}/api/core/storages/${storageId}/status`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ status: newStatus })
     })
         .then(response => {
@@ -86,7 +88,8 @@ function deleteStorage(storageId) {
     if (!confirm('정말 이 저장소를 삭제하시겠습니까?')) return;
 
     fetch(`${API_BASE_URL}/api/core/storages/${storageId}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        credentials: 'include'
     })
         .then(response => {
             if (response.ok || response.status === 204) {
@@ -129,6 +132,7 @@ function createZone(storageId) {
     fetch(`${API_BASE_URL}/api/core/storages/${storageId}/zones`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ name: name, description: description === '' ? null : description })
     })
         .then(response => {
@@ -165,6 +169,7 @@ function updateStockThreshold(storageId, thresholdId) {
         headers: {
             'Content-Type': 'application/json'
         },
+        credentials: 'include',
         body: JSON.stringify(requestData)
     })
         .then(response => {
@@ -193,7 +198,8 @@ function deleteStockThreshold(storageId, thresholdId) {
     }
 
     fetch(`${API_BASE_URL}/api/core/storages/${storageId}/stock-thresholds/${thresholdId}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        credentials: 'include'
     })
         .then(response => {
             if (response.ok || response.status === 204) {
@@ -236,7 +242,9 @@ function searchMedicines() {
     }
 
     // SearchType.PRODUCT_NAME 기준 검색 요청 (필요시 page, size 조절 가능)
-    fetch(`${API_BASE_URL}/api/core/medicines?searchType=PRODUCT_NAME&search=${encodeURIComponent(keyword)}&page=0&size=5`)
+    fetch(`${API_BASE_URL}/api/core/medicines?searchType=PRODUCT_NAME&search=${encodeURIComponent(keyword)}&page=0&size=5`, {
+        credentials: 'include'
+    })
         .then(res => res.json())
         .then(resData => {
             // ApiResponse 구조에 맞게 content 배열 추출 (PageResponse 구조 고려)
@@ -300,6 +308,7 @@ function saveStockThreshold(storageId) {
         headers: {
             'Content-Type': 'application/json'
         },
+        credentials: 'include',
         body: JSON.stringify(requestData)
     })
         .then(response => {
