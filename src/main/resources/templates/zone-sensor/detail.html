@@ -18,7 +18,7 @@
                 <span class="path-prefix" th:text="${sensor.organizationName + ' > ' + sensor.storageName + ' > ' + sensor.zoneName + ' > '}">조직이름 &gt; 저장소이름 &gt; 구역이름 &gt; </span>
                 <span th:text="${sensor.name}">센서 이름</span>
             </h2>
-            <div class="action-buttons">
+            <div class="action-buttons" th:if="${canManage}">
                 <button type="button" onclick="openUpdateModal()" class="btn-warning">수정</button>
                 <button type="button" th:onclick="'deleteZoneSensor(' + ${sensor.zoneId} + ', ' + ${sensor.zoneSensorId} + ')'" class="btn-danger">삭제</button>
             </div>
@@ -39,7 +39,7 @@
     </div>
 
     <!-- 센서 수정 모달 박스 -->
-    <div id="update-modal" class="modal-wrapper" style="display:none;">
+    <div id="update-modal" class="modal-wrapper" style="display:none;" th:if="${canManage}">
         <div class="modal-backdrop" onclick="closeUpdateModal()"></div>
         <div class="modal-box">
             <h3>센서 정보 수정</h3>

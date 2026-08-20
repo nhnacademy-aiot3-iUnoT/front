@@ -19,7 +19,10 @@
                       th:text="${storageList[0].organizationName + ' > '}"></span>
                 📦 저장소 목록
             </h2>
-            <button type="button" onclick="openCreateModal()" class="btn-primary">+ 저장소 추가</button>
+            <button type="button"
+                    th:if="${canManage}"
+                    onclick="openCreateModal()"
+                    class="btn-primary">+ 저장소 추가</button>
         </div>
 
         <table>
@@ -49,7 +52,7 @@
     </div>
 
     <!-- 저장소 추가 모달 박스 -->
-    <div id="create-modal" style="display:none;" class="modal-wrapper">
+    <div id="create-modal" style="display:none;" class="modal-wrapper" th:if="${canManage}">
         <div class="modal-backdrop" onclick="closeCreateModal()"></div>
         <div class="modal-box">
             <h3>저장소 추가</h3>

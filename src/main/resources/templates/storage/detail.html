@@ -21,7 +21,7 @@
             </h2>
 
             <!-- 관리 액션 버튼들 -->
-            <div class="action-buttons">
+            <div class="action-buttons" th:if="${canManage}">
                 <button type="button" class="btn-secondary" onclick="openEditModal()">수정</button>
                 <button type="button" class="btn-warning" th:text="${storage.status.name() == 'ACTIVE'} ? '비활성화' : '활성화'"
                         th:attr="onclick=|toggleStorageStatus('${storage.storageId}', '${storage.status.name()}')|">상태변경</button>
@@ -61,7 +61,7 @@
         <!-- 3. 소속 구역 리스트 섹션 -->
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
             <h3 style="margin: 0;">📍 소속 구역 목록</h3>
-            <button type="button" class="btn-primary" onclick="openZoneModal()">+ 구역 추가</button>
+            <button type="button" class="btn-primary" th:if="${canManage}" onclick="openZoneModal()">+ 구역 추가</button>
         </div>
 
         <table>
@@ -107,7 +107,7 @@
         <!-- 최소 재고 임계값 목록 타이틀 옆에 추가 버튼 배치 -->
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; margin-top: 30px;">
             <h3 style="margin: 0;">📦 최소 재고 임계값 목록</h3>
-            <button type="button" class="btn-primary" onclick="openStockThresholdModal()">+ 최소 재고 추가</button>
+            <button type="button" class="btn-primary" th:if="${canManage}" onclick="openStockThresholdModal()">+ 최소 재고 추가</button>
         </div>
 
         <table>
@@ -117,12 +117,12 @@
                 <th>포장 단위</th>
                 <th class="center">최소 재고 임계값</th>
                 <th class="center">상태 (활성화)</th>
-                <th class="center" style="width: 150px;">관리</th>
+                <th class="center" style="width: 150px;" th:if="${canManage}">관리</th>
             </tr>
             </thead>
             <tbody>
             <tr th:if="${#lists.isEmpty(stockThresholdList)}">
-                <td colspan="5" style="text-align: center; color: #888; padding: 20px;">등록된 최소 재고 임계값이 없습니다.</td>
+                <td th:colspan="${canManage} ? 5 : 4" style="text-align: center; color: #888; padding: 20px;">등록된 최소 재고 임계값이 없습니다.</td>
             </tr>
 
             <!-- 최소 재고 임계값 리스트 순회 -->
@@ -130,12 +130,13 @@
                 <td th:text="${threshold.productName}">의약품명</td>
                 <td th:text="${threshold.packUnit}">포장단위</td>
 
-                <!-- 최소재고 입력 필드 -->
+                <!-- 최소재고 입력 필드 (관리자가 아닐 때는 읽기 전용/텍스트로 처리되거나 input 유지) -->
                 <td class="center">
                     <input type="number"
                            th:id="'input-threshold-' + ${threshold.stockThresholdId}"
                            th:value="${threshold.stockThreshold}"
                            min="0"
+                           th:readonly="${!canManage}"
                            style="width: 80px; padding: 4px; text-align: center; border: 1px solid #cbd5e1; border-radius: 4px;">
                 </td>
 
@@ -144,11 +145,12 @@
                     <input type="checkbox"
                            th:id="'input-active-' + ${threshold.stockThresholdId}"
                            th:checked="${threshold.isActive}"
+                           th:disabled="${!canManage}"
                            style="width: 18px; height: 18px; cursor: pointer;">
                 </td>
 
                 <!-- 수정 및 삭제 버튼 -->
-                <td class="center">
+                <td class="center" th:if="${canManage}">
                     <button type="button"
                             class="btn-primary"
                             style="padding: 4px 8px; font-size: 12px; margin-right: 4px;"
@@ -168,7 +170,7 @@
     <!-- ================= 모달 영역 ================= -->
 
     <!-- 1. 저장소 수정 모달 -->
-    <div id="edit-modal" class="modal-wrapper" style="display:none;">
+    <div id="edit-modal" class="modal-wrapper" style="display:none;" th:if="${canManage}">
         <div class="modal-backdrop" onclick="closeEditModal()"></div>
         <div class="modal-box">
             <h3>저장소 수정</h3>
@@ -186,7 +188,7 @@
     </div>
 
     <!-- 2. 구역 추가 모달 -->
-    <div id="zone-modal" class="modal-wrapper" style="display:none;">
+    <div id="zone-modal" class="modal-wrapper" style="display:none;" th:if="${canManage}">
         <div class="modal-backdrop" onclick="closeZoneModal()"></div>
         <div class="modal-box">
             <h3>구역 추가</h3>
@@ -204,7 +206,7 @@
     </div>
 
     <!-- 3. 최소 재고 추가 모달 -->
-    <div id="stock-threshold-modal" class="modal-wrapper" style="display:none;">
+    <div id="stock-threshold-modal" class="modal-wrapper" style="display:none;" th:if="${canManage}">
         <div class="modal-backdrop" onclick="closeStockThresholdModal()"></div>
         <div class="modal-box" style="width: 550px !important;">
             <h3>최소 재고 임계값 추가</h3>

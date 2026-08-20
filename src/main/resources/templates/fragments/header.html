@@ -31,6 +31,14 @@
                 </ul>
 
                 <div class="navbar-nav flex-row order-md-last">
+
+                    <div class="nav-item me-3 position-relative">
+                        <a href="/alerts" class="nav-link px-2 text-reset" title="알림함">
+                            <i class="ti ti-bell fs-2"></i>
+                            <span id="unread-notification-badge" class="badge bg-red rounded-pill position-absolute top-0 start-100 translate-middle" style="display: none; font-size: 10px;">0</span>
+                        </a>
+                    </div>
+
                     <div class="nav-item me-2">
                         <button type="button" class="btn btn-icon btn-ghost-secondary" id="theme-toggle">
                             <i class="ti ti-moon fs-2 moon-icon"></i>
@@ -64,6 +72,8 @@
             </div>
         </div>
     </header>
+
+    <script th:src="@{/js/alert/alerts-count.js}"></script>
 </th:block>
 </body>
 </html>
