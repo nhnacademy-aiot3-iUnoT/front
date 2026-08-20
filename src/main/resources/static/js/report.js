@@ -35,14 +35,16 @@ document.addEventListener("DOMContentLoaded", function () {
         return `${mYear}.${mMonth}.${mDate} (월) ~ ${sYear}.${sMonth}.${sDate} (일)`;
     }
 
+    const maxDate = weekPickerInput.dataset.maxDate || "today";
+
     flatpickr(weekPickerInput, {
         locale: {
-            ...(flatpickr.l10ns.ko || {}),
+            ...flatpickr.l10ns.ko,
             firstDayOfWeek: 1
         },
         plugins: [new weekSelect({})],
         defaultDate: currentStart,
-        maxDate: "today",
+        maxDate: maxDate,
         dateFormat: "Y-m-d",
         onReady: function (selectedDates, dateStr, instance) {
             if (selectedDates && selectedDates.length > 0) {

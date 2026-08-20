@@ -26,14 +26,14 @@
                             </h2>
                             <div class="text-muted mt-1" th:if="${report != null}">
                                 집계 기간: <span class="badge bg-blue-lt text-blue fs-4" th:text="${report.periodStart + ' ~ ' + report.periodEnd}"></span>
-                                <span class="badge bg-green-lt text-green ms-2" th:if="${isCurrentWeek}">
-                                    <i class="ti ti-clock-play me-1"></i>이번 주 (집계 진행 중)
+                                <span class="badge bg-green-lt text-green ms-2" th:if="${isLatestWeek}">
+                                    <i class="ti ti-check me-1"></i>최근 마감 주차
                                 </span>
                             </div>
                             <div class="text-muted mt-1" th:if="${report == null}">
                                 선택 기간: <span class="badge bg-secondary-lt text-secondary fs-4" th:text="${currentMonday + ' ~ ' + currentMonday.plusDays(6)}"></span>
-                                <span class="badge bg-azure-lt text-azure ms-2" th:if="${isCurrentWeek}">
-                                    <i class="ti ti-info-circle me-1"></i>이번 주 (미생성)
+                                <span class="badge bg-azure-lt text-azure ms-2" th:if="${isLatestWeek}">
+                                    <i class="ti ti-info-circle me-1"></i>최근 마감 주차 (미생성)
                                 </span>
                             </div>
                         </div>
@@ -43,10 +43,10 @@
                                 <a th:href="@{/reports/weekly(periodStart=${prevMonday})}" class="btn btn-outline-secondary btn-icon" title="이전 주">
                                     <i class="ti ti-chevron-left"></i>
                                 </a>
-                                <a th:href="@{/reports/weekly(periodStart=${todayMonday})}"
+                                <a th:href="@{/reports/weekly(periodStart=${lastMonday})}"
                                    class="btn btn-outline-secondary"
-                                   th:classappend="${isCurrentWeek} ? 'active' : ''">
-                                    이번 주
+                                   th:classappend="${isLatestWeek} ? 'active' : ''">
+                                    최근 주차
                                 </a>
                                 <a th:href="@{/reports/weekly(periodStart=${nextMonday})}"
                                    class="btn btn-outline-secondary btn-icon"
@@ -63,6 +63,7 @@
                                 </span>
                                 <input type="text" id="week-picker" class="form-control form-control-sm"
                                        th:data-current-start="${currentMonday}"
+                                       th:data-max-date="${lastSunday}"
                                        placeholder="주차 선택" readonly>
                             </div>
                         </div>
@@ -85,7 +86,7 @@
                         </div>
                         <p class="empty-title fs-2">주간 리포트가 아직 생성되지 않았습니다</p>
                         <p class="empty-subtitle text-muted fs-3">
-                            해당 주간(<span class="fw-bold text-dark" th:text="${currentMonday + ' ~ ' + currentMonday.plusDays(6)}"></span>)의 의약품 출고 및 폐기 데이터를 집계하고 AI 분석을 시작합니다.
+                            해당 주간(<span class="fw-bold text-dark" th:text="${currentMonday + ' ~ ' + currentMonday.plusDays(6)}"></span>)의 의약품 입고, 사용 및 폐기 데이터를 집계하고 AI 분석을 시작합니다.
                         </p>
                         <div class="empty-action mt-4">
                             <form th:action="@{/reports/weekly}" method="post">
@@ -99,21 +100,21 @@
                 </div>
 
                 <div th:if="${report != null}">
-                    <div class="card mt-3 border-primary-subtle bg-primary-lt"
+                    <div class="card mt-3 border-start border-3 border-primary shadow-sm"
                          th:if="${report.aiSummaryStatus != null and report.aiSummaryStatus.name() == 'COMPLETED'}">
                         <div class="card-body">
-                            <div class="d-flex align-items-center justify-content-between mb-2">
+                            <div class="d-flex align-items-center justify-content-between mb-3">
                                 <h3 class="card-title text-primary d-flex align-items-center mb-0">
                                     <i class="ti ti-sparkles me-2 fs-2"></i>AI 주간 재고 분석 요약
                                 </h3>
                                 <form th:action="@{/reports/{id}/ai-summary/retry(id=${report.reportId})}" method="post" class="d-inline">
                                     <input type="hidden" name="periodStart" th:value="${currentMonday}">
-                                    <button type="submit" class="btn btn-sm btn-ghost-primary" title="AI 요약 재생성">
+                                    <button type="submit" class="btn btn-sm btn-outline-primary" title="AI 요약 재생성">
                                         <i class="ti ti-refresh me-1"></i>재생성
                                     </button>
                                 </form>
                             </div>
-                            <div class="text-secondary ps-1 ai-summary-text"
+                            <div class="ps-1 ai-summary-text"
                                  th:text="${report.aiSummary}">
                             </div>
                         </div>
@@ -156,11 +157,12 @@
                     </div>
 
                     <div class="row row-cards mt-1">
-                        <div class="col-md-6">
+                        <!-- 입고 내역 -->
+                        <div class="col-md-4">
                             <div class="card">
-                                <div class="card-header bg-success-lt">
-                                    <h3 class="card-title text-success d-flex align-items-center">
-                                        <i class="ti ti-package-export me-2 fs-2"></i>출고(사용) 내역
+                                <div class="card-header bg-primary-lt">
+                                    <h3 class="card-title text-primary d-flex align-items-center">
+                                        <i class="ti ti-package-import me-2 fs-2"></i>입고 내역
                                     </h3>
                                 </div>
                                 <div class="table-responsive">
@@ -169,19 +171,19 @@
                                             <tr>
                                                 <th>의약품명</th>
                                                 <th>규격 / 포장단위</th>
-                                                <th class="text-end">출고 수량</th>
+                                                <th class="text-end">입고 수량</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr th:each="item : ${report.items}" th:if="${item.reportItemType.name() == 'USAGE'}">
+                                            <tr th:each="item : ${report.items}" th:if="${item.reportItemType.name() == 'INBOUND'}">
                                                 <td class="fw-medium" th:text="${item.medicineName}">타이레놀정</td>
                                                 <td class="text-muted" th:text="${item.packUnit}">10정</td>
-                                                <td class="text-end fw-bold text-success" th:text="${#numbers.formatInteger(item.quantity, 0, 'COMMA')} + ' 개'">42 개</td>
+                                                <td class="text-end fw-bold text-primary" th:text="${#numbers.formatInteger(item.quantity, 0, 'COMMA')} + ' 개'">100 개</td>
                                             </tr>
-                                            <tr th:if="${#lists.isEmpty(report.items.?[reportItemType.name() == 'USAGE'])}">
+                                            <tr th:if="${#lists.isEmpty(report.items.?[reportItemType.name() == 'INBOUND'])}">
                                                 <td colspan="3" class="text-center text-muted py-4">
                                                     <i class="ti ti-inbox fs-2 d-block mb-1 text-muted"></i>
-                                                    해당 주간에 발생한 출고(사용) 내역이 없습니다.
+                                                    해당 주간에 발생한 입고 내역이 없습니다.
                                                 </td>
                                             </tr>
                                         </tbody>
@@ -190,7 +192,43 @@
                             </div>
                         </div>
 
-                        <div class="col-md-6">
+                        <!-- 사용 내역 -->
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-header bg-success-lt">
+                                    <h3 class="card-title text-success d-flex align-items-center">
+                                        <i class="ti ti-package-export me-2 fs-2"></i>사용 내역
+                                    </h3>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-vcenter card-table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>의약품명</th>
+                                                <th>규격 / 포장단위</th>
+                                                <th class="text-end">사용 수량</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr th:each="item : ${report.items}" th:if="${item.reportItemType.name() == 'OUTBOUND'}">
+                                                <td class="fw-medium" th:text="${item.medicineName}">타이레놀정</td>
+                                                <td class="text-muted" th:text="${item.packUnit}">10정</td>
+                                                <td class="text-end fw-bold text-success" th:text="${#numbers.formatInteger(item.quantity, 0, 'COMMA')} + ' 개'">42 개</td>
+                                            </tr>
+                                            <tr th:if="${#lists.isEmpty(report.items.?[reportItemType.name() == 'OUTBOUND'])}">
+                                                <td colspan="3" class="text-center text-muted py-4">
+                                                    <i class="ti ti-inbox fs-2 d-block mb-1 text-muted"></i>
+                                                    해당 주간에 발생한 사용 내역이 없습니다.
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 폐기 내역 -->
+                        <div class="col-md-4">
                             <div class="card">
                                 <div class="card-header bg-danger-lt">
                                     <h3 class="card-title text-danger d-flex align-items-center">

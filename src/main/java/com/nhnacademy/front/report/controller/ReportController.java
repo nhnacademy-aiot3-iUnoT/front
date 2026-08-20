@@ -26,11 +26,11 @@ public class ReportController {
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate periodStart,
             Model model
     ) {
-        LocalDate todayMonday = LocalDate.now().with(DayOfWeek.MONDAY);
+        LocalDate lastMonday = LocalDate.now().with(DayOfWeek.MONDAY).minusWeeks(1);
 
-        // 날짜 파라미터가 없거나 미래 날짜인 경우 이번 주 월요일로 제한
-        if (periodStart == null || periodStart.isAfter(todayMonday)) {
-            periodStart = todayMonday;
+        // 날짜 파라미터가 없거나 지난 주보다 미래 날짜인 경우 지난 주 월요일로 제한
+        if (periodStart == null || periodStart.isAfter(lastMonday)) {
+            periodStart = lastMonday;
         } else {
             // 사용자가 선택한 날짜가 월요일이 아니더라도 해당 주의 월요일로 자동 보정
             periodStart = periodStart.with(DayOfWeek.MONDAY);
@@ -46,11 +46,12 @@ public class ReportController {
         }
 
         model.addAttribute("currentMonday", periodStart);
-        model.addAttribute("todayMonday", todayMonday);
+        model.addAttribute("lastMonday", lastMonday);
+        model.addAttribute("lastSunday", lastMonday.plusDays(6));
         model.addAttribute("prevMonday", periodStart.minusWeeks(1));
         model.addAttribute("nextMonday", periodStart.plusWeeks(1));
-        model.addAttribute("hasFuture", periodStart.isBefore(todayMonday));
-        model.addAttribute("isCurrentWeek", periodStart.isEqual(todayMonday));
+        model.addAttribute("hasFuture", periodStart.isBefore(lastMonday));
+        model.addAttribute("isLatestWeek", periodStart.isEqual(lastMonday));
 
         return "report/weekly";
     }

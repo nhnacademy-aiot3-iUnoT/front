@@ -14,5 +14,8 @@
 
 .ai-summary-text {
     white-space: pre-line;
-    line-height: 1.6;
+    line-height: 1.75;
+    color: #1e293b;
+    font-size: 0.95rem;
+    letter-spacing: -0.01em;
 }

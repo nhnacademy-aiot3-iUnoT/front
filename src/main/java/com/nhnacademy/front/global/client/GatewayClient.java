@@ -84,21 +84,23 @@ public class GatewayClient {
     }
 
     public <T> T post(String path, Object body, Class<T> dataType) {
-        return execute(() ->
-                restClient.post()
-                        .uri(baseUrl + path)
-                        .body(body)
-                        .retrieve()
-                        .body(responseTypeOf(dataType)));
+        return execute(() -> {
+            var requestSpec = restClient.post().uri(baseUrl + path);
+            if (body != null) {
+                requestSpec.body(body);
+            }
+            return requestSpec.retrieve().body(responseTypeOf(dataType));
+        });
     }
 
     public <T> T post(String path, Object body, ParameterizedTypeReference<ApiResponse<T>> responseType) {
-        return execute(() ->
-                restClient.post()
-                        .uri(baseUrl + path)
-                        .body(body)
-                        .retrieve()
-                        .body(responseType));
+        return execute(() -> {
+            var requestSpec = restClient.post().uri(baseUrl + path);
+            if (body != null) {
+                requestSpec.body(body);
+            }
+            return requestSpec.retrieve().body(responseType);
+        });
     }
 
     public void post(String path, Object body) {
@@ -125,21 +127,23 @@ public class GatewayClient {
     }
 
     public <T> T put(String path, Object body, Class<T> dataType) {
-        return execute(() ->
-                restClient.put()
-                        .uri(baseUrl + path)
-                        .body(body)
-                        .retrieve()
-                        .body(responseTypeOf(dataType)));
+        return execute(() -> {
+            var requestSpec = restClient.put().uri(baseUrl + path);
+            if (body != null) {
+                requestSpec.body(body);
+            }
+            return requestSpec.retrieve().body(responseTypeOf(dataType));
+        });
     }
 
     public <T> T put(String path, Object body, ParameterizedTypeReference<ApiResponse<T>> responseType) {
-        return execute(() ->
-                restClient.put()
-                        .uri(baseUrl + path)
-                        .body(body)
-                        .retrieve()
-                        .body(responseType));
+        return execute(() -> {
+            var requestSpec = restClient.put().uri(baseUrl + path);
+            if (body != null) {
+                requestSpec.body(body);
+            }
+            return requestSpec.retrieve().body(responseType);
+        });
     }
 
     public void put(String path, Object body) {

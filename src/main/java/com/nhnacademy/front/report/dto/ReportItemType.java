@@ -6,7 +6,8 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum ReportItemType {
-    USAGE("출고"),
+    INBOUND("입고"),
+    OUTBOUND("출고"),
     DISPOSAL("폐기");
 
     private final String description;
