@@ -1,5 +1,6 @@
 package com.nhnacademy.front.global.config;
 
+import com.nhnacademy.front.account.dto.AccountStatus;
 import com.nhnacademy.front.global.security.AccessTokenCookieManager;
 import com.nhnacademy.front.global.security.CookieAuthenticationEntryPoint;
 import com.nhnacademy.front.global.security.PageAccessDeniedHandler;
@@ -35,6 +36,8 @@ import java.util.UUID;
 
 @Configuration
 public class SecurityConfig {
+
+    public static final String ACCOUNT_STATUS_CLAIM = "account_status";
 
     @Bean
     public SecurityFilterChain securityFilterChain(
@@ -139,6 +142,7 @@ public class SecurityConfig {
                 ? OAuth2TokenValidatorResult.success()
                 : validationFailure("JWT kid header is required"));
         validators.add(this::validateUuidSubject);
+        validators.add(this::validateAccountStatus);
 
         return new DelegatingOAuth2TokenValidator<>(validators);
     }
@@ -149,6 +153,15 @@ public class SecurityConfig {
             return OAuth2TokenValidatorResult.success();
         } catch (IllegalArgumentException | NullPointerException exception) {
             return validationFailure("JWT subject must be an account UUID");
+        }
+    }
+
+    private OAuth2TokenValidatorResult validateAccountStatus(Jwt jwt) {
+        try {
+            AccountStatus.valueOf(jwt.getClaimAsString(ACCOUNT_STATUS_CLAIM));
+            return OAuth2TokenValidatorResult.success();
+        } catch (IllegalArgumentException | NullPointerException exception) {
+            return validationFailure("JWT account_status claim is required");
         }
     }
 

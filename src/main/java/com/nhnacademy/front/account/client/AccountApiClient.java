@@ -21,6 +21,10 @@ public class AccountApiClient {
         return backendApiClient.get(ACCOUNT_SERVICE + "/me", AccountInfoResponse.class);
     }
 
+    public void reactivateAccount() {
+        backendApiClient.post(ACCOUNT_SERVICE + "/me/reactivation");
+    }
+
     public WithdrawAccountResponse withdraw(@Valid WithdrawAccountRequest request) {
         return backendApiClient.delete(ACCOUNT_SERVICE + "/me", null);
     }

@@ -1,6 +1,9 @@
 package com.nhnacademy.front.auth.controller;
 
 import com.nhnacademy.front.account.client.AccountApiClient;
+import com.nhnacademy.front.account.dto.AccountRole;
+import com.nhnacademy.front.account.dto.AccountStatus;
+import com.nhnacademy.front.account.dto.response.AccountInfoResponse;
 import com.nhnacademy.front.auth.client.AuthApiClient;
 import com.nhnacademy.front.auth.dto.request.CheckEmailRequest;
 import com.nhnacademy.front.auth.dto.request.LoginRequest;
@@ -21,11 +24,16 @@ import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.BDDMockito.given;
@@ -60,6 +68,13 @@ class AuthControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name("auth/login"))
                 .andExpect(model().attribute("loginRequest", new LoginRequest()));
+    }
+
+    @Test
+    void reactivatedAccountIsAskedToLoginAgain() throws Exception {
+        mockMvc.perform(get("/login").param("reactivated", ""))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("계정이 재활성화되었습니다. 다시 로그인해주세요.")));
     }
 
     @Test
@@ -113,6 +128,36 @@ class AuthControllerTest {
     }
 
     @Test
+    void adminIsRedirectedToAdminPageAfterLogin() throws Exception {
+        AccountInfoResponse account = new AccountInfoResponse(
+                "admin@example.com",
+                "관리자",
+                AccountRole.ADMIN,
+                AccountStatus.ACTIVE,
+                LocalDateTime.of(2026, 8, 20, 12, 0)
+        );
+        given(accountApiClient.getAccountInfo()).willReturn(account);
+
+        mockMvc.perform(get("/login/success"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name("redirect:/admin"))
+                .andExpect(redirectedUrl("/admin"));
+
+        then(accountApiClient).should().getAccountInfo();
+        then(organizationApiClient).shouldHaveNoInteractions();
+    }
+
+    @Test
+    void inactiveAccountCannotOpenLoginPage() throws Exception {
+        mockMvc.perform(get("/login")
+                        .principal(authentication(AccountStatus.INACTIVE)))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/reactivation"));
+
+        then(accountApiClient).shouldHaveNoInteractions();
+    }
+
+    @Test
     void logout() throws Exception {
         mockMvc.perform(post("/logout"))
                 .andExpect(status().is3xxRedirection())
@@ -124,6 +169,17 @@ class AuthControllerTest {
                 .andExpect(header().string(
                         HttpHeaders.SET_COOKIE,
                         containsString("Max-Age=0")));
+    }
+
+    private JwtAuthenticationToken authentication(AccountStatus status) {
+        Jwt jwt = Jwt.withTokenValue("token")
+                .header("alg", "RS256")
+                .subject(UUID.randomUUID().toString())
+                .issuedAt(Instant.now())
+                .expiresAt(Instant.now().plusSeconds(60))
+                .claim("account_status", status.name())
+                .build();
+        return new JwtAuthenticationToken(jwt, List.of());
     }
 
     @Test

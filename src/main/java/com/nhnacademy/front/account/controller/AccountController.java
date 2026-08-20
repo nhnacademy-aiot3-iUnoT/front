@@ -19,6 +19,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -44,6 +45,18 @@ public class AccountController {
         model.addAttribute("accountInfoResponse", response);
 
         return "account/account-info";
+    }
+
+    @GetMapping("/reactivation")
+    public String reactivation() {
+        return "account/reactivation";
+    }
+
+    @PostMapping("/reactivation")
+    public String reactivateAccount(HttpServletResponse response) {
+        accountApiClient.reactivateAccount();
+        deleteAccessTokenCookie(response);
+        return "redirect:/login?reactivated";
     }
 
     @PutMapping("/mypage")
@@ -99,6 +112,12 @@ public class AccountController {
 
         accountApiClient.withdraw(request);
 
+        deleteAccessTokenCookie(response);
+
+        return "redirect:/login";
+    }
+
+    private void deleteAccessTokenCookie(HttpServletResponse response) {
         ResponseCookie cookie = ResponseCookie.from("access_token", "")
                 .httpOnly(true)
                 .secure(secure)
@@ -108,8 +127,5 @@ public class AccountController {
                 .build();
 
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
-
-        return "redirect:/login";
     }
-
 }

@@ -2,11 +2,13 @@ package com.nhnacademy.front.account.controller;
 
 import com.nhnacademy.front.account.client.AccountApiClient;
 import com.nhnacademy.front.account.dto.AccountRole;
+import com.nhnacademy.front.account.dto.AccountStatus;
 import com.nhnacademy.front.account.dto.request.ChangePasswordFormRequest;
 import com.nhnacademy.front.account.dto.request.UpdateAccountNameRequest;
 import com.nhnacademy.front.account.dto.request.UpdateAccountPasswordRequest;
 import com.nhnacademy.front.account.dto.response.AccountInfoResponse;
 import com.nhnacademy.front.account.validator.PasswordFormValidator;
+import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -17,9 +19,12 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static org.springframework.http.HttpHeaders.SET_COOKIE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -41,7 +46,13 @@ class AccountControllerTest {
     void info() throws Exception {
         LocalDateTime createdAt = LocalDateTime.of(2026, 8, 5, 12, 0);
         AccountInfoResponse response =
-                new AccountInfoResponse("test@test.com", "test", AccountRole.USER, createdAt);
+                new AccountInfoResponse(
+                        "test@test.com",
+                        "test",
+                        AccountRole.USER,
+                        AccountStatus.ACTIVE,
+                        createdAt
+                );
 
         given(accountApiClient.getAccountInfo())
                 .willReturn(response);
@@ -52,6 +63,28 @@ class AccountControllerTest {
                 .andExpect(model().attribute("accountInfoResponse", response));
 
         then(accountApiClient).should().getAccountInfo();
+    }
+
+    @Test
+    void reactivation() throws Exception {
+        mockMvc.perform(get("/reactivation")
+                        .cookie(new Cookie("access_token", "inactive-token")))
+                .andExpect(status().isOk())
+                .andExpect(view().name("account/reactivation"));
+
+        then(accountApiClient).shouldHaveNoInteractions();
+    }
+
+    @Test
+    void reactivateAccount() throws Exception {
+        mockMvc.perform(post("/reactivation"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name("redirect:/login?reactivated"))
+                .andExpect(redirectedUrl("/login?reactivated"))
+                .andExpect(header().string(SET_COOKIE, containsString("access_token=")))
+                .andExpect(header().string(SET_COOKIE, containsString("Max-Age=0")));
+
+        then(accountApiClient).should().reactivateAccount();
     }
 
     @Test

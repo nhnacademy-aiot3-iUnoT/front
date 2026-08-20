@@ -100,6 +100,9 @@
         alert('초대 링크가 없습니다.' + '\n' +
             '조직 관리자가 발송한 초대 링크를 통해 회원가입해주세요.');
     </script>
+    <script th:if="${param.reactivated != null}">
+        alert('계정이 재활성화되었습니다. 다시 로그인해주세요.');
+    </script>
 </div>
 </body>
 </html>
