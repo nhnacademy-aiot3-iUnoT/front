@@ -3,7 +3,7 @@
     padding: 0.4rem 0.65rem;
 }
 
-.status-pending, .status-used {
+.status-pending, .status-used, .status-warning {
     color: var(--warning);
     background-color: var(--warning-soft);
 }
@@ -18,7 +18,7 @@
     background-color: var(--line);
 }
 
-.status-suspended, .status-canceled, .status-locked {
+.status-suspended, .status-canceled, .status-closed, .status-locked {
     color: var(--danger);
     background-color: var(--danger-soft);
 }
