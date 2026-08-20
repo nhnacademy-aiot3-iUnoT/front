@@ -11,7 +11,6 @@
 <body>
 
 
-
 <div layout:fragment="content">
     <main class="inventory-page">
         <div class="page-heading">
@@ -33,14 +32,19 @@
                 </label>
                 <div class="filters">
                     <!-- dropdown -->
-                    <select name="storage-id">
+                    <select name="storage-id" class="storage-select">
+
                         <option value="">
                             전체 저장소
+                        </option>
+                        <option th:each="item : ${storages}" th:value="${item.storageId}" th:text="${item.storageName}">
                         </option>
 
                     </select>
 
-                    <button type="submit"></button>
+                    <button type="submit" class="search-button">
+                        검색
+                    </button>
 
                 </div>
             </form>

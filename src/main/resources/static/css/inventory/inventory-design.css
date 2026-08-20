@@ -324,3 +324,87 @@ tbody tr:last-child td {
     .filters button { flex: 1; }
     .detail-grid { grid-template-columns: repeat(2, 1fr); }
 }
+
+.storage-select {
+
+    width: 220px;
+    height: 40px;
+    padding: 0 2.25rem 0 .75rem;
+
+    border: 1px solid var(--line-strong);
+    border-radius: 7px;
+
+    background: var(--surface);
+    color: var(--ink-soft);
+
+    font: inherit;
+    font-size: .8rem;
+    font-weight: 600;
+
+    cursor: pointer;
+    outline: none;
+
+    transition:
+            border-color .15s ease,
+            box-shadow .15s ease,
+            background-color .15s ease;
+
+
+}
+
+
+.storage-select:hover{
+
+    border-color: var(--teal);
+}
+
+.storage-select:focus{
+
+    border-color: var(--teal);
+    box-shadow: 0 0 0 3px var(--teal-soft);
+
+}
+.storage-select option {
+    background: var(--surface);
+    color: var(--ink);
+}
+
+.search-button{
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    height: 40px;
+    padding: 0 1rem;
+
+    border: 1px solid var(--teal);
+    border-radius: 7px;
+
+    background: var(--teal);
+    color: #fff;
+
+    font-size: .8rem;
+    font-weight: 600;
+    text-decoration: none;
+
+    cursor: pointer;
+
+    transition:
+            background-color .15s ease,
+            border-color .15s ease,
+            box-shadow .15s ease;
+
+}
+
+.search-button:hover {
+    background: var(--teal-dark);
+    border-color: var(--teal-dark);
+    color: #fff;
+    text-decoration: none;
+}
+
+.search-button:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--teal-soft);
+}
