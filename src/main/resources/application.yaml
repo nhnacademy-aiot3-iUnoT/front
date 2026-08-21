@@ -5,6 +5,8 @@ spring:
     hiddenmethod:
       filter:
         enabled: true
+  config:
+    import: optional:file:.env[.properties]
 
 server:
   port: ${SERVER_PORT:10404}
@@ -13,13 +15,16 @@ management:
   endpoints:
     web:
       exposure:
-        include: health, serviceregistry
+        include: health, service-registry
   endpoint:
     health:
       show-details: never
 
 gateway:
   url: http://localhost:10400
+
+juso:
+  confirm-key: ${JUSO_CONFIRM_KEY:}
 
 security:
   jwt:

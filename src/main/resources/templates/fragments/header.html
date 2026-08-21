@@ -6,7 +6,7 @@
     <header class="navbar navbar-expand-md">
         <div class="container">
             <h1 class="navbar-brand pe-3">
-                <a href="/" class="text-decoration-none">
+                <a th:href="@{/}" class="text-decoration-none">
                     iUnoT
                 </a>
             </h1>
@@ -14,11 +14,11 @@
             <div class="collapse navbar-collapse">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link active">조직관리</a>
+                        <a th:href="@{/organizations/me}" class="nav-link active">조직관리</a>
                     </li>
 
                     <li class="nav-item">
-                        <a class="nav-link">저장소관리</a>
+                        <a th:href="@{/storages}" class="nav-link">저장소관리</a>
                     </li>
 
                     <li class="nav-item">
@@ -31,6 +31,14 @@
                 </ul>
 
                 <div class="navbar-nav flex-row order-md-last">
+
+                    <div class="nav-item me-3 position-relative">
+                        <a href="/alerts" class="nav-link px-2 text-reset notification-link" title="알림함">
+                            <i class="ti ti-bell fs-2"></i>
+                            <span id="unread-notification-badge" class="notification-badge" style="display: none;">0</span>
+                        </a>
+                    </div>
+
                     <div class="nav-item me-2">
                         <button type="button" class="btn btn-icon btn-ghost-secondary" id="theme-toggle">
                             <i class="ti ti-moon fs-2 moon-icon"></i>
@@ -47,8 +55,11 @@
                         </a>
 
                         <div class="dropdown-menu dropdown-menu-end">
-                            <a class="dropdown-item" href="/mypage">
+                            <a class="dropdown-item" th:href="@{/mypage}">
                                 회원정보
+                            </a>
+                            <a class="dropdown-item" th:href="@{/organizations/me}">
+                                나의조직
                             </a>
                             <form th:action="@{/logout}" method="post">
                                 <button type="submit" class="dropdown-item">
@@ -61,6 +72,7 @@
             </div>
         </div>
     </header>
+
 </th:block>
 </body>
 </html>

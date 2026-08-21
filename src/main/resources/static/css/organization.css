@@ -1,0 +1,138 @@
+.organization-page {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2rem 0;
+}
+
+.organization-page-header {
+    margin-bottom: 1.75rem;
+}
+
+.organization-page-header h1 {
+    margin: 0;
+    color: var(--ink);
+    font-size: 1.75rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+.organization-page-header p {
+    margin: 0.5rem 0 0;
+    color: var(--ink-soft);
+}
+
+.organization-container {
+    padding: 2rem;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    box-shadow: 0 4px 20px #30403b0a;
+}
+
+.organization-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.5fr) minmax(320px, 1fr);
+    gap: 2.5rem;
+}
+
+.organization-grid.organization-grid-single {
+    grid-template-columns: minmax(0, 1fr);
+}
+
+.organization-section + .organization-section {
+    margin-top: 2rem;
+}
+
+.organization-section-title {
+    margin: 0 0 0.75rem;
+    color: var(--ink);
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.organization-panel {
+    overflow: hidden;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+}
+
+.organization-row {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    min-height: 72px;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--line);
+}
+
+.organization-row:last-child {
+    border-bottom: 0;
+}
+
+.organization-label {
+    flex: 0 0 90px;
+    color: var(--ink-soft);
+    font-size: 0.9rem;
+}
+
+.organization-value {
+    flex: 1;
+    min-width: 0;
+}
+
+.organization-action-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding: 1.25rem;
+}
+
+.organization-action-title {
+    color: var(--ink);
+    font-weight: 600;
+}
+
+.organization-action-description {
+    margin: 0.3rem 0 0;
+    color: var(--ink-soft);
+    font-size: 0.875rem;
+}
+
+@media (max-width: 900px) {
+    .organization-page {
+        padding: 2rem 1rem;
+    }
+
+    .organization-container {
+        padding: 1.5rem;
+    }
+
+    .organization-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .organization-page {
+        padding: 1.5rem 1rem;
+    }
+
+    .organization-container {
+        padding: 1rem;
+        border-radius: 14px;
+    }
+
+    .organization-row,
+    .organization-action-row {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .organization-label {
+        flex: none;
+    }
+}

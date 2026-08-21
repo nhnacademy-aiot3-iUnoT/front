@@ -16,68 +16,81 @@
                             <h2 class="page-title">
                                 조직 생성
                             </h2>
+                            <div class="text-secondary mt-1">
+                                새로운 조직과 Owner 계정을 생성합니다.
+                            </div>
                         </div>
                     </div>
                 </div>
+                <div class="row justify-content-center mt-4">
+                    <div class="col-lg-8 col-xl-7">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">
+                                    조직 정보
+                                </h3>
+                            </div>
 
-                <div class="card mt-3">
-                    <div class="card-body">
-                        <form th:action="@{/admin/organizations}" th:object="${orgCreateRequest}" method="post" id="orgCreateForm">
-                            <div class="mb-3">
-                                <label class="form-label">
-                                    사업자번호
-                                </label>
+                            <form th:action="@{/admin/organizations}" th:object="${orgCreateRequest}" method="post" id="orgCreateForm">
+                                <div class="card-body">
+                                    <div class="mb-4">
+                                        <label class="form-label" for="businessNumber">
+                                            사업자번호
+                                        </label>
+                                        <input type="text" id="businessNumber" class="form-control" maxlength="10"
+                                               th:field="*{businessNumber}" placeholder="숫자만 입력하세요" required>
 
-                                <input type="text" class="form-control" maxlength="10"
-                                       th:field="*{businessNumber}" placeholder="숫자만 입력하세요" required>
+                                        <div class="invalid-feedback"></div>
 
-                                <div class="invalid-feedback"></div>
+                                        <div class="text-danger"
+                                             th:errors="*{businessNumber}">
+                                        </div>
+                                    </div>
 
-                                <div class="text-danger"
-                                     th:errors="*{businessNumber}">
+                                    <div class="mb-4">
+                                        <label class="form-label" for="name">
+                                            조직명
+                                        </label>
+
+                                        <input type="text" id="name" class="form-control" maxlength="50"
+                                               th:field="*{name}" placeholder="조직명을 입력해주세요" required>
+
+                                        <div class="invalid-feedback"></div>
+
+                                        <div class="text-danger"
+                                             th:errors="*{name}">
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-0">
+                                        <label class="form-label" for="email">
+                                            Owner 이메일
+                                        </label>
+
+                                        <input type="email" id="email" class="form-control" maxlength="255"
+                                               th:field="*{email}" placeholder="Owner의 이메일을 입력해주세요" required>
+
+                                        <div class="invalid-feedback"></div>
+
+                                        <div class="text-danger"
+                                             th:errors="*{email}">
+                                        </div>
+                                    </div>
+
                                 </div>
-                            </div>
 
-                            <div class="mb-3">
-                                <label class="form-label">
-                                    조직명
-                                </label>
-
-                                <input type="text" class="form-control" maxlength="50"
-                                       th:field="*{name}" placeholder="조직명을 입력해주세요" required>
-
-                                <div class="invalid-feedback"></div>
-
-                                <div class="text-danger"
-                                     th:errors="*{name}">
+                                <div class="card-footer d-flex justify-content-end gap-2">
+                                    <a th:href="@{/admin/organizations}"
+                                       class="btn btn-outline-secondary">
+                                        취소
+                                    </a>
+                                    <button type="submit"
+                                            class="btn btn-primary">
+                                        생성
+                                    </button>
                                 </div>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label">
-                                    Owner 이메일
-                                </label>
-                                <input type="email" class="form-control" maxlength="255"
-                                       th:field="*{email}" placeholder="Owner의 이메일을 입력해주세요" required>
-
-                                <div class="invalid-feedback"></div>
-
-                                <div class="text-danger"
-                                     th:errors="*{email}">
-                                </div>
-                            </div>
-
-                            <div class="d-flex justify-content-end gap-2">
-                                <a th:href="@{/admin/organizations}"
-                                   class="btn btn-secondary">
-                                    취소
-                                </a>
-                                <button type="submit" class="btn btn-primary">
-                                    생성
-                                </button>
-                            </div>
-                        </form>
-
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>

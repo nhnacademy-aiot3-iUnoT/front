@@ -1,0 +1,53 @@
+.member-table .member-email-column {
+    width: 230px;
+}
+
+.member-email-cell {
+    max-width: 230px;
+}
+
+.member-table .member-role-column {
+    width: 120px;
+}
+
+.member-table .member-date-column {
+    width: 170px;
+}
+
+.member-table .member-action-column {
+    width: 180px;
+    text-align: right;
+}
+
+.member-role-select {
+    min-width: 105px;
+}
+
+.member-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    white-space: nowrap;
+}
+
+.member-actions form {
+    margin: 0;
+}
+
+.department-selection {
+    display: grid;
+    gap: 0.625rem;
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+
+@media (max-width: 768px) {
+    .member-table .member-date-column {
+        display: none;
+    }
+
+    .member-table .member-action-column {
+        width: auto;
+    }
+}

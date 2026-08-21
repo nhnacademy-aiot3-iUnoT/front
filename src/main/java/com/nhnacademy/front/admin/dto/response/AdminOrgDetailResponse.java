@@ -3,6 +3,7 @@ package com.nhnacademy.front.admin.dto.response;
 import com.nhnacademy.front.admin.dto.OrganizationStatus;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public record AdminOrgDetailResponse(
         Long id,
@@ -12,6 +13,7 @@ public record AdminOrgDetailResponse(
         String zipCode,
         String addressDetail,
         OrganizationStatus status,
-        LocalDateTime createdAt
+        LocalDateTime createdAt,
+        AdminInvitationResponse invitation
 ) {
 }

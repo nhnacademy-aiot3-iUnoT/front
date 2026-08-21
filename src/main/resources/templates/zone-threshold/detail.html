@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main-layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>임계값 상세 정보</title>
+    <!-- 해당 페이지 전용 CSS 연결 -->
+    <link rel="stylesheet" th:href="@{/css/zone-threshold-detail.css}">
+</head>
+<body>
+
+<div layout:fragment="content">
+    <div class="table-container">
+        <div class="header-top">
+            <h2 class="main-title">
+                <span class="path-prefix" th:text="${threshold.organizationName + ' > ' + threshold.storageName + ' > ' + threshold.zoneName + ' > '}">조직이름 &gt; 저장소이름 &gt; 구역이름 &gt; </span>
+                <span th:text="${threshold.sensorTypeName}">센서 타입 이름</span>
+            </h2>
+            <div class="action-buttons" th:if="${canManage}">
+                <button type="button" th:onclick="'deleteZoneThreshold(' + ${threshold.zoneId} + ', ' + ${threshold.zoneThresholdId} + ')'" class="btn-danger">삭제</button>
+            </div>
+        </div>
+
+        <h2 class="section-title">⚙️ 센서 임계값 상세 정보</h2>
+
+        <div class="info-box">
+            <p><strong>임계값 설정 ID:</strong> <span th:text="${threshold.zoneThresholdId}">1</span></p>
+            <p><strong>센서 타입 이름:</strong> <span class="highlight" th:text="${threshold.sensorTypeName}">온도 센서</span></p>
+
+            <p><strong>센서 타입 설명:</strong></p>
+            <div class="desc-box" th:text="${threshold.sensorTypeDescription()}">설명 없음</div>
+
+            <p style="margin-top: 20px;"><strong>허용 범위:</strong> <span th:text="${threshold.minValue}">0</span> ~ <span th:text="${threshold.maxValue}">100</span></p>
+            <p><strong>경고 지속 시간(Alert Duration):</strong> <span th:text="${threshold.alertDuration}">30</span>초</p>
+        </div>
+
+        <a th:href="@{/storages/{storageId}/zones/{zoneId}(storageId=${threshold.storageId}, zoneId=${threshold.zoneId})}" class="btn-back">← 구역 상세로 돌아가기</a>
+    </div>
+</div>
+
+<!-- 페이지 전용 JS 선언부 -->
+<th:block layout:fragment="script">
+    <script th:src="@{/js/zone-threshold/detail.js}"></script>
+</th:block>
+
+</body>
+</html>

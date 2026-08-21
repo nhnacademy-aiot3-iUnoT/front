@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main-layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>저장소 목록</title>
+    <!-- 해당 페이지 전용 CSS 연결 -->
+    <link rel="stylesheet" th:href="@{/css/storage-list.css}">
+</head>
+<body>
+
+<div layout:fragment="content">
+    <div class="table-container">
+        <div class="header-flex">
+            <h2>
+                <span th:if="${!#lists.isEmpty(storageList)}"
+                      th:text="${storageList[0].organizationName + ' > '}"></span>
+                📦 저장소 목록
+            </h2>
+            <button type="button"
+                    th:if="${canManage}"
+                    onclick="openCreateModal()"
+                    class="btn-primary">+ 저장소 추가</button>
+        </div>
+
+        <table>
+            <thead>
+            <tr>
+                <th>저장소 이름</th>
+                <th>상태</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:if="${#lists.isEmpty(storageList)}">
+                <td colspan="2" style="text-align: center; color: #888;">등록된 저장소가 없습니다.</td>
+            </tr>
+
+            <tr th:each="storage : ${storageList}"
+                class="clickable-row"
+                th:onclick="'location.href=\'/storages/' + ${storage.storageId} + '\''">
+                <td th:text="${storage.name}">저장소 이름</td>
+                <td>
+                    <span class="badge"
+                          th:classappend="${storage.status.name() == 'ACTIVE'} ? 'active' : 'inactive'"
+                          th:text="${storage.status.ko}">활성</span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 저장소 추가 모달 박스 -->
+    <div id="create-modal" style="display:none;" class="modal-wrapper" th:if="${canManage}">
+        <div class="modal-backdrop" onclick="closeCreateModal()"></div>
+        <div class="modal-box">
+            <h3>저장소 추가</h3>
+            <label for="new-name">이름</label>
+            <input id="new-name" type="text" placeholder="저장소 이름 (최대 50자)" maxlength="50">
+
+            <label for="new-description">설명</label>
+            <textarea id="new-description" placeholder="설명 (선택, 최대 255자)" maxlength="255"></textarea>
+
+            <div class="modal-actions">
+                <button type="button" onclick="closeCreateModal()">취소</button>
+                <button type="button" onclick="createStorage()">추가</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 페이지 전용 JS 혹은 스크립트 선언부 (필요시 layout의 script fragment와 연동) -->
+<th:block layout:fragment="script">
+    <script th:src="@{/js/storage/list.js}"></script>
+</th:block>
+
+</body>
+</html>

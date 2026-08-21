@@ -19,3 +19,19 @@ function isBusinessNumber(value) {
 function isZipCode(value) {
     return /^\d{5}$/.test(value);
 }
+
+function isDeviceEui(value) {
+    return /^[A-Za-z0-9_-]+$/.test(value);
+}
+
+function isNumber(value) {
+    return isRequired(value) && !Number.isNaN(Number(value));
+}
+
+function isPositiveInteger(value) {
+    return Number.isInteger(Number(value)) && Number(value) >= 1;
+}
+
+function isInRange(value, min, max) {
+    return isNumber(value) && Number(value) >= min && Number(value) <= max;
+}
