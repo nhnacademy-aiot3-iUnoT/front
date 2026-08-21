@@ -1,5 +1,3 @@
-const GATEWAY_URL = 'https://iunot.cloud';
-
 // 임계값 삭제 API 호출
 function deleteZoneThreshold(zoneId, zoneThresholdId) {
     if (!confirm('정말 이 임계값 설정을 삭제하시겠습니까?')) {
@@ -7,7 +5,7 @@ function deleteZoneThreshold(zoneId, zoneThresholdId) {
     }
 
     // API 명세에 맞는 엔드포인트로 DELETE 요청
-    fetch(`${GATEWAY_URL}/api/core/zones/${zoneId}/zone-thresholds/${zoneThresholdId}`, {
+    fetch(`/api/core/zones/${zoneId}/zone-thresholds/${zoneThresholdId}`, {
         method: 'DELETE',
         credentials: 'include'
     })

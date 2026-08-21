@@ -1,5 +1,3 @@
-const GATEWAY_URL = 'https://iunot.cloud';
-
 // 모달 열기
 function openUpdateModal() {
     document.getElementById('update-modal').style.display = 'flex';
@@ -38,7 +36,7 @@ function updateZoneSensor() {
         return;
     }
 
-    fetch(`${GATEWAY_URL}/api/core/zones/${zoneId}/zone-sensors/${sensorId}`, {
+    fetch(`/api/core/zones/${zoneId}/zone-sensors/${sensorId}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
@@ -71,7 +69,7 @@ function deleteZoneSensor(zoneId, sensorId) {
         return;
     }
 
-    fetch(`${GATEWAY_URL}/api/core/zones/${zoneId}/zone-sensors/${sensorId}`, {
+    fetch(`/api/core/zones/${zoneId}/zone-sensors/${sensorId}`, {
         method: 'DELETE',
         credentials: 'include'
     })
