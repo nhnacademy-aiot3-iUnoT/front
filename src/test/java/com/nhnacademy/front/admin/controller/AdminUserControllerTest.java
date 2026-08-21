@@ -193,6 +193,22 @@ class AdminUserControllerTest {
     }
 
     @Test
+    void putUpdateUserNameReturnsFormWhenInvalid() throws Exception {
+        AdminUserResponse user = user(
+                "관리자", "admin@example.com", AccountRole.ADMIN, AccountStatus.ACTIVE, 1
+        );
+        given(adminApiClient.getUser(user.uuid())).willReturn(user);
+
+        mockMvc.perform(put("/admin/users/{uuid}/name", user.uuid())
+                        .param("name", "   "))
+                .andExpect(status().isOk())
+                .andExpect(view().name("admin/user-detail"))
+                .andExpect(model().attributeHasFieldErrors("nameRequest", "name"));
+
+        then(adminApiClient).should(never()).updateName(any(), any());
+    }
+
+    @Test
     void putUpdateUserPassword() throws Exception {
         UUID uuid = UUID.randomUUID();
         UpdateAccountPasswordRequest request = new UpdateAccountPasswordRequest("changed1234");
@@ -204,6 +220,22 @@ class AdminUserControllerTest {
                 .andExpect(flash().attribute("successMessage", "회원 비밀번호를 재설정했습니다."));
 
         then(adminApiClient).should().updatePassword(uuid, request);
+    }
+
+    @Test
+    void putUpdateUserPasswordReturnsFormWhenInvalid() throws Exception {
+        AdminUserResponse user = user(
+                "관리자", "admin@example.com", AccountRole.ADMIN, AccountStatus.ACTIVE, 1
+        );
+        given(adminApiClient.getUser(user.uuid())).willReturn(user);
+
+        mockMvc.perform(put("/admin/users/{uuid}/password", user.uuid())
+                        .param("password", "123"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("admin/user-detail"))
+                .andExpect(model().attributeHasFieldErrors("passwordRequest", "password"));
+
+        then(adminApiClient).should(never()).updatePassword(any(), any());
     }
 
     @Test
@@ -221,6 +253,25 @@ class AdminUserControllerTest {
                 .andExpect(flash().attribute("successMessage", "회원 상태를 변경했습니다."));
 
         then(adminApiClient).should().changeStatus(uuid, request);
+    }
+
+    @Test
+    void putChangeUserStatusReturnsFormWhenInvalid() throws Exception {
+        AdminUserResponse user = user(
+                "관리자", "admin@example.com", AccountRole.ADMIN, AccountStatus.ACTIVE, 1
+        );
+        given(adminApiClient.getUser(user.uuid())).willReturn(user);
+
+        mockMvc.perform(put("/admin/users/{uuid}/status", user.uuid())
+                        .param("action", "")
+                        .param("reason", "   "))
+                .andExpect(status().isOk())
+                .andExpect(view().name("admin/user-detail"))
+                .andExpect(model().attributeHasFieldErrors(
+                        "statusRequest", "action", "reason"
+                ));
+
+        then(adminApiClient).should(never()).changeStatus(any(), any());
     }
 
     private AdminUserResponse user(
