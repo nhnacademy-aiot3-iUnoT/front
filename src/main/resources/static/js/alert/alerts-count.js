@@ -1,7 +1,5 @@
-const API_BASE_URL = 'https://iunot.cloud';
-
 function fetchUnreadAlertCount() {
-    fetch(`${API_BASE_URL}/api/core/alerts/unread-count`, {
+    fetch(`/api/core/alerts/unread-count`, {
         credentials: 'include'
     })
         .then(res => {
