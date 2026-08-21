@@ -4,7 +4,6 @@ import com.nhnacademy.front.account.client.AccountApiClient;
 import com.nhnacademy.front.account.dto.AccountRole;
 import com.nhnacademy.front.account.dto.request.ChangePasswordFormRequest;
 import com.nhnacademy.front.account.dto.request.UpdateAccountNameRequest;
-import com.nhnacademy.front.account.dto.request.UpdateAccountPasswordRequest;
 import com.nhnacademy.front.account.dto.request.WithdrawAccountRequest;
 import com.nhnacademy.front.account.dto.response.AccountInfoResponse;
 import com.nhnacademy.front.account.validator.PasswordFormValidator;
@@ -100,8 +99,11 @@ class AccountControllerTest {
                         "12341234",
                         "12341234"
                 );
-        UpdateAccountPasswordRequest request =
-                new UpdateAccountPasswordRequest(formRequest.newPassword());
+
+        ChangeOwnPasswordRequest request = new ChangeOwnPasswordRequest(
+                formRequest.currentPassword(),
+                formRequest.newPassword()
+        );
 
         mockMvc.perform(put("/mypage/change-password")
                         .param("currentPassword", formRequest.currentPassword())

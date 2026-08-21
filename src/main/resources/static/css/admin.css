@@ -46,3 +46,32 @@
 .admin-card .card-title {
     color: var(--ink);
 }
+
+.admin-filter-card {
+    border-color: var(--line-strong);
+}
+
+.user-summary-card {
+    border-left: 3px solid var(--teal);
+}
+
+.user-avatar {
+    color: var(--teal-dark);
+    background-color: var(--teal-soft);
+    font-weight: 700;
+}
+
+.role-badge {
+    font-weight: 500;
+    padding: 0.4rem 0.65rem;
+}
+
+.role-admin {
+    color: var(--warning);
+    background-color: var(--warning-soft);
+}
+
+.role-user {
+    color: var(--teal-dark);
+    background-color: var(--teal-soft);
+}
