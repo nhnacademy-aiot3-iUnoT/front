@@ -1,9 +1,9 @@
 package com.nhnacademy.front.account.controller;
 
 import com.nhnacademy.front.account.client.AccountApiClient;
+import com.nhnacademy.front.account.dto.request.ChangeOwnPasswordRequest;
 import com.nhnacademy.front.account.dto.request.ChangePasswordFormRequest;
 import com.nhnacademy.front.account.dto.request.UpdateAccountNameRequest;
-import com.nhnacademy.front.account.dto.request.UpdateAccountPasswordRequest;
 import com.nhnacademy.front.account.dto.request.WithdrawAccountRequest;
 import com.nhnacademy.front.account.dto.response.AccountInfoResponse;
 import com.nhnacademy.front.account.validator.PasswordFormValidator;
@@ -78,7 +78,10 @@ public class AccountController {
             return "account/change-password";
         }
 
-        accountApiClient.changePassword(new UpdateAccountPasswordRequest(request.newPassword()));
+        accountApiClient.changePassword(new ChangeOwnPasswordRequest(
+                request.currentPassword(),
+                request.newPassword()
+        ));
         return "redirect:/mypage";
     }
 

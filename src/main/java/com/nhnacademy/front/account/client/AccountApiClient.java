@@ -1,7 +1,7 @@
 package com.nhnacademy.front.account.client;
 
+import com.nhnacademy.front.account.dto.request.ChangeOwnPasswordRequest;
 import com.nhnacademy.front.account.dto.request.UpdateAccountNameRequest;
-import com.nhnacademy.front.account.dto.request.UpdateAccountPasswordRequest;
 import com.nhnacademy.front.account.dto.request.WithdrawAccountRequest;
 import com.nhnacademy.front.account.dto.response.AccountInfoResponse;
 import com.nhnacademy.front.account.dto.response.UpdateAccountResponse;
@@ -29,7 +29,7 @@ public class AccountApiClient {
         return backendApiClient.put(ACCOUNT_SERVICE + "/me", request, UpdateAccountResponse.class);
     }
 
-    public UpdateAccountResponse changePassword(@Valid UpdateAccountPasswordRequest request) {
+    public UpdateAccountResponse changePassword(@Valid ChangeOwnPasswordRequest request) {
         return backendApiClient.put(ACCOUNT_SERVICE + "/me/pwd", request, UpdateAccountResponse.class);
     }
 

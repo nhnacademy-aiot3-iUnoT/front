@@ -2,11 +2,11 @@ package com.nhnacademy.front.admin.controller;
 
 import com.nhnacademy.front.account.dto.AccountRole;
 import com.nhnacademy.front.account.dto.request.UpdateAccountNameRequest;
-import com.nhnacademy.front.account.dto.request.UpdateAccountPasswordRequest;
 import com.nhnacademy.front.admin.client.AdminApiClient;
 import com.nhnacademy.front.admin.dto.AccountStatus;
 import com.nhnacademy.front.admin.dto.AccountStatusAction;
 import com.nhnacademy.front.admin.dto.AdminUserSort;
+import com.nhnacademy.front.admin.dto.request.AdminResetPasswordRequest;
 import com.nhnacademy.front.admin.dto.request.AdminUserCreateRequest;
 import com.nhnacademy.front.admin.dto.request.AdminUserStatusRequest;
 import com.nhnacademy.front.admin.dto.response.AdminUserResponse;
@@ -124,7 +124,7 @@ public class AdminUserController {
     @PutMapping("/{uuid}/password")
     public String updatePassword(
             @PathVariable UUID uuid,
-            @Valid @ModelAttribute("passwordRequest") UpdateAccountPasswordRequest request,
+            @Valid @ModelAttribute("passwordRequest") AdminResetPasswordRequest request,
             BindingResult bindingResult,
             Model model,
             RedirectAttributes redirectAttributes
@@ -262,7 +262,7 @@ public class AdminUserController {
             model.addAttribute("nameRequest", new UpdateAccountNameRequest(user.name()));
         }
         if (!model.containsAttribute("passwordRequest")) {
-            model.addAttribute("passwordRequest", new UpdateAccountPasswordRequest(""));
+            model.addAttribute("passwordRequest", new AdminResetPasswordRequest(""));
         }
         if (!model.containsAttribute("statusRequest")) {
             model.addAttribute("statusRequest", new AdminUserStatusRequest());

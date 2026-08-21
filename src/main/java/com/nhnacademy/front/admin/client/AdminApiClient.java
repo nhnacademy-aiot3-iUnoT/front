@@ -1,7 +1,7 @@
 package com.nhnacademy.front.admin.client;
 
 import com.nhnacademy.front.account.dto.request.UpdateAccountNameRequest;
-import com.nhnacademy.front.account.dto.request.UpdateAccountPasswordRequest;
+import com.nhnacademy.front.admin.dto.request.AdminResetPasswordRequest;
 import com.nhnacademy.front.admin.dto.request.AdminUserCreateRequest;
 import com.nhnacademy.front.admin.dto.request.AdminUserStatusRequest;
 import com.nhnacademy.front.admin.dto.response.AdminUserResponse;
@@ -35,7 +35,7 @@ public class AdminApiClient {
         gatewayClient.put(ACCOUNT_SERVICE + "/" + uuid, request);
     }
 
-    public void updatePassword(UUID uuid, UpdateAccountPasswordRequest request) {
+    public void updatePassword(UUID uuid, AdminResetPasswordRequest request) {
         gatewayClient.put(ACCOUNT_SERVICE + "/" + uuid + "/pwd", request);
     }
 

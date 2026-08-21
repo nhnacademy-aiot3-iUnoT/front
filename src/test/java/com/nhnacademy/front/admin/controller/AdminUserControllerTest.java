@@ -2,10 +2,10 @@ package com.nhnacademy.front.admin.controller;
 
 import com.nhnacademy.front.account.dto.AccountRole;
 import com.nhnacademy.front.account.dto.request.UpdateAccountNameRequest;
-import com.nhnacademy.front.account.dto.request.UpdateAccountPasswordRequest;
 import com.nhnacademy.front.admin.client.AdminApiClient;
 import com.nhnacademy.front.admin.dto.AccountStatus;
 import com.nhnacademy.front.admin.dto.AccountStatusAction;
+import com.nhnacademy.front.admin.dto.request.AdminResetPasswordRequest;
 import com.nhnacademy.front.admin.dto.request.AdminUserCreateRequest;
 import com.nhnacademy.front.admin.dto.request.AdminUserStatusRequest;
 import com.nhnacademy.front.admin.dto.response.AdminUserResponse;
@@ -211,7 +211,7 @@ class AdminUserControllerTest {
     @Test
     void putUpdateUserPassword() throws Exception {
         UUID uuid = UUID.randomUUID();
-        UpdateAccountPasswordRequest request = new UpdateAccountPasswordRequest("changed1234");
+        AdminResetPasswordRequest request = new AdminResetPasswordRequest("changed1234");
 
         mockMvc.perform(put("/admin/users/{uuid}/password", uuid)
                         .param("password", request.password()))

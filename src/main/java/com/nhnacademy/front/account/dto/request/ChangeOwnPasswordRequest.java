@@ -3,9 +3,13 @@ package com.nhnacademy.front.account.dto.request;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-public record UpdateAccountPasswordRequest(
+public record ChangeOwnPasswordRequest(
         @NotBlank
         @Size(min = 6, max = 64)
-        String password
+        String currentPassword,
+
+        @NotBlank
+        @Size(min = 6, max = 64)
+        String newPassword
 ) {
 }

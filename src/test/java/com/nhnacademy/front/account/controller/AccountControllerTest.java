@@ -2,9 +2,9 @@ package com.nhnacademy.front.account.controller;
 
 import com.nhnacademy.front.account.client.AccountApiClient;
 import com.nhnacademy.front.account.dto.AccountRole;
+import com.nhnacademy.front.account.dto.request.ChangeOwnPasswordRequest;
 import com.nhnacademy.front.account.dto.request.ChangePasswordFormRequest;
 import com.nhnacademy.front.account.dto.request.UpdateAccountNameRequest;
-import com.nhnacademy.front.account.dto.request.UpdateAccountPasswordRequest;
 import com.nhnacademy.front.account.dto.response.AccountInfoResponse;
 import com.nhnacademy.front.account.validator.PasswordFormValidator;
 import org.junit.jupiter.api.Test;
@@ -97,7 +97,10 @@ class AccountControllerTest {
                         "12341234"
                 );
 
-        UpdateAccountPasswordRequest request = new UpdateAccountPasswordRequest(formRequest.newPassword());
+        ChangeOwnPasswordRequest request = new ChangeOwnPasswordRequest(
+                formRequest.currentPassword(),
+                formRequest.newPassword()
+        );
 
         mockMvc.perform(put("/mypage/change-password")
                         .param("currentPassword", formRequest.currentPassword())
@@ -118,8 +121,6 @@ class AccountControllerTest {
                         "12341234",
                         "12341234"
                 );
-
-        UpdateAccountPasswordRequest request = new UpdateAccountPasswordRequest(formRequest.newPassword());
 
         mockMvc.perform(put("/mypage/change-password")
                         .param("currentPassword", formRequest.currentPassword())
@@ -144,8 +145,6 @@ class AccountControllerTest {
                             "newpass2"
                     );
 
-        UpdateAccountPasswordRequest request = new UpdateAccountPasswordRequest(formRequest.newPassword());
-
         mockMvc.perform(put("/mypage/change-password")
                         .param("currentPassword", formRequest.currentPassword())
                         .param("newPassword", formRequest.newPassword())
@@ -168,8 +167,6 @@ class AccountControllerTest {
                         "12341234",
                         "12341234"
                 );
-
-        UpdateAccountPasswordRequest request = new UpdateAccountPasswordRequest(formRequest.newPassword());
 
         mockMvc.perform(put("/mypage/change-password")
                         .param("currentPassword", formRequest.currentPassword())
