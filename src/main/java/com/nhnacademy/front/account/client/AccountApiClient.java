@@ -5,7 +5,6 @@ import com.nhnacademy.front.account.dto.request.UpdateAccountNameRequest;
 import com.nhnacademy.front.account.dto.request.WithdrawAccountRequest;
 import com.nhnacademy.front.account.dto.response.AccountInfoResponse;
 import com.nhnacademy.front.account.dto.response.UpdateAccountResponse;
-import com.nhnacademy.front.account.dto.response.WithdrawAccountResponse;
 import com.nhnacademy.front.global.client.GatewayClient;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
