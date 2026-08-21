@@ -99,7 +99,6 @@ public class SecurityConfig {
             JwtProperties properties
     ) {
         Assert.hasText(properties.getIssuer(), "security.jwt.issuer must be configured");
-        Assert.notEmpty(properties.getAudiences(), "security.jwt.audiences must not be empty");
         Assert.notEmpty(
                 properties.getAllowedAlgorithms(),
                 "security.jwt.allowed-algorithms must not be empty"
