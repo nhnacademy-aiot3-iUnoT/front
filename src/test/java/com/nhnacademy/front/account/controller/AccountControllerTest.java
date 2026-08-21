@@ -10,6 +10,10 @@ import com.nhnacademy.front.account.dto.response.AccountInfoResponse;
 import com.nhnacademy.front.account.validator.PasswordFormValidator;
 import com.nhnacademy.front.global.security.AccessTokenCookieManager;
 import jakarta.servlet.http.HttpServletResponse;
+import com.nhnacademy.front.organization.client.OrganizationMemberApiClient;
+import com.nhnacademy.front.organization.client.DepartmentApiClient;
+import com.nhnacademy.front.organization.dto.response.OrganizationMemberRoleResponse;
+import com.nhnacademy.front.organization.dto.OrganizationRole;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -46,6 +50,13 @@ class AccountControllerTest {
     @MockitoBean
     private AccessTokenCookieManager cookieManager;
 
+    @MockitoBean
+    private OrganizationMemberApiClient organizationMemberApiClient;
+
+    @MockitoBean
+    private DepartmentApiClient departmentApiClient;
+
+
     @Test
     void info() throws Exception {
         LocalDateTime createdAt = LocalDateTime.of(2026, 8, 5, 12, 0);
@@ -54,6 +65,10 @@ class AccountControllerTest {
 
         given(accountApiClient.getAccountInfo())
                 .willReturn(response);
+        given(organizationMemberApiClient.getRole())
+                .willReturn(new OrganizationMemberRoleResponse(OrganizationRole.ORG_MEMBER));
+        given(departmentApiClient.getMyDepartments())
+                .willReturn(List.of());
 
         mockMvc.perform(get("/mypage"))
                 .andExpect(status().isOk())
