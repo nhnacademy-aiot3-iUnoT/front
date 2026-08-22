@@ -12,6 +12,8 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.util.List;
+
 @Component
 @RequiredArgsConstructor
 public class OrganizationMemberApiClient {
@@ -40,8 +42,7 @@ public class OrganizationMemberApiClient {
         return gatewayClient.get(uri, new ParameterizedTypeReference<>() {});
     }
 
-    // TODO 이것만 수정. email로만 검색
-    public PageResponse<OrganizationMemberResponse> searchMembers(MemberByEmailRequest request) {
+    public List<OrganizationMemberResponse> searchMembers(MemberByEmailRequest request) {
         UriComponentsBuilder builder = UriComponentsBuilder
                 .fromPath(CORE_SERVICE + "/search")
                 .queryParam("email", request.email());

@@ -26,7 +26,7 @@ public class OrganizationSearchController {
      */
     @GetMapping("/members")
     public List<OrganizationMemberResponse> searchMembers(@RequestParam(defaultValue = "") String email) {
-        return memberApiClient.searchMembers(new MemberByEmailRequest()).content();
+        return memberApiClient.searchMembers(new MemberByEmailRequest(email));
     }
 
     /**
