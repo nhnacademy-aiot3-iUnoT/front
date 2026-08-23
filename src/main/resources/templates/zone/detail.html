@@ -16,12 +16,12 @@
         <!-- 상단 메인 타이틀 및 관리 버튼 영역 -->
         <div class="header-top">
             <h2 class="main-title">
-                <span class="org-prefix" th:text="${zone.storageName + ' > '}">저장소이름 &gt; </span>
+                <span class="path-prefix" th:text="${zone.organizationName + ' > ' + zone.storageName + ' > '}">조직이름 &gt; 저장소이름 &gt; </span>
                 <span th:text="${zone.name}">구역 이름</span>
             </h2>
 
             <!-- 관리 액션 버튼들 -->
-            <div class="action-buttons">
+            <div class="action-buttons" th:if="${canManage}">
                 <button type="button" class="btn-secondary" onclick="openEditZoneModal()">구역 수정</button>
                 <button type="button" id="btn-toggle-status" class="btn-warning"
                         th:attr="data-storage-id=${zone.storageId}, data-zone-id=${zone.zoneId}, data-status=${zone.status.name()}"
@@ -67,7 +67,7 @@
         <!-- 1. 구역 임계값 섹션 -->
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
             <h3 style="margin: 0;">⚙️ 구역 임계값 목록</h3>
-            <button type="button" class="btn-primary" onclick="openThresholdModal()">+ 임계값 설정</button>
+            <button type="button" class="btn-primary" th:if="${canManage}" onclick="openThresholdModal()">+ 임계값 설정</button>
         </div>
 
         <div th:if="${#lists.isEmpty(thresholdList)}" style="color: #888; padding: 10px 0; margin-bottom: 20px;">
@@ -95,7 +95,7 @@
         <!-- 2. 소속 센서 리스트 섹션 -->
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
             <h3 style="margin: 0;">📡 소속 센서 목록</h3>
-            <button type="button" class="btn-primary" onclick="openSensorModal()">+ 센서 추가</button>
+            <button type="button" class="btn-primary" th:if="${canManage}" onclick="openSensorModal()">+ 센서 추가</button>
         </div>
 
         <table>
@@ -124,7 +124,7 @@
     <!-- ================= 모달 영역 ================= -->
 
     <!-- 1. 구역 수정 모달 -->
-    <div id="edit-zone-modal" class="modal-wrapper" style="display:none;">
+    <div id="edit-zone-modal" class="modal-wrapper" style="display:none;" th:if="${canManage}">
         <div class="modal-backdrop" onclick="closeEditZoneModal()"></div>
         <div class="modal-box">
             <h3>구역 정보 수정</h3>
@@ -144,7 +144,7 @@
     </div>
 
     <!-- 2. 센서 추가 모달 -->
-    <div id="sensor-modal" class="modal-wrapper" style="display:none;">
+    <div id="sensor-modal" class="modal-wrapper" style="display:none;" th:if="${canManage}">
         <div class="modal-backdrop" onclick="closeSensorModal()"></div>
         <div class="modal-box">
             <h3>구역 센서 추가</h3>
@@ -167,7 +167,7 @@
     </div>
 
     <!-- 3. 임계값 설정 모달 -->
-    <div id="threshold-modal" class="modal-wrapper" style="display:none;">
+    <div id="threshold-modal" class="modal-wrapper" style="display:none;" th:if="${canManage}">
         <div class="modal-backdrop" onclick="closeThresholdModal()"></div>
         <div class="modal-box">
             <h3>구역 임계값 설정</h3>

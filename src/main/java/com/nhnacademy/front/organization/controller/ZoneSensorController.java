@@ -1,6 +1,9 @@
 package com.nhnacademy.front.organization.controller;
 
+import com.nhnacademy.front.organization.client.OrganizationMemberApiClient;
 import com.nhnacademy.front.organization.client.ZoneSensorApiClient;
+import com.nhnacademy.front.organization.dto.OrganizationRole;
+import com.nhnacademy.front.organization.dto.response.OrganizationMemberRoleResponse;
 import com.nhnacademy.front.organization.dto.response.ZoneSensorDetailResponse;
 import com.nhnacademy.front.organization.dto.response.ZoneSensorInfoResponse;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/zones")
 public class ZoneSensorController {
     private final ZoneSensorApiClient sensorApiClient;
+    private final OrganizationMemberApiClient organizationMemberApiClient;
 
     @GetMapping("/{zone-id}/zone-sensors/{zone-sensor-id}")
     public String getZoneSensorDetail(
@@ -27,8 +31,14 @@ public class ZoneSensorController {
     ){
         ZoneSensorDetailResponse sensor = sensorApiClient
                 .getZoneThreshold(zoneId, zoneSensorId);
+        OrganizationMemberRoleResponse roleResponse = organizationMemberApiClient.getRole();
+        boolean canManage = (
+                roleResponse.role() == OrganizationRole.ORG_BOSS ||
+                        roleResponse.role() == OrganizationRole.ORG_OWNER
+        );
 
         model.addAttribute("sensor", sensor);
+        model.addAttribute("canManage", canManage);
 
         return "zone-sensor/detail";
     }

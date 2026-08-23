@@ -1,6 +1,3 @@
-// 💡 API Gateway 서버의 주소와 포트 (예: 10400)
-const GATEWAY_URL = 'https://iunot.cloud';
-
 // 모달 열기
 function openCreateModal() {
     document.getElementById('create-modal').style.display = 'flex';
@@ -39,8 +36,7 @@ function createStorage() {
         return;
     }
 
-    // 💡 게이트웨이 주소를 포함한 절대 경로로 요청
-    fetch(`${GATEWAY_URL}/api/core/storages`, {
+    fetch(`/api/core/storages`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

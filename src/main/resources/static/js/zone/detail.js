@@ -1,5 +1,3 @@
-const API_BASE_URL = 'https://iunot.cloud';
-
 // --- 모달 제어 ---
 function openEditZoneModal() { document.getElementById('edit-zone-modal').style.display = 'flex'; }
 function closeEditZoneModal() { document.getElementById('edit-zone-modal').style.display = 'none'; }
@@ -18,7 +16,7 @@ function onCreateZoneSensorClick(btn) { createZoneSensor(btn.dataset.zoneId); }
 function updateZoneInfo(storageId, zoneId) {
     const name = document.getElementById('edit-zone-name').value.trim();
     const description = document.getElementById('edit-zone-description').value.trim();
-    fetch(`${API_BASE_URL}/api/core/storages/${storageId}/zones/${zoneId}`, {
+    fetch(`/api/core/storages/${storageId}/zones/${zoneId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -27,7 +25,7 @@ function updateZoneInfo(storageId, zoneId) {
 }
 
 function toggleZoneStatus(storageId, zoneId, status) {
-    fetch(`${API_BASE_URL}/api/core/storages/${storageId}/zones/${zoneId}/status`, {
+    fetch(`/api/core/storages/${storageId}/zones/${zoneId}/status`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -37,7 +35,7 @@ function toggleZoneStatus(storageId, zoneId, status) {
 
 function deleteZone(storageId, zoneId) {
     if (!confirm('정말 삭제하시겠습니까?')) return;
-    fetch(`${API_BASE_URL}/api/core/storages/${storageId}/zones/${zoneId}`, {
+    fetch(`/api/core/storages/${storageId}/zones/${zoneId}`, {
         method: 'DELETE',
         credentials: 'include'
     })
@@ -45,7 +43,7 @@ function deleteZone(storageId, zoneId) {
 }
 
 function createZoneSensor(zoneId) {
-    fetch(`${API_BASE_URL}/api/core/zones/${zoneId}/zone-sensors`, {
+    fetch(`/api/core/zones/${zoneId}/zone-sensors`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -58,7 +56,7 @@ function createZoneSensor(zoneId) {
 }
 
 function loadSensorTypes() {
-    fetch(`${API_BASE_URL}/api/core/sensor-types`, {
+    fetch(`/api/core/sensor-types`, {
         credentials: 'include'
     })
         .then(res => res.json())
@@ -86,7 +84,7 @@ document.getElementById('btn-create-threshold').addEventListener('click', functi
         alertDuration: Number(document.getElementById('threshold-delay').value)
     };
 
-    fetch(`${API_BASE_URL}/api/core/zones/${zoneId}/zone-thresholds`, {
+    fetch(`/api/core/zones/${zoneId}/zone-thresholds`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
