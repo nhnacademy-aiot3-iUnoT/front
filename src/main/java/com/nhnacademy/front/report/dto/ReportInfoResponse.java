@@ -14,5 +14,13 @@ public record ReportInfoResponse(
         String aiSummary,
         AiSummaryStatus aiSummaryStatus,
         LocalDateTime createdAt,
-        List<ReportItemResponse> items
-) {}
+        List<ReportItemResponse> items,
+        List<ReportEnvironmentResponse> environments,
+        List<ReportDoorResponse> doors
+) {
+
+    public boolean hasEnvironment() {
+        return (environments != null && !environments.isEmpty())
+                || (doors != null && !doors.isEmpty());
+    }
+}

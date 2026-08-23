@@ -269,6 +269,147 @@
                         </div>
                     </div>
 
+                    <!-- 보관 환경 (구역별) -->
+                    <div class="row row-cards mt-1" th:if="${report.hasEnvironment()}">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header bg-azure-lt">
+                                    <h3 class="card-title text-azure d-flex align-items-center">
+                                        <i class="ti ti-temperature me-2 fs-2"></i>보관 환경
+                                    </h3>
+                                    <div class="card-actions text-muted small">
+                                        구역을 선택해 일평균 추이와 기간 요약을 확인합니다.
+                                    </div>
+                                </div>
+
+                                <!-- 구역 탭 -->
+                                <div class="card-header">
+                                    <ul class="nav nav-tabs card-header-tabs" role="tablist">
+                                        <li class="nav-item" role="presentation"
+                                            th:each="zone, zoneStat : ${zoneEnvironments}">
+                                            <a class="nav-link d-flex align-items-center"
+                                               th:classappend="${zoneStat.first} ? 'active'"
+                                               data-bs-toggle="tab"
+                                               th:href="'#zone-pane-' + ${zone.zoneId}"
+                                               role="tab">
+                                                <span th:text="${zone.zoneName}">냉장 보관실</span>
+                                                <span class="badge bg-red text-white ms-2"
+                                                      th:if="${zone.hasOutOfRange()}"
+                                                      th:text="${zone.outOfRangeSensorCount()}"
+                                                      title="기준을 벗어난 센서 수">1</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <!-- 차트 데이터. 표는 Thymeleaf가 그리고 차트는 이 값을 읽는다.
+                                     data 속성은 Thymeleaf가 이스케이프하므로 스크립트 삽입 위험이 없다. -->
+                                <div class="card-body"
+                                     id="environment-root"
+                                     th:attr="data-environments=${environmentJson}">
+                                    <div class="tab-content">
+                                        <div th:each="zone, zoneStat : ${zoneEnvironments}"
+                                             class="tab-pane"
+                                             th:classappend="${zoneStat.first} ? 'active show'"
+                                             th:id="'zone-pane-' + ${zone.zoneId}"
+                                             role="tabpanel">
+
+                                            <!-- 센서별 일평균 추이 -->
+                                            <div th:each="env, envStat : ${zone.sensors}"
+                                                 th:class="${envStat.last} ? 'env-chart-block' : 'env-chart-block mb-4'">
+                                                <div class="d-flex align-items-center justify-content-between mb-2">
+                                                    <div class="fw-medium">
+                                                        <span th:text="${env.sensorType}">TEMPERATURE</span>
+                                                        <span class="text-muted" th:if="${env.unit != null}"
+                                                              th:text="' (' + ${env.unit} + ')'"> (°C)</span>
+                                                    </div>
+                                                    <span class="badge bg-red-lt" th:if="${env.hasOutOfRange()}"
+                                                          th:text="'기준 이탈 ' + ${env.outOfRangeDays} + '일'">기준 이탈 2일</span>
+                                                    <span class="badge bg-green-lt"
+                                                          th:if="${!env.hasOutOfRange() and env.hasThreshold()}">기준 이내</span>
+                                                    <span class="badge bg-secondary-lt"
+                                                          th:if="${!env.hasThreshold()}">기준 미설정</span>
+                                                </div>
+
+                                                <div class="env-chart">
+                                                    <canvas class="env-chart-canvas"
+                                                            th:attr="data-zone-id=${env.zoneId}, data-sensor-type=${env.sensorType}"></canvas>
+                                                </div>
+                                            </div>
+
+                                            <!-- 기간 요약 -->
+                                            <div class="table-responsive mt-3">
+                                                <table class="table table-vcenter card-table table-hover">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>센서</th>
+                                                            <th class="text-end">평균</th>
+                                                            <th class="text-end">범위</th>
+                                                            <th class="text-end">기준</th>
+                                                            <th class="text-end">이탈</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr th:each="env : ${zone.sensors}"
+                                                            th:classappend="${env.hasOutOfRange()} ? 'table-danger' : ''">
+                                                            <td class="fw-medium">
+                                                                <span th:text="${env.sensorType}">TEMPERATURE</span>
+                                                                <span class="text-muted" th:if="${env.unit != null}"
+                                                                      th:text="' (' + ${env.unit} + ')'"> (°C)</span>
+                                                            </td>
+                                                            <td class="text-end fw-bold" th:text="${env.avgValue}">5.2</td>
+                                                            <td class="text-end text-muted"
+                                                                th:text="${env.minValue} + ' ~ ' + ${env.maxValue}">3.9 ~ 10.4</td>
+                                                            <td class="text-end text-muted">
+                                                                <span th:if="${!env.hasThreshold()}">미설정</span>
+                                                                <th:block th:if="${env.hasThreshold()}">
+                                                                    <span th:text="${env.thresholdMin != null ? env.thresholdMin : '제한없음'}">2.0</span>
+                                                                    <span> ~ </span>
+                                                                    <span th:text="${env.thresholdMax != null ? env.thresholdMax : '제한없음'}">8.0</span>
+                                                                </th:block>
+                                                            </td>
+                                                            <td class="text-end">
+                                                                <span class="text-muted" th:if="${!env.hasOutOfRange()}">없음</span>
+                                                                <span class="text-danger fw-bold" th:if="${env.hasOutOfRange()}"
+                                                                      th:text="${env.outOfRangeDays} + ' / ' + ${env.measuredDays} + '일'">2 / 7일</span>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+
+                                            <!-- 문 개폐 -->
+                                            <div class="mt-3" th:if="${zone.hasDoor()}">
+                                                <div class="hr-text hr-text-left">문 개폐</div>
+                                                <div class="row g-2">
+                                                    <div class="col-md-4">
+                                                        <div class="card card-sm">
+                                                            <div class="card-body">
+                                                                <div class="text-muted small">
+                                                                    총 <span class="fw-bold text-teal"
+                                                                             th:text="${zone.door.totalOpenCount}">144</span>회 ·
+                                                                    누적 <span class="fw-bold text-teal"
+                                                                             th:text="${zone.door.totalOpenMinutes}">255</span>분
+                                                                </div>
+                                                                <div class="text-muted small"
+                                                                     th:text="${zone.door.measuredDays} + '일 측정'">7일 측정</div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- 문 센서가 없는 구역임을 명시한다. 개폐 0회와 구분하기 위함이다. -->
+                                            <div class="text-muted small mt-3" th:if="${!zone.hasDoor()}">
+                                                이 구역에는 문 센서가 없습니다.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
 
             </div>
@@ -280,7 +421,9 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/weekSelect/weekSelect.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
     <script th:src="@{/js/report.js}"></script>
+    <script th:src="@{/js/report-chart.js}"></script>
 </th:block>
 </body>
 </html>

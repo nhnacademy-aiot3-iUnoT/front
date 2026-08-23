@@ -19,3 +19,15 @@
     font-size: 0.95rem;
     letter-spacing: -0.01em;
 }
+
+/* Chart.js는 maintainAspectRatio가 false일 때 부모의 높이를 따르므로 높이를 지정해 준다. */
+.env-chart {
+    position: relative;
+    height: 220px;
+}
+
+@media (max-width: 768px) {
+    .env-chart {
+        height: 180px;
+    }
+}

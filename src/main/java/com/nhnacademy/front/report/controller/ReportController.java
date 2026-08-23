@@ -1,7 +1,14 @@
 package com.nhnacademy.front.report.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nhnacademy.front.organization.client.ZoneApiClient;
+import com.nhnacademy.front.organization.dto.response.ZoneInfoResponse;
 import com.nhnacademy.front.report.client.ReportApiClient;
+import com.nhnacademy.front.report.dto.ReportDoorResponse;
+import com.nhnacademy.front.report.dto.ReportEnvironmentResponse;
 import com.nhnacademy.front.report.dto.ReportInfoResponse;
+import com.nhnacademy.front.report.dto.ZoneEnvironmentView;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -11,6 +18,12 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Controller
@@ -19,6 +32,8 @@ import java.time.LocalDate;
 public class ReportController {
 
     private final ReportApiClient reportApiClient;
+    private final ZoneApiClient zoneApiClient;
+    private final ObjectMapper objectMapper;
 
     @GetMapping("/weekly")
     public String weeklyReport(
@@ -40,6 +55,8 @@ public class ReportController {
         try {
             ReportInfoResponse report = reportApiClient.getWeeklyReport(storageId, periodStart);
             model.addAttribute("report", report);
+            model.addAttribute("environmentJson", toEnvironmentJson(report));
+            model.addAttribute("zoneEnvironments", toZoneEnvironments(storageId, report));
         } catch (Exception e) {
             // 리포트가 아직 생성되지 않은 상태 -> report = null로 뷰 전달
             log.info("주간 리포트가 아직 생성되지 않았습니다 (storageId={}, periodStart={})", storageId, periodStart);
@@ -90,5 +107,61 @@ public class ReportController {
             return "redirect:/storages/" + storageId + "/reports/weekly?periodStart=" + periodStart;
         }
         return "redirect:/storages/" + storageId + "/reports/weekly";
+    }
+
+    private List<ZoneEnvironmentView> toZoneEnvironments(Long storageId, ReportInfoResponse report) {
+        if (report == null || report.environments() == null || report.environments().isEmpty()) {
+            return List.of();
+        }
+
+        Map<Long, String> zoneNames = loadZoneNames(storageId);
+
+        Map<Long, ReportDoorResponse> doorsByZone = (report.doors() == null)
+                ? Map.of()
+                : report.doors().stream()
+                .collect(Collectors.toMap(ReportDoorResponse::zoneId, Function.identity(), (a, b) -> a));
+
+        return report.environments().stream()
+                .collect(Collectors.groupingBy(
+                        ReportEnvironmentResponse::zoneId,
+                        LinkedHashMap::new,
+                        Collectors.toList()))
+                .entrySet().stream()
+                .map(entry -> new ZoneEnvironmentView(
+                        entry.getKey(),
+                        zoneNames.getOrDefault(entry.getKey(), "구역 " + entry.getKey()),
+                        entry.getValue(),
+                        doorsByZone.get(entry.getKey())))
+                .sorted(Comparator.comparing(ZoneEnvironmentView::zoneId))
+                .toList();
+    }
+
+    private Map<Long, String> loadZoneNames(Long storageId) {
+        try {
+            List<ZoneInfoResponse> zones = zoneApiClient.getZones(storageId);
+
+            if (zones == null) {
+                return Map.of();
+            }
+
+            return zones.stream()
+                    .collect(Collectors.toMap(ZoneInfoResponse::zoneId, ZoneInfoResponse::name, (a, b) -> a));
+        } catch (Exception e) {
+            log.warn("구역 이름을 불러오지 못해 구역 번호로 표시합니다. storageId={}", storageId, e);
+            return Map.of();
+        }
+    }
+
+    private String toEnvironmentJson(ReportInfoResponse report) {
+        if (report == null || report.environments() == null) {
+            return "[]";
+        }
+
+        try {
+            return objectMapper.writeValueAsString(report.environments());
+        } catch (JsonProcessingException e) {
+            log.warn("환경 차트 데이터를 JSON으로 변환하지 못했습니다. reportId={}", report.reportId(), e);
+            return "[]";
+        }
     }
 }
