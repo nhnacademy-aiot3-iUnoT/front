@@ -38,7 +38,7 @@ public class GatewayClient {
     public <T> T get(String path, Class<T> dataType) {
         return execute(() ->
                 restClient.get()
-                        .uri(baseUrl + path)
+                        .uri(URI.create(baseUrl + path))
                         .retrieve()
                         .body(responseTypeOf(dataType)));
     }

@@ -15,13 +15,13 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Component
 @RequiredArgsConstructor
 public class InventoryApiClient {
-    private final GatewayClient backendApiClient;
+    private final GatewayClient gatewayClient;
     private static final String CORE_SERVICE = "/api/core"; // 담당자가 수정
 
 
     // 입고 등록
     public void inbound(InboundMedicineRequest request){
-        backendApiClient.post(CORE_SERVICE + "/inventories",request);
+        gatewayClient.post(CORE_SERVICE + "/inventories",request);
 
     }
 
@@ -49,7 +49,7 @@ public class InventoryApiClient {
                 .toUriString();
 
 
-        return backendApiClient.get(path,
+        return gatewayClient.get(path,
                 new ParameterizedTypeReference<>() {}
                 );
 
@@ -70,7 +70,7 @@ public class InventoryApiClient {
                 .toUriString();
 
 
-        return backendApiClient.get(path,InventoryInfoResponse.class);
+        return gatewayClient.get(path,InventoryInfoResponse.class);
 
     }
 

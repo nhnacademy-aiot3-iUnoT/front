@@ -13,7 +13,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MedicineEnvApiClient {
 
-    private final GatewayClient backendApiClient;
+    private final GatewayClient gatewayClient;
     private static final String CORE_SERVICE = "/api/core";
 
 
@@ -22,21 +22,21 @@ public class MedicineEnvApiClient {
     // 환경유형 조회
     public List<MedicineEnvironmentTypeResponse> getTypes(Long packageUnitId){
 
-        return backendApiClient.get(CORE_SERVICE + "/package-units/"+ packageUnitId +"/medicine-environment-types", new ParameterizedTypeReference<>() {});
+        return gatewayClient.get(CORE_SERVICE + "/package-units/"+ packageUnitId +"/medicine-environment-types", new ParameterizedTypeReference<>() {});
 
     }
 
     //환경유형 수정
     public void updateTypes(Long packageUnitId, MedicineEnvironmentRequest request){
 
-        backendApiClient.put(CORE_SERVICE + "/package-units/"+ packageUnitId + "/medicine-environment-standards",request);
+        gatewayClient.put(CORE_SERVICE + "/package-units/"+ packageUnitId + "/medicine-environment-standards",request);
 
     }
 
     // 환경유형 삭제
     public void deleteTypes(Long standardId){
 
-        backendApiClient.delete(CORE_SERVICE + "/medicine-environment-standards/"+ standardId);
+        gatewayClient.delete(CORE_SERVICE + "/medicine-environment-standards/"+ standardId);
     }
 
 

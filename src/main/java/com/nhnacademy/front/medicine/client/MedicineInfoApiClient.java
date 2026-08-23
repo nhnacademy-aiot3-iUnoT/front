@@ -19,7 +19,7 @@ import java.nio.charset.StandardCharsets;
 @Slf4j
 public class MedicineInfoApiClient {
 
-    private final GatewayClient backendApiClient;
+    private final GatewayClient gatewayClient;
     private static final String CORE_SERVICE = "/api/core";
 
     // 의약품 조회
@@ -48,14 +48,14 @@ public class MedicineInfoApiClient {
         log.info("Front API 요청 path: {}", path);
 
 
-        return backendApiClient.get(path,new ParameterizedTypeReference<>() {});
+        return gatewayClient.get(path,new ParameterizedTypeReference<>() {});
 
     }
 
     // 특정 의약품 조회
     public MedicineDetailResponse getMedicine(Long packageUnitId){
 
-        return backendApiClient.get(CORE_SERVICE + "/medicines/package-units/" + packageUnitId, MedicineDetailResponse.class);
+        return gatewayClient.get(CORE_SERVICE + "/medicines/package-units/" + packageUnitId, MedicineDetailResponse.class);
 
     }
 
