@@ -21,9 +21,14 @@
                 <div class="page-header mt-3">
                     <div class="row align-items-center">
                         <div class="col">
-                            <h2 class="page-title">
-                                <i class="ti ti-report-analytics me-2"></i>주간 리포트
-                            </h2>
+                            <div class="d-flex align-items-center gap-2">
+                                <h2 class="page-title mb-0">
+                                    <i class="ti ti-report-analytics me-2"></i>주간 리포트
+                                </h2>
+                                <a th:href="@{/storages/{storageId}(storageId=${storageId})}" class="btn btn-outline-secondary btn-sm" title="저장소 상세로 돌아가기">
+                                    <i class="ti ti-arrow-left me-1"></i>저장소로 돌아가기
+                                </a>
+                            </div>
                             <div class="text-muted mt-1" th:if="${report != null}">
                                 집계 기간: <span class="badge bg-blue-lt text-blue fs-4" th:text="${report.periodStart + ' ~ ' + report.periodEnd}"></span>
                                 <span class="badge bg-green-lt text-green ms-2" th:if="${isLatestWeek}">

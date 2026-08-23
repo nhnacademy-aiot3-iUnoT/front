@@ -22,6 +22,7 @@
 
             <!-- 관리 액션 버튼들 -->
             <div class="action-buttons">
+                <a th:href="@{/storages/{storageId}/reports/weekly(storageId=${storage.storageId})}" class="btn-primary">주간 리포트</a>
                 <button type="button" class="btn-secondary" onclick="openEditModal()">수정</button>
                 <button type="button" class="btn-warning" th:text="${storage.status.name() == 'ACTIVE'} ? '비활성화' : '활성화'"
                         th:attr="onclick=|toggleStorageStatus('${storage.storageId}', '${storage.status.name()}')|">상태변경</button>
