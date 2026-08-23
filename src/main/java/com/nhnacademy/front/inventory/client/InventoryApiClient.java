@@ -5,6 +5,7 @@ import com.nhnacademy.front.global.dto.ApiResponse;
 import com.nhnacademy.front.global.dto.PageResponse;
 import com.nhnacademy.front.inventory.dto.request.InboundMedicineRequest;
 import com.nhnacademy.front.inventory.dto.response.InventoriesResponse;
+import com.nhnacademy.front.inventory.dto.response.InventoryInfoResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
@@ -51,6 +52,25 @@ public class InventoryApiClient {
         return backendApiClient.get(path,
                 new ParameterizedTypeReference<>() {}
                 );
+
+    }
+
+
+
+    // 상세 재고 조회
+    public InventoryInfoResponse getInventoryInfo(Long storageId, Long packageUnitId,int page, int size){
+
+
+        String path = UriComponentsBuilder
+                .fromPath(CORE_SERVICE + "/inventories/storages/{storageId}/pack-units/{packageUnitId}")
+                .queryParam("page", page)
+                .queryParam("size", size)
+                .buildAndExpand(storageId, packageUnitId)
+                .encode()
+                .toUriString();
+
+
+        return backendApiClient.get(path,InventoryInfoResponse.class);
 
     }
 

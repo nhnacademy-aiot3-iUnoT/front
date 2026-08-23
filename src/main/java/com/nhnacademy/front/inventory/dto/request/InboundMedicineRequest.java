@@ -22,6 +22,8 @@ public record InboundMedicineRequest(
         @NotNull(message = "입고 수량을 입력해주세요.")
         @Positive(message = "수량은 양수여야 합니다.")
         Integer quantity,
+        @Size(max=255, message= "메모는 255자 이하여야 합니다.")
+        String memo,
         @Valid
         MedicineEnvironmentRequest medicineEnvironmentRequest
 
@@ -36,6 +38,7 @@ public record InboundMedicineRequest(
                 return new InboundMedicineRequest(
                         packageUnitId,
                         zoneId,
+                        null,
                         null,
                         null,
                         null,

@@ -326,3 +326,216 @@ button, input, select { font: inherit; }
     .medicine-result-section { overflow-x: auto; }
     .medicine-result-section table { min-width: 680px; }
 }
+
+
+/* =========================
+   Pagination
+   ========================= */
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+
+    margin-top: 28px;
+    padding-top: 20px;
+}
+
+.pagination a {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+
+    min-width: 38px;
+    height: 38px;
+    padding: 0 12px;
+
+    border: 1px solid #e0e5e2;
+    border-radius: 8px;
+
+    background-color: #ffffff;
+    color: #59635f;
+
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+
+    transition: all 0.2s ease;
+}
+
+/* 마우스 올렸을 때 */
+.pagination a:hover {
+    background-color: #f4f7f5;
+    border-color: #bec8c3;
+    color: #26332e;
+}
+
+/* 현재 페이지 */
+.pagination a.active {
+    background-color: #34443e;
+    border-color: #34443e;
+    color: #ffffff;
+
+    font-weight: 700;
+}
+
+
+
+/* 메모 영역 */
+.memo-field {
+    grid-column: 1 / -1;
+}
+
+.memo-field textarea {
+    width: 100%;
+    min-height: 140px;
+    padding: 16px;
+
+    border: 1px solid var(--inbound-border);
+    border-radius: 13px;
+
+    background: var(--inbound-white);
+    color: var(--inbound-text);
+
+    font: inherit;
+    line-height: 1.5;
+
+    resize: vertical;
+    outline: none;
+}
+
+.memo-field textarea:focus {
+    border-color: var(--inbound-primary);
+    box-shadow: 0 0 0 4px rgba(20, 122, 105, .13);
+}
+
+.memo-field textarea::placeholder {
+    color: #a8afab;
+}
+
+
+
+#summaryModal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+
+    background: rgba(35, 51, 47, 0.45);
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 24px;
+}
+
+#summaryModal.show {
+    display: flex;
+}
+
+#summaryModal .modal-content {
+    width: min(480px, 100%);
+    padding: 30px 32px 28px;
+
+    background: var(--inbound-white);
+
+    border: 1px solid var(--inbound-border);
+    border-radius: 22px;
+
+    box-shadow: 0 20px 50px rgba(35, 51, 47, 0.18);
+}
+
+#summaryModal .modal-content h2 {
+    margin: 0 0 6px;
+
+    color: var(--inbound-text);
+
+    font-size: 24px;
+    font-weight: 800;
+}
+
+#summaryModal .modal-content > p {
+    margin: 0 0 24px;
+
+    color: var(--inbound-muted);
+
+    font-size: 14px;
+}
+
+.summary-item {
+    display: grid;
+    grid-template-columns: 100px minmax(0, 1fr);
+    align-items: center;
+    gap: 16px;
+
+    min-height: 48px;
+    padding: 12px 0;
+
+    border-bottom: 1px solid #ece9e2;
+}
+
+.summary-item span {
+    color: var(--inbound-muted);
+
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.summary-item strong {
+    color: var(--inbound-text);
+
+    font-size: 15px;
+    font-weight: 750;
+
+    text-align: right;
+    word-break: break-word;
+}
+
+.summary-item:last-of-type {
+    border-bottom: 0;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+
+    margin-top: 26px;
+}
+
+#closeSummaryButton,
+#confirmInboundButton {
+    min-height: 44px;
+    padding: 0 18px;
+
+    border-radius: 11px;
+
+    font: inherit;
+    font-weight: 750;
+
+    cursor: pointer;
+}
+
+#closeSummaryButton {
+    border: 1px solid var(--inbound-border);
+
+    background: var(--inbound-white);
+    color: var(--inbound-text);
+}
+
+#closeSummaryButton:hover {
+    background: #f3f4f1;
+}
+
+#confirmInboundButton {
+    border: 1px solid var(--inbound-primary);
+
+    background: var(--inbound-primary);
+    color: #fff;
+}
+
+#confirmInboundButton:hover {
+    filter: brightness(0.95);
+}
+

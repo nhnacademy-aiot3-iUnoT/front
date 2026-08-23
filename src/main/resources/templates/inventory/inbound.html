@@ -7,7 +7,7 @@
     <title>의약품 입고</title>
 
 
-    <link rel="stylesheet" th:href="@{/css/inventory/inbound.css}">
+    <link rel="stylesheet" th:href="@{/css/inbound.css}">
 
     <script th:src="@{/js/inventory/inbound.js}"></script>
 
@@ -97,9 +97,50 @@
 
             </table>
 
+
+            <div class="pagination" th:if="${medicines != null and medicines.totalPages > 1}">
+
+                <a th:if="${currentPage >0}"
+                   th:href="@{/medicines(searchType=${medicineSearchRequest.searchType},
+                   search=${medicineSearchRequest.search},
+                   storageId=${selectedStorageId},
+                   zoneId=${selectedZoneId},
+                   page=${currentPage - 1},
+                   size=${pageSize}
+                   )}">
+                    이전
+                </a>
+
+                <a th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}"
+                   th:href="@{/medicines(searchType=${medicineSearchRequest.searchType},
+                   search=${medicineSearchRequest.search},
+                   storageId=${selectedStorageId},
+                   zoneId=${selectedZoneId},
+                   page=${pageNum},
+                   size=${pageSize}
+                   )}"
+                   th:text="${pageNum + 1}"
+                   th:classappend="${pageNum == currentPage} ? ' active'">
+                </a>
+
+                <a th:if="${currentPage + 1 < totalPages}"
+                    th:href="@{/medicines(
+                    searchType=${medicineSearchRequest.searchType},
+                    search=${medicineSearchRequest.search},
+                    storageId=${selectedStorageId},
+                    zoneId=${selectedZoneId},
+                    page=${currentPage + 1},
+                    size=${pageSize}
+                    )}">
+                    다음
+                </a>
+
+            </div>
+
+
+
         </section>
 
-    </section>
 
 
 <!--    2. 입고등록 폼-->
@@ -118,8 +159,6 @@
 
                 <span class="section-status">확인 필요</span>
             </header>
-
-
 
 
             <div class="location-select-list">
@@ -172,7 +211,7 @@
 
                     <div class="detail-item">
                         <span>제품명</span>
-                        <strong th:text="${medicine.productName}">
+                        <strong id="selectedProductName" th:text="${medicine.productName}">
                         </strong>
                     </div>
 
@@ -422,26 +461,94 @@
                    <p class="field-error" th:if="${#fields.hasErrors('quantity')}" th:errors="*{quantity}"></p>
                </div>
 
+               <div class="input-field memo-field">
+                   <label for="memo">메모
+                       <span aria-hidden="true">*</span>
+
+                   </label>
+
+                   <textarea id="memo"
+                             th:field="*{memo}"
+                             maxlength="255"
+                             placeholder="입고 관련 특이사항을 입력해주세요."></textarea>
+               </div>
+
+
            </div>
        </section>
     </div>
 
+
         <div class="form-actions">
-            <button type="submit" th:disabled="${medicine == null}">입고 등록</button>
+            <button type="button" id="openSummaryButton" th:disabled="${medicine == null}">입고 등록</button>
         </div>
 
 
     </form>
 
+    </section>
+
+
+    <div id="summaryModal">
+        <div class="modal-content">
+
+            <h2>입고 정보 확인</h2>
+            <p>입력한 정보를 확인해주세요.</p>
+
+            <div class="summary-item">
+                <span>제품명</span>
+                <strong id="summaryProductName"></strong>
+            </div>
+
+            <div class="summary-item">
+                <span>저장소</span>
+                <strong id="summaryStorageName"></strong>
+            </div>
+
+            <div class="summary-item">
+                <span>구역</span>
+                <strong id="summaryZoneName"></strong>
+            </div>
+
+            <div class="summary-item">
+                <span>제조번호</span>
+                <strong id="summaryLotNumber"></strong>
+            </div>
+
+            <div class="summary-item">
+                <span>유통기한</span>
+                <strong id="summaryExpirationDate"></strong>
+            </div>
+
+            <div class="summary-item">
+                <span>수량</span>
+                <strong id="summaryQuantity"></strong>
+            </div>
+
+            <div class="summary-item">
+                <span>메모</span>
+                <strong id="summaryMemo"></strong>
+            </div>
+
+            <div class="model-actions">
+            <button type="button" id="closeSummaryButton">
+                수정
+            </button>
+
+            <button type="button" id="confirmInboundButton">
+                입고 등록
+            </button>
+            </div>
+
+        </div>
+    </div>
+
+
 
 </main>
 
-
-
-
-
-
-
-
 </body>
+
+
 </html>
+

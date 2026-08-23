@@ -6,7 +6,7 @@
 
 <head>
     <title>전체 재고 | iUnoT</title>
-    <link rel="stylesheet" th:href="@{/css/inventory/inventory-design.css}">
+    <link rel="stylesheet" th:href="@{/css/inventory-design.css}">
 </head>
 <body>
 
@@ -51,7 +51,7 @@
 
 
             <div class="table-wrap">
-                <table th:if="${inventories != null or !#lists.isEmpty(inventories.content)}">
+                <table th:if="${inventories != null or !#lists.isEmpty(inventories)}">
                     <thead>
                     <tr>
                         <th>의약품</th>
@@ -62,7 +62,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr th:each="item : ${inventories.content}" class="inventory-row">
+                    <tr th:each="item : ${inventories}" class="inventory-row" th:data-storage-id="${item.storageId}" th:data-pack-unit-id="${item.packUnitId}">
                         <td th:text="${item.productName}"></td>
                         <td th:text="${item.itemCode}"></td>
                         <td th:text="${item.expirationDate}"></td>
@@ -72,7 +72,7 @@
                     </tbody>
                 </table>
 
-                <p class="empty-message" th:if="${inventories == null or #lists.isEmpty(inventories.content)}">
+                <p class="empty-message" th:if="${inventories == null or #lists.isEmpty(inventories)}">
                     조회된 재고가 없습니다.
                 </p>
 
@@ -84,8 +84,14 @@
 <th:block layout:fragment="script">
     <script>
         document.querySelectorAll('tbody tr').forEach(row => {
+
             // 추후 경로 수정 필요
-            row.addEventListener('click', () => location.href = '/inventory-detail');
+            row.addEventListener('click', () => {
+                const storageId = row.dataset.storageId;
+                const packUnitId = row.dataset.packUnitId;
+                location.href = `/storages/${storageId}/pack-units/${packUnitId}`;
+
+            });
         });
     </script>
 </th:block>

@@ -1,11 +1,13 @@
 package com.nhnacademy.front.medicine.controller;
 
+import com.nhnacademy.front.global.dto.PageResponse;
 import com.nhnacademy.front.medicine.client.MedicineEnvApiClient;
 import com.nhnacademy.front.medicine.client.MedicineInfoApiClient;
 import com.nhnacademy.front.medicine.dto.EnvironmentType;
 import com.nhnacademy.front.inventory.dto.request.InboundMedicineRequest;
 import com.nhnacademy.front.medicine.dto.request.MedicineSearchRequest;
 import com.nhnacademy.front.medicine.dto.response.MedicineEnvironmentTypeResponse;
+import com.nhnacademy.front.medicine.dto.response.MedicineSearchResponse;
 import com.nhnacademy.front.organization.client.StorageApiClient;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +33,7 @@ public class MedicineSearchController {
 
     // 의약품 조회
     @GetMapping("/medicines")
-    public String getMedicines(@Valid @ModelAttribute MedicineSearchRequest medicineSearchRequest,
+    public String getMedicines(@Valid @ModelAttribute("medicineSearchRequest") MedicineSearchRequest medicineSearchRequest,
                                BindingResult bindingResult,
                                @RequestParam(
                                        name = "storageId",
@@ -60,8 +62,14 @@ public class MedicineSearchController {
         log.info(" 제품명 :{}",medicineSearchRequest.search());
 
 
+        PageResponse<MedicineSearchResponse> medicines = medicineInfoApiClient.getMedicines(medicineSearchRequest,page,size);
 
-        model.addAttribute("medicines", medicineInfoApiClient.getMedicines(medicineSearchRequest,page,size));
+        model.addAttribute("medicines",medicines);
+        model.addAttribute("currentPage",medicines.page());
+        model.addAttribute("totalPages",medicines.totalPages());
+        model.addAttribute("pageSize",medicines.size());
+
+
 
         return INBOUND_VIEW;
 

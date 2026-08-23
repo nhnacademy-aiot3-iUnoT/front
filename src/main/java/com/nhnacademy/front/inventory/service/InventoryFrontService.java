@@ -1,6 +1,9 @@
 package com.nhnacademy.front.inventory.service;
 
+import com.nhnacademy.front.global.dto.PageResponse;
 import com.nhnacademy.front.inventory.dto.response.InventoriesResponse;
+import com.nhnacademy.front.inventory.dto.response.InventoryDetailResponse;
+import com.nhnacademy.front.inventory.dto.response.InventoryInfoResponse;
 import com.nhnacademy.front.inventory.dto.response.StorageInfoResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -29,5 +32,21 @@ public class InventoryFrontService {
     }
 
 
+    public Integer getStorageQuantity(PageResponse<InventoryDetailResponse> responses){
+
+        int sum = 0;
+
+
+        List<InventoryDetailResponse> list = responses.content();
+
+        for(InventoryDetailResponse response : list){
+
+           sum += response.currentQuantity();
+
+        }
+
+        return sum;
+
+    }
 
 }

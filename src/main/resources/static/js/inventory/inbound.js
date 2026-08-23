@@ -481,6 +481,81 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (storageSelect && savedStorageId) {
         storageSelect.value = savedStorageId;
-        storageSelect.dispatchEvent(new Event('change'));
+        storageSelect.dispatchEvent(new Event("change"));
     }
+
+
+    const form = document.getElementById("inbound-form");
+    const modal = document.getElementById("summaryModal");
+
+    const openButton = document.getElementById("openSummaryButton");
+    const closeButton = document.getElementById("closeSummaryButton");
+    const confirmButton = document.getElementById("confirmInboundButton");
+
+    if (form && modal && openButton && closeButton && confirmButton) {
+
+        openButton.addEventListener("click", () => {
+
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const productName =
+                document.getElementById("selectedProductName")?.textContent.trim() ?? "";
+
+            const storageName =
+                storageSelect?.selectedOptions[0]?.textContent.trim() ?? "";
+
+            const zoneName =
+                zoneSelect?.selectedOptions[0]?.textContent.trim() ?? "";
+
+            const lotNumber =
+                form.querySelector("[name='lotNumber']")?.value ?? "";
+
+            const expirationDate =
+                form.querySelector("[name='expirationDate']")?.value ?? "";
+
+            const quantity =
+                form.querySelector("[name='quantity']")?.value ?? "";
+
+            const memo =
+                form.querySelector("[name='memo']")?.value ?? "";
+
+
+            document.getElementById("summaryProductName").textContent =
+                productName;
+
+            document.getElementById("summaryStorageName").textContent =
+                storageName;
+
+            document.getElementById("summaryZoneName").textContent =
+                zoneName;
+
+            document.getElementById("summaryLotNumber").textContent =
+                lotNumber;
+
+            document.getElementById("summaryExpirationDate").textContent =
+                expirationDate;
+
+            document.getElementById("summaryQuantity").textContent =
+                quantity;
+
+
+
+
+            modal.classList.add("show");
+        });
+
+        closeButton.addEventListener("click", () => {
+            modal.classList.remove("show");
+        });
+
+        confirmButton.addEventListener("click", () => {
+            form.requestSubmit();
+        });
+    }
+
+
 });
+
