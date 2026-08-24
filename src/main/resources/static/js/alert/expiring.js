@@ -1,8 +1,38 @@
-// /static/js/inventory/expiring.js
+// /static/js/alert/expiring.js
 
 document.addEventListener("DOMContentLoaded", function () {
+    loadStorages(); // 저장소 목록 먼저 불러오기
     loadExpiringInventories(0);
 });
+
+// 저장소 목록 조회 후 드롭다운 채우기
+function loadStorages() {
+    fetch('/api/core/storages', {
+        method: "GET",
+        credentials: 'include',
+        headers: {
+            "Content-Type": "application/json"
+        }
+    })
+        .then(response => response.json())
+        .then(result => {
+            const storages = result.data || result;
+            const selectElement = document.getElementById("search-storage");
+
+            if (Array.isArray(storages)) {
+                storages.forEach(storage => {
+                    const option = document.createElement("option");
+                    option.value = storage.storageId;
+                    // 예: [조직명] 저장소이름 형태로 표시
+                    option.textContent = `[${storage.organizationName}] ${storage.name}`;
+                    selectElement.appendChild(option);
+                });
+            }
+        })
+        .catch(error => {
+            console.error("저장소 목록 로딩 실패:", error);
+        });
+}
 
 // 유통기한 임박 재고 데이터 비동기 로드
 function loadExpiringInventories(page) {
@@ -17,6 +47,7 @@ function loadExpiringInventories(page) {
 
     fetch(url, {
         method: "GET",
+        credentials: 'include',
         headers: {
             "Content-Type": "application/json"
         }
