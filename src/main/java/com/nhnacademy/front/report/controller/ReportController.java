@@ -52,17 +52,10 @@ public class ReportController {
             periodStart = periodStart.with(DayOfWeek.MONDAY);
         }
 
-        try {
-            ReportInfoResponse report = reportApiClient.getWeeklyReport(storageId, periodStart);
-            model.addAttribute("report", report);
-            model.addAttribute("environmentJson", toEnvironmentJson(report));
-            model.addAttribute("zoneEnvironments", toZoneEnvironments(storageId, report));
-        } catch (Exception e) {
-            // 리포트가 아직 생성되지 않은 상태 -> report = null로 뷰 전달
-            log.info("주간 리포트가 아직 생성되지 않았습니다 (storageId={}, periodStart={})", storageId, periodStart);
-            model.addAttribute("report", null);
-        }
-
+        ReportInfoResponse report = reportApiClient.getWeeklyReport(storageId, periodStart);
+        model.addAttribute("report", report);
+        model.addAttribute("environmentJson", toEnvironmentJson(report));
+        model.addAttribute("zoneEnvironments", toZoneEnvironments(storageId, report));
         model.addAttribute("storageId", storageId);
         model.addAttribute("currentMonday", periodStart);
         model.addAttribute("lastMonday", lastMonday);
@@ -81,11 +74,7 @@ public class ReportController {
             @RequestParam(name = "periodStart")
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate periodStart
     ) {
-        try {
-            reportApiClient.createWeeklyReport(storageId, periodStart);
-        } catch (Exception e) {
-            log.error("주간 리포트 생성 실패: storageId={}, periodStart={}", storageId, periodStart, e);
-        }
+        reportApiClient.createWeeklyReport(storageId, periodStart);
 
         return "redirect:/storages/" + storageId + "/reports/weekly?periodStart=" + periodStart;
     }
@@ -97,15 +86,12 @@ public class ReportController {
             @RequestParam(name = "periodStart", required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate periodStart
     ) {
-        try {
-            reportApiClient.retryAiSummary(storageId, reportId);
-        } catch (Exception e) {
-            log.error("AI 요약 생성을 재시도하는 도중 오류가 발생했습니다: {}", reportId, e);
-        }
+        reportApiClient.retryAiSummary(storageId, reportId);
 
         if (periodStart != null) {
             return "redirect:/storages/" + storageId + "/reports/weekly?periodStart=" + periodStart;
         }
+
         return "redirect:/storages/" + storageId + "/reports/weekly";
     }
 
