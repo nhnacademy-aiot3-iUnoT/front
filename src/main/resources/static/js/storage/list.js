@@ -26,8 +26,10 @@ function loadDepartmentsForModal() {
             if (!response.ok) throw new Error('부서 목록을 불러오지 못했습니다.');
             return response.json();
         })
-        .then(departments => {
-            container.innerHTML = ''; // 로딩 문구 제거
+        .then(result => {
+            container.innerHTML = '';
+
+            const departments = result.data || [];
 
             if (!departments || departments.length === 0) {
                 container.innerHTML = '<span style="color: #888; font-size: 13px;">등록된 부서가 없습니다.</span>';
@@ -35,7 +37,6 @@ function loadDepartmentsForModal() {
             }
 
             departments.forEach(dept => {
-                // ACTIVE 상태인 부서만 보여주거나 전체를 보여줄 수 있습니다. (원하는 대로 조건 추가 가능)
                 const label = document.createElement('label');
 
                 const checkbox = document.createElement('input');
@@ -45,7 +46,7 @@ function loadDepartmentsForModal() {
                 checkbox.style.marginRight = '6px';
 
                 label.appendChild(checkbox);
-                label.append(`${dept.name} (${dept.status})`); // 필요에 따라 상태 표시 조절 가능
+                label.append(`${dept.name} (${dept.status})`);
 
                 container.appendChild(label);
             });
