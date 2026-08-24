@@ -10,14 +10,7 @@ public record ZoneInfoResponse(
         Long zoneId,
         Long storageId,
         String name,
-        String description,
         ZoneStatus status,
-        EnvStatus envStatus,
-        LocalDateTime createdAt,
-        LocalDateTime updatedAt
-
-
-
-
+        EnvStatus envStatus
 ) {
 }
