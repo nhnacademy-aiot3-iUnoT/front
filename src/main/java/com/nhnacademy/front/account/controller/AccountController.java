@@ -30,29 +30,35 @@ public class AccountController {
     private final AccessTokenCookieManager cookieManager;
 
     @GetMapping("/mypage")
-    public String info(
-            Model model
-    ) {
-
-        AccountInfoResponse response = accountApiClient.getAccountInfo();
-        model.addAttribute("accountInfoResponse", response);
-
+    public String info(Model model) {
+        populateAccountInfoModel(model);
         return "account/account-info";
     }
 
     @PutMapping("/mypage")
     public String changeName(
-            @Valid @ModelAttribute UpdateAccountNameRequest request,
+            @Valid @ModelAttribute("nameRequest") UpdateAccountNameRequest request,
             BindingResult bindingResult,
+            Model model,
             RedirectAttributes redirectAttributes
     ) {
         if (bindingResult.hasErrors()) {
-            return "redirect:/mypage";
+            populateAccountInfoModel(model);
+            return "account/account-info";
         }
 
         accountApiClient.changeName(request);
         redirectAttributes.addFlashAttribute("successMessage", "회원정보가 수정되었습니다.");
         return "redirect:/mypage";
+    }
+
+    private void populateAccountInfoModel(Model model) {
+        AccountInfoResponse response = accountApiClient.getAccountInfo();
+        model.addAttribute("accountInfoResponse", response);
+
+        if (!model.containsAttribute("nameRequest")) {
+            model.addAttribute("nameRequest", new UpdateAccountNameRequest(response.name()));
+        }
     }
 
     @GetMapping("/mypage/change-password")

@@ -17,12 +17,17 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.validation.BindingResult;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.never;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -53,7 +58,10 @@ class AccountControllerTest {
         mockMvc.perform(get("/mypage"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("account/account-info"))
-                .andExpect(model().attribute("accountInfoResponse", response));
+                .andExpect(model().attribute("accountInfoResponse", response))
+                .andExpect(model().attribute(
+                        "nameRequest", new UpdateAccountNameRequest(response.name())
+                ));
 
         then(accountApiClient).should().getAccountInfo();
     }
@@ -75,12 +83,32 @@ class AccountControllerTest {
 
     @Test
     void changeNameError() throws Exception {
-        mockMvc.perform(put("/mypage"))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(view().name("redirect:/mypage"))
-                .andExpect(redirectedUrl("/mypage"));
+        AccountInfoResponse response = new AccountInfoResponse(
+                "test@test.com", "기존 이름", AccountRole.USER,
+                LocalDateTime.of(2026, 8, 5, 12, 0)
+        );
+        given(accountApiClient.getAccountInfo()).willReturn(response);
 
-        then(accountApiClient).shouldHaveNoInteractions();
+        MvcResult result = mockMvc.perform(put("/mypage").param("name", "   "))
+                .andExpect(status().isOk())
+                .andExpect(view().name("account/account-info"))
+                .andExpect(model().attribute("accountInfoResponse", response))
+                .andExpect(model().attributeHasFieldErrors("nameRequest", "name"))
+                .andReturn();
+
+        assertThat(fieldErrorMessage(result, "nameRequest", "name"))
+                .isEqualTo("이름을 입력해주세요.");
+
+        then(accountApiClient).should().getAccountInfo();
+        then(accountApiClient).should(never()).changeName(any());
+    }
+
+    private static String fieldErrorMessage(MvcResult result, String objectName, String field) {
+        BindingResult bindingResult = (BindingResult) Objects.requireNonNull(result.getModelAndView())
+                .getModel()
+                .get(BindingResult.MODEL_KEY_PREFIX + objectName);
+
+        return Objects.requireNonNull(bindingResult.getFieldError(field)).getDefaultMessage();
     }
 
     @Test

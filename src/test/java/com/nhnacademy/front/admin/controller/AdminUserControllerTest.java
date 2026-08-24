@@ -15,12 +15,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.validation.BindingResult;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -199,11 +203,15 @@ class AdminUserControllerTest {
         );
         given(adminApiClient.getUser(user.uuid())).willReturn(user);
 
-        mockMvc.perform(put("/admin/users/{uuid}/name", user.uuid())
+        MvcResult result = mockMvc.perform(put("/admin/users/{uuid}/name", user.uuid())
                         .param("name", "   "))
                 .andExpect(status().isOk())
                 .andExpect(view().name("admin/user-detail"))
-                .andExpect(model().attributeHasFieldErrors("nameRequest", "name"));
+                .andExpect(model().attributeHasFieldErrors("nameRequest", "name"))
+                .andReturn();
+
+        assertThat(fieldErrorMessage(result, "nameRequest", "name"))
+                .isEqualTo("이름을 입력해주세요.");
 
         then(adminApiClient).should(never()).updateName(any(), any());
     }
@@ -229,13 +237,25 @@ class AdminUserControllerTest {
         );
         given(adminApiClient.getUser(user.uuid())).willReturn(user);
 
-        mockMvc.perform(put("/admin/users/{uuid}/password", user.uuid())
+        MvcResult result = mockMvc.perform(put("/admin/users/{uuid}/password", user.uuid())
                         .param("password", "123"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("admin/user-detail"))
-                .andExpect(model().attributeHasFieldErrors("passwordRequest", "password"));
+                .andExpect(model().attributeHasFieldErrors("passwordRequest", "password"))
+                .andReturn();
+
+        assertThat(fieldErrorMessage(result, "passwordRequest", "password"))
+                .isEqualTo("새 비밀번호는 6자 이상 64자 이하여야 합니다.");
 
         then(adminApiClient).should(never()).updatePassword(any(), any());
+    }
+
+    private static String fieldErrorMessage(MvcResult result, String objectName, String field) {
+        BindingResult bindingResult = (BindingResult) Objects.requireNonNull(result.getModelAndView())
+                .getModel()
+                .get(BindingResult.MODEL_KEY_PREFIX + objectName);
+
+        return Objects.requireNonNull(bindingResult.getFieldError(field)).getDefaultMessage();
     }
 
     @Test
