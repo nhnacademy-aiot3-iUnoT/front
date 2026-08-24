@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/admin-layout}">
+
+<head>
+    <meta charset="UTF-8">
+    <title>회원 관리</title>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+    <link rel="stylesheet" th:href="@{/css/status.css}">
+</head>
+
+<body>
+<div layout:fragment="content">
+    <div class="page-header d-print-none mt-3">
+        <div class="row align-items-center g-3">
+            <div class="col">
+                <h2 class="page-title">회원 관리</h2>
+                <div class="text-secondary">회원을 검색하고 계정 정보와 상태를 관리합니다.</div>
+            </div>
+            <div class="col-auto ms-auto">
+                <a class="btn btn-primary" th:href="@{/admin/users/new}">
+                    <i class="ti ti-user-plus me-1"></i>
+                    관리자 생성
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="alert alert-success mt-4" role="alert" th:if="${successMessage}">
+        <i class="ti ti-circle-check me-1"></i>
+        <span th:text="${successMessage}"></span>
+    </div>
+
+    <div class="row row-cards mt-2">
+        <div class="col-sm-4">
+            <div class="card user-summary-card">
+                <div class="card-body">
+                    <div class="text-secondary">전체 회원</div>
+                    <div class="h2 mb-0" th:text="${totalUserCount}">0</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="card user-summary-card">
+                <div class="card-body">
+                    <div class="text-secondary">활성 계정</div>
+                    <div class="h2 mb-0" th:text="${activeCount}">0</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="card user-summary-card">
+                <div class="card-body">
+                    <div class="text-secondary">관리자</div>
+                    <div class="h2 mb-0" th:text="${adminCount}">0</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mt-4 admin-filter-card">
+        <div class="card-body">
+            <form class="row g-3 align-items-end" th:action="@{/admin/users}" method="get">
+                <div class="col-lg-4 col-md-6">
+                    <label class="form-label" for="keyword">회원 검색</label>
+                    <div class="input-icon">
+                        <span class="input-icon-addon"><i class="ti ti-search"></i></span>
+                        <input id="keyword"
+                               class="form-control"
+                               type="search"
+                               name="keyword"
+                               placeholder="이름 또는 이메일"
+                               th:value="${keyword}">
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-3">
+                    <label class="form-label" for="role">권한</label>
+                    <select id="role" class="form-select" name="role">
+                        <option value="">전체 권한</option>
+                        <option th:each="roleOption : ${roles}"
+                                th:value="${roleOption}"
+                                th:selected="${roleOption == selectedRole}"
+                                th:text="${roleOption.name() == 'ADMIN' ? '관리자' : '일반 회원'}"></option>
+                    </select>
+                </div>
+                <div class="col-lg-2 col-md-3">
+                    <label class="form-label" for="status">상태</label>
+                    <select id="status" class="form-select" name="status">
+                        <option value="">전체 상태</option>
+                        <option th:each="statusOption : ${statuses}"
+                                th:value="${statusOption}"
+                                th:selected="${statusOption == selectedStatus}"
+                                th:text="${statusOption.ko}"></option>
+                    </select>
+                </div>
+                <div class="col-lg-2 col-md-4">
+                    <label class="form-label" for="sort">정렬</label>
+                    <select id="sort" class="form-select" name="sort">
+                        <option th:each="sortOption : ${sortTypes}"
+                                th:value="${sortOption}"
+                                th:selected="${sortOption == selectedSort}"
+                                th:text="${sortOption.ko}"></option>
+                    </select>
+                </div>
+                <div class="col-lg-1 col-md-4">
+                    <label class="form-label" for="size">표시</label>
+                    <select id="size" class="form-select" name="size">
+                        <option th:each="pageSize : ${pageSizes}"
+                                th:value="${pageSize}"
+                                th:selected="${pageSize == users.size}"
+                                th:text="${pageSize}"></option>
+                    </select>
+                </div>
+                <div class="col-lg-1 col-md-4 d-flex gap-2">
+                    <button class="btn btn-primary flex-fill" type="submit" aria-label="검색">
+                        <i class="ti ti-search"></i>
+                    </button>
+                    <a class="btn btn-outline-secondary" th:href="@{/admin/users}" aria-label="검색 초기화">
+                        <i class="ti ti-refresh"></i>
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card mt-4">
+        <div class="card-header">
+            <div>
+                <h3 class="card-title">회원 목록</h3>
+                <div class="text-secondary small">
+                    검색 결과 <strong th:text="${users.totalElements}">0</strong>명
+                </div>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-vcenter table-hover card-table">
+                <thead>
+                <tr>
+                    <th>회원</th>
+                    <th>권한</th>
+                    <th>상태</th>
+                    <th>가입일</th>
+                    <th>최종 수정</th>
+                    <th class="text-end">관리</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${#lists.isEmpty(users.content)}">
+                    <td colspan="6" class="text-center text-secondary py-5">
+                        <div class="mb-2"><i class="ti ti-user-search fs-1"></i></div>
+                        조건에 맞는 회원이 없습니다.
+                    </td>
+                </tr>
+                <tr th:each="user : ${users.content}">
+                    <td>
+                        <div class="d-flex align-items-center gap-3">
+                            <span class="avatar user-avatar"
+                                  th:text="${user.name != null and !user.name.isBlank() ? #strings.substring(user.name, 0, 1) : '?'}">?</span>
+                            <div>
+                                <div class="fw-medium" th:text="${user.name != null ? user.name : '탈퇴 회원'}"></div>
+                                <div class="text-secondary small" th:text="${user.email != null ? user.email : '-'}"></div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge role-badge"
+                              th:classappend="${user.accountRole.name() == 'ADMIN'} ? ' role-admin' : ' role-user'"
+                              th:text="${user.accountRole.name() == 'ADMIN' ? '관리자' : '일반 회원'}"></span>
+                    </td>
+                    <td>
+                        <span class="badge status-badge"
+                              th:classappend="' status-' + ${user.accountStatus.name().toLowerCase()}"
+                              th:text="${user.accountStatus.ko}"></span>
+                    </td>
+                    <td class="text-secondary"
+                        th:text="${user.createdAt != null ? #temporals.format(user.createdAt, 'yyyy-MM-dd HH:mm') : '-'}"></td>
+                    <td class="text-secondary"
+                        th:text="${user.updatedAt != null ? #temporals.format(user.updatedAt, 'yyyy-MM-dd HH:mm') : '-'}"></td>
+                    <td class="text-end">
+                        <a class="btn btn-sm btn-outline-secondary"
+                           th:href="@{/admin/users/{uuid}(uuid=${user.uuid})}">
+                            상세 / 수정
+                        </a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card-footer d-flex flex-column flex-md-row align-items-center justify-content-between gap-3"
+             th:if="${users.totalPages > 0}">
+            <div class="text-secondary small"
+                 th:text="|${users.page + 1} / ${users.totalPages} 페이지|">1 / 1 페이지</div>
+            <ul class="pagination m-0">
+                <li class="page-item" th:classappend="${users.page == 0} ? 'disabled'">
+                    <a class="page-link"
+                       th:href="@{/admin/users(page=${users.page - 1},size=${users.size},keyword=${keyword},role=${selectedRole},status=${selectedStatus},sort=${selectedSort})}">
+                        이전
+                    </a>
+                </li>
+                <li class="page-item"
+                    th:each="pageNumber : ${pageNumbers}"
+                    th:classappend="${pageNumber == users.page} ? 'active'">
+                    <a class="page-link"
+                       th:href="@{/admin/users(page=${pageNumber},size=${users.size},keyword=${keyword},role=${selectedRole},status=${selectedStatus},sort=${selectedSort})}"
+                       th:text="${pageNumber + 1}"></a>
+                </li>
+                <li class="page-item" th:classappend="${users.last} ? 'disabled'">
+                    <a class="page-link"
+                       th:href="@{/admin/users(page=${users.page + 1},size=${users.size},keyword=${keyword},role=${selectedRole},status=${selectedStatus},sort=${selectedSort})}">
+                        다음
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+</body>
+</html>

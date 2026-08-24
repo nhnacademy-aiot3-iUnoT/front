@@ -31,7 +31,7 @@
                             기본 정보
                         </h2>
 
-                        <form th:action="@{/mypage}" th:method="put">
+                        <form th:action="@{/mypage}" th:method="put" th:object="${nameRequest}">
                             <div class="account-panel">
                                 <div class="account-row">
                                     <div class="account-label">
@@ -50,11 +50,12 @@
                                     <div class="account-value">
                                         <input type="text"
                                                id="name"
-                                               name="name"
                                                class="form-control"
-                                               th:value="${accountInfoResponse.name}"
+                                               th:field="*{name}"
+                                               th:classappend="${#fields.hasErrors('name')} ? 'is-invalid'"
                                                maxlength="100"
                                                required>
+                                        <div class="invalid-feedback" th:errors="*{name}"></div>
                                     </div>
                                 </div>
 

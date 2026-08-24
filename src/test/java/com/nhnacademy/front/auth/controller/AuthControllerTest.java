@@ -12,13 +12,14 @@ import com.nhnacademy.front.auth.dto.response.CheckEmailResponse;
 import com.nhnacademy.front.auth.dto.response.LoginResponse;
 import com.nhnacademy.front.auth.dto.response.SignupResponse;
 import com.nhnacademy.front.auth.validator.PasswordResetFormValidator;
+import com.nhnacademy.front.global.security.AccessTokenCookieManager;
 import com.nhnacademy.front.organization.client.InvitationApiClient;
 import com.nhnacademy.front.organization.client.OrganizationApiClient;
+import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -26,7 +27,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.List;
 import java.util.Map;
 
-import static org.hamcrest.Matchers.containsString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -38,26 +40,37 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class AuthControllerTest {
 
     @Autowired
-    MockMvc mockMvc;
+    private MockMvc mockMvc;
 
     @MockitoBean
-    AuthApiClient authApiClient;
+    private AuthApiClient authApiClient;
 
     @MockitoBean
-    AccountApiClient accountApiClient;
+    private AccessTokenCookieManager cookieManager;
 
     @MockitoBean
-    OrganizationApiClient organizationApiClient;
+    private AccountApiClient accountApiClient;
 
     @MockitoBean
-    InvitationApiClient invitationApiClient;
+    private OrganizationApiClient organizationApiClient;
+
+    @MockitoBean
+    private InvitationApiClient invitationApiClient;
 
     @Test
-    void login() throws Exception {
+    void anonymousUserCanOpenLoginPage() throws Exception {
         mockMvc.perform(get("/login"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("auth/login"))
                 .andExpect(model().attribute("loginRequest", new LoginRequest()));
+    }
+
+    @Test
+    void authenticatedUserIsRedirectedFromLoginToHome() throws Exception {
+        mockMvc.perform(get("/login").principal(() -> "account"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name("redirect:/"))
+                .andExpect(redirectedUrl("/"));
     }
 
     @Test
@@ -85,7 +98,7 @@ class AuthControllerTest {
     }
 
     @Test
-    void loginPost() throws Exception {
+    void loginAddsAccessTokenCookieAndRedirectsToSuccessPage() throws Exception {
         LoginRequest request = new LoginRequest("test@test.com", "password");
         LoginResponse response = new LoginResponse("access-token");
 
@@ -96,32 +109,23 @@ class AuthControllerTest {
                         .param("password", request.password()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name("redirect:/login/success"))
-                .andExpect(redirectedUrl("/login/success"))
-                .andExpect(header().string(
-                        HttpHeaders.SET_COOKIE,
-                        containsString("access_token=access-token")))
-                .andExpect(header().string(
-                        HttpHeaders.SET_COOKIE,
-                        containsString("HttpOnly")))
-                .andExpect(header().string(
-                        HttpHeaders.SET_COOKIE,
-                        containsString("SameSite=Lax")));
+                .andExpect(redirectedUrl("/login/success"));
 
         then(authApiClient).should().login(request);
+        then(cookieManager).should().add(
+                any(HttpServletResponse.class),
+                eq(response.accessToken())
+        );
     }
 
     @Test
-    void logout() throws Exception {
+    void logoutDeletesAccessTokenCookieAndRedirectsToLogin() throws Exception {
         mockMvc.perform(post("/logout"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name("redirect:/login"))
-                .andExpect(redirectedUrl("/login"))
-                .andExpect(header().string(
-                        HttpHeaders.SET_COOKIE,
-                        containsString("access_token=")))
-                .andExpect(header().string(
-                        HttpHeaders.SET_COOKIE,
-                        containsString("Max-Age=0")));
+                .andExpect(redirectedUrl("/login"));
+
+        then(cookieManager).should().delete(any(HttpServletResponse.class));
     }
 
     @Test
@@ -284,7 +288,7 @@ class AuthControllerTest {
     }
 
     @Test
-    void ResetPasswordForm() throws Exception {
+    void resetPasswordForm() throws Exception {
         String token = "t".repeat(64);
 
         mockMvc.perform(get("/pwd/{token}", token))

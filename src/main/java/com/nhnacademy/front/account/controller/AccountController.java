@@ -1,18 +1,16 @@
 package com.nhnacademy.front.account.controller;
 
 import com.nhnacademy.front.account.client.AccountApiClient;
+import com.nhnacademy.front.account.dto.request.ChangeOwnPasswordRequest;
 import com.nhnacademy.front.account.dto.request.ChangePasswordFormRequest;
 import com.nhnacademy.front.account.dto.request.UpdateAccountNameRequest;
-import com.nhnacademy.front.account.dto.request.UpdateAccountPasswordRequest;
 import com.nhnacademy.front.account.dto.request.WithdrawAccountRequest;
 import com.nhnacademy.front.account.dto.response.AccountInfoResponse;
 import com.nhnacademy.front.account.validator.PasswordFormValidator;
+import com.nhnacademy.front.global.security.AccessTokenCookieManager;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import jakarta.ws.rs.core.HttpHeaders;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -23,42 +21,44 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.time.Duration;
-
 @Controller
 @RequiredArgsConstructor
 public class AccountController {
 
     private final AccountApiClient accountApiClient;
     private final PasswordFormValidator passwordFormValidator;
-
-    @Value("${cookie.secure:false}")
-    private boolean secure;
+    private final AccessTokenCookieManager cookieManager;
 
     @GetMapping("/mypage")
-    public String info(
-            Model model
-    ) {
-
-        AccountInfoResponse response = accountApiClient.getAccountInfo();
-        model.addAttribute("accountInfoResponse", response);
-
+    public String info(Model model) {
+        populateAccountInfoModel(model);
         return "account/account-info";
     }
 
     @PutMapping("/mypage")
     public String changeName(
-            @Valid @ModelAttribute UpdateAccountNameRequest request,
+            @Valid @ModelAttribute("nameRequest") UpdateAccountNameRequest request,
             BindingResult bindingResult,
+            Model model,
             RedirectAttributes redirectAttributes
     ) {
         if (bindingResult.hasErrors()) {
-            return "redirect:/mypage";
+            populateAccountInfoModel(model);
+            return "account/account-info";
         }
 
         accountApiClient.changeName(request);
         redirectAttributes.addFlashAttribute("successMessage", "회원정보가 수정되었습니다.");
         return "redirect:/mypage";
+    }
+
+    private void populateAccountInfoModel(Model model) {
+        AccountInfoResponse response = accountApiClient.getAccountInfo();
+        model.addAttribute("accountInfoResponse", response);
+
+        if (!model.containsAttribute("nameRequest")) {
+            model.addAttribute("nameRequest", new UpdateAccountNameRequest(response.name()));
+        }
     }
 
     @GetMapping("/mypage/change-password")
@@ -78,7 +78,10 @@ public class AccountController {
             return "account/change-password";
         }
 
-        accountApiClient.changePassword(new UpdateAccountPasswordRequest(request.newPassword()));
+        accountApiClient.changePassword(new ChangeOwnPasswordRequest(
+                request.currentPassword(),
+                request.newPassword()
+        ));
         return "redirect:/mypage";
     }
 
@@ -99,15 +102,7 @@ public class AccountController {
 
         accountApiClient.withdraw(request);
 
-        ResponseCookie cookie = ResponseCookie.from("access_token", "")
-                .httpOnly(true)
-                .secure(secure)
-                .sameSite("Lax")
-                .path("/")
-                .maxAge(Duration.ZERO)
-                .build();
-
-        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+        cookieManager.delete(response);
 
         return "redirect:/login";
     }

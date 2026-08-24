@@ -13,12 +13,12 @@
     background-color: var(--mint);
 }
 
-.status-inactive, .status-reissued {
+.status-inactive, .status-reissued, .status-withdrawn {
     color: var(--ink-soft);
     background-color: var(--line);
 }
 
-.status-suspended, .status-canceled {
+.status-suspended, .status-canceled, .status-locked {
     color: var(--danger);
     background-color: var(--danger-soft);
 }
