@@ -22,8 +22,8 @@ public class ReportApiClient {
         );
     }
 
-    public ReportInfoResponse createWeeklyReport(Long storageId, LocalDate periodStart) {
-        return gatewayClient.post(
+    public void createWeeklyReport(Long storageId, LocalDate periodStart) {
+        gatewayClient.post(
                 CORE_SERVICE + "/storages/" + storageId + "/reports/weekly",
                 new ReportCreateRequest(periodStart),
                 ReportInfoResponse.class
@@ -38,10 +38,6 @@ public class ReportApiClient {
     }
 
     public void retryAiSummary(Long storageId, Long reportId) {
-        gatewayClient.post(
-                CORE_SERVICE + "/storages/" + storageId + "/reports/" + reportId + "/ai-summary/retry",
-                null,
-                Void.class
-        );
+        gatewayClient.post(CORE_SERVICE + "/storages/" + storageId + "/reports/" + reportId + "/ai-summary/retry");
     }
 }
