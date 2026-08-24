@@ -203,7 +203,7 @@ public class GatewayClient {
     private ApiException convertApiException(HttpStatusCodeException e) {
         String responseBody = e.getResponseBodyAsString();
 
-        log.error(
+        log.warn(
                 "Gateway request failed. status={}, body={}",
                 e.getStatusCode(),
                 responseBody
