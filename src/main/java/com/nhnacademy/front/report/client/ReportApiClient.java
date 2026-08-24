@@ -25,9 +25,7 @@ public class ReportApiClient {
     public void createWeeklyReport(Long storageId, LocalDate periodStart) {
         gatewayClient.post(
                 CORE_SERVICE + "/storages/" + storageId + "/reports/weekly",
-                new ReportCreateRequest(periodStart),
-                ReportInfoResponse.class
-        );
+                new ReportCreateRequest(periodStart));
     }
 
     public ReportInfoResponse getReport(Long storageId, Long reportId) {
