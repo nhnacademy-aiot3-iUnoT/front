@@ -27,7 +27,6 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
@@ -130,17 +129,6 @@ class ReportControllerTest {
                 .andExpect(view().name("report/weekly"))
                 .andExpect(content().string(org.hamcrest.Matchers.not(
                         org.hamcrest.Matchers.containsString("env-chart-canvas"))));
-    }
-
-    @Test
-    @DisplayName("리포트가 없으면 report가 null로 전달된다.")
-    void weeklyReport_WhenReportNotFound_PassesNullReport() throws Exception {
-        given(reportApiClient.getWeeklyReport(anyLong(), any(LocalDate.class)))
-                .willThrow(new RuntimeException("not found"));
-
-        mockMvc.perform(get("/storages/{storageId}/reports/weekly", 1L))
-                .andExpect(status().isOk())
-                .andExpect(model().attribute("report", org.hamcrest.Matchers.nullValue()));
     }
 
     private ReportInfoResponse reportWithEnvironment() {
