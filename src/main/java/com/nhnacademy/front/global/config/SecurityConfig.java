@@ -79,7 +79,9 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/login",
                                 "/signup",
+                                "/check-email",
                                 "/forgot-password",
+                                "/.well-known/jwks.json",
                                 "/pwd/**",
                                 "/403",
                                 "/css/**",
