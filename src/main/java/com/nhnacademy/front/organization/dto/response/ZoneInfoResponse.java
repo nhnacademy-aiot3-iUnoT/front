@@ -6,6 +6,7 @@ import com.nhnacademy.front.organization.dto.ZoneStatus;
 import java.time.LocalDateTime;
 
 public record ZoneInfoResponse(
+
         Long zoneId,
         Long storageId,
         String name,

@@ -71,12 +71,50 @@ tr.clickable-row:hover { background-color: #f1f5f9; }
 .modal-box label { display: block; margin-top: 14px; margin-bottom: 6px; font-weight: 600; font-size: 13px; color: #555; }
 
 /* 이름 입력 input */
-.modal-box input { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 4px; box-sizing: border-box; font-size: 14px; }
+.modal-box input[type="text"] { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 4px; box-sizing: border-box; font-size: 14px; }
 
 /* 설명 입력 textarea */
-.modal-box textarea { width: 100%; height: 100px; padding: 10px; border: 1px solid #cbd5e1; border-radius: 4px; box-sizing: border-box; font-family: inherit; font-size: 14px; resize: vertical; }
+.modal-box textarea { width: 100%; height: 90px; padding: 10px; border: 1px solid #cbd5e1; border-radius: 4px; box-sizing: border-box; font-family: inherit; font-size: 14px; resize: vertical; }
+
+/* 💡 [정돈됨] 부서 선택 스크롤 박스 스타일 (input/textarea 테두리 및 폰트 통일) */
+.department-scroll-box {
+    max-height: 140px;
+    overflow-y: auto;
+    border: 1px solid #cbd5e1;
+    padding: 10px;
+    border-radius: 4px;
+    background-color: #fff;
+    text-align: left;
+    box-sizing: border-box;
+}
+
+/* 💡 [정돈됨] 스크롤 박스 내부의 체크박스 라벨 정렬 */
+.department-scroll-box label {
+    display: flex;
+    align-items: center;
+    font-weight: normal;
+    font-size: 14px;
+    color: #333;
+    margin-top: 0;
+    margin-bottom: 8px;
+    cursor: pointer;
+}
+
+.department-scroll-box label:last-child {
+    margin-bottom: 0;
+}
+
+/* 체크박스와 텍스트 간격 조정 */
+.department-scroll-box input[type="checkbox"] {
+    margin-right: 8px;
+    width: 16px;
+    height: 16px;
+    accent-color: #2563eb; /* 체크 시 파란색 포인트 */
+    cursor: pointer;
+}
 
 .modal-actions { margin-top: 25px; text-align: right; }
 .modal-actions button { padding: 8px 16px; border-radius: 4px; cursor: pointer; border: 1px solid #cbd5e1; font-weight: 500; font-size: 14px; }
 .modal-actions button:first-child { background-color: #fff; color: #333; margin-right: 8px; }
 .modal-actions button:last-child { background-color: #2563eb; color: #fff; border: none; }
+.modal-actions button:hover { opacity: 0.9; }

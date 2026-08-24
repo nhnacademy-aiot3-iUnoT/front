@@ -14,7 +14,13 @@
     <div class="table-container">
         <!-- 상단 타이틀 및 전체 삭제 버튼 -->
         <div class="header-flex" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h2>🔔 알림 센터</h2>
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <h2>🔔 알림 센터</h2>
+                <!-- 유통기한 임박 재고 페이지로 이동하는 링크 버튼 -->
+                <a th:href="@{/expiring}" class="btn-secondary" style="padding: 6px 12px; background: #e2e8f0; color: #334155; text-decoration: none; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">
+                    ⏳ 임박 재고 조회
+                </a>
+            </div>
             <button type="button" class="btn-danger" th:if="${canManage}" onclick="deleteAllAlerts()">전체 삭제</button>
         </div>
 
