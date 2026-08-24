@@ -1,5 +1,3 @@
-const GATEWAY_URL = 'http://localhost:10400';
-
 // 모달 열기
 function openUpdateModal() {
     document.getElementById('update-modal').style.display = 'flex';
@@ -38,11 +36,12 @@ function updateZoneSensor() {
         return;
     }
 
-    fetch(`${GATEWAY_URL}/api/core/zones/${zoneId}/zone-sensors/${sensorId}`, {
+    fetch(`/api/core/zones/${zoneId}/zone-sensors/${sensorId}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({
             name: name,
             description: description === '' ? null : description
@@ -70,8 +69,9 @@ function deleteZoneSensor(zoneId, sensorId) {
         return;
     }
 
-    fetch(`${GATEWAY_URL}/api/core/zones/${zoneId}/zone-sensors/${sensorId}`, {
-        method: 'DELETE'
+    fetch(`/api/core/zones/${zoneId}/zone-sensors/${sensorId}`, {
+        method: 'DELETE',
+        credentials: 'include'
     })
         .then(response => {
             if (response.ok || response.status === 204) {

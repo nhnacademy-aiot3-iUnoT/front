@@ -3,6 +3,10 @@ package com.nhnacademy.front.organization.controller;
 import com.nhnacademy.front.organization.client.ThresholdZoneApiClient;
 import com.nhnacademy.front.organization.client.ZoneThresholdApiClient;
 import com.nhnacademy.front.organization.dto.response.ThresholdSpecResponse;
+import com.nhnacademy.front.organization.client.OrganizationMemberApiClient;
+import com.nhnacademy.front.organization.client.ZoneThresholdApiClient;
+import com.nhnacademy.front.organization.dto.OrganizationRole;
+import com.nhnacademy.front.organization.dto.response.OrganizationMemberRoleResponse;
 import com.nhnacademy.front.organization.dto.response.ZoneThresholdDetailResponse;
 
 import lombok.RequiredArgsConstructor;
@@ -24,6 +28,7 @@ import java.util.List;
 public class ZoneThresholdController {
     private final ZoneThresholdApiClient thresholdApiClient;
     private final ThresholdZoneApiClient thresholdZoneApiClient;
+    private final OrganizationMemberApiClient organizationMemberApiClient;
 
     @GetMapping("/{zone-id}/zone-thresholds/{zone-threshold-id}")
     public String getZoneSensorDetail(
@@ -33,8 +38,14 @@ public class ZoneThresholdController {
     ){
         ZoneThresholdDetailResponse threshold = thresholdApiClient
                 .getZoneThreshold(zoneId, zoneThresholdId);
+        OrganizationMemberRoleResponse roleResponse = organizationMemberApiClient.getRole();
+        boolean canManage = (
+                roleResponse.role() == OrganizationRole.ORG_BOSS ||
+                        roleResponse.role() == OrganizationRole.ORG_OWNER
+        );
 
         model.addAttribute("threshold", threshold);
+        model.addAttribute("canManage", canManage);
 
         return "zone-threshold/detail";
     }
