@@ -13,6 +13,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
 
@@ -25,6 +26,7 @@ public class ZoneController {
     private final ZoneThresholdApiClient thresholdApiClient;
     private final ZoneSensorApiClient sensorApiClient;
     private final OrganizationMemberApiClient organizationMemberApiClient;
+
 
     @GetMapping("/{storage-id}/zones/{zone-id}")
     public String getZoneDetail(
@@ -50,4 +52,16 @@ public class ZoneController {
 
         return "zone/detail";
     }
+
+
+    // 해당 저장소의 구역 찾기
+    @GetMapping("/storages/{storage-id}/zones")
+    @ResponseBody
+    public List<ZoneInfoResponse> getZones(@PathVariable(name="storage-id")Long storageId){
+
+        return zoneApiClient.getZones(storageId);
+    }
+
+
+
 }

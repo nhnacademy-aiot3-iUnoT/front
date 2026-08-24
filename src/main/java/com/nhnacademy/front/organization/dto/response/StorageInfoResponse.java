@@ -5,10 +5,15 @@ import com.nhnacademy.front.organization.dto.StorageStatus;
 import java.time.LocalDateTime;
 
 public record StorageInfoResponse(
+
         Long storageId,
         Long organizationId,
-        String organizationName,
         String name,
-        StorageStatus status
+        String description,
+        StorageStatus status,
+        LocalDateTime createdAt,
+        LocalDateTime updatedAt
+
+
 ) {
 }
