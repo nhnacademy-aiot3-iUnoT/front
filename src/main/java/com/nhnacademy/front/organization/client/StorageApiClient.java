@@ -17,6 +17,8 @@ public class StorageApiClient {
     private final GatewayClient gatewayClient;
     private static final String CORE_SERVICE = "/api/core"; // 담당자가 수정
 
+
+
     public List<StorageInfoResponse> getStorages(){
         String uri = String.format("%s/storages", CORE_SERVICE);
 

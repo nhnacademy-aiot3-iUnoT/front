@@ -6,9 +6,11 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum EnvStatus {
+
     NORMAL("정상"),
     WARNING("경고"),
     CRITICAL("위험");
+
 
     private final String ko;
 }

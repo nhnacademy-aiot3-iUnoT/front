@@ -1,0 +1,478 @@
+.inventory-page {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 2rem 0 4rem;
+}
+
+.breadcrumb {
+    margin: 0 0 1.25rem;
+    color: var(--ink-soft);
+    font-size: .8rem;
+    font-weight: 600;
+}
+
+.breadcrumb span {
+    margin: 0 .45rem;
+    color: var(--line-strong);
+}
+
+.breadcrumb a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.page-heading, .detail-heading {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.page-heading h1, .detail-heading h1 {
+    margin: 0;
+    color: var(--ink);
+    font-size: 1.75rem;
+    font-weight: 700;
+    letter-spacing: -.04em;
+}
+
+.description {
+    margin: .5rem 0 0;
+    color: var(--ink-soft);
+    font-size: .9rem;
+}
+
+.primary-button {
+    flex: 0 0 auto;
+    padding: .65rem 1rem;
+    border: 1px solid var(--teal);
+    border-radius: 8px;
+    background: var(--teal);
+    color: #fff;
+    font-size: .875rem;
+    font-weight: 600;
+}
+
+.primary-button:hover {
+    background: var(--teal-dark);
+    border-color: var(--teal-dark);
+    color: #fff;
+    text-decoration: none;
+}
+
+.inventory-card, .detail-card {
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: var(--surface);
+    box-shadow: 0 4px 20px #30403b0a;
+}
+
+.toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--line);
+}
+
+.search-box {
+    display: flex;
+    align-items: center;
+    width: 360px;
+    height: 40px;
+    padding: 0 .75rem;
+    border: 1px solid var(--line-strong);
+    border-radius: 7px;
+    color: var(--ink-soft);
+}
+
+.search-box span {
+    margin-right: .4rem;
+    font-size: 1.1rem;
+}
+
+.search-box input {
+    width: 100%;
+    min-width: 0;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: var(--ink);
+    font: inherit;
+    font-size: .8rem;
+}
+
+.filters {
+    display: flex;
+    gap: .5rem;
+}
+
+.filters button, .secondary-button {
+    padding: .6rem .8rem;
+    border: 1px solid var(--line-strong);
+    border-radius: 7px;
+    background: var(--surface);
+    color: var(--ink-soft);
+    font-size: .8rem;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.filters span {
+    margin-left: .75rem;
+}
+
+.table-wrap, .stock-table-wrap {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    min-width: 800px;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: .9rem 1.25rem;
+    border-bottom: 1px solid var(--line);
+    text-align: left;
+    white-space: nowrap;
+}
+
+th {
+    background: var(--canvas);
+    color: var(--ink-soft);
+    font-size: .75rem;
+    font-weight: 600;
+}
+
+td {
+    color: var(--ink-soft);
+    font-size: .8rem;
+}
+
+tbody tr {
+    cursor: pointer;
+    transition: background-color .15s ease;
+}
+
+tbody tr:hover {
+    background: var(--teal-soft);
+}
+
+tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.medicine strong, td > strong, td > small {
+    display: block;
+}
+
+.medicine strong, td > strong {
+    color: var(--ink);
+    font-weight: 600;
+}
+
+.medicine small, td > small {
+    margin-top: .25rem;
+    color: var(--ink-soft);
+    font-size: .7rem;
+}
+
+.quantity {
+    font-size: .9rem;
+}
+
+.detail-page {
+    max-width: 900px;
+}
+
+.detail-heading {
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.detail-card {
+    margin-bottom: 1rem;
+    padding: 1.5rem;
+}
+
+.hero-medicine {
+    background: var(--surface);
+}
+
+.eyebrow {
+    margin: 0 0 .4rem;
+    color: var(--ink-soft);
+    font-size: .75rem;
+    font-weight: 600;
+}
+
+.hero-medicine h2,
+.section-title h2 {
+    margin: 0;
+    color: var(--ink);
+    font-size: 1.15rem;
+    font-weight: 700;
+}
+
+.hero-medicine p:last-child,
+.location-row p {
+    margin: .35rem 0 0;
+    color: var(--ink-soft);
+    font-size: .8rem;
+}
+
+.section-title {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 1.25rem;
+}
+
+.total-stock {
+    color: var(--teal);
+    font-size: 1rem;
+}
+
+.detail-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--line);
+}
+
+.detail-grid span {
+    display: block;
+    margin-bottom: .4rem;
+    color: var(--ink-soft);
+    font-size: .75rem;
+}
+
+.detail-grid strong {
+    color: var(--ink);
+    font-size: .9rem;
+    font-weight: 600;
+}
+
+.detail-grid .highlight {
+    color: var(--teal);
+    font-size: 1rem;
+}
+
+.stock-table-wrap {
+    border-top: 1px solid var(--line);
+}
+
+.stock-table {
+    min-width: 650px;
+}
+
+.stock-table th,
+.stock-table td {
+    padding: .9rem .75rem;
+}
+
+.stock-table th:first-child,
+.stock-table td:first-child {
+    padding-left: 0;
+}
+
+.stock-table th:last-child,
+.stock-table td:last-child {
+    padding-right: 0;
+}
+
+.stock-table td strong {
+    color: var(--ink);
+    font-weight: 600;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: .3rem .55rem;
+    border-radius: 999px;
+    font-size: .7rem;
+    font-weight: 600;
+}
+
+.status-badge.normal {
+    background: var(--teal-soft);
+    color: var(--teal);
+}
+
+.status-badge.warning {
+    background: var(--warning-soft);
+    color: var(--warning);
+}
+
+.action-column {
+    text-align: right;
+}
+
+@media (max-width: 768px) {
+    .inventory-page { padding: 1.5rem 1rem 3rem; }
+    .page-heading,
+    .detail-heading { align-items: flex-start; flex-direction: column; }
+    .primary-button { margin-top: .25rem; }
+    .toolbar { align-items: stretch; flex-direction: column; }
+    .search-box { width: 100%; }
+    .filters button { flex: 1; }
+    .detail-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+.storage-select {
+
+    width: 220px;
+    height: 40px;
+    padding: 0 2.25rem 0 .75rem;
+
+    border: 1px solid var(--line-strong);
+    border-radius: 7px;
+
+    background: var(--surface);
+    color: var(--ink-soft);
+
+    font: inherit;
+    font-size: .8rem;
+    font-weight: 600;
+
+    cursor: pointer;
+    outline: none;
+
+    transition:
+            border-color .15s ease,
+            box-shadow .15s ease,
+            background-color .15s ease;
+
+
+}
+
+
+.storage-select:hover{
+
+    border-color: var(--teal);
+}
+
+.storage-select:focus{
+
+    border-color: var(--teal);
+    box-shadow: 0 0 0 3px var(--teal-soft);
+
+}
+.storage-select option {
+    background: var(--surface);
+    color: var(--ink);
+}
+
+.search-button{
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    height: 40px;
+    padding: 0 1rem;
+
+    border: 1px solid var(--teal);
+    border-radius: 7px;
+
+    background: var(--teal);
+    color: #fff;
+
+    font-size: .8rem;
+    font-weight: 600;
+    text-decoration: none;
+
+    cursor: pointer;
+
+    transition:
+            background-color .15s ease,
+            border-color .15s ease,
+            box-shadow .15s ease;
+
+}
+
+.search-button:hover {
+    background: var(--teal-dark);
+    border-color: var(--teal-dark);
+    color: #fff;
+    text-decoration: none;
+}
+
+.search-button:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--teal-soft);
+}
+
+.hero-medicine {
+    padding: 32px 48px;
+}
+
+.hero-medicine h2 {
+    margin: 22px 0 24px;
+}
+
+.medicine-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 32px;
+}
+
+.meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 140px;
+}
+
+.meta-label {
+    font-size: 13px;
+    color: #8a938f;
+}
+
+.meta-value {
+    font-size: 15px;
+    font-weight: 600;
+    color: #36423e;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-top: 24px;
+}
+
+.pagination a {
+    min-width: 36px;
+    height: 36px;
+    padding: 0 10px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid #d8d8d8;
+    border-radius: 8px;
+
+    background: #fff;
+    color: #555;
+    text-decoration: none;
+}
+
+.pagination a:hover {
+    background: #f5f5f5;
+}
+
+.pagination a.active {
+    background: #34423d;
+    color: #fff;
+    border-color: #34423d;
+    font-weight: 700;
+}
