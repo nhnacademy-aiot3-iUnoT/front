@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main-layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>유통기한 임박 재고 조회</title>
+    <link rel="stylesheet" th:href="@{/css/expiring-inventory.css}">
+</head>
+<body>
+
+<div layout:fragment="content">
+    <div class="table-container">
+        <!-- 상단 타이틀 -->
+        <div class="header-flex" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2>⏳ 유통기한 임박 재고 조회</h2>
+        </div>
+
+        <!-- 🔍 검색 및 필터 컨트롤 영역 -->
+        <div class="filter-box" style="display: flex; flex-wrap: wrap; gap: 15px; align-items: center; margin-bottom: 20px; background: #f8fafc; padding: 15px; border-radius: 8px;">
+            <div>
+                <label for="search-storage" style="font-weight: bold; margin-right: 5px;">저장소 ID:</label>
+                <input type="number" id="search-storage" placeholder="저장소 ID 입력" style="padding: 6px; border-radius: 4px; border: 1px solid #cbd5e1; width: 130px;">
+            </div>
+
+            <div>
+                <label for="search-filter" style="font-weight: bold; margin-right: 5px;">필터 타입:</label>
+                <select id="search-filter" style="padding: 6px; border-radius: 4px; border: 1px solid #cbd5e1;">
+                    <option value="ALL">전체 (ALL)</option>
+                    <option value="WARNING">유통기한 임박 (WARNING)</option>
+                    <option value="EXPIRED">유통기한 경과 (EXPIRED)</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="search-sort" style="font-weight: bold; margin-right: 5px;">유통기한 정렬:</label>
+                <select id="search-sort" style="padding: 6px; border-radius: 4px; border: 1px solid #cbd5e1;">
+                    <option value="ASC">오름차순 (임박순)</option>
+                    <option value="DESC">내림차순 (먼 날짜순)</option>
+                </select>
+            </div>
+
+            <div>
+                <button type="button" class="btn-primary" onclick="loadExpiringInventories(0)" style="padding: 7px 15px; background: #2563eb; color: #fff; border: none; border-radius: 4px; cursor: pointer;">검색</button>
+                <button type="button" class="btn-secondary" onclick="resetSearch()" style="padding: 7px 15px; background: #64748b; color: #fff; border: none; border-radius: 4px; cursor: pointer; margin-left: 5px;">초기화</button>
+            </div>
+        </div>
+
+        <!-- 임박 재고 리스트 테이블 -->
+        <table>
+            <thead>
+            <tr>
+                <th style="width: 80px; text-align: center;">번호</th>
+                <th style="width: 110px;">조직명</th>
+                <th style="width: 130px;">창고 / 구역</th>
+                <th>의약품명 (단위)</th>
+                <th style="width: 110px;">LOT 번호</th>
+                <th style="width: 100px; text-align: center;">현재 수량</th>
+                <th style="width: 120px; text-align: center;">유통기한</th>
+            </tr>
+            </thead>
+            <tbody id="inventory-table-body">
+            <tr>
+                <td colspan="7" style="text-align: center; color: #888; padding: 30px;">데이터를 불러오는 중입니다...</td>
+            </tr>
+            </tbody>
+        </table>
+
+        <!-- 📄 페이지네이션 영역 -->
+        <div id="pagination" class="pagination-container" style="display: flex; justify-content: center; gap: 5px; margin-top: 20px;">
+            <!-- JS로 동적 생성 -->
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="script">
+    <script th:src="@{/js/alert/expiring.js}"></script>
+</th:block>
+
+</body>
+</html>

@@ -14,7 +14,7 @@ public class AlertViewController {
 
     private final OrganizationMemberApiClient organizationMemberApiClient;
 
-    @GetMapping("alerts")
+    @GetMapping("/alerts")
     public String alertsPage(Model model){
         OrganizationMemberRoleResponse roleResponse = organizationMemberApiClient.getRole();
         boolean canManage = (
