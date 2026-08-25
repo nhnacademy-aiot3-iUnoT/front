@@ -25,6 +25,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.validation.BindingResult;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -103,6 +104,10 @@ class AccountControllerTest {
                 LocalDateTime.of(2026, 8, 5, 12, 0)
         );
         given(accountApiClient.getAccountInfo()).willReturn(response);
+        given(organizationMemberApiClient.getRole())
+                .willReturn(new OrganizationMemberRoleResponse(OrganizationRole.ORG_MEMBER));
+        given(departmentApiClient.getMyDepartments())
+                .willReturn(List.of());
 
         MvcResult result = mockMvc.perform(put("/mypage").param("name", "   "))
                 .andExpect(status().isOk())
