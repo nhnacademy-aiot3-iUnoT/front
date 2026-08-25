@@ -1,7 +1,5 @@
 package com.nhnacademy.front.global.client;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.front.global.dto.ApiResponse;
 import com.nhnacademy.front.global.error.ApiException;
 import com.nhnacademy.front.global.error.ErrorCode;
@@ -9,12 +7,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.ResolvableType;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClient;
 
 import java.net.URI;
-import java.util.function.Supplier;
 
 // 추후 리팩토링 할 예정 (임시 진행)
 @Slf4j
@@ -22,220 +19,121 @@ import java.util.function.Supplier;
 public class GatewayClient {
     private final String baseUrl;
     private final RestClient restClient;
-    private final ObjectMapper objectMapper;
 
     public GatewayClient(
             @Value("${gateway.url}") String baseUrl,
-            RestClient restClient,
-            ObjectMapper objectMapper
+            RestClient restClient
     ) {
         this.baseUrl = baseUrl;
         this.restClient = restClient;
-        this.objectMapper = objectMapper;
     }
 
     // 단건 DTO
     public <T> T get(String path, Class<T> dataType) {
-        return execute(() ->
-                restClient.get()
-                        .uri(URI.create(baseUrl + path))
-                        .retrieve()
-                        .body(responseTypeOf(dataType)));
+        return request(HttpMethod.GET, path, null, responseTypeOf(dataType));
     }
 
     // List, Page 등 제네릭 타입
     public <T> T get(String path, ParameterizedTypeReference<ApiResponse<T>> responseType) {
-        return execute(() ->
-                restClient.get()
-                        .uri(URI.create(baseUrl + path))
-                        .retrieve()
-                        .body(responseType));
+        return request(HttpMethod.GET, path, null, responseType);
     }
 
     public <T> T getRaw(String path, ParameterizedTypeReference<T> responseType) {
-        try {
-            T response = restClient.get()
-                    .uri(URI.create(baseUrl + path))
-                    .retrieve()
-                    .body(responseType);
+        T response = prepare(HttpMethod.GET, path, null)
+                .retrieve()
+                .body(responseType);
 
-            if (response == null) {
-                throw new ApiException(
-                        ErrorCode.UNKNOWN,
-                        "응답이 없습니다."
-                );
-            }
-
-            return response;
-        } catch (HttpStatusCodeException e) {
-            throw convertApiException(e);
+        if (response == null) {
+            throw new ApiException(
+                    ErrorCode.UNKNOWN,
+                    "응답이 없습니다."
+            );
         }
+
+        return response;
     }
 
     public void get(String path) {
-        try {
-            restClient.get()
-                    .uri(URI.create(baseUrl + path))
-                    .retrieve()
-                    .toBodilessEntity();
-        } catch (HttpStatusCodeException e) {
-            throw convertApiException(e);
-        }
+        requestVoid(HttpMethod.GET, path, null);
     }
 
     public <T> T post(String path, Object body, Class<T> dataType) {
-        return execute(() ->
-                restClient.post()
-                        .uri(baseUrl + path)
-                        .body(body)
-                        .retrieve()
-                        .body(responseTypeOf(dataType)));
+        return request(HttpMethod.POST, path, body, responseTypeOf(dataType));
     }
 
     public <T> T post(String path, Object body, ParameterizedTypeReference<ApiResponse<T>> responseType) {
-        return execute(() ->
-                restClient.post()
-                        .uri(baseUrl + path)
-                        .body(body)
-                        .retrieve()
-                        .body(responseType));
+        return request(HttpMethod.POST, path, body, responseType);
     }
 
-
-    public void post(String path, Object body){
-
-        try{
-            restClient.post()
-                    .uri(baseUrl + path)
-                    .body(body)
-                    .retrieve()
-                    .toBodilessEntity();
-
-        }catch(HttpStatusCodeException e){
-            throw convertApiException(e);
-        }
-
+    public void post(String path, Object body) {
+        requestVoid(HttpMethod.POST, path, body);
     }
 
     public void post(String path) {
-        try {
-            restClient.post()
-                    .uri(URI.create(baseUrl + path))
-                    .retrieve()
-                    .toBodilessEntity();
-        } catch (HttpStatusCodeException e) {
-            throw convertApiException(e);
-        }
+        requestVoid(HttpMethod.POST, path, null);
     }
 
     public <T> T put(String path, Object body, Class<T> dataType) {
-        return execute(() ->
-                restClient.put()
-                        .uri(baseUrl + path)
-                        .body(body)
-                        .retrieve()
-                        .body(responseTypeOf(dataType)));
+        return request(HttpMethod.PUT, path, body, responseTypeOf(dataType));
     }
 
     public <T> T put(String path, Object body, ParameterizedTypeReference<ApiResponse<T>> responseType) {
-        return execute(() ->
-                restClient.put()
-                        .uri(baseUrl + path)
-                        .body(body)
-                        .retrieve()
-                        .body(responseType));
+        return request(HttpMethod.PUT, path, body, responseType);
     }
 
     public void put(String path, Object body) {
-        try {
-            restClient.put()
-                    .uri(baseUrl + path)
-                    .body(body)
-                    .retrieve()
-                    .toBodilessEntity();
-
-        } catch (HttpStatusCodeException e) {
-            throw convertApiException(e);
-        }
+        requestVoid(HttpMethod.PUT, path, body);
     }
 
     public <T> T delete(String path, ParameterizedTypeReference<ApiResponse<T>> responseType) {
-        return execute(() ->
-                restClient.delete()
-                        .uri(baseUrl + path)
-                        .retrieve()
-                        .body(responseType));
+        return request(HttpMethod.DELETE, path, null, responseType);
     }
 
     public void delete(String path) {
-        try {
-            restClient.delete()
-                    .uri(baseUrl + path)
-                    .retrieve()
-                    .toBodilessEntity();
-
-        } catch (HttpStatusCodeException e) {
-            throw convertApiException(e);
-        }
+        requestVoid(HttpMethod.DELETE, path, null);
     }
 
-    private <T> T execute(Supplier<ApiResponse<T>> supplier) {
-        try {
-            ApiResponse<T> response = supplier.get();
+    private <T> T request(HttpMethod method, String path, Object body, ParameterizedTypeReference<ApiResponse<T>> responseType) {
+        ApiResponse<T> response = prepare(method, path, body)
+                .retrieve()
+                .body(responseType);
 
-            if (response == null) {
-                throw new ApiException(
-                        ErrorCode.UNKNOWN,
-                        "응답이 없습니다."
-                );
-            }
-
-            if (!response.success()) {
-                throw new ApiException(
-                        ErrorCode.from(response.error().code()),
-                        response.error().message()
-                );
-            }
-
-            return response.data();
-
-        } catch (HttpStatusCodeException e) {
-            throw convertApiException(e); // API Server가 준 JSON -> Front 예외 객체로 변환
+        if (response == null) {
+            throw new ApiException(ErrorCode.UNKNOWN, "응답이 없습니다.");
         }
+
+        if (!response.success()) {
+            if (response.error() == null) {
+                throw new ApiException(ErrorCode.UNKNOWN, "응답이 없습니다.");
+            }
+
+            String code = response.error().code();
+            String message = response.error().message();
+
+            throw new ApiException(ErrorCode.from(code), message);
+        }
+
+        return response.data();
     }
 
-    private ApiException convertApiException(HttpStatusCodeException e) {
-        String responseBody = e.getResponseBodyAsString();
+    private void requestVoid(HttpMethod method, String path, Object body) {
+        prepare(method, path, body).retrieve()
+                .toBodilessEntity();
+    }
 
-        log.warn(
-                "Gateway request failed. status={}, body={}",
-                e.getStatusCode(),
-                responseBody
-        );
+    private RestClient.RequestBodySpec prepare(HttpMethod method, String path, Object body) {
+        RestClient.RequestBodySpec spec = restClient.method(method)
+                .uri(URI.create(baseUrl + path));
 
-
-        try {
-            ApiResponse<Void> response = objectMapper.readValue(
-                    e.getResponseBodyAsString(),
-                    new TypeReference<>() {}
-            );
-
-            return new ApiException(
-                    ErrorCode.from(response.error().code()),
-                    response.error().message()
-            );
-
-        } catch (Exception ex) {
-            return new ApiException(
-                    ErrorCode.UNKNOWN,
-                    "서버 요청 처리 중 오류가 발생했습니다."
-            );
+        if (body != null) {
+            spec.body(body);
         }
+
+        return spec;
     }
 
     private <T> ParameterizedTypeReference<ApiResponse<T>> responseTypeOf(Class<T> dataType) {
         ResolvableType type = ResolvableType.forClassWithGenerics(ApiResponse.class, dataType);
         return ParameterizedTypeReference.forType(type.getType());
     }
-
 }

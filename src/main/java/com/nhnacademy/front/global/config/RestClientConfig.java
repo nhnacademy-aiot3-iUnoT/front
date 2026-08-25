@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.web.client.RestClient;
 
 @Configuration
@@ -26,9 +27,11 @@ public class RestClientConfig {
     @Profile("prod")
     public RestClient restClient(
             @LoadBalanced RestClient.Builder builder,
-            AccessTokenInterceptor accessTokenInterceptor) {
+            AccessTokenInterceptor accessTokenInterceptor,
+            GatewayErrorHandler gatewayErrorHandler) {
         return builder
                 .requestInterceptor(accessTokenInterceptor)
+                .defaultStatusHandler(HttpStatusCode::isError, gatewayErrorHandler)
                 .build();
     }
 
@@ -36,9 +39,11 @@ public class RestClientConfig {
     @Profile("!prod")
     public RestClient devRestClient(
             RestClient.Builder builder,
-            AccessTokenInterceptor accessTokenInterceptor) {
+            AccessTokenInterceptor accessTokenInterceptor,
+            GatewayErrorHandler gatewayErrorHandler) {
         return builder
                 .requestInterceptor(accessTokenInterceptor)
+                .defaultStatusHandler(HttpStatusCode::isError, gatewayErrorHandler)
                 .build();
     }
 }
