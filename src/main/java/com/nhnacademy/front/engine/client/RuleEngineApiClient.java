@@ -16,22 +16,22 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+/**
+ * 센서 데이터와 가상 센서는 룰엔진이 갖고 있지만 요청은 인벤토리를 거친다.
+ * 구역이 어느 조직 것인지 아는 쪽이 인벤토리뿐이라 접근 검증을 거기서 하기 때문이다.
+ * 조직 ID는 인벤토리가 토큰으로 해석하므로 보내지 않는다.
+ */
 @Component
 @RequiredArgsConstructor
 public class RuleEngineApiClient {
 
-    private static final String RULE_SERVICE =
-            "/api/rule-engine";
+    private static final String CORE_SERVICE = "/api/core";
 
     private final GatewayClient gatewayClient;
 
     // zoneId의 각 센서별 최신데이터
-    public List<SensorLatestResponse> getLatestSensors(
-            Long zoneId
-    ) {
-        String path = RULE_SERVICE
-                + "/zones/" + zoneId
-                + "/sensor-data/latest";
+    public List<SensorLatestResponse> getLatestSensors(Long zoneId) {
+        String path = zonePath(zoneId) + "/sensor-data/latest";
 
         return gatewayClient.get(
                 path,
@@ -43,13 +43,11 @@ public class RuleEngineApiClient {
     }
 
     // zoneId의 센서별 1일 데이터
-    public List<SensorHistoryResponse> getSensorHistory(
-            Long zoneId
-    ) {
-        String path = RULE_SERVICE
-                + "/zones/" + zoneId
-                + "/sensor-data/history";
-        return gatewayClient.get(path,
+    public List<SensorHistoryResponse> getSensorHistory(Long zoneId) {
+        String path = zonePath(zoneId) + "/sensor-data/history";
+
+        return gatewayClient.get(
+                path,
                 new ParameterizedTypeReference<
                         ApiResponse<List<SensorHistoryResponse>>
                         >() {
@@ -57,16 +55,13 @@ public class RuleEngineApiClient {
         );
     }
 
-
     // 가상 센서데이터 생성
     public VirtualSensorCreateResponse createVirtualSensorData(
-            Long organizationId,
-            Long storageId,
             Long zoneId,
             VirtualSensorCreateRequest request
     ) {
         return gatewayClient.post(
-                virtualSensorPath(organizationId, storageId, zoneId),
+                virtualSensorPath(zoneId),
                 request,
                 VirtualSensorCreateResponse.class
         );
@@ -74,68 +69,42 @@ public class RuleEngineApiClient {
 
     // 가상 센서데이터 수정
     public VirtualSensorUpdateResponse updateVirtualSensorData(
-            Long organizationId,
-            Long storageId,
             Long zoneId,
             VirtualSensorUpdateRequest request
     ) {
         return gatewayClient.put(
-                virtualSensorPath(organizationId, storageId, zoneId),
+                virtualSensorPath(zoneId),
                 request,
                 VirtualSensorUpdateResponse.class
         );
     }
 
     // 가상 센서데이터 삭제
-    public void deleteVirtualSensorData(
-            Long organizationId,
-            Long storageId,
-            Long zoneId
-    ) {
-        gatewayClient.delete(virtualSensorPath(organizationId, storageId, zoneId));
+    public void deleteVirtualSensorData(Long zoneId) {
+        gatewayClient.delete(virtualSensorPath(zoneId));
     }
 
     // 가상 센서데이터 설정 조회
-    public VirtualSensorInfoResponse getVirtualSensorData(
-            Long organizationId,
-            Long storageId,
-            Long zoneId
-    ) {
+    public VirtualSensorInfoResponse getVirtualSensorData(Long zoneId) {
         return gatewayClient.get(
-                virtualSensorPath(organizationId, storageId, zoneId),
+                virtualSensorPath(zoneId),
                 VirtualSensorInfoResponse.class
         );
     }
 
     // 가상 센서데이터 활성화 / 비활성화
     public void changeVirtualSensorStatus(
-            Long organizationId,
-            Long storageId,
             Long zoneId,
             VirtualSensorStatusRequest request
     ) {
-        String path = zonePath(organizationId, storageId, zoneId) + "/status";
-
-        gatewayClient.put(path, request);
+        gatewayClient.put(virtualSensorPath(zoneId) + "/status", request);
     }
 
-    private String virtualSensorPath(
-            Long organizationId,
-            Long storageId,
-            Long zoneId
-    ) {
-        return zonePath(organizationId, storageId, zoneId) + "/virtual-sensor";
+    private String virtualSensorPath(Long zoneId) {
+        return zonePath(zoneId) + "/virtual-sensor";
     }
 
-    private String zonePath(
-            Long organizationId,
-            Long storageId,
-            Long zoneId
-    ) {
-        return RULE_SERVICE
-                + "/organizations/" + organizationId
-                + "/storages/" + storageId
-                + "/zones/" + zoneId;
+    private String zonePath(Long zoneId) {
+        return CORE_SERVICE + "/zones/" + zoneId;
     }
-
 }

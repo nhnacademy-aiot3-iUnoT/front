@@ -9,7 +9,6 @@ import com.nhnacademy.front.engine.dto.request.VirtualSensorUpdateRequest;
 import com.nhnacademy.front.engine.dto.response.SensorHistoryResponse;
 import com.nhnacademy.front.engine.dto.response.SensorLatestResponse;
 import com.nhnacademy.front.engine.dto.response.VirtualSensorInfoResponse;
-import com.nhnacademy.front.organization.client.OrganizationApiClient;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -33,8 +32,6 @@ public class RuleEngineController {
     private static final String SENSOR_INFO_VIEW = "organization/sensorInfo";
 
     private final RuleEngineApiClient ruleEngineApiClient;
-    private final OrganizationApiClient orgApiClient;
-
     /*
         가상 센서데이터 생성 화면
      */
@@ -63,7 +60,7 @@ public class RuleEngineController {
         model.addAttribute("edit", true); // 수정모드
 
         VirtualSensorInfoResponse virtualSensor =
-                ruleEngineApiClient.getVirtualSensorData(currentOrganizationId(), storageId, zoneId);
+                ruleEngineApiClient.getVirtualSensorData(zoneId);
 
         model.addAttribute("virtualSensor", virtualSensor);
 
@@ -88,9 +85,7 @@ public class RuleEngineController {
             return VIRTUAL_SENSOR_FORM_VIEW;
         }
 
-        ruleEngineApiClient.createVirtualSensorData(
-                currentOrganizationId(), storageId, zoneId, request
-        );
+        ruleEngineApiClient.createVirtualSensorData(zoneId, request);
 
         return redirectToVirtualSensorInfo(storageId, zoneId);
     }
@@ -106,20 +101,18 @@ public class RuleEngineController {
             BindingResult result,
             Model model
     ) {
-        Long organizationId = currentOrganizationId();
-
         if (result.hasErrors()) {
             addZoneAttributes(model, storageId, zoneId);
             model.addAttribute("edit", true); // 수정모드
             model.addAttribute(
                     "virtualSensor",
-                    ruleEngineApiClient.getVirtualSensorData(organizationId, storageId, zoneId)
+                    ruleEngineApiClient.getVirtualSensorData(zoneId)
             );
 
             return VIRTUAL_SENSOR_FORM_VIEW;
         }
 
-        ruleEngineApiClient.updateVirtualSensorData(organizationId, storageId, zoneId, request);
+        ruleEngineApiClient.updateVirtualSensorData(zoneId, request);
 
         return redirectToVirtualSensorInfo(storageId, zoneId);
     }
@@ -132,7 +125,7 @@ public class RuleEngineController {
             @PathVariable("storage-id") Long storageId,
             @PathVariable("zone-id") Long zoneId
     ) {
-        ruleEngineApiClient.deleteVirtualSensorData(currentOrganizationId(), storageId, zoneId);
+        ruleEngineApiClient.deleteVirtualSensorData(zoneId);
 
         return "redirect:" + zoneBasePath(storageId, zoneId) + "/sensorInfo";
     }
@@ -150,15 +143,15 @@ public class RuleEngineController {
 
         try {
             VirtualSensorInfoResponse virtualSensor =
-                    ruleEngineApiClient.getVirtualSensorData(currentOrganizationId(), storageId, zoneId);
+                    ruleEngineApiClient.getVirtualSensorData(zoneId);
 
             model.addAttribute("virtualSensor", virtualSensor);
 
         } catch (ApiException e) {
-            // 아직 가상 센서를 만들지 않은 Zone도 화면은 열리도록 한다.
-            // 설정이 없는 경우(R009)는 오류가 아니라 '미등록' 상태로 안내한다.
-            if (e.getErrorCode() != ErrorCode.R009) {
-                model.addAttribute("virtualSensorErrorMessage", e.getMessage());
+            // 아직 가상 센서를 만들지 않은 Zone(V001)은 오류가 아니라 '미등록' 상태로 화면에서 안내한다.
+            // 그 외에는 화면을 열지 않고 error.html이 안내하도록 그대로 둔다.
+            if (e.getErrorCode() != ErrorCode.V001) {
+                throw e;
             }
         }
 
@@ -179,9 +172,7 @@ public class RuleEngineController {
             return redirectToVirtualSensorInfo(storageId, zoneId);
         }
 
-        ruleEngineApiClient.changeVirtualSensorStatus(
-                currentOrganizationId(), storageId, zoneId, request
-        );
+        ruleEngineApiClient.changeVirtualSensorStatus(zoneId, request);
 
         return redirectToVirtualSensorInfo(storageId, zoneId);
     }
@@ -205,6 +196,11 @@ public class RuleEngineController {
             model.addAttribute("latestSensors", latestSensors);
 
         } catch (ApiException e) {
+            // 남의 조직이거나 없는 구역이면 화면을 열지 않고 error.html이 안내하도록 다시 던진다.
+            if (isNotAccessible(e)) {
+                throw e;
+            }
+
             model.addAttribute("latestSensors", List.of());
             model.addAttribute("latestSensorsErrorMessage", e.getMessage());
         }
@@ -217,6 +213,11 @@ public class RuleEngineController {
             model.addAttribute("sensorHistory", sensorHistory);
 
         } catch (ApiException e) {
+            // 남의 조직이거나 없는 구역이면 화면을 열지 않고 error.html이 안내하도록 다시 던진다.
+            if (isNotAccessible(e)) {
+                throw e;
+            }
+
             model.addAttribute("sensorHistory", List.of());
             model.addAttribute("sensorHistoryErrorMessage", e.getMessage());
         }
@@ -225,10 +226,15 @@ public class RuleEngineController {
     }
 
     /*
-        로그인한 사용자가 속한 조직의 ID
+        남의 조직이거나 없는 구역/창고인지 판단한다.
+        인벤토리가 권한 없음은 G002, 대상 없음은 S001/Z001로 답한다.
      */
-    private Long currentOrganizationId() {
-        return orgApiClient.getOrgInfo().id();
+    private boolean isNotAccessible(ApiException e) {
+        ErrorCode errorCode = e.getErrorCode();
+
+        return errorCode == ErrorCode.G002
+                || errorCode == ErrorCode.S001
+                || errorCode == ErrorCode.Z001;
     }
 
     private void addZoneAttributes(
