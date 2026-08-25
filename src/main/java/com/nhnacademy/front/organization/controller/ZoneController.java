@@ -57,9 +57,6 @@ public class ZoneController {
 
 
 
-
-
-
     // 해당 저장소의 구역 찾기
     @GetMapping("/{storage-id}/zones")
     @ResponseBody
