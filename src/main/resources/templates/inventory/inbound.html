@@ -161,7 +161,7 @@
             </header>
 
 
-            <div class="location-select-list">
+            <div class="location-select-list" th:if="${! #lists.isEmpty(storages)}">
                 <div class="select-field">
                     <label for="storage-id">
                         저장소

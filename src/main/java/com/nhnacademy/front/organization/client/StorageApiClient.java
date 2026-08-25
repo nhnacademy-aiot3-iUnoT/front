@@ -25,7 +25,7 @@ public class StorageApiClient {
 
         return gatewayClient.get(
                 uri,
-                new ParameterizedTypeReference<ApiResponse<List<StorageInfoResponse>>>() {}
+                new ParameterizedTypeReference<>() {}
         );
     }
 
@@ -45,4 +45,18 @@ public class StorageApiClient {
                 StorageDetailResponse.class
         );
     }
+
+
+    // 입고 - 저장소 목록
+    public List<StorageInfoResponse> getStoragesInbound(){
+
+        return gatewayClient.get(CORE_SERVICE + "/inbound/storages",
+                new ParameterizedTypeReference<
+                        ApiResponse<List<StorageInfoResponse>>
+                        >() {});
+
+    }
+
+
+
 }
