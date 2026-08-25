@@ -2,10 +2,9 @@ package com.nhnacademy.front.organization.client;
 
 import com.nhnacademy.front.global.client.GatewayClient;
 import com.nhnacademy.front.global.dto.PageResponse;
+import com.nhnacademy.front.organization.dto.request.MemberByEmailRequest;
 import com.nhnacademy.front.organization.dto.request.OrganizationMemberSearchRequest;
-import com.nhnacademy.front.organization.dto.request.MemberDepartmentUpdateRequest;
 import com.nhnacademy.front.organization.dto.request.OrganizationRoleUpdateRequest;
-import com.nhnacademy.front.organization.dto.response.DepartmentListResponse;
 import com.nhnacademy.front.organization.dto.response.OrganizationMemberResponse;
 import com.nhnacademy.front.organization.dto.response.OrganizationMemberRoleResponse;
 import lombok.RequiredArgsConstructor;
@@ -43,6 +42,14 @@ public class OrganizationMemberApiClient {
         return gatewayClient.get(uri, new ParameterizedTypeReference<>() {});
     }
 
+    public List<OrganizationMemberResponse> searchMembers(MemberByEmailRequest request) {
+        UriComponentsBuilder builder = UriComponentsBuilder
+                .fromPath(CORE_SERVICE + "/search")
+                .queryParam("email", request.email());
+
+        return gatewayClient.get(builder.toUriString(), new ParameterizedTypeReference<>() {});
+    }
+
     public OrganizationMemberRoleResponse getRole(){
         String uri = String.format("%s/me/role", CORE_SERVICE);
 
@@ -61,20 +68,6 @@ public class OrganizationMemberApiClient {
      */
     public void deleteMember(Long memberId) {
         gatewayClient.delete(CORE_SERVICE + "/" + memberId);
-    }
-
-    /**
-     * 조직원 부서 배정 내역
-     */
-    public List<DepartmentListResponse> getMemberDepartments(Long memberId) {
-        return gatewayClient.get(CORE_SERVICE + "/" + memberId + "/departments", new ParameterizedTypeReference<>() {});
-    }
-
-    /**
-     * 조직원 부서 배정/제거
-     */
-    public void updateMemberDepartments(Long memberId, MemberDepartmentUpdateRequest request) {
-        gatewayClient.put(CORE_SERVICE + "/" + memberId + "/departments", request);
     }
 
 }

@@ -6,6 +6,7 @@ import java.time.LocalDate;
 
 public record InventoryDetailResponse(
 
+        Long inventoryId,
         Long zoneId,
         String zoneName,
         String lotNumber,

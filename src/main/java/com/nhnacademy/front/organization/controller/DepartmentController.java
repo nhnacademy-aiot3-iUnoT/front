@@ -1,10 +1,11 @@
 package com.nhnacademy.front.organization.controller;
 
 import com.nhnacademy.front.organization.client.DepartmentApiClient;
+import com.nhnacademy.front.organization.service.DepartmentPageService;
+import com.nhnacademy.front.organization.dto.response.*;
 import com.nhnacademy.front.organization.dto.request.DepartmentCreateRequest;
 import com.nhnacademy.front.organization.dto.request.DepartmentStatusUpdateRequest;
 import com.nhnacademy.front.organization.dto.request.DepartmentUpdateRequest;
-import com.nhnacademy.front.organization.dto.response.DepartmentInfoResponse;
 import com.nhnacademy.front.organization.dto.response.DepartmentListResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import com.nhnacademy.front.organization.dto.response.DepartmentPageResponse;
 
 import java.util.List;
 
@@ -27,6 +29,7 @@ import java.util.List;
 public class DepartmentController {
 
     private final DepartmentApiClient departmentApiClient;
+    private final DepartmentPageService departmentPageService;
 
     @GetMapping
     public String departmentList(Model model) {
@@ -51,11 +54,18 @@ public class DepartmentController {
     }
 
     @GetMapping("/{department-id}")
-    public String departmentInfo(@PathVariable(name = "department-id") Long departmentId, Model model) {
-        DepartmentInfoResponse department = departmentApiClient.getDepartment(departmentId);
+    public String departmentInfo(@PathVariable(name = "department-id") Long departmentId,
+                                 Model model) {
+        DepartmentPageResponse page = departmentPageService.getDepartmentPage(departmentId);
 
-        model.addAttribute("department", department);
-        model.addAttribute("departmentUpdateRequest", new DepartmentUpdateRequest(department.name(), department.description()));
+        model.addAttribute("department", page.department());
+        model.addAttribute("departmentUpdateRequest", new DepartmentUpdateRequest(page.department().name(), page.department().description()));
+        model.addAttribute("memberRole", page.memberRole());
+
+        // 부서에 속한 저장소, 조직원 목록
+        model.addAttribute("departmentStorages", page.storages());
+        model.addAttribute("departmentMembers", page.members());
+
         return "organization/department-info";
     }
 

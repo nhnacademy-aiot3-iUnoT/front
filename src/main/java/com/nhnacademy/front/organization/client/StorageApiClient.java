@@ -7,6 +7,7 @@ import com.nhnacademy.front.organization.dto.response.StorageInfoResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
 
@@ -15,7 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class StorageApiClient {
     private final GatewayClient gatewayClient;
-    private static final String CORE_SERVICE = "/api/core"; // 담당자가 수정
+    private static final String CORE_SERVICE = "/api/core";
 
 
 
@@ -26,6 +27,14 @@ public class StorageApiClient {
                 uri,
                 new ParameterizedTypeReference<ApiResponse<List<StorageInfoResponse>>>() {}
         );
+    }
+
+    public List<StorageInfoResponse> searchStorages(String name) {
+        UriComponentsBuilder builder = UriComponentsBuilder
+                .fromPath(CORE_SERVICE + "/storages")
+                .queryParam("name", name);
+
+        return gatewayClient.get(builder.toUriString(), new ParameterizedTypeReference<>() {});
     }
 
     public StorageDetailResponse getStorage(Long storageId){
