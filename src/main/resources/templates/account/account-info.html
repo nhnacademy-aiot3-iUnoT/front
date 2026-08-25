@@ -9,6 +9,7 @@
     <meta charset="UTF-8">
     <title>회원정보</title>
     <link rel="stylesheet" th:href="@{/css/account.css}">
+    <link rel="stylesheet" th:href="@{/css/status.css}">
 </head>
 
 <body>
@@ -76,6 +77,23 @@
                                 </button>
                             </div>
                         </form>
+                    </section>
+                    <section class="account-section" th:if="${memberRole.role.name != 'ORG_BOSS'}">
+                        <h2 class="account-section-title">
+                            내 부서
+                        </h2>
+
+                        <div th:if="${#lists.isEmpty(departments) || departments == null}" class="mb-2">
+                             소속된 부서가 없습니다.
+                        </div>
+
+                        <span th:each="department : ${departments}" class="m-1">
+                            <a class="badge status-badge"
+                                  th:classappend="' status-' + ${department.status.name().toLowerCase()}"
+                                  th:text="${department.name}"
+                                  th:href="@{/departments/{department-id}(department-id=${department.id})}">
+                            </a>
+                        </span>
                     </section>
                 </div>
 

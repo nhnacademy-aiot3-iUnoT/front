@@ -2,7 +2,7 @@ package com.nhnacademy.front.organization.dto.request;
 
 import java.util.List;
 
-public record MemberDepartmentUpdateRequest(
+public record MemberDepartmentAssignRequest(
         List<Long> departmentIds
 ) {
 }
