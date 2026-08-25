@@ -54,8 +54,14 @@ public class ZoneController {
     }
 
 
+
+
+
+
+
+
     // 해당 저장소의 구역 찾기
-    @GetMapping("/storages/{storage-id}/zones")
+    @GetMapping("/{storage-id}/zones")
     @ResponseBody
     public List<ZoneInfoResponse> getZones(@PathVariable(name="storage-id")Long storageId){
 
