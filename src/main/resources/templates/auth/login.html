@@ -38,6 +38,13 @@
                     <div class="col-lg-7">
                         <div class="login-section">
                             <h1 class="fw-bold mb-4">로그인</h1>
+
+                            <div id="login-success-message"
+                                 class="alert alert-success"
+                                 role="alert"
+                                 th:if="${successMessage}"
+                                 th:text="${successMessage}"></div>
+
                             <form th:action="@{/login}" th:object="${loginRequest}" method="post">
                                 <div class="mb-4">
                                     <label class="form-label">
@@ -100,7 +107,7 @@
         alert('초대 링크가 없습니다.' + '\n' +
             '조직 관리자가 발송한 초대 링크를 통해 회원가입해주세요.');
     </script>
-    <script th:if="${param.reactivated != null}">
+    <script th:if="${param.reactivated != null and successMessage == null}">
         alert('계정이 재활성화되었습니다. 다시 로그인해주세요.');
     </script>
 </div>

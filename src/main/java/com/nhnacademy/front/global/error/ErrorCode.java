@@ -5,6 +5,7 @@ public enum ErrorCode {
 
     // Account
     U001,
+    A009,
 
     // Organization
     O001,

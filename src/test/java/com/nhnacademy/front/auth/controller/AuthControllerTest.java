@@ -18,6 +18,8 @@ import com.nhnacademy.front.auth.validator.PasswordResetFormValidator;
 import com.nhnacademy.front.organization.client.InvitationApiClient;
 import com.nhnacademy.front.organization.client.OrganizationApiClient;
 import org.junit.jupiter.api.Test;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -28,6 +30,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -36,6 +39,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import static org.hamcrest.Matchers.containsString;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -320,10 +324,30 @@ class AuthControllerTest {
         mockMvc.perform(post("/pwd")
                     .param("email", request.email()))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(view().name("redirect:/login"))
-                .andExpect(redirectedUrl("/login"));
+                .andExpect(view().name("redirect:/forgot-password"))
+                .andExpect(redirectedUrl("/forgot-password"))
+                .andExpect(flash().attribute(
+                        "successMessage",
+                        "비밀번호 재설정 메일 발송 요청을 접수했습니다."
+                ));
 
         then(authApiClient).should().passwordResetToken(request);
+    }
+
+    @Test
+    void passwordResetRequestPageShowsGenericAcceptedMessage() throws Exception {
+        MvcResult result = mockMvc.perform(get("/forgot-password")
+                        .flashAttr(
+                                "successMessage",
+                                "비밀번호 재설정 메일 발송 요청을 접수했습니다."
+                        ))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        Document document = Jsoup.parse(result.getResponse().getContentAsString());
+        assertThat(document.select("#password-reset-request-message")).hasSize(1);
+        assertThat(document.select("#password-reset-request-message").text())
+                .isEqualTo("비밀번호 재설정 메일 발송 요청을 접수했습니다.");
     }
 
 
