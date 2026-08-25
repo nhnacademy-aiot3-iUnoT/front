@@ -1,5 +1,6 @@
 package com.nhnacademy.front.global.security;
 
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.access.AccessDeniedException;
@@ -16,7 +17,7 @@ public class PageAccessDeniedHandler implements AccessDeniedHandler {
             HttpServletRequest request,
             HttpServletResponse response,
             AccessDeniedException accessDeniedException
-    ) throws IOException {
+    ) throws IOException, ServletException {
         response.sendRedirect(request.getContextPath() + "/403");
     }
 }

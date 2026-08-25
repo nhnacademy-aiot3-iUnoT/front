@@ -20,6 +20,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtIssuerValidator;
 import org.springframework.security.oauth2.jwt.JwtTimestampValidator;
+import org.springframework.security.oauth2.jwt.JwtValidators;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
@@ -29,6 +30,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.web.util.WebUtils;
 
+import java.time.Clock;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -52,8 +54,11 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .formLogin(AbstractHttpConfigurer::disable)
+                .logout(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
                 .oauth2ResourceServer(resourceServer -> resourceServer
                         .bearerTokenResolver(bearerTokenResolver)
                         .authenticationEntryPoint(authenticationEntryPoint)
@@ -67,14 +72,16 @@ public class SecurityConfig {
                         .accessDeniedHandler(accessDeniedHandler)
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(EndpointRequest.to("health", "serviceregistry")).permitAll()
+                        .requestMatchers(
+                                EndpointRequest.to("health", "serviceregistry")
+                        ).permitAll()
                         .requestMatchers(
                                 "/login",
                                 "/signup",
                                 "/check-email",
                                 "/forgot-password",
-                                "/pwd/**",
                                 "/.well-known/jwks.json",
+                                "/pwd/**",
                                 "/403",
                                 "/404",
                                 "/error",
@@ -94,7 +101,10 @@ public class SecurityConfig {
     public JwtDecoder jwtDecoder(JwtProperties properties) {
         Assert.hasText(properties.getIssuer(), "security.jwt.issuer must be configured");
         Assert.notEmpty(properties.getAudiences(), "security.jwt.audiences must not be empty");
-        Assert.notEmpty(properties.getAllowedAlgorithms(), "security.jwt.allowed-algorithms must not be empty");
+        Assert.notEmpty(
+                properties.getAllowedAlgorithms(),
+                "security.jwt.allowed-algorithms must not be empty"
+        );
         Assert.hasText(properties.getJwkSetUri(), "security.jwt.jwk-set-uri must not be empty");
 
         NimbusJwtDecoder.JwkSetUriJwtDecoderBuilder builder =
@@ -103,6 +113,7 @@ public class SecurityConfig {
 
         NimbusJwtDecoder decoder = builder.build();
         decoder.setJwtValidator(jwtValidator(properties));
+
         return decoder;
     }
 
@@ -115,17 +126,8 @@ public class SecurityConfig {
         JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
         converter.setPrincipalClaimName("sub");
         converter.setJwtGrantedAuthoritiesConverter(authoritiesConverter);
-        return converter;
-    }
 
-    @Bean
-    public BearerTokenResolver bearerTokenResolver() {
-        return request -> {
-            Cookie cookie = WebUtils.getCookie(request, AccessTokenCookieManager.COOKIE_NAME);
-            return cookie != null && StringUtils.hasText(cookie.getValue())
-                    ? cookie.getValue()
-                    : null;
-        };
+        return converter;
     }
 
     private OAuth2TokenValidator<Jwt> jwtValidator(JwtProperties properties) {
@@ -133,8 +135,10 @@ public class SecurityConfig {
         timestampValidator.setAllowEmptyExpiryClaim(false);
 
         List<OAuth2TokenValidator<Jwt>> validators = new ArrayList<>();
-        validators.add(timestampValidator);
-        validators.add(new JwtIssuerValidator(properties.getIssuer()));
+        validators.add(JwtValidators.createDefaultWithValidators(
+                timestampValidator,
+                new JwtIssuerValidator(properties.getIssuer())
+        ));
         validators.add(jwt -> jwt.getAudience().stream().anyMatch(properties.getAudiences()::contains)
                 ? OAuth2TokenValidatorResult.success()
                 : validationFailure("JWT audience is not allowed"));
@@ -166,6 +170,23 @@ public class SecurityConfig {
     }
 
     private OAuth2TokenValidatorResult validationFailure(String description) {
-        return OAuth2TokenValidatorResult.failure(new OAuth2Error("invalid_token", description, null));
+        return OAuth2TokenValidatorResult.failure(
+                new OAuth2Error("invalid_token", description, null)
+        );
+    }
+
+    @Bean
+    public BearerTokenResolver bearerTokenResolver() {
+        return request -> {
+            Cookie cookie = WebUtils.getCookie(request, AccessTokenCookieManager.COOKIE_NAME);
+            return cookie != null && StringUtils.hasText(cookie.getValue())
+                    ? cookie.getValue()
+                    : null;
+        };
+    }
+
+    @Bean
+    public Clock clock() {
+        return Clock.systemUTC();
     }
 }

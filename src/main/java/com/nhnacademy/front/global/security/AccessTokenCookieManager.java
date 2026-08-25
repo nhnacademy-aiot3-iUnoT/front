@@ -26,17 +26,19 @@ public class AccessTokenCookieManager {
     }
 
     public void add(HttpServletResponse response, String accessToken) {
-        response.addHeader(
-                HttpHeaders.SET_COOKIE,
-                baseCookie(accessToken).maxAge(accessTokenTtl).build().toString()
-        );
+        ResponseCookie cookie = baseCookie(accessToken)
+                .maxAge(accessTokenTtl)
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
 
     public void delete(HttpServletResponse response) {
-        response.addHeader(
-                HttpHeaders.SET_COOKIE,
-                baseCookie("").maxAge(Duration.ZERO).build().toString()
-        );
+        ResponseCookie cookie = baseCookie("")
+                .maxAge(Duration.ZERO)
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
 
     private ResponseCookie.ResponseCookieBuilder baseCookie(String value) {

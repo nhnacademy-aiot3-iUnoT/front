@@ -29,5 +29,15 @@ gateway:
 cookie:
   secure: true
 
+security:
+  jwt:
+    issuer: ${JWT_ISSUER:account-api}
+    access-token-ttl: ${JWT_ACCESS_TOKEN_TTL:30m}
+    allowed-algorithms:
+      - rs256
+    jwk-set-uri: ${JWK_SET_URI:http://team1-account-1:10413/.well-known/jwks.json}
+    audiences:
+      - front
+
 juso:
   confirm-key: ${JUSO_CONFIRM_KEY}

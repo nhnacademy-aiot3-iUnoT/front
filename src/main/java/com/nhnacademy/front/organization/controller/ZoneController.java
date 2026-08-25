@@ -1,12 +1,11 @@
 package com.nhnacademy.front.organization.controller;
 
+import com.nhnacademy.front.organization.client.OrganizationMemberApiClient;
 import com.nhnacademy.front.organization.client.ZoneApiClient;
 import com.nhnacademy.front.organization.client.ZoneSensorApiClient;
 import com.nhnacademy.front.organization.client.ZoneThresholdApiClient;
-import com.nhnacademy.front.organization.dto.response.ZoneDetailResponse;
-import com.nhnacademy.front.organization.dto.response.ZoneInfoResponse;
-import com.nhnacademy.front.organization.dto.response.ZoneSensorInfoResponse;
-import com.nhnacademy.front.organization.dto.response.ZoneThresholdInfoResponse;
+import com.nhnacademy.front.organization.dto.OrganizationRole;
+import com.nhnacademy.front.organization.dto.response.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -14,6 +13,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
 
@@ -25,6 +25,8 @@ public class ZoneController {
     private final ZoneApiClient zoneApiClient;
     private final ZoneThresholdApiClient thresholdApiClient;
     private final ZoneSensorApiClient sensorApiClient;
+    private final OrganizationMemberApiClient organizationMemberApiClient;
+
 
     @GetMapping("/{storage-id}/zones/{zone-id}")
     public String getZoneDetail(
@@ -37,11 +39,35 @@ public class ZoneController {
                 .getZoneThresholds(zoneId);
         List<ZoneSensorInfoResponse> sensorList = sensorApiClient
                 .getZoneThresholds(zoneId);
+        OrganizationMemberRoleResponse roleResponse = organizationMemberApiClient.getRole();
+        boolean canManage = (
+                roleResponse.role() == OrganizationRole.ORG_BOSS ||
+                        roleResponse.role() == OrganizationRole.ORG_OWNER
+        );
 
         model.addAttribute("zone", zone);
         model.addAttribute("thresholdList", thresholdList);
         model.addAttribute("sensorList", sensorList);
+        model.addAttribute("canManage", canManage);
 
         return "zone/detail";
     }
+
+
+
+
+
+
+
+
+    // 해당 저장소의 구역 찾기
+    @GetMapping("/{storage-id}/zones")
+    @ResponseBody
+    public List<ZoneInfoResponse> getZones(@PathVariable(name="storage-id")Long storageId){
+
+        return zoneApiClient.getZones(storageId);
+    }
+
+
+
 }

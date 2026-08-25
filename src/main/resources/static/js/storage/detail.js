@@ -1,6 +1,3 @@
-// 💡 API 서버(또는 게이트웨이) 주소와 포트
-const API_BASE_URL = 'http://localhost:10400';
-
 // --- 저장소 수정 모달 제어 ---
 function openEditModal() {
     document.getElementById('edit-modal').style.display = 'flex';
@@ -37,9 +34,10 @@ function updateStorage(storageId) {
         return;
     }
 
-    fetch(`${API_BASE_URL}/api/core/storages/${storageId}`, {
+    fetch(`/api/core/storages/${storageId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ name: name, description: description === '' ? null : description })
     })
         .then(response => {
@@ -63,9 +61,10 @@ function toggleStorageStatus(storageId, currentStatus) {
 
     if (!confirm(`이 저장소를 ${actionText} 하시겠습니까?`)) return;
 
-    fetch(`${API_BASE_URL}/api/core/storages/${storageId}/status`, {
+    fetch(`/api/core/storages/${storageId}/status`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ status: newStatus })
     })
         .then(response => {
@@ -85,8 +84,9 @@ function toggleStorageStatus(storageId, currentStatus) {
 function deleteStorage(storageId) {
     if (!confirm('정말 이 저장소를 삭제하시겠습니까?')) return;
 
-    fetch(`${API_BASE_URL}/api/core/storages/${storageId}`, {
-        method: 'DELETE'
+    fetch(`/api/core/storages/${storageId}`, {
+        method: 'DELETE',
+        credentials: 'include'
     })
         .then(response => {
             if (response.ok || response.status === 204) {
@@ -126,9 +126,10 @@ function createZone(storageId) {
         return;
     }
 
-    fetch(`${API_BASE_URL}/api/core/storages/${storageId}/zones`, {
+    fetch(`/api/core/storages/${storageId}/zones`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ name: name, description: description === '' ? null : description })
     })
         .then(response => {
@@ -160,11 +161,12 @@ function updateStockThreshold(storageId, thresholdId) {
         return;
     }
 
-    fetch(`${API_BASE_URL}/api/core/storages/${storageId}/stock-thresholds/${thresholdId}`, {
+    fetch(`/api/core/storages/${storageId}/stock-thresholds/${thresholdId}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
         },
+        credentials: 'include',
         body: JSON.stringify(requestData)
     })
         .then(response => {
@@ -192,8 +194,9 @@ function deleteStockThreshold(storageId, thresholdId) {
         return;
     }
 
-    fetch(`${API_BASE_URL}/api/core/storages/${storageId}/stock-thresholds/${thresholdId}`, {
-        method: 'DELETE'
+    fetch(`/api/core/storages/${storageId}/stock-thresholds/${thresholdId}`, {
+        method: 'DELETE',
+        credentials: 'include'
     })
         .then(response => {
             if (response.ok || response.status === 204) {
@@ -236,7 +239,9 @@ function searchMedicines() {
     }
 
     // SearchType.PRODUCT_NAME 기준 검색 요청 (필요시 page, size 조절 가능)
-    fetch(`${API_BASE_URL}/api/core/medicines?searchType=PRODUCT_NAME&search=${encodeURIComponent(keyword)}&page=0&size=5`)
+    fetch(`/api/core/medicines?searchType=PRODUCT_NAME&search=${encodeURIComponent(keyword)}&page=0&size=5`, {
+        credentials: 'include'
+    })
         .then(res => res.json())
         .then(resData => {
             // ApiResponse 구조에 맞게 content 배열 추출 (PageResponse 구조 고려)
@@ -295,11 +300,12 @@ function saveStockThreshold(storageId) {
         stockThreshold: stockThreshold
     };
 
-    fetch(`${API_BASE_URL}/api/core/storages/${storageId}/stock-thresholds`, {
+    fetch(`/api/core/storages/${storageId}/stock-thresholds`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
+        credentials: 'include',
         body: JSON.stringify(requestData)
     })
         .then(response => {

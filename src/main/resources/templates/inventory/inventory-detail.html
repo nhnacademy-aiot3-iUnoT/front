@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main-layout}">
+
+<head>
+    <title>재고 상세 | iUnoT</title>
+    <link rel="stylesheet" th:href="@{/css/inventory-design.css}">
+</head>
+
+<body>
+<div layout:fragment="content">
+    <main class="inventory-page detail-page">
+        <p class="breadcrumb">
+            <a th:href="@{/inventories}">재고 관리</a>
+            <span>/</span> 전체 재고 <span>/</span> 재고 상세
+        </p>
+
+        <div class="detail-heading">
+            <div >
+                <h1 th:text="${inventory.storageName}"></h1>
+                <p class="description">의약품 재고 상세 정보와 보관 위치를 확인합니다.</p>
+            </div>
+            <a class="secondary-button" th:href="@{/inventories}">← 목록으로</a>
+        </div>
+
+        <section class="detail-card hero-medicine">
+            <p class="eyebrow">의약품 정보</p>
+            <h2 th:text="${inventory.productName}">아세트아미노펜정 500mg</h2>
+
+            <div class="medicine-meta">
+                <div class="meta-item">
+                    <span class="meta-label">품목코드</span>
+                    <span class="meta-value" th:text="${inventory.itemCode}">
+                        MED-000184
+                    </span>
+                </div>
+
+                <div class="meta-item">
+                    <span class="meta-label">제조사</span>
+                    <span class="meta-value" th:text="${medicineInfo.companyName}">
+                        한미약품
+                    </span>
+                </div>
+
+                <div class="meta-item">
+                    <span class="meta-label">포장단위</span>
+                    <span class="meta-value" th:text="${medicineInfo.packUnit}">
+                        30정/병
+                    </span>
+                </div>
+
+                <div class="meta-item">
+                    <span class="meta-label">저장방법</span>
+                    <span class="meta-value" th:text="${medicineInfo.storageMethod}"></span>
+                </div>
+
+                <div class="meta-item">
+                    <span class="meta-label">마약코드</span>
+                    <span class="meta-value" th:text="${medicineInfo.narcoticKindCode == null ? '해당없음' : medicineInfo.narcoticKindCode}"></span>
+                </div>
+            </div>
+
+        </section>
+
+
+        <section class="detail-card">
+            <div class="section-title">
+                <div>
+                    <p class="eyebrow">재고 현황</p>
+<!--                    <h2 th:text="${inventory.storageName}">00저장소</h2>-->
+                </div>
+                <strong class="total-stock" th:text="|총 ${totalQuantity}정|">총 180정</strong>
+            </div>
+            <div class="stock-table-wrap">
+                <table class="stock-table" th:each="item : ${inventories}">
+                    <thead>
+                    <tr>
+                        <th>보관 구역</th>
+                        <th>제조번호</th>
+                        <th>유통기한</th>
+                        <th>수량</th>
+                        <th>상태</th>
+                        <th class="action-column"></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td th:text="${item.zoneName}">A-03 상온 보관구역 · 선반 2</td>
+                        <td th:text="${item.lotNumber}"></td>
+                        <td th:text="${item.expirationDate}"></td>
+                        <td th:text="${item.currentQuantity}"><strong>120정</strong></td>
+                        <td th:text="${item.managementStatus}" class="status-badge normal">정상</td>
+                        <td class="action-column">
+                            <a class="btn btn-sm btn-outline-primary" th:href="@{/outbound}">출고</a>
+                            <a class="btn btn-sm btn-outline-danger" th:href="@{/disposal}">폐기</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+
+
+                <div class="pageination" th:if="${totalPages >1}">
+                    <a th:if="${currentPage >0}"
+                       th:href="@{/inventories/storages/{storageId}/pack-units/{packUnitId}(storageId=${inventory.storageId},packUnitId=${inventory.medicinePackUnitId},page=${currentPage - 1}, size=${pageSize})}">
+                        이전</a>
+
+                    <a th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}"
+                       th:href="@{/inventories/storages/{storageId}/pack-units/{packUnitId}(storageId=${inventory.storageId},packUnitId=${inventory.medicinePackUnitId},page=${pageNum},size=${pageSize})}"
+                       th:text="${pageNum + 1}"
+                       th:classappend="${pageNum == currentPage} ? ' active'">1</a>
+
+                    <a th:if="${currentPage + 1 < totalPages}"
+                       th:href="@{/inventories/storages/{storageId}/pack-units/{packUnitId}(storageId=${inventory.storageId},packUnitId=${inventory.medicinePackUnitId},page=${currentPage + 1},size=${pageSize})}">
+                        다음
+                    </a>
+
+                </div>
+
+
+
+            </div>
+        </section>
+    </main>
+</div>
+</body>
+</html>

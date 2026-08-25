@@ -101,16 +101,20 @@ public class GatewayClient {
                         .body(responseType));
     }
 
-    public void post(String path, Object body) {
-        try {
+
+    public void post(String path, Object body){
+
+        try{
             restClient.post()
-                    .uri(URI.create(baseUrl + path))
+                    .uri(baseUrl + path)
                     .body(body)
                     .retrieve()
                     .toBodilessEntity();
-        } catch (HttpStatusCodeException e) {
+
+        }catch(HttpStatusCodeException e){
             throw convertApiException(e);
         }
+
     }
 
     public void post(String path) {
@@ -203,7 +207,7 @@ public class GatewayClient {
     private ApiException convertApiException(HttpStatusCodeException e) {
         String responseBody = e.getResponseBodyAsString();
 
-        log.error(
+        log.warn(
                 "Gateway request failed. status={}, body={}",
                 e.getStatusCode(),
                 responseBody

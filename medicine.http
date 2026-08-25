@@ -1,0 +1,7 @@
+
+
+###
+GET http://localhost:10404/inventory
+
+###
+GET http://localhost:10404/inventories

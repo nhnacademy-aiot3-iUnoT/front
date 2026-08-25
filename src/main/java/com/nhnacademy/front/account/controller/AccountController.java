@@ -1,10 +1,10 @@
 package com.nhnacademy.front.account.controller;
 
 import com.nhnacademy.front.account.client.AccountApiClient;
+import com.nhnacademy.front.account.dto.request.ChangeOwnPasswordRequest;
 import com.nhnacademy.front.account.dto.request.ChangePasswordFormRequest;
 import com.nhnacademy.front.account.dto.request.ReactivationConfirmRequest;
 import com.nhnacademy.front.account.dto.request.UpdateAccountNameRequest;
-import com.nhnacademy.front.account.dto.request.UpdateAccountPasswordRequest;
 import com.nhnacademy.front.account.dto.request.WithdrawAccountRequest;
 import com.nhnacademy.front.account.dto.response.AccountInfoResponse;
 import com.nhnacademy.front.account.validator.PasswordFormValidator;
@@ -35,13 +35,8 @@ public class AccountController {
     private final AccessTokenCookieManager cookieManager;
 
     @GetMapping("/mypage")
-    public String info(
-            Model model
-    ) {
-
-        AccountInfoResponse response = accountApiClient.getAccountInfo();
-        model.addAttribute("accountInfoResponse", response);
-
+    public String info(Model model) {
+        populateAccountInfoModel(model);
         return "account/account-info";
     }
 
@@ -110,17 +105,28 @@ public class AccountController {
 
     @PutMapping("/mypage")
     public String changeName(
-            @Valid @ModelAttribute UpdateAccountNameRequest request,
+            @Valid @ModelAttribute("nameRequest") UpdateAccountNameRequest request,
             BindingResult bindingResult,
+            Model model,
             RedirectAttributes redirectAttributes
     ) {
         if (bindingResult.hasErrors()) {
-            return "redirect:/mypage";
+            populateAccountInfoModel(model);
+            return "account/account-info";
         }
 
         accountApiClient.changeName(request);
         redirectAttributes.addFlashAttribute("successMessage", "회원정보가 수정되었습니다.");
         return "redirect:/mypage";
+    }
+
+    private void populateAccountInfoModel(Model model) {
+        AccountInfoResponse response = accountApiClient.getAccountInfo();
+        model.addAttribute("accountInfoResponse", response);
+
+        if (!model.containsAttribute("nameRequest")) {
+            model.addAttribute("nameRequest", new UpdateAccountNameRequest(response.name()));
+        }
     }
 
     @GetMapping("/mypage/change-password")
@@ -140,7 +146,10 @@ public class AccountController {
             return "account/change-password";
         }
 
-        accountApiClient.changePassword(new UpdateAccountPasswordRequest(request.newPassword()));
+        accountApiClient.changePassword(new ChangeOwnPasswordRequest(
+                request.currentPassword(),
+                request.newPassword()
+        ));
         return "redirect:/mypage";
     }
 

@@ -1,10 +1,9 @@
-// 💡 API Gateway 서버의 주소와 포트 (예: 10400)
-const GATEWAY_URL = 'http://localhost:10400';
-
 // 모달 열기
 function openCreateModal() {
     document.getElementById('create-modal').style.display = 'flex';
     document.getElementById('new-name').focus();
+
+    loadDepartmentsForModal();
 }
 
 // 모달 닫기
@@ -12,6 +11,50 @@ function closeCreateModal() {
     document.getElementById('create-modal').style.display = 'none';
     document.getElementById('new-name').value = '';
     document.getElementById('new-description').value = '';
+    document.getElementById('department-checkbox-container').innerHTML = '';
+}
+
+function loadDepartmentsForModal() {
+    const container = document.getElementById('department-checkbox-container');
+    container.innerHTML = '<span style="color: #888; font-size: 13px;">부서 목록을 불러오는 중...</span>';
+
+    fetch(`/api/core/departments`, {
+        method: 'GET',
+        credentials: 'include'
+    })
+        .then(response => {
+            if (!response.ok) throw new Error('부서 목록을 불러오지 못했습니다.');
+            return response.json();
+        })
+        .then(result => {
+            container.innerHTML = '';
+
+            const departments = result.data || [];
+
+            if (!departments || departments.length === 0) {
+                container.innerHTML = '<span style="color: #888; font-size: 13px;">등록된 부서가 없습니다.</span>';
+                return;
+            }
+
+            departments.forEach(dept => {
+                const label = document.createElement('label');
+
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.name = 'departmentIds';
+                checkbox.value = dept.id;
+                checkbox.style.marginRight = '6px';
+
+                label.appendChild(checkbox);
+                label.append(`${dept.name} (${dept.status})`);
+
+                container.appendChild(label);
+            });
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            container.innerHTML = '<span style="color: red; font-size: 13px;">부서 목록 로드 실패</span>';
+        });
 }
 
 // 저장소 생성 API 호출 함수
@@ -21,6 +64,10 @@ function createStorage() {
 
     const name = nameInput.value.trim();
     const description = descInput.value.trim();
+
+    const selectedDepartments = Array.from(
+        document.querySelectorAll('input[name="departmentIds"]:checked')
+    ).map(cb => Number(cb.value));
 
     // 클라이언트단 유효성 검사 (@NotBlank, @Size 대응)
     if (!name) {
@@ -39,15 +86,16 @@ function createStorage() {
         return;
     }
 
-    // 💡 게이트웨이 주소를 포함한 절대 경로로 요청
-    fetch(`${GATEWAY_URL}/api/core/storages`, {
+    fetch(`/api/core/storages`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({
             name: name,
-            description: description === '' ? null : description
+            description: description === '' ? null : description,
+            departmentIds: selectedDepartments.length > 0 ? selectedDepartments : null
         })
     })
         .then(response => {

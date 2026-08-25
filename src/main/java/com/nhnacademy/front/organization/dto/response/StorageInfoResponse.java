@@ -1,8 +1,7 @@
 package com.nhnacademy.front.organization.dto.response;
 
-import com.nhnacademy.front.organization.dto.StorageStatus;
 
-import java.time.LocalDateTime;
+import com.nhnacademy.front.organization.dto.StorageStatus;
 
 public record StorageInfoResponse(
         Long storageId,

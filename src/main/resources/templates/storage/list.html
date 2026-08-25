@@ -19,7 +19,10 @@
                       th:text="${storageList[0].organizationName + ' > '}"></span>
                 📦 저장소 목록
             </h2>
-            <button type="button" onclick="openCreateModal()" class="btn-primary">+ 저장소 추가</button>
+            <button type="button"
+                    th:if="${canManage}"
+                    onclick="openCreateModal()"
+                    class="btn-primary">+ 저장소 추가</button>
         </div>
 
         <table>
@@ -49,7 +52,7 @@
     </div>
 
     <!-- 저장소 추가 모달 박스 -->
-    <div id="create-modal" style="display:none;" class="modal-wrapper">
+    <div id="create-modal" style="display:none;" class="modal-wrapper" th:if="${canManage}">
         <div class="modal-backdrop" onclick="closeCreateModal()"></div>
         <div class="modal-box">
             <h3>저장소 추가</h3>
@@ -58,6 +61,11 @@
 
             <label for="new-description">설명</label>
             <textarea id="new-description" placeholder="설명 (선택, 최대 255자)" maxlength="255"></textarea>
+
+            <label>연결 부서 (선택)</label>
+            <div id="department-checkbox-container" class="department-scroll-box">
+                <span style="color: #888; font-size: 13px;">부서 목록을 불러오는 중...</span>
+            </div>
 
             <div class="modal-actions">
                 <button type="button" onclick="closeCreateModal()">취소</button>

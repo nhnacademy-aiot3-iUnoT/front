@@ -6,26 +6,39 @@
 <head>
     <meta charset="UTF-8">
     <title th:text="${edit} ? |Zone ${zoneId} 가상 센서 수정| : |Zone ${zoneId} 가상 센서 생성|">가상 센서 생성</title>
+    <link rel="stylesheet" th:href="@{/css/virtualsensor.css}">
 </head>
 <body>
 <!-- 생성 / 수정을 같은 폼으로 처리한다. edit=true 이면 수정 모드 -->
-<main layout:fragment="content">
+<main layout:fragment="content" class="virtual-sensor-form">
 
-    <div class="page-header mt-3">
-        <div class="row align-items-center">
-            <div class="col">
-                <h2 class="page-title"
-                    th:text="${edit} ? |Zone ${zoneId} 가상 센서 수정| : |Zone ${zoneId} 가상 센서 생성|">
-                    가상 센서 생성
-                </h2>
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb breadcrumb-arrows mb-0">
+            <li class="breadcrumb-item"><a href="/">환경관리</a></li>
+            <li class="breadcrumb-item"><span th:text="|저장소 ${storageId}|">저장소</span></li>
+            <li class="breadcrumb-item">
+                <a th:href="@{/organizations/me/storages/{storageId}/zones/{zoneId}/sensorInfo(
+                           storageId=${storageId}, zoneId=${zoneId})}"
+                   th:text="|Zone ${zoneId}|">Zone</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page"
+                th:text="${edit} ? '가상 센서 수정' : '가상 센서 생성'">가상 센서 생성</li>
+        </ol>
+    </nav>
 
-                <div class="text-muted">
-                    실제 센서 없이 측정값을 생성해 전송합니다. 선택한 센서 타입만 설정한 주기에 맞춰 발행되며,
-                    문 상태는 값이 바뀔 때만 발행됩니다.
-                </div>
-            </div>
+    <header class="virtual-sensor-heading">
+        <div class="virtual-sensor-heading-icon"><i class="ti ti-cpu"></i></div>
+        <div>
+            <div class="page-pretitle">VIRTUAL SENSOR</div>
+            <h2 class="page-title"
+                th:text="${edit} ? |Zone ${zoneId} 가상 센서 수정| : |Zone ${zoneId} 가상 센서 생성|">
+                가상 센서 생성
+            </h2>
+            <p class="virtual-sensor-description">
+                실제 장비 없이 테스트용 측정값을 생성합니다. 센서별 생성 방식과 발행 주기를 설정하세요.
+            </p>
         </div>
-    </div>
+    </header>
 
     <div class="alert alert-danger" role="alert"
          th:if="${errorMessage}" th:text="${errorMessage}"></div>
@@ -37,15 +50,17 @@
                           storageId=${storageId},
                           zoneId=${zoneId})}">
 
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            기본 정보
-                        </h3>
+                <div class="card virtual-sensor-card">
+                    <div class="card-header section-header">
+                        <span class="section-icon"><i class="ti ti-adjustments-horizontal"></i></span>
+                        <div>
+                            <h3 class="card-title">기본 정보</h3>
+                            <p>가상 센서를 식별하고 데이터가 생성될 간격을 정합니다.</p>
+                        </div>
                     </div>
 
                     <div class="card-body">
-                        <div class="row">
+                        <div class="row basic-info-grid">
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label class="form-label required" for="deviceEui">
@@ -90,194 +105,288 @@
                         </div>
                     </div>
 
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            측정값 범위
-                        </h3>
+                    <div class="card-header section-header">
+                        <span class="section-icon"><i class="ti ti-wave-sine"></i></span>
+                        <div>
+                            <h3 class="card-title">측정값 생성 설정</h3>
+                            <p>필요한 센서를 선택한 다음 값을 만드는 방식을 설정합니다.</p>
+                        </div>
                     </div>
 
                     <div class="card-body">
-                        <div class="text-muted mb-3">
-                            <span th:if="${!edit}">센서 타입을 하나 이상 선택하고 생성 범위를 입력하세요.</span>
-                            <span th:if="${edit}">매 주기마다 아래 범위 안에서 무작위 값이 생성됩니다.</span>
-                        </div>
+                        <div class="mb-4" id="sensorTypeSelection">
+                            <div class="sensor-selection-heading">
+                                <label class="form-label required mb-0">생성할 센서 타입</label>
+                                <span id="selectedSensorCount" class="badge bg-secondary-lt" aria-live="polite">0개 선택</span>
+                            </div>
 
-                        <div class="mb-4" th:if="${!edit}" id="sensorTypeSelection">
-                            <label class="form-label required">생성할 센서 타입</label>
-
-                            <div class="d-flex flex-wrap gap-3">
-                                <label class="form-check">
+                            <div class="sensor-type-grid">
+                                <label class="sensor-type-option" data-sensor-option="TEMPERATURE">
                                     <input class="form-check-input sensor-type-checkbox" type="checkbox"
                                            name="enabledSensorTypes" value="TEMPERATURE"
                                            data-sensor-type="TEMPERATURE"
-                                           th:checked="${param.enabledSensorTypes != null
-                                                       and #arrays.contains(param.enabledSensorTypes, 'TEMPERATURE')}">
-                                    <span class="form-check-label">온도</span>
+                                           th:checked="${virtualSensor != null
+                                                       ? virtualSensor.virtualSensorValues.temperature != null
+                                                       : param.enabledSensorTypes != null
+                                                         and #arrays.contains(param.enabledSensorTypes, 'TEMPERATURE')}">
+                                    <span class="sensor-type-icon sensor-type-temperature"><i class="ti ti-temperature"></i></span>
+                                    <span class="sensor-type-copy"><strong>온도</strong><small>°C</small></span>
+                                    <i class="ti ti-check sensor-type-check"></i>
                                 </label>
 
-                                <label class="form-check">
+                                <label class="sensor-type-option" data-sensor-option="HUMIDITY">
                                     <input class="form-check-input sensor-type-checkbox" type="checkbox"
                                            name="enabledSensorTypes" value="HUMIDITY"
                                            data-sensor-type="HUMIDITY"
-                                           th:checked="${param.enabledSensorTypes != null
-                                                       and #arrays.contains(param.enabledSensorTypes, 'HUMIDITY')}">
-                                    <span class="form-check-label">습도</span>
+                                           th:checked="${virtualSensor != null
+                                                       ? virtualSensor.virtualSensorValues.humidity != null
+                                                       : param.enabledSensorTypes != null
+                                                         and #arrays.contains(param.enabledSensorTypes, 'HUMIDITY')}">
+                                    <span class="sensor-type-icon sensor-type-humidity"><i class="ti ti-droplet"></i></span>
+                                    <span class="sensor-type-copy"><strong>습도</strong><small>%</small></span>
+                                    <i class="ti ti-check sensor-type-check"></i>
                                 </label>
 
-                                <label class="form-check">
+                                <label class="sensor-type-option" data-sensor-option="ILLUMINATION">
                                     <input class="form-check-input sensor-type-checkbox" type="checkbox"
                                            name="enabledSensorTypes" value="ILLUMINATION"
                                            data-sensor-type="ILLUMINATION"
-                                           th:checked="${param.enabledSensorTypes != null
-                                                       and #arrays.contains(param.enabledSensorTypes, 'ILLUMINATION')}">
-                                    <span class="form-check-label">밝기</span>
+                                           th:checked="${virtualSensor != null
+                                                       ? virtualSensor.virtualSensorValues.illumination != null
+                                                       : param.enabledSensorTypes != null
+                                                         and #arrays.contains(param.enabledSensorTypes, 'ILLUMINATION')}">
+                                    <span class="sensor-type-icon sensor-type-illumination"><i class="ti ti-sun"></i></span>
+                                    <span class="sensor-type-copy"><strong>밝기</strong><small>lux</small></span>
+                                    <i class="ti ti-check sensor-type-check"></i>
                                 </label>
 
-                                <label class="form-check">
+                                <label class="sensor-type-option" data-sensor-option="DOOR">
                                     <input class="form-check-input sensor-type-checkbox" type="checkbox"
                                            name="enabledSensorTypes" value="DOOR"
                                            data-sensor-type="DOOR"
-                                           th:checked="${param.enabledSensorTypes != null
-                                                       and #arrays.contains(param.enabledSensorTypes, 'DOOR')}">
-                                    <span class="form-check-label">문 열림</span>
+                                           th:checked="${virtualSensor != null
+                                                       ? virtualSensor.virtualSensorValues.door != null
+                                                       : param.enabledSensorTypes != null
+                                                         and #arrays.contains(param.enabledSensorTypes, 'DOOR')}">
+                                    <span class="sensor-type-icon sensor-type-door"><i class="ti ti-door"></i></span>
+                                    <span class="sensor-type-copy"><strong>문 상태</strong><small>열림 · 닫힘</small></span>
+                                    <i class="ti ti-check sensor-type-check"></i>
                                 </label>
                             </div>
 
                             <div class="invalid-feedback d-block" id="sensorTypeFeedback" hidden></div>
                         </div>
 
-                        <div data-sensor-fields="TEMPERATURE"
-                             th:if="${!edit or virtualSensor.temperature != null}">
-                        <label class="form-label required">온도 (°C)</label>
+                        <div class="sensor-config-empty" id="sensorConfigEmpty">
+                            <span><i class="ti ti-pointer"></i></span>
+                            <div>
+                                <strong>설정할 센서를 선택해 주세요</strong>
+                                <p>선택한 센서의 세부 설정만 아래에 표시됩니다.</p>
+                            </div>
+                        </div>
 
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
+                        <div class="sensor-config-list" id="sensorConfigList">
+
+                        <div class="sensor-config-card" data-sensor-fields="TEMPERATURE">
+                            <div class="sensor-config-title">
+                                <span class="sensor-type-icon sensor-type-temperature"><i class="ti ti-temperature"></i></span>
+                                <div><strong>온도 설정</strong><small>범위 내 무작위 값 또는 고정값을 생성합니다.</small></div>
+                            </div>
+                            <div class="sensor-single-field mb-3">
+                                <label class="form-label required" for="temperatureMode">생성 방식</label>
+                                <select class="form-select generation-mode-select" id="temperatureMode"
+                                        name="virtualSensorValues.valueMap[TEMPERATURE].mode"
+                                        data-sensor-type="TEMPERATURE">
+                                        <option value="RANGE"
+                                                th:selected="${virtualSensor == null
+                                                             or virtualSensor.virtualSensorValues.temperature == null
+                                                             or virtualSensor.virtualSensorValues.temperature.mode.name() == 'RANGE'}">범위 내 무작위</option>
+                                        <option value="FIXED"
+                                                th:selected="${virtualSensor != null
+                                                             and virtualSensor.virtualSensorValues.temperature != null
+                                                             and virtualSensor.virtualSensorValues.temperature.mode.name() == 'FIXED'}">고정값</option>
+                                </select>
+                            </div>
+                            <div class="sensor-range-fields" data-mode-fields="RANGE">
+                                <div class="sensor-range-field mb-3">
                                     <div class="input-group">
                                         <span class="input-group-text">최소</span>
-
                                         <input type="number" class="form-control" id="temperatureMin"
-                                               name="temperature.min" step="0.1" required
-                                               th:value="${virtualSensor != null and virtualSensor.temperature != null
-                                                           ? virtualSensor.temperature.min : 20}">
+                                               name="virtualSensorValues.valueMap[TEMPERATURE].min" step="0.1" required
+                                               th:value="${virtualSensor != null and virtualSensor.virtualSensorValues.temperature != null
+                                                           ? virtualSensor.virtualSensorValues.temperature.min : 20}">
                                     </div>
-
                                     <div class="invalid-feedback"></div>
                                 </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <div class="mb-3">
+                                <div class="sensor-range-field mb-3">
                                     <div class="input-group">
                                         <span class="input-group-text">최대</span>
-
                                         <input type="number" class="form-control" id="temperatureMax"
-                                               name="temperature.max" step="0.1" required
-                                               th:value="${virtualSensor != null and virtualSensor.temperature != null
-                                                           ? virtualSensor.temperature.max : 30}">
+                                               name="virtualSensorValues.valueMap[TEMPERATURE].max" step="0.1" required
+                                               th:value="${virtualSensor != null and virtualSensor.virtualSensorValues.temperature != null
+                                                           ? virtualSensor.virtualSensorValues.temperature.max : 30}">
                                     </div>
-
                                     <div class="invalid-feedback"></div>
                                 </div>
                             </div>
-                        </div>
+                            <div class="mb-3" data-mode-fields="FIXED">
+                                <label class="form-label required" for="temperatureFixedValue">고정값</label>
+                                <input type="number" class="form-control" id="temperatureFixedValue"
+                                       name="virtualSensorValues.valueMap[TEMPERATURE].fixedValue" step="0.1" required
+                                       th:value="${virtualSensor != null and virtualSensor.virtualSensorValues.temperature != null
+                                                   ? virtualSensor.virtualSensorValues.temperature.fixedValue : 25}">
+                                <div class="invalid-feedback"></div>
+                            </div>
                         </div>
 
-                        <div data-sensor-fields="HUMIDITY"
-                             th:if="${!edit or virtualSensor.humidity != null}">
-                        <label class="form-label required">습도 (%)</label>
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
+                        <div class="sensor-config-card" data-sensor-fields="HUMIDITY">
+                            <div class="sensor-config-title">
+                                <span class="sensor-type-icon sensor-type-humidity"><i class="ti ti-droplet"></i></span>
+                                <div><strong>습도 설정</strong><small>범위 내 무작위 값 또는 고정값을 생성합니다.</small></div>
+                            </div>
+                            <div class="sensor-single-field mb-3">
+                                <label class="form-label required" for="humidityMode">생성 방식</label>
+                                <select class="form-select generation-mode-select" id="humidityMode"
+                                        name="virtualSensorValues.valueMap[HUMIDITY].mode"
+                                        data-sensor-type="HUMIDITY">
+                                        <option value="RANGE"
+                                                th:selected="${virtualSensor == null
+                                                             or virtualSensor.virtualSensorValues.humidity == null
+                                                             or virtualSensor.virtualSensorValues.humidity.mode.name() == 'RANGE'}">범위 내 무작위</option>
+                                        <option value="FIXED"
+                                                th:selected="${virtualSensor != null
+                                                             and virtualSensor.virtualSensorValues.humidity != null
+                                                             and virtualSensor.virtualSensorValues.humidity.mode.name() == 'FIXED'}">고정값</option>
+                                </select>
+                            </div>
+                            <div class="sensor-range-fields" data-mode-fields="RANGE">
+                                <div class="sensor-range-field mb-3">
                                     <div class="input-group">
                                         <span class="input-group-text">최소</span>
-
                                         <input type="number" class="form-control" id="humidityMin"
-                                               name="humidity.min" step="0.1" required
-                                               th:value="${virtualSensor != null and virtualSensor.humidity != null
-                                                           ? virtualSensor.humidity.min : 40}">
+                                               name="virtualSensorValues.valueMap[HUMIDITY].min" step="0.1" required
+                                               th:value="${virtualSensor != null and virtualSensor.virtualSensorValues.humidity != null
+                                                           ? virtualSensor.virtualSensorValues.humidity.min : 40}">
                                     </div>
-
                                     <div class="invalid-feedback"></div>
                                 </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <div class="mb-3">
+                                <div class="sensor-range-field mb-3">
                                     <div class="input-group">
                                         <span class="input-group-text">최대</span>
-
                                         <input type="number" class="form-control" id="humidityMax"
-                                               name="humidity.max" step="0.1" required
-                                               th:value="${virtualSensor != null and virtualSensor.humidity != null
-                                                           ? virtualSensor.humidity.max : 60}">
+                                               name="virtualSensorValues.valueMap[HUMIDITY].max" step="0.1" required
+                                               th:value="${virtualSensor != null and virtualSensor.virtualSensorValues.humidity != null
+                                                           ? virtualSensor.virtualSensorValues.humidity.max : 60}">
                                     </div>
-
                                     <div class="invalid-feedback"></div>
                                 </div>
                             </div>
-                        </div>
+                            <div class="mb-3" data-mode-fields="FIXED">
+                                <label class="form-label required" for="humidityFixedValue">고정값</label>
+                                <input type="number" class="form-control" id="humidityFixedValue"
+                                       name="virtualSensorValues.valueMap[HUMIDITY].fixedValue" step="0.1" required
+                                       th:value="${virtualSensor != null and virtualSensor.virtualSensorValues.humidity != null
+                                                   ? virtualSensor.virtualSensorValues.humidity.fixedValue : 50}">
+                                <div class="invalid-feedback"></div>
+                            </div>
                         </div>
 
-                        <div data-sensor-fields="ILLUMINATION"
-                             th:if="${!edit or virtualSensor.illumination != null}">
-                        <label class="form-label required">밝기 (lux)</label>
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
+                        <div class="sensor-config-card" data-sensor-fields="ILLUMINATION">
+                            <div class="sensor-config-title">
+                                <span class="sensor-type-icon sensor-type-illumination"><i class="ti ti-sun"></i></span>
+                                <div><strong>밝기 설정</strong><small>범위 내 무작위 값 또는 고정값을 생성합니다.</small></div>
+                            </div>
+                            <div class="sensor-single-field mb-3">
+                                <label class="form-label required" for="illuminationMode">생성 방식</label>
+                                <select class="form-select generation-mode-select" id="illuminationMode"
+                                        name="virtualSensorValues.valueMap[ILLUMINATION].mode"
+                                        data-sensor-type="ILLUMINATION">
+                                        <option value="RANGE"
+                                                th:selected="${virtualSensor == null
+                                                             or virtualSensor.virtualSensorValues.illumination == null
+                                                             or virtualSensor.virtualSensorValues.illumination.mode.name() == 'RANGE'}">범위 내 무작위</option>
+                                        <option value="FIXED"
+                                                th:selected="${virtualSensor != null
+                                                             and virtualSensor.virtualSensorValues.illumination != null
+                                                             and virtualSensor.virtualSensorValues.illumination.mode.name() == 'FIXED'}">고정값</option>
+                                </select>
+                            </div>
+                            <div class="sensor-range-fields" data-mode-fields="RANGE">
+                                <div class="sensor-range-field mb-3">
                                     <div class="input-group">
                                         <span class="input-group-text">최소</span>
-
                                         <input type="number" class="form-control" id="illuminationMin"
-                                               name="illumination.min" step="1" required
-                                               th:value="${virtualSensor != null and virtualSensor.illumination != null
-                                                           ? virtualSensor.illumination.min : 100}">
+                                               name="virtualSensorValues.valueMap[ILLUMINATION].min" step="1" required
+                                               th:value="${virtualSensor != null and virtualSensor.virtualSensorValues.illumination != null
+                                                           ? virtualSensor.virtualSensorValues.illumination.min : 100}">
                                     </div>
-
                                     <div class="invalid-feedback"></div>
                                 </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <div class="mb-3">
+                                <div class="sensor-range-field mb-3">
                                     <div class="input-group">
                                         <span class="input-group-text">최대</span>
-
                                         <input type="number" class="form-control" id="illuminationMax"
-                                               name="illumination.max" step="1" required
-                                               th:value="${virtualSensor != null and virtualSensor.illumination != null
-                                                           ? virtualSensor.illumination.max : 150}">
+                                               name="virtualSensorValues.valueMap[ILLUMINATION].max" step="1" required
+                                               th:value="${virtualSensor != null and virtualSensor.virtualSensorValues.illumination != null
+                                                           ? virtualSensor.virtualSensorValues.illumination.max : 150}">
                                     </div>
-
                                     <div class="invalid-feedback"></div>
                                 </div>
                             </div>
-                        </div>
-                        </div>
-
-                        <div class="row" data-sensor-fields="DOOR"
-                             th:if="${!edit or virtualSensor.doorOpenProbability != null}">
-                            <div class="">
-                                <div class="mb-3">
-                                    <label class="form-label required" for="doorOpenProbability">
-                                        문 열림 확률
-                                    </label>
-
-                                    <input type="number" class="form-control" id="doorOpenProbability"
-                                           name="doorOpenProbability" min="0" max="1" step="0.01" required
-                                           th:value="${virtualSensor != null and virtualSensor.doorOpenProbability != null
-                                                       ? virtualSensor.doorOpenProbability : 0.01}">
-
-                                    <div class="invalid-feedback"></div>
-
-                                    <small class="form-hint">
-                                        0 ~ 1 사이. 매 주기마다 이 확률로 문 상태를 다시 뽑고,
-                                        직전과 달라졌을 때만 전송합니다.
-                                    </small>
-                                </div>
+                            <div class="mb-3" data-mode-fields="FIXED">
+                                <label class="form-label required" for="illuminationFixedValue">고정값</label>
+                                <input type="number" class="form-control" id="illuminationFixedValue"
+                                       name="virtualSensorValues.valueMap[ILLUMINATION].fixedValue" step="1" required
+                                       th:value="${virtualSensor != null and virtualSensor.virtualSensorValues.illumination != null
+                                                   ? virtualSensor.virtualSensorValues.illumination.fixedValue : 125}">
+                                <div class="invalid-feedback"></div>
                             </div>
+                        </div>
+
+                        <div class="sensor-config-card" data-sensor-fields="DOOR">
+                            <div class="sensor-config-title">
+                                <span class="sensor-type-icon sensor-type-door"><i class="ti ti-door"></i></span>
+                                <div><strong>문 상태 설정</strong><small>열림 확률 또는 고정 상태를 사용합니다.</small></div>
+                            </div>
+                            <div class="sensor-single-field mb-3">
+                                <label class="form-label required" for="doorMode">생성 방식</label>
+                                <select class="form-select generation-mode-select" id="doorMode"
+                                        name="virtualSensorValues.valueMap[DOOR].mode"
+                                        data-sensor-type="DOOR">
+                                        <option value="PROBABILITY"
+                                                th:selected="${virtualSensor == null
+                                                             or virtualSensor.virtualSensorValues.door == null
+                                                             or virtualSensor.virtualSensorValues.door.mode.name() == 'PROBABILITY'}">확률</option>
+                                        <option value="FIXED"
+                                                th:selected="${virtualSensor != null
+                                                             and virtualSensor.virtualSensorValues.door != null
+                                                             and virtualSensor.virtualSensorValues.door.mode.name() == 'FIXED'}">고정 상태</option>
+                                </select>
+                            </div>
+                            <div class="mb-3" data-mode-fields="PROBABILITY">
+                                <label class="form-label required" for="doorProbability">문 열림 확률</label>
+                                <input type="number" class="form-control" id="doorProbability"
+                                       name="virtualSensorValues.valueMap[DOOR].probability"
+                                       min="0" max="1" step="0.01" required
+                                       th:value="${virtualSensor != null and virtualSensor.virtualSensorValues.door != null
+                                                   ? virtualSensor.virtualSensorValues.door.probability : 0.01}">
+                                <div class="invalid-feedback"></div>
+                                <small class="form-hint">0 ~ 1 사이. 직전 상태와 달라졌을 때만 전송합니다.</small>
+                            </div>
+                            <div class="mb-3" data-mode-fields="FIXED">
+                                <label class="form-label required" for="doorFixedValue">고정 상태</label>
+                                <select class="form-select" id="doorFixedValue"
+                                        name="virtualSensorValues.valueMap[DOOR].fixedValue" required>
+                                    <option value="0" th:selected="${virtualSensor == null
+                                                                    or virtualSensor.virtualSensorValues.door == null
+                                                                    or virtualSensor.virtualSensorValues.door.fixedValue == null
+                                                                    or virtualSensor.virtualSensorValues.door.fixedValue == 0}">닫힘</option>
+                                    <option value="1" th:selected="${virtualSensor != null
+                                                                    and virtualSensor.virtualSensorValues.door != null
+                                                                    and virtualSensor.virtualSensorValues.door.fixedValue == 1}">열림</option>
+                                </select>
+                            </div>
+                        </div>
                         </div>
                     </div>
 
@@ -297,8 +406,9 @@
                             취소
                         </a>
 
-                        <button type="submit" class="btn btn-primary" th:text="${edit} ? '수정' : '생성'">
-                            생성
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ti ti-device-floppy me-1"></i>
+                            <span th:text="${edit} ? '수정' : '생성'">생성</span>
                         </button>
                     </div>
                 </div>

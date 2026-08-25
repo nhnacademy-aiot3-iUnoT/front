@@ -1,5 +1,6 @@
 package com.nhnacademy.front.global.security;
 
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +22,7 @@ public class CookieAuthenticationEntryPoint implements AuthenticationEntryPoint 
             HttpServletRequest request,
             HttpServletResponse response,
             AuthenticationException authenticationException
-    ) throws IOException {
+    ) throws IOException, ServletException {
         if (WebUtils.getCookie(request, AccessTokenCookieManager.COOKIE_NAME) != null) {
             cookieManager.delete(response);
         }
