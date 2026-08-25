@@ -41,7 +41,15 @@ public class InventoryController {
         // storages 해당 재고 저장소만 목록 조회
         model.addAttribute("storages",inventoryFrontService.getStorageInfos(result.content()));
 
+
+        model.addAttribute("currentPages",result.page());
+        model.addAttribute("totalPages",result.totalPages());
+        model.addAttribute("totalElements",result.totalElements());
+        model.addAttribute("pageSize",result.size());
+
+
         return "inventory/inventory-list";
+
     }
 
 
@@ -63,7 +71,7 @@ public class InventoryController {
         model.addAttribute("inventory",result);
         model.addAttribute("inventories",result.inventories().content());
 
-        model.addAttribute("currentPage",result.inventories().content());
+        model.addAttribute("currentPage",result.inventories().page());
         model.addAttribute("totalPages",result.inventories().totalPages());
         model.addAttribute("totalElements",result.inventories().totalElements());
         model.addAttribute("pageSize",result.inventories().size());
