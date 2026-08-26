@@ -1,11 +1,15 @@
 package com.nhnacademy.front.inventory.client;
 
 import com.nhnacademy.front.global.client.GatewayClient;
+import com.nhnacademy.front.inventory.dto.request.MedicineDisposalRequest;
+import com.nhnacademy.front.inventory.dto.request.MedicineOutboundRequest;
+import com.nhnacademy.front.inventory.dto.response.MedicineDisposalTargetResponse;
 import com.nhnacademy.front.global.dto.ApiResponse;
 import com.nhnacademy.front.global.dto.PageResponse;
 import com.nhnacademy.front.inventory.dto.request.InboundMedicineRequest;
 import com.nhnacademy.front.inventory.dto.response.InventoriesResponse;
 import com.nhnacademy.front.inventory.dto.response.InventoryInfoResponse;
+import com.nhnacademy.front.inventory.dto.response.MedicineOutboundTargetResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
@@ -15,9 +19,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Component
 @RequiredArgsConstructor
 public class InventoryApiClient {
+    private static final String CORE_SERVICE = "/api/core";
     private final GatewayClient gatewayClient;
-    private static final String CORE_SERVICE = "/api/core"; // 담당자가 수정
-
 
     // 입고 등록
     public void inbound(InboundMedicineRequest request){
@@ -75,21 +78,59 @@ public class InventoryApiClient {
     }
 
 
-    // 출고
+    // 출고 대상 조회
+    public MedicineOutboundTargetResponse getOutboundTarget(
+            Long inventoryId
+    ) {
+        String path = UriComponentsBuilder
+                .fromPath(
+                        CORE_SERVICE
+                                + "/medicine-inventories/{inventoryId}/outbound-target"
+                )
+                .buildAndExpand(inventoryId)
+                .encode()
+                .toUriString();
+
+        return gatewayClient.get(
+                path,
+                MedicineOutboundTargetResponse.class
+        );
+    }
+
+    // 출고 처리
+    public void outbound(MedicineOutboundRequest request) {
+        gatewayClient.post(
+                CORE_SERVICE + "/medicine-inventories/outbound",
+                request
+        );
+    }
 
 
-    // 폐기
+    // 폐기 대상 조회
+    public MedicineDisposalTargetResponse getDisposalTarget(Long inventoryId) {
+        String path = UriComponentsBuilder
+                .fromPath(CORE_SERVICE + "/inventories/{inventoryId}/disposal-target")
+                .buildAndExpand(inventoryId)
+                .encode()
+                .toUriString();
 
+        return gatewayClient.get(
+                path,
+                MedicineDisposalTargetResponse.class
+        );
+    }
 
+    // 폐기 처리
+    public void dispose(
+            Long inventoryId,
+            MedicineDisposalRequest request
+    ) {
+        String path = UriComponentsBuilder
+                .fromPath(CORE_SERVICE + "/inventories/{inventoryId}/disposal")
+                .buildAndExpand(inventoryId)
+                .encode()
+                .toUriString();
 
-
-
-
-
-
-
-
-
-
-
+        gatewayClient.post(path, request);
+    }
 }

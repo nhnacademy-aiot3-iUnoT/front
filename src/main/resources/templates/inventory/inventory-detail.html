@@ -93,8 +93,9 @@
                         <td th:text="${item.currentQuantity}"><strong>120정</strong></td>
                         <td th:text="${item.managementStatus}" class="status-badge normal">정상</td>
                         <td class="action-column">
-                            <a class="btn btn-sm btn-outline-primary" th:href="@{/outbound}">출고</a>
-                            <a class="btn btn-sm btn-outline-danger" th:href="@{/disposal}">폐기</a>
+                            <a class="btn btn-sm btn-outline-primary"
+                               th:href="@{/inventories/{inventory-id}/outbound(inventory-id=${item.inventoryId})}">출고</a>
+                            <a class="btn btn-sm btn-outline-danger" th:href="@{/inventories/{inventory-id}/disposal(inventory-id=${item.inventoryId})}">폐기</a>
                         </td>
                     </tr>
                     </tbody>
