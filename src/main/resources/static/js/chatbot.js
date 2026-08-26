@@ -26,22 +26,10 @@
         messages.scrollTop = messages.scrollHeight;
     };
 
-    const reply = (question) => {
-        if (question.includes('부족')) {
-            return '현재 재고 부족 품목은 4개입니다.\n상세 목록은 재고 관리에서 확인할 수 있어요.';
-        }
-
-        if (question.includes('출고')) {
-            return '최근 출고 내역을 준비 중입니다.\n출고 화면에서 상세 내역을 확인할 수 있어요.';
-        }
-
-        return '질문을 확인했습니다. 재고·저장소 관련 기능이 연결되면 더 정확하게 안내해드릴게요.';
-    };
-
     trigger.addEventListener('click', () => togglePanel(!panel.classList.contains('is-open')));
     close.addEventListener('click', () => togglePanel(false));
 
-    form.addEventListener('submit', (event) => {
+    form.addEventListener('submit', async (event) => {
         event.preventDefault();
         const question = input.value.trim();
         if (!question) {
@@ -50,7 +38,24 @@
 
         addMessage(question, 'user');
         input.value = '';
-        window.setTimeout(() => addMessage(reply(question), 'assistant'), 250);
+        try {
+            const response = await fetch('/api/core/chatbot/chat', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({message: question})
+            });
+            const contentType = response.headers.get('content-type') || '';
+            if (!contentType.includes('application/json')) {
+                throw new Error('서버 연결에 실패했습니다.');
+            }
+            const body = await response.json();
+            if (!response.ok || !body.success) {
+                throw new Error(body.error?.message || '챗봇 응답을 받을 수 없습니다.');
+            }
+            addMessage(body.data.message, 'assistant');
+        } catch (error) {
+            addMessage(error.message || '챗봇 연결 중 오류가 발생했습니다.', 'assistant');
+        }
     });
 
     document.querySelectorAll('.chatbot-suggestions button').forEach((button) => {
