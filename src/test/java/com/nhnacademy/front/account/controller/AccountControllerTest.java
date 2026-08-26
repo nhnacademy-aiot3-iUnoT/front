@@ -16,6 +16,10 @@ import com.nhnacademy.front.global.config.WebMvcConfig;
 import com.nhnacademy.front.global.error.ApiException;
 import com.nhnacademy.front.global.error.ErrorCode;
 import com.nhnacademy.front.global.security.AccessTokenCookieManager;
+import com.nhnacademy.front.organization.client.DepartmentApiClient;
+import com.nhnacademy.front.organization.client.OrganizationMemberApiClient;
+import com.nhnacademy.front.organization.dto.OrganizationRole;
+import com.nhnacademy.front.organization.dto.response.OrganizationMemberRoleResponse;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.Test;
@@ -36,8 +40,8 @@ import org.springframework.validation.BindingResult;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 import java.util.Objects;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -69,6 +73,13 @@ class AccountControllerTest {
     @MockitoBean
     private AccessTokenCookieManager cookieManager;
 
+    @MockitoBean
+    private OrganizationMemberApiClient organizationMemberApiClient;
+
+    @MockitoBean
+    private DepartmentApiClient departmentApiClient;
+
+
     @Test
     void info() throws Exception {
         LocalDateTime createdAt = LocalDateTime.of(2026, 8, 5, 12, 0);
@@ -83,6 +94,10 @@ class AccountControllerTest {
 
         given(accountApiClient.getAccountInfo())
                 .willReturn(response);
+        given(organizationMemberApiClient.getRole())
+                .willReturn(new OrganizationMemberRoleResponse(OrganizationRole.ORG_MEMBER));
+        given(departmentApiClient.getMyDepartments())
+                .willReturn(List.of());
 
         mockMvc.perform(get("/mypage"))
                 .andExpect(status().isOk())
@@ -258,6 +273,10 @@ class AccountControllerTest {
                 LocalDateTime.of(2026, 8, 5, 12, 0)
         );
         given(accountApiClient.getAccountInfo()).willReturn(response);
+        given(organizationMemberApiClient.getRole())
+                .willReturn(new OrganizationMemberRoleResponse(OrganizationRole.ORG_MEMBER));
+        given(departmentApiClient.getMyDepartments())
+                .willReturn(List.of());
 
         MvcResult result = mockMvc.perform(put("/mypage").param("name", "   "))
                 .andExpect(status().isOk())

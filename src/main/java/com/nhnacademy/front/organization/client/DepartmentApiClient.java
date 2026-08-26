@@ -1,6 +1,7 @@
 package com.nhnacademy.front.organization.client;
 
 import com.nhnacademy.front.global.client.GatewayClient;
+import com.nhnacademy.front.global.dto.ApiResponse;
 import com.nhnacademy.front.organization.dto.request.DepartmentCreateRequest;
 import com.nhnacademy.front.organization.dto.request.DepartmentStatusUpdateRequest;
 import com.nhnacademy.front.organization.dto.request.DepartmentUpdateRequest;
@@ -28,6 +29,10 @@ public class DepartmentApiClient {
 
     public DepartmentInfoResponse getDepartment(Long departmentId) {
         return gatewayClient.get(CORE_SERVICE + "/" + departmentId, DepartmentInfoResponse.class);
+    }
+
+    public List<DepartmentListResponse> getMyDepartments() {
+        return gatewayClient.get(CORE_SERVICE + "/me", new ParameterizedTypeReference<>() {});
     }
 
     public void updateDepartment(Long departmentId, DepartmentUpdateRequest request) {
