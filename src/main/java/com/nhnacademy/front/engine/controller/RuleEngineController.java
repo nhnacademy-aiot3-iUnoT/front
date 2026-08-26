@@ -7,8 +7,12 @@ import com.nhnacademy.front.engine.dto.request.VirtualSensorCreateRequest;
 import com.nhnacademy.front.engine.dto.request.VirtualSensorStatusRequest;
 import com.nhnacademy.front.engine.dto.request.VirtualSensorUpdateRequest;
 import com.nhnacademy.front.engine.dto.response.SensorHistoryResponse;
+import com.nhnacademy.front.engine.dto.response.StorageZonesResponse;
 import com.nhnacademy.front.engine.dto.response.SensorLatestResponse;
 import com.nhnacademy.front.engine.dto.response.VirtualSensorInfoResponse;
+import com.nhnacademy.front.organization.client.StorageApiClient;
+import com.nhnacademy.front.organization.client.ZoneApiClient;
+import com.nhnacademy.front.organization.dto.response.StorageInfoResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -30,8 +34,41 @@ public class RuleEngineController {
     private static final String VIRTUAL_SENSOR_FORM_VIEW = "organization/virtualsensor-create";
     private static final String VIRTUAL_SENSOR_INFO_VIEW = "organization/virtualsensor-info";
     private static final String SENSOR_INFO_VIEW = "organization/sensorInfo";
+    private static final String ENVIRONMENT_MONITORING_VIEW = "organization/environment-monitoring";
 
     private final RuleEngineApiClient ruleEngineApiClient;
+    private final StorageApiClient storageApiClient;
+    private final ZoneApiClient zoneApiClient;
+
+    /*
+        환경 관리 화면
+        내 조직의 저장소 목록과 저장소별 구역 목록을 함께 보여준다.
+        구역을 고르면 그 구역의 센서 상세 화면으로 넘어간다.
+     */
+    @GetMapping("/me/environmentMonitoring")
+    public String environmentMonitoring(
+            Model model
+    ) {
+        List<StorageInfoResponse> storages = storageApiClient.getStorages();
+
+        List<StorageZonesResponse> storageZones = storages.stream()
+                .map(storage -> new StorageZonesResponse(
+                        storage.storageId(),
+                        storage.name(),
+                        storage.status(),
+                        zoneApiClient.getZones(storage.storageId())
+                ))
+                .toList();
+
+        model.addAttribute("storageZones", storageZones);
+        model.addAttribute(
+                "organizationName",
+                storages.isEmpty() ? null : storages.getFirst().organizationName()
+        );
+
+        return ENVIRONMENT_MONITORING_VIEW;
+    }
+
     /*
         가상 센서데이터 생성 화면
      */
