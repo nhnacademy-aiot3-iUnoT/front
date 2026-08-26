@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+<th:block th:fragment="chatbot">
+    <button type="button" class="chatbot-trigger" id="chatbot-trigger" aria-label="챗봇 열기">
+        <i class="ti ti-message-chatbot"></i>
+    </button>
+
+    <aside class="chatbot-panel" id="chatbot-panel" aria-label="iUnoT 도우미" aria-hidden="true">
+        <div class="chatbot-header">
+            <div>
+                <strong>iUnoT 도우미</strong>
+                <span>재고와 저장소를 빠르게 찾아보세요.</span>
+            </div>
+            <button type="button" class="chatbot-close" id="chatbot-close" aria-label="챗봇 닫기">
+                <i class="ti ti-x"></i>
+            </button>
+        </div>
+
+        <div class="chatbot-messages" id="chatbot-messages">
+            <div class="chatbot-message assistant">
+                안녕하세요. 재고, 저장소, 구역에 대해 무엇이든 물어보세요.
+            </div>
+            <div class="chatbot-suggestions">
+                <button type="button">재고 부족 의약품 알려줘</button>
+                <button type="button">최근 출고 내역 보여줘</button>
+            </div>
+        </div>
+
+        <form class="chatbot-input" id="chatbot-form">
+            <input id="chatbot-input" type="text" placeholder="메시지를 입력하세요" autocomplete="off">
+            <button type="submit" aria-label="메시지 전송">
+                <i class="ti ti-send"></i>
+            </button>
+        </form>
+    </aside>
+</th:block>
+</body>
+</html>

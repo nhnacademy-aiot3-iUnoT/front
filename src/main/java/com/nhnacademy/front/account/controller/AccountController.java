@@ -8,6 +8,10 @@ import com.nhnacademy.front.account.dto.request.WithdrawAccountRequest;
 import com.nhnacademy.front.account.dto.response.AccountInfoResponse;
 import com.nhnacademy.front.account.validator.PasswordFormValidator;
 import com.nhnacademy.front.global.security.AccessTokenCookieManager;
+import com.nhnacademy.front.organization.client.DepartmentApiClient;
+import com.nhnacademy.front.organization.client.OrganizationMemberApiClient;
+import com.nhnacademy.front.organization.dto.response.DepartmentListResponse;
+import com.nhnacademy.front.organization.dto.response.OrganizationMemberRoleResponse;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -21,11 +25,15 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.List;
+
 @Controller
 @RequiredArgsConstructor
 public class AccountController {
 
     private final AccountApiClient accountApiClient;
+    private final DepartmentApiClient departmentApiClient;
+    private final OrganizationMemberApiClient memberApiClient;
     private final PasswordFormValidator passwordFormValidator;
     private final AccessTokenCookieManager cookieManager;
 
@@ -54,7 +62,12 @@ public class AccountController {
 
     private void populateAccountInfoModel(Model model) {
         AccountInfoResponse response = accountApiClient.getAccountInfo();
+        OrganizationMemberRoleResponse memberRole = memberApiClient.getRole();
+        List<DepartmentListResponse> departments = departmentApiClient.getMyDepartments();
+
         model.addAttribute("accountInfoResponse", response);
+        model.addAttribute("departments", departments);
+        model.addAttribute("memberRole", memberRole);
 
         if (!model.containsAttribute("nameRequest")) {
             model.addAttribute("nameRequest", new UpdateAccountNameRequest(response.name()));
