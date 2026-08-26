@@ -55,6 +55,7 @@ public class ReportController {
         ReportInfoResponse report = reportApiClient.getWeeklyReport(storageId, periodStart);
         model.addAttribute("report", report);
         model.addAttribute("environmentJson", toEnvironmentJson(report));
+        model.addAttribute("doorJson", toDoorJson(report));
         model.addAttribute("zoneEnvironments", toZoneEnvironments(storageId, report));
         model.addAttribute("storageId", storageId);
         model.addAttribute("currentMonday", periodStart);
@@ -87,6 +88,22 @@ public class ReportController {
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate periodStart
     ) {
         reportApiClient.retryAiSummary(storageId, reportId);
+
+        if (periodStart != null) {
+            return "redirect:/storages/" + storageId + "/reports/weekly?periodStart=" + periodStart;
+        }
+
+        return "redirect:/storages/" + storageId + "/reports/weekly";
+    }
+
+    @PostMapping("/{reportId}/recreations")
+    public String recreateReport(
+            @PathVariable Long storageId,
+            @PathVariable Long reportId,
+            @RequestParam(name = "periodStart", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate periodStart
+    ) {
+        reportApiClient.recreateReport(storageId, reportId);
 
         if (periodStart != null) {
             return "redirect:/storages/" + storageId + "/reports/weekly?periodStart=" + periodStart;
@@ -143,10 +160,22 @@ public class ReportController {
             return "[]";
         }
 
+        return toChartJson(report.environments(), report.reportId(), "환경");
+    }
+
+    private String toDoorJson(ReportInfoResponse report) {
+        if (report == null || report.doors() == null) {
+            return "[]";
+        }
+
+        return toChartJson(report.doors(), report.reportId(), "문 개폐");
+    }
+
+    private String toChartJson(Object value, Long reportId, String label) {
         try {
-            return objectMapper.writeValueAsString(report.environments());
+            return objectMapper.writeValueAsString(value);
         } catch (JsonProcessingException e) {
-            log.warn("환경 차트 데이터를 JSON으로 변환하지 못했습니다. reportId={}", report.reportId(), e);
+            log.warn("{} 차트 데이터를 JSON으로 변환하지 못했습니다. reportId={}", label, reportId, e);
             return "[]";
         }
     }
