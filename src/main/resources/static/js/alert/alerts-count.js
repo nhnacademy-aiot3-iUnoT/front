@@ -1,7 +1,5 @@
 function fetchUnreadAlertCount() {
-    fetch(`/api/core/alerts/unread-count`, {
-        credentials: 'include'
-    })
+    apiFetch(`/api/core/alerts/unread-count`)
         .then(res => {
             if (!res.ok) throw new Error('알림 개수 조회 실패');
             return res.json();
