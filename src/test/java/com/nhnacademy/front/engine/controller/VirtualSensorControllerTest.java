@@ -63,7 +63,7 @@ class VirtualSensorControllerTest {
                 virtualSensor(DEVICE_EUI, 11L)
         ));
 
-        mockMvc.perform(get("/organizations/me/virtual-sensors"))
+        mockMvc.perform(get("/virtual-sensors"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("organization/virtualsensor-list"))
                 .andExpect(content().string(containsString(DEVICE_EUI)))
@@ -77,7 +77,7 @@ class VirtualSensorControllerTest {
                 virtualSensor(DEVICE_EUI, null)
         ));
 
-        mockMvc.perform(get("/organizations/me/virtual-sensors"))
+        mockMvc.perform(get("/virtual-sensors"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("미등록")));
     }
@@ -87,7 +87,7 @@ class VirtualSensorControllerTest {
     void virtualSensorsWhenEmpty() throws Exception {
         given(ruleEngineApiClient.getVirtualSensors(ORGANIZATION_ID)).willReturn(List.of());
 
-        mockMvc.perform(get("/organizations/me/virtual-sensors"))
+        mockMvc.perform(get("/virtual-sensors"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("등록된 가상 센서가 없습니다.")));
     }
@@ -95,7 +95,7 @@ class VirtualSensorControllerTest {
     @Test
     @DisplayName("생성 화면은 구역을 고르지 않고 deviceEui만 받는다")
     void showCreateForm() throws Exception {
-        mockMvc.perform(get("/organizations/me/virtual-sensors/create"))
+        mockMvc.perform(get("/virtual-sensors/create"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("organization/virtualsensor-create"))
                 .andExpect(content().string(containsString("디바이스 EUI")));
@@ -104,13 +104,13 @@ class VirtualSensorControllerTest {
     @Test
     @DisplayName("생성하면 목록으로 돌아간다")
     void createVirtualSensor() throws Exception {
-        mockMvc.perform(post("/organizations/me/virtual-sensors")
+        mockMvc.perform(post("/virtual-sensors")
                         .param("deviceEui", DEVICE_EUI)
                         .param("measurementIntervalSeconds", "10")
                         .param("virtualSensorValues.valueMap[TEMPERATURE].mode", "FIXED")
                         .param("virtualSensorValues.valueMap[TEMPERATURE].fixedValue", "21.5"))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/organizations/me/virtual-sensors"));
+                .andExpect(redirectedUrl("/virtual-sensors"));
 
         verify(ruleEngineApiClient).createVirtualSensorData(eq(ORGANIZATION_ID), any());
     }
@@ -118,7 +118,7 @@ class VirtualSensorControllerTest {
     @Test
     @DisplayName("입력이 잘못되면 생성하지 않고 폼을 다시 보여준다")
     void createVirtualSensorRejectsInvalidInput() throws Exception {
-        mockMvc.perform(post("/organizations/me/virtual-sensors")
+        mockMvc.perform(post("/virtual-sensors")
                         .param("deviceEui", "")
                         .param("measurementIntervalSeconds", "10"))
                 .andExpect(status().isOk())
@@ -131,9 +131,9 @@ class VirtualSensorControllerTest {
         given(ruleEngineApiClient.getVirtualSensorData(ORGANIZATION_ID, DEVICE_EUI))
                 .willReturn(new VirtualSensorInfoResponse(false, null, null, null, null, null));
 
-        mockMvc.perform(get("/organizations/me/virtual-sensors/{deviceEui}/edit", DEVICE_EUI))
+        mockMvc.perform(get("/virtual-sensors/{deviceEui}/edit", DEVICE_EUI))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/organizations/me/virtual-sensors"));
+                .andExpect(redirectedUrl("/virtual-sensors"));
     }
 
     private VirtualSensorInfoResponse virtualSensor(String deviceEui, Long zoneId) {

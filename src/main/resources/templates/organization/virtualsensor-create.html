@@ -16,7 +16,7 @@
         <ol class="breadcrumb breadcrumb-arrows mb-0">
             <li class="breadcrumb-item"><a th:href="@{/organizations/me}">조직관리</a></li>
             <li class="breadcrumb-item">
-                <a th:href="@{/organizations/me/virtual-sensors}">가상센서 관리</a>
+                <a th:href="@{/virtual-sensors}">가상센서 관리</a>
             </li>
             <li class="breadcrumb-item active" aria-current="page"
                 th:text="${edit} ? '가상 센서 수정' : '가상 센서 생성'">가상 센서 생성</li>
@@ -45,8 +45,8 @@
         <div class="col-12">
             <form id="virtualSensorCreateForm" th:method="${edit} ? 'put' : 'post'"
                   th:action="${edit}
-                          ? @{/organizations/me/virtual-sensors/{deviceEui}(deviceEui=${deviceEui})}
-                          : @{/organizations/me/virtual-sensors}">
+                          ? @{/virtual-sensors/{deviceEui}(deviceEui=${deviceEui})}
+                          : @{/virtual-sensors}">
 
                 <div class="card virtual-sensor-card">
                     <div class="card-header section-header">
@@ -391,12 +391,12 @@
                     <div class="card-footer d-flex justify-content-end gap-2">
                         <!-- 수정 모드는 가상 센서 정보 화면으로, 생성 모드는 목록으로 돌아간다 -->
                         <a class="btn btn-outline-secondary" th:if="${edit}"
-                           th:href="@{/organizations/me/virtual-sensors/{deviceEui}(deviceEui=${deviceEui})}">
+                           th:href="@{/virtual-sensors/{deviceEui}(deviceEui=${deviceEui})}">
                             취소
                         </a>
 
                         <a class="btn btn-outline-secondary" th:if="${!edit}"
-                           th:href="@{/organizations/me/virtual-sensors}">
+                           th:href="@{/virtual-sensors}">
                             취소
                         </a>
 

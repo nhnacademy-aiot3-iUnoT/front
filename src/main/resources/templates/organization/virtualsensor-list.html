@@ -30,7 +30,7 @@
             </div>
 
             <div class="col-auto">
-                <a class="btn btn-primary" th:href="@{/organizations/me/virtual-sensors/create}">
+                <a class="btn btn-primary" th:href="@{/virtual-sensors/create}">
                     <i class="ti ti-plus me-1"></i>가상 센서 생성
                 </a>
             </div>
@@ -58,7 +58,7 @@
 
                 <tr th:each="sensor : ${virtualSensors}">
                     <td>
-                        <a th:href="@{/organizations/me/virtual-sensors/{deviceEui}(deviceEui=${sensor.deviceEui})}"
+                        <a th:href="@{/virtual-sensors/{deviceEui}(deviceEui=${sensor.deviceEui})}"
                            th:text="${sensor.deviceEui}">device-eui</a>
                     </td>
 
@@ -88,7 +88,7 @@
                     <td>
                         <!-- 설정은 그대로 두고 값 생성만 켜고 끈다 -->
                         <form class="m-0" th:method="put"
-                              th:action="@{/organizations/me/virtual-sensors/{deviceEui}/status(deviceEui=${sensor.deviceEui})}">
+                              th:action="@{/virtual-sensors/{deviceEui}/status(deviceEui=${sensor.deviceEui})}">
 
                             <input type="hidden" name="status"
                                    th:value="${sensor.active} ? 'INACTIVE' : 'ACTIVE'">

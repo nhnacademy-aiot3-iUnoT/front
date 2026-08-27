@@ -65,7 +65,7 @@ public class RuleEngineController {
     /*
         zone의 센서의 상세 데이터 정보 화면
      */
-    @GetMapping("/organizations/me/storages/{storage-id}/zones/{zone-id}/sensorInfo")
+    @GetMapping("/storages/{storage-id}/zones/{zone-id}/sensorInfo")
     public String info(
             @PathVariable("storage-id") Long storageId,
             @PathVariable("zone-id") Long zoneId,

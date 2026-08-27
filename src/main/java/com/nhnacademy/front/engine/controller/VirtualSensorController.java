@@ -22,14 +22,14 @@ import java.util.List;
  */
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/organizations/me/virtual-sensors")
+@RequestMapping("/virtual-sensors")
 public class VirtualSensorController {
 
     private static final String LIST_VIEW = "organization/virtualsensor-list";
     private static final String FORM_VIEW = "organization/virtualsensor-create";
     private static final String INFO_VIEW = "organization/virtualsensor-info";
 
-    private static final String LIST_PATH = "redirect:/organizations/me/virtual-sensors";
+    private static final String LIST_PATH = "redirect:/virtual-sensors";
 
     private final RuleEngineApiClient ruleEngineApiClient;
     private final OrganizationApiClient organizationApiClient;
