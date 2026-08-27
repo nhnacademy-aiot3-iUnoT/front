@@ -34,14 +34,6 @@
         </div>
 
         <div class="d-flex gap-2">
-            <!-- 가상 센서 설정 화면 -->
-            <a class="btn btn-outline-secondary"
-               th:href="@{/organizations/me/storages/{storageId}/zones/{zoneId}/virtual-sensors(
-                       storageId=${storageId},
-                       zoneId=${zoneId})}">
-                <i class="ti ti-cpu me-1"></i>가상 센서
-            </a>
-
             <!-- 새로고침 버튼 -->
             <button type="button" class="btn btn-outline-secondary" id="refresh-button">
                 <i class="ti ti-refresh me-1">새로고침</i>

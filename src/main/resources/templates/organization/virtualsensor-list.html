@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main-layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>가상센서 관리</title>
+</head>
+<body>
+<main layout:fragment="content">
+
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb breadcrumb-arrows mb-0">
+            <li class="breadcrumb-item"><a th:href="@{/organizations/me}">조직관리</a></li>
+            <li class="breadcrumb-item active" aria-current="page">가상센서 관리</li>
+        </ol>
+    </nav>
+
+    <div class="page-header mt-3">
+        <div class="row align-items-center">
+            <div class="col">
+                <div class="page-pretitle">VIRTUAL SENSOR</div>
+                <h2 class="page-title">가상센서 관리</h2>
+
+                <div class="text-muted mt-1">
+                    실제 장비 없이 측정값을 만들어 냅니다.
+                    여기서 만든 Device EUI를 구역의 센서로 등록해야 그 구역의 값으로 쌓입니다.
+                </div>
+            </div>
+
+            <div class="col-auto">
+                <a class="btn btn-primary" th:href="@{/organizations/me/virtual-sensors/create}">
+                    <i class="ti ti-plus me-1"></i>가상 센서 생성
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mt-3">
+        <div class="table-responsive">
+            <table class="table card-table table-vcenter">
+                <thead>
+                <tr>
+                    <th>Device EUI</th>
+                    <th>측정 주기</th>
+                    <th>구역 등록</th>
+                    <th>상태</th>
+                    <th class="w-1"></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${#lists.isEmpty(virtualSensors)}">
+                    <td colspan="5" class="text-center text-muted py-4">
+                        등록된 가상 센서가 없습니다.
+                    </td>
+                </tr>
+
+                <tr th:each="sensor : ${virtualSensors}">
+                    <td>
+                        <a th:href="@{/organizations/me/virtual-sensors/{deviceEui}(deviceEui=${sensor.deviceEui})}"
+                           th:text="${sensor.deviceEui}">device-eui</a>
+                    </td>
+
+                    <td th:text="${sensor.measurementIntervalSeconds == null
+                                   ? '-'
+                                   : sensor.measurementIntervalSeconds + '초'}">-</td>
+
+                    <td>
+                        <span class="badge bg-blue-lt" th:if="${sensor.registeredToZone}"
+                              th:text="|Zone ${sensor.zoneId}|">Zone</span>
+
+                        <span class="badge bg-orange-lt" th:if="${!sensor.registeredToZone}">
+                            미등록
+                        </span>
+                    </td>
+
+                    <td>
+                        <span class="badge bg-green-lt" th:if="${sensor.active}">
+                            <span class="status-dot status-dot-animated bg-green me-1"></span>활성화
+                        </span>
+
+                        <span class="badge bg-secondary-lt" th:if="${!sensor.active}">
+                            <span class="status-dot bg-secondary me-1"></span>비활성화
+                        </span>
+                    </td>
+
+                    <td>
+                        <!-- 설정은 그대로 두고 값 생성만 켜고 끈다 -->
+                        <form class="m-0" th:method="put"
+                              th:action="@{/organizations/me/virtual-sensors/{deviceEui}/status(deviceEui=${sensor.deviceEui})}">
+
+                            <input type="hidden" name="status"
+                                   th:value="${sensor.active} ? 'INACTIVE' : 'ACTIVE'">
+
+                            <button type="submit" class="btn btn-sm"
+                                    th:classappend="${sensor.active} ? 'btn-outline-danger' : 'btn-outline-success'"
+                                    th:text="${sensor.active} ? '중지' : '시작'">중지</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</main>
+</body>
+</html>

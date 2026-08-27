@@ -16,10 +16,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-/**
- * 센서 데이터와 가상 센서는 룰엔진이 직접 갖고 있어 게이트웨이의 /api/rule-engine 라우트로 보낸다.
- * 센서 데이터 조회는 zoneId만 받지만, 가상 센서는 룰엔진이 조직/저장소까지 URL로 받아 권한을 검증한다.
- */
 @Component
 @RequiredArgsConstructor
 public class RuleEngineApiClient {
@@ -54,15 +50,24 @@ public class RuleEngineApiClient {
         );
     }
 
+    // 조직의 가상 센서 목록
+    public List<VirtualSensorInfoResponse> getVirtualSensors(Long organizationId) {
+        return gatewayClient.get(
+                virtualSensorPath(organizationId),
+                new ParameterizedTypeReference<
+                        ApiResponse<List<VirtualSensorInfoResponse>>
+                        >() {
+                }
+        );
+    }
+
     // 가상 센서데이터 생성
     public VirtualSensorCreateResponse createVirtualSensorData(
             Long organizationId,
-            Long storageId,
-            Long zoneId,
             VirtualSensorCreateRequest request
     ) {
         return gatewayClient.post(
-                virtualSensorPath(organizationId, storageId, zoneId),
+                virtualSensorPath(organizationId),
                 request,
                 VirtualSensorCreateResponse.class
         );
@@ -71,12 +76,11 @@ public class RuleEngineApiClient {
     // 가상 센서데이터 수정
     public VirtualSensorUpdateResponse updateVirtualSensorData(
             Long organizationId,
-            Long storageId,
-            Long zoneId,
+            String deviceEui,
             VirtualSensorUpdateRequest request
     ) {
         return gatewayClient.put(
-                virtualSensorPath(organizationId, storageId, zoneId),
+                virtualSensorPath(organizationId, deviceEui),
                 request,
                 VirtualSensorUpdateResponse.class
         );
@@ -85,20 +89,18 @@ public class RuleEngineApiClient {
     // 가상 센서데이터 삭제
     public void deleteVirtualSensorData(
             Long organizationId,
-            Long storageId,
-            Long zoneId
+            String deviceEui
     ) {
-        gatewayClient.delete(virtualSensorPath(organizationId, storageId, zoneId));
+        gatewayClient.delete(virtualSensorPath(organizationId, deviceEui));
     }
 
     // 가상 센서데이터 설정 조회
     public VirtualSensorInfoResponse getVirtualSensorData(
             Long organizationId,
-            Long storageId,
-            Long zoneId
+            String deviceEui
     ) {
         return gatewayClient.get(
-                virtualSensorPath(organizationId, storageId, zoneId),
+                virtualSensorPath(organizationId, deviceEui),
                 VirtualSensorInfoResponse.class
         );
     }
@@ -106,11 +108,10 @@ public class RuleEngineApiClient {
     // 가상 센서데이터 활성화 / 비활성화
     public void changeVirtualSensorStatus(
             Long organizationId,
-            Long storageId,
-            Long zoneId,
+            String deviceEui,
             VirtualSensorStatusRequest request
     ) {
-        gatewayClient.put(zonePath(organizationId, storageId, zoneId) + "/status", request);
+        gatewayClient.put(virtualSensorPath(organizationId, deviceEui) + "/status", request);
     }
 
     // 센서 데이터 조회는 저장소를 거치지 않고 조직 + 구역으로만 찾는다.
@@ -124,22 +125,13 @@ public class RuleEngineApiClient {
                 + "/sensor-data";
     }
 
-    private String virtualSensorPath(
-            Long organizationId,
-            Long storageId,
-            Long zoneId
-    ) {
-        return zonePath(organizationId, storageId, zoneId) + "/virtual-sensor";
-    }
-
-    private String zonePath(
-            Long organizationId,
-            Long storageId,
-            Long zoneId
-    ) {
+    private String virtualSensorPath(Long organizationId) {
         return RULE_ENGINE_SERVICE
                 + "/organizations/" + organizationId
-                + "/storages/" + storageId
-                + "/zones/" + zoneId;
+                + "/virtual-sensors";
+    }
+
+    private String virtualSensorPath(Long organizationId, String deviceEui) {
+        return virtualSensorPath(organizationId) + "/" + deviceEui;
     }
 }
