@@ -27,6 +27,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
 import java.util.Map;
@@ -162,15 +163,20 @@ public class AuthController {
     @PostMapping("/pwd")
     public String passwordResetToken(
             @Valid ResetPasswordTokenRequest request,
-            BindingResult bindingResult
+            BindingResult bindingResult,
+            RedirectAttributes redirectAttributes
     ) {
         if (bindingResult.hasErrors()) {
             return "redirect:/forgot-password";
         }
 
         authApiClient.passwordResetToken(request);
+        redirectAttributes.addFlashAttribute(
+                "successMessage",
+                "비밀번호 재설정 메일 발송 요청을 접수했습니다."
+        );
 
-        return "redirect:/login";
+        return "redirect:/forgot-password";
     }
 
     @GetMapping("/pwd/{token}")

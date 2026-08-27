@@ -1,9 +1,11 @@
 package com.nhnacademy.front.account.client;
 
 import com.nhnacademy.front.account.dto.request.ChangeOwnPasswordRequest;
+import com.nhnacademy.front.account.dto.request.ReactivationConfirmRequest;
 import com.nhnacademy.front.account.dto.request.UpdateAccountNameRequest;
 import com.nhnacademy.front.account.dto.request.WithdrawAccountRequest;
 import com.nhnacademy.front.account.dto.response.AccountInfoResponse;
+import com.nhnacademy.front.account.dto.response.AccountResponse;
 import com.nhnacademy.front.account.dto.response.UpdateAccountResponse;
 import com.nhnacademy.front.global.client.GatewayClient;
 import jakarta.validation.Valid;
@@ -18,6 +20,20 @@ public class AccountApiClient {
 
     public AccountInfoResponse getAccountInfo() {
         return backendApiClient.get(ACCOUNT_SERVICE + "/me", AccountInfoResponse.class);
+    }
+
+    public void requestReactivationVerification() {
+        backendApiClient.post(ACCOUNT_SERVICE + "/me/reactivation/verification");
+    }
+
+    public AccountResponse confirmReactivation(
+            @Valid ReactivationConfirmRequest request
+    ) {
+        return backendApiClient.post(
+                ACCOUNT_SERVICE + "/me/reactivation/confirm",
+                request,
+                AccountResponse.class
+        );
     }
 
     public void withdraw(@Valid WithdrawAccountRequest request) {

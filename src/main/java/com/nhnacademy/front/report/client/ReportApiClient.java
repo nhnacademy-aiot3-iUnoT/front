@@ -36,6 +36,10 @@ public class ReportApiClient {
     }
 
     public void retryAiSummary(Long storageId, Long reportId) {
-        gatewayClient.post(CORE_SERVICE + "/storages/" + storageId + "/reports/" + reportId + "/ai-summary/retry");
+        gatewayClient.post(CORE_SERVICE + "/storages/" + storageId + "/reports/" + reportId + "/ai-summary/recreations");
+    }
+
+    public void recreateReport(Long storageId, Long reportId) {
+        gatewayClient.post(CORE_SERVICE + "/storages/" + storageId + "/reports/" + reportId + "/recreations");
     }
 }

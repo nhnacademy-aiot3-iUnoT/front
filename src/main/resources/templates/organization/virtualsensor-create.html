@@ -5,7 +5,7 @@
       layout:decorate="~{layout/main-layout}">
 <head>
     <meta charset="UTF-8">
-    <title th:text="${edit} ? |Zone ${zoneId} 가상 센서 수정| : |Zone ${zoneId} 가상 센서 생성|">가상 센서 생성</title>
+    <title th:text="${edit} ? '가상 센서 수정' : '가상 센서 생성'">가상 센서 생성</title>
     <link rel="stylesheet" th:href="@{/css/virtualsensor.css}">
 </head>
 <body>
@@ -14,12 +14,9 @@
 
     <nav aria-label="breadcrumb" class="mb-3">
         <ol class="breadcrumb breadcrumb-arrows mb-0">
-            <li class="breadcrumb-item"><a href="/">환경관리</a></li>
-            <li class="breadcrumb-item"><span th:text="|저장소 ${storageId}|">저장소</span></li>
+            <li class="breadcrumb-item"><a th:href="@{/organizations/me}">조직관리</a></li>
             <li class="breadcrumb-item">
-                <a th:href="@{/organizations/me/storages/{storageId}/zones/{zoneId}/sensorInfo(
-                           storageId=${storageId}, zoneId=${zoneId})}"
-                   th:text="|Zone ${zoneId}|">Zone</a>
+                <a th:href="@{/virtual-sensors}">가상센서 관리</a>
             </li>
             <li class="breadcrumb-item active" aria-current="page"
                 th:text="${edit} ? '가상 센서 수정' : '가상 센서 생성'">가상 센서 생성</li>
@@ -31,11 +28,12 @@
         <div>
             <div class="page-pretitle">VIRTUAL SENSOR</div>
             <h2 class="page-title"
-                th:text="${edit} ? |Zone ${zoneId} 가상 센서 수정| : |Zone ${zoneId} 가상 센서 생성|">
+                th:text="${edit} ? '가상 센서 수정' : '가상 센서 생성'">
                 가상 센서 생성
             </h2>
             <p class="virtual-sensor-description">
                 실제 장비 없이 테스트용 측정값을 생성합니다. 센서별 생성 방식과 발행 주기를 설정하세요.
+                여기서 만든 Device EUI를 구역의 센서로 등록해야 그 구역의 값으로 쌓입니다.
             </p>
         </div>
     </header>
@@ -46,9 +44,9 @@
     <div class="row row-cards">
         <div class="col-12">
             <form id="virtualSensorCreateForm" th:method="${edit} ? 'put' : 'post'"
-                  th:action="@{/organizations/me/storages/{storageId}/zones/{zoneId}/virtual-sensors(
-                          storageId=${storageId},
-                          zoneId=${zoneId})}">
+                  th:action="${edit}
+                          ? @{/virtual-sensors/{deviceEui}(deviceEui=${deviceEui})}
+                          : @{/virtual-sensors}">
 
                 <div class="card virtual-sensor-card">
                     <div class="card-header section-header">
@@ -391,18 +389,14 @@
                     </div>
 
                     <div class="card-footer d-flex justify-content-end gap-2">
-                        <!-- 수정 모드는 가상 센서 정보 화면으로, 생성 모드는 센서 데이터 화면으로 돌아간다 -->
+                        <!-- 수정 모드는 가상 센서 정보 화면으로, 생성 모드는 목록으로 돌아간다 -->
                         <a class="btn btn-outline-secondary" th:if="${edit}"
-                           th:href="@{/organizations/me/storages/{storageId}/zones/{zoneId}/virtual-sensors(
-                                   storageId=${storageId},
-                                   zoneId=${zoneId})}">
+                           th:href="@{/virtual-sensors/{deviceEui}(deviceEui=${deviceEui})}">
                             취소
                         </a>
 
                         <a class="btn btn-outline-secondary" th:if="${!edit}"
-                           th:href="@{/organizations/me/storages/{storageId}/zones/{zoneId}/sensorInfo(
-                                   storageId=${storageId},
-                                   zoneId=${zoneId})}">
+                           th:href="@{/virtual-sensors}">
                             취소
                         </a>
 

@@ -1,5 +1,7 @@
 package com.nhnacademy.front.global.config;
 
+import com.nhnacademy.front.account.dto.AccountStatus;
+import com.nhnacademy.front.global.security.AccessTokenCookieManager;
 import com.nhnacademy.front.global.security.CookieAuthenticationEntryPoint;
 import com.nhnacademy.front.global.security.PageAccessDeniedHandler;
 import jakarta.servlet.http.Cookie;
@@ -14,7 +16,12 @@ import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
 import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.core.OAuth2TokenValidatorResult;
-import org.springframework.security.oauth2.jwt.*;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtIssuerValidator;
+import org.springframework.security.oauth2.jwt.JwtTimestampValidator;
+import org.springframework.security.oauth2.jwt.JwtValidators;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.oauth2.server.resource.web.BearerTokenResolver;
@@ -32,6 +39,8 @@ import java.util.UUID;
 @Configuration
 public class SecurityConfig {
 
+    public static final String ACCOUNT_STATUS_CLAIM = "account_status";
+
     @Bean
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http,
@@ -41,24 +50,15 @@ public class SecurityConfig {
             CookieAuthenticationEntryPoint authenticationEntryPoint,
             PageAccessDeniedHandler accessDeniedHandler
     ) throws Exception {
-
         http
                 .csrf(AbstractHttpConfigurer::disable)
-
                 .cors(Customizer.withDefaults())
-
                 .formLogin(AbstractHttpConfigurer::disable)
-
                 .logout(AbstractHttpConfigurer::disable)
-
                 .httpBasic(AbstractHttpConfigurer::disable)
-
                 .sessionManagement(session ->
-                        session.sessionCreationPolicy(
-                                SessionCreationPolicy.STATELESS
-                        )
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-
                 .oauth2ResourceServer(resourceServer -> resourceServer
                         .bearerTokenResolver(bearerTokenResolver)
                         .authenticationEntryPoint(authenticationEntryPoint)
@@ -67,17 +67,14 @@ public class SecurityConfig {
                                 .jwtAuthenticationConverter(converter)
                         )
                 )
-
                 .exceptionHandling(exceptions -> exceptions
                         .authenticationEntryPoint(authenticationEntryPoint)
                         .accessDeniedHandler(accessDeniedHandler)
                 )
-
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 EndpointRequest.to("health", "serviceregistry")
                         ).permitAll()
-
                         .requestMatchers(
                                 "/login",
                                 "/signup",
@@ -86,6 +83,9 @@ public class SecurityConfig {
                                 "/.well-known/jwks.json",
                                 "/pwd/**",
                                 "/403",
+                                "/404",
+                                "/error",
+                                "/favicon.ico",
                                 "/css/**",
                                 "/js/**",
                                 "/img/**"
@@ -94,20 +94,17 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 );
 
-
         return http.build();
     }
 
     @Bean
-    public JwtDecoder jwtDecoder(
-            JwtProperties properties
-    ) {
+    public JwtDecoder jwtDecoder(JwtProperties properties) {
         Assert.hasText(properties.getIssuer(), "security.jwt.issuer must be configured");
         Assert.notEmpty(
                 properties.getAllowedAlgorithms(),
                 "security.jwt.allowed-algorithms must not be empty"
         );
-        Assert.hasText(properties.getJwkSetUri(),  "security.jwt.jwk-set-uri must not be empty");
+        Assert.hasText(properties.getJwkSetUri(), "security.jwt.jwk-set-uri must not be empty");
 
         NimbusJwtDecoder.JwkSetUriJwtDecoderBuilder builder =
                 NimbusJwtDecoder.withJwkSetUri(properties.getJwkSetUri());
@@ -122,12 +119,10 @@ public class SecurityConfig {
     @Bean
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
         JwtGrantedAuthoritiesConverter authoritiesConverter = new JwtGrantedAuthoritiesConverter();
-
         authoritiesConverter.setAuthoritiesClaimName("roles");
         authoritiesConverter.setAuthorityPrefix("ROLE_");
 
         JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
-
         converter.setPrincipalClaimName("sub");
         converter.setJwtGrantedAuthoritiesConverter(authoritiesConverter);
 
@@ -136,7 +131,6 @@ public class SecurityConfig {
 
     private OAuth2TokenValidator<Jwt> jwtValidator(JwtProperties properties) {
         JwtTimestampValidator timestampValidator = new JwtTimestampValidator(Duration.ofSeconds(30));
-
         timestampValidator.setAllowEmptyExpiryClaim(false);
 
         List<OAuth2TokenValidator<Jwt>> validators = new ArrayList<>();
@@ -144,18 +138,14 @@ public class SecurityConfig {
                 timestampValidator,
                 new JwtIssuerValidator(properties.getIssuer())
         ));
-
         validators.add(jwt -> jwt.getHeaders().get("kid") instanceof String kid && !kid.isBlank()
                 ? OAuth2TokenValidatorResult.success()
                 : validationFailure("JWT kid header is required"));
-
-
         validators.add(this::validateUuidSubject);
+        validators.add(this::validateAccountStatus);
 
         return new DelegatingOAuth2TokenValidator<>(validators);
     }
-
-
 
     private OAuth2TokenValidatorResult validateUuidSubject(Jwt jwt) {
         try {
@@ -163,6 +153,15 @@ public class SecurityConfig {
             return OAuth2TokenValidatorResult.success();
         } catch (IllegalArgumentException | NullPointerException exception) {
             return validationFailure("JWT subject must be an account UUID");
+        }
+    }
+
+    private OAuth2TokenValidatorResult validateAccountStatus(Jwt jwt) {
+        try {
+            AccountStatus.valueOf(jwt.getClaimAsString(ACCOUNT_STATUS_CLAIM));
+            return OAuth2TokenValidatorResult.success();
+        } catch (IllegalArgumentException | NullPointerException exception) {
+            return validationFailure("JWT account_status claim is required");
         }
     }
 
@@ -175,7 +174,7 @@ public class SecurityConfig {
     @Bean
     public BearerTokenResolver bearerTokenResolver() {
         return request -> {
-            Cookie cookie = WebUtils.getCookie(request, "access_token");
+            Cookie cookie = WebUtils.getCookie(request, AccessTokenCookieManager.COOKIE_NAME);
             return cookie != null && StringUtils.hasText(cookie.getValue())
                     ? cookie.getValue()
                     : null;
