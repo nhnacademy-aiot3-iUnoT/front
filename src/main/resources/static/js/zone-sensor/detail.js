@@ -36,12 +36,11 @@ function updateZoneSensor() {
         return;
     }
 
-    fetch(`/api/core/zones/${zoneId}/zone-sensors/${sensorId}`, {
+    apiFetch(`/api/core/zones/${zoneId}/zone-sensors/${sensorId}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
         },
-        credentials: 'include',
         body: JSON.stringify({
             name: name,
             description: description === '' ? null : description
@@ -69,9 +68,8 @@ function deleteZoneSensor(zoneId, sensorId) {
         return;
     }
 
-    fetch(`/api/core/zones/${zoneId}/zone-sensors/${sensorId}`, {
-        method: 'DELETE',
-        credentials: 'include'
+    apiFetch(`/api/core/zones/${zoneId}/zone-sensors/${sensorId}`, {
+        method: 'DELETE'
     })
         .then(response => {
             if (response.ok || response.status === 204) {

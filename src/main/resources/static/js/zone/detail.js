@@ -16,37 +16,33 @@ function onCreateZoneSensorClick(btn) { createZoneSensor(btn.dataset.zoneId); }
 function updateZoneInfo(storageId, zoneId) {
     const name = document.getElementById('edit-zone-name').value.trim();
     const description = document.getElementById('edit-zone-description').value.trim();
-    fetch(`/api/core/storages/${storageId}/zones/${zoneId}`, {
+    apiFetch(`/api/core/storages/${storageId}/zones/${zoneId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({ name, description: description || null })
     }).then(res => res.ok ? location.reload() : alert('실패'));
 }
 
 function toggleZoneStatus(storageId, zoneId, status) {
-    fetch(`/api/core/storages/${storageId}/zones/${zoneId}/status`, {
+    apiFetch(`/api/core/storages/${storageId}/zones/${zoneId}/status`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({ status: status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE' })
     }).then(res => res.ok ? location.reload() : alert('실패'));
 }
 
 function deleteZone(storageId, zoneId) {
     if (!confirm('정말 삭제하시겠습니까?')) return;
-    fetch(`/api/core/storages/${storageId}/zones/${zoneId}`, {
-        method: 'DELETE',
-        credentials: 'include'
+    apiFetch(`/api/core/storages/${storageId}/zones/${zoneId}`, {
+        method: 'DELETE'
     })
         .then(res => res.ok ? location.href = `/storages/${storageId}` : alert('실패'));
 }
 
 function createZoneSensor(zoneId) {
-    fetch(`/api/core/zones/${zoneId}/zone-sensors`, {
+    apiFetch(`/api/core/zones/${zoneId}/zone-sensors`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({
             deviceEui: document.getElementById('sensor-eui').value,
             name: document.getElementById('sensor-name').value,
@@ -56,9 +52,7 @@ function createZoneSensor(zoneId) {
 }
 
 function loadSensorTypes() {
-    fetch(`/api/core/sensor-types`, {
-        credentials: 'include'
-    })
+    apiFetch(`/api/core/sensor-types`)
         .then(res => res.json())
         .then(result => {
             const selectBox = document.getElementById('threshold-sensor-type');
@@ -84,10 +78,9 @@ document.getElementById('btn-create-threshold').addEventListener('click', functi
         alertDuration: Number(document.getElementById('threshold-delay').value)
     };
 
-    fetch(`/api/core/zones/${zoneId}/zone-thresholds`, {
+    apiFetch(`/api/core/zones/${zoneId}/zone-thresholds`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify(requestData)
     })
         .then(res => {

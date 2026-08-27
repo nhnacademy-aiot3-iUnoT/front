@@ -7,9 +7,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // 저장소 목록 조회 후 드롭다운 채우기
 function loadStorages() {
-    fetch('/api/core/storages', {
+    apiFetch(`/api/core/storages`, {
         method: "GET",
-        credentials: 'include',
         headers: {
             "Content-Type": "application/json"
         }
@@ -45,9 +44,8 @@ function loadExpiringInventories(page) {
     if (filterType) url += `&filterType=${filterType}`;
     if (sortDirection) url += `&sortDirection=${sortDirection}`;
 
-    fetch(url, {
+    apiFetch(url, {
         method: "GET",
-        credentials: 'include',
         headers: {
             "Content-Type": "application/json"
         }

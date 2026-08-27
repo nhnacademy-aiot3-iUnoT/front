@@ -4,6 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <title>iUnoT</title>
+    <meta name="api-base" th:content="${@environment.getProperty('app.api-base-url')}">
+    <script th:src="@{/js/api.js}"></script>
+
     <!-- 페이지 로드 시 라이트 -> 다크 FOUC 현상 감소 -->
     <script>
         const savedTheme = localStorage.getItem("theme");

@@ -15,9 +15,8 @@ function loadAlerts(page = 0) {
     if (alertType) url += `alertType=${alertType}&`;
     if (isChecked !== '') url += `isChecked=${isChecked}&`;
 
-    fetch(url, {
-        method: 'GET',
-        credentials: 'include'
+    apiFetch(url, {
+        method: 'GET'
     })
         .then(res => res.json())
         .then(resData => {
@@ -139,11 +138,10 @@ function markSelectedAsChecked() {
         return;
     }
 
-    fetch('/api/core/alerts/check', {
+    apiFetch(`/api/core/alerts/check`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ alertIds: selectedIds }),
-        credentials: 'include'
+        body: JSON.stringify({ alertIds: selectedIds })
     })
         .then(res => {
             if (res.ok) {
@@ -165,11 +163,10 @@ function deleteSelectedAlerts() {
 
     if (!confirm('선택한 알림을 정말 삭제하시겠습니까?')) return;
 
-    fetch('/api/core/alerts', {
+    apiFetch(`/api/core/alerts`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ alertIds: selectedIds }),
-        credentials: 'include'
+        body: JSON.stringify({ alertIds: selectedIds })
     })
         .then(res => {
             if (res.ok) {
@@ -185,9 +182,8 @@ function deleteSelectedAlerts() {
 function deleteAllAlerts() {
     if (!confirm('모든 알림을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) return;
 
-    fetch('/api/core/alerts/all', {
-        method: 'DELETE',
-        credentials: 'include'
+    apiFetch(`/api/core/alerts/all`, {
+        method: 'DELETE'
     })
         .then(res => {
             if (res.ok) {
