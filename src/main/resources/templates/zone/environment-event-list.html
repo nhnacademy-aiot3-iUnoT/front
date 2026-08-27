@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main-layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>구역 환경 이벤트 발생 내역</title>
+    <link rel="stylesheet" th:href="@{/css/zone-event.css}">
+</head>
+<body>
+
+<div layout:fragment="content">
+    <div class="event-container">
+        <input type="hidden" id="zone-id" th:value="${zoneId}">
+
+        <h2>🚨 구역 환경 이벤트 발생 내역</h2>
+        <p style="color: #666; margin-bottom: 20px;">해당 구역에서 발생한 임계값 이탈 이벤트 기록입니다.</p>
+
+        <!-- 검색 조건 필터 -->
+        <div class="filter-box">
+            <div class="filter-group">
+                <label for="search-env-type">환경 타입</label>
+                <select id="search-env-type">
+                    <option value="">전체</option>
+                    <option value="TEMPERATURE">온도 (TEMPERATURE)</option>
+                    <option value="HUMIDITY">습도 (HUMIDITY)</option>
+                    <option value="ILLUMINANCE">조도 (ILLUMINANCE)</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="search-breach-type">이탈 유형</label>
+                <select id="search-breach-type">
+                    <option value="">전체</option>
+                    <option value="ABOVE_MAX">상한 초과 (ABOVE_MAX)</option>
+                    <option value="BELOW_MIN">하한 미달 (BELOW_MIN)</option>
+                </select>
+            </div>
+
+            <button type="button" class="btn-search" onclick="fetchEnvironmentEvents(0)">검색</button>
+        </div>
+
+        <!-- 이벤트 목록 테이블 -->
+        <table>
+            <thead>
+            <tr>
+                <th>발생 ID</th>
+                <th>환경 타입</th>
+                <th>이탈 유형</th>
+                <th>감지된 값</th>
+                <th>임계 기준값</th>
+                <th>조직 / 저장소 / 구역</th>
+            </tr>
+            </thead>
+            <tbody id="event-table-body">
+            <tr>
+                <td colspan="6" style="text-align: center; color: #888; padding: 30px;">데이터를 불러오는 중입니다...</td>
+            </tr>
+            </tbody>
+        </table>
+
+        <!-- 페이징 영역 -->
+        <div id="pagination-box" class="pagination"></div>
+
+        <div style="margin-top: 30px;">
+            <a th:href="@{/zones/{zoneId}(zoneId=${zoneId})}" style="text-decoration: none; color: #2563eb; font-weight: 600;">← 구역 상세로 돌아가기</a>
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="script">
+    <script th:src="@{/js/zone/environment-event.js}"></script>
+</th:block>
+
+</body>
+</html>

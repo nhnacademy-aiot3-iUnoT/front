@@ -20,16 +20,20 @@
                 <span th:text="${zone.name}">구역 이름</span>
             </h2>
 
-            <!-- 관리 액션 버튼들 -->
-            <div class="action-buttons" th:if="${canManage}">
-                <button type="button" class="btn-secondary" onclick="openEditZoneModal()">구역 수정</button>
-                <button type="button" id="btn-toggle-status" class="btn-warning"
-                        th:attr="data-storage-id=${zone.storageId}, data-zone-id=${zone.zoneId}, data-status=${zone.status.name()}"
-                        onclick="onToggleZoneStatusClick(this)"
-                        th:text="${zone.status.name() == 'ACTIVE'} ? '비활성화' : '활성화'">상태변경</button>
-                <button type="button" id="btn-delete-zone" class="btn-danger"
-                        th:attr="data-storage-id=${zone.storageId}, data-zone-id=${zone.zoneId}"
-                        onclick="onDeleteZoneClick(this)">구역 삭제</button>
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <a th:href="@{/zones/{zoneId}/environment-events(zoneId=${zone.zoneId})}" class="btn-secondary">🚨 이벤트 내역</a>
+
+                <!-- 관리 액션 버튼들 (관리자만 보임) -->
+                <div class="action-buttons" th:if="${canManage}" style="display: inline-flex; gap: 5px;">
+                    <button type="button" class="btn-secondary" onclick="openEditZoneModal()">구역 수정</button>
+                    <button type="button" id="btn-toggle-status" class="btn-warning"
+                            th:attr="data-storage-id=${zone.storageId}, data-zone-id=${zone.zoneId}, data-status=${zone.status.name()}"
+                            onclick="onToggleZoneStatusClick(this)"
+                            th:text="${zone.status.name() == 'ACTIVE'} ? '비활성화' : '활성화'">상태변경</button>
+                    <button type="button" id="btn-delete-zone" class="btn-danger"
+                            th:attr="data-storage-id=${zone.storageId}, data-zone-id=${zone.zoneId}"
+                            onclick="onDeleteZoneClick(this)">구역 삭제</button>
+                </div>
             </div>
         </div>
 
