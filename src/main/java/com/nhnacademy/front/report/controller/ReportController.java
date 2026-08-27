@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Controller
-@RequestMapping("/storages/{storageId}/reports")
+@RequestMapping("/storages/{storage-id}/reports")
 @RequiredArgsConstructor
 public class ReportController {
 
@@ -37,7 +37,7 @@ public class ReportController {
 
     @GetMapping("/weekly")
     public String weeklyReport(
-            @PathVariable Long storageId,
+            @PathVariable("storage-id") Long storageId,
             @RequestParam(name = "periodStart", required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate periodStart,
             Model model
@@ -71,7 +71,7 @@ public class ReportController {
 
     @PostMapping("/weekly")
     public String createWeeklyReport(
-            @PathVariable Long storageId,
+            @PathVariable("storage-id") Long storageId,
             @RequestParam(name = "periodStart")
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate periodStart
     ) {
@@ -80,10 +80,10 @@ public class ReportController {
         return "redirect:/storages/" + storageId + "/reports/weekly?periodStart=" + periodStart;
     }
 
-    @PostMapping("/{reportId}/ai-summary/retry")
+    @PostMapping("/{report-id}/ai-summary/retry")
     public String retryAiSummary(
-            @PathVariable Long storageId,
-            @PathVariable Long reportId,
+            @PathVariable("storage-id") Long storageId,
+            @PathVariable("report-id") Long reportId,
             @RequestParam(name = "periodStart", required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate periodStart
     ) {
@@ -96,10 +96,10 @@ public class ReportController {
         return "redirect:/storages/" + storageId + "/reports/weekly";
     }
 
-    @PostMapping("/{reportId}/recreations")
+    @PostMapping("/{report-id}/recreations")
     public String recreateReport(
-            @PathVariable Long storageId,
-            @PathVariable Long reportId,
+            @PathVariable("storage-id") Long storageId,
+            @PathVariable("report-id") Long reportId,
             @RequestParam(name = "periodStart", required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate periodStart
     ) {
