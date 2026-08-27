@@ -23,7 +23,6 @@ import java.util.List;
  */
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/organizations")
 public class RuleEngineController {
 
     private static final String SENSOR_INFO_VIEW = "organization/sensorInfo";
@@ -39,7 +38,7 @@ public class RuleEngineController {
         내 조직의 저장소 목록과 저장소별 구역 목록을 함께 보여준다.
         구역을 고르면 그 구역의 센서 상세 화면으로 넘어간다.
      */
-    @GetMapping("/me/environmentMonitoring")
+    @GetMapping("/environmentMonitoring")
     public String environmentMonitoring(
             Model model
     ) {
@@ -66,7 +65,7 @@ public class RuleEngineController {
     /*
         zone의 센서의 상세 데이터 정보 화면
      */
-    @GetMapping("/me/storages/{storage-id}/zones/{zone-id}/sensorInfo")
+    @GetMapping("/organizations/me/storages/{storage-id}/zones/{zone-id}/sensorInfo")
     public String info(
             @PathVariable("storage-id") Long storageId,
             @PathVariable("zone-id") Long zoneId,
