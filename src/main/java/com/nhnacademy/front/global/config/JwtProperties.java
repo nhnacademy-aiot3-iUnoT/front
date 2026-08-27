@@ -2,6 +2,7 @@ package com.nhnacademy.front.global.config;
 
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,9 +23,6 @@ public class JwtProperties {
     private String issuer;
 
     @Setter
-    private Set<String> audiences;
-
-    @Setter
     @NotNull
     private Duration accessTokenTtl;
 
@@ -33,6 +31,7 @@ public class JwtProperties {
     private String jwkSetUri;
 
     @Setter
+    @NotEmpty
     private Set<SignatureAlgorithm> allowedAlgorithms =
             new LinkedHashSet<>(Set.of(SignatureAlgorithm.RS256));
 
@@ -40,5 +39,4 @@ public class JwtProperties {
     public boolean isAccessTokenTtlPositive() {
         return accessTokenTtl == null || accessTokenTtl.compareTo(Duration.ZERO) > 0;
     }
-
 }

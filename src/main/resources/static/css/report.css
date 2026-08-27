@@ -26,8 +26,17 @@
     height: 220px;
 }
 
+/* 문 개폐는 센서 차트를 보조하는 패널이라 더 낮게 둔다. */
+.env-chart-door {
+    height: 170px;
+}
+
 @media (max-width: 768px) {
     .env-chart {
         height: 180px;
+    }
+
+    .env-chart-door {
+        height: 150px;
     }
 }
