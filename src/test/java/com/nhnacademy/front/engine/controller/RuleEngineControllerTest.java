@@ -1,6 +1,7 @@
 package com.nhnacademy.front.engine.controller;
 
 import com.nhnacademy.front.engine.client.RuleEngineApiClient;
+import com.nhnacademy.front.organization.client.OrganizationApiClient;
 import com.nhnacademy.front.organization.client.StorageApiClient;
 import com.nhnacademy.front.organization.client.ZoneApiClient;
 import com.nhnacademy.front.organization.dto.EnvStatus;
@@ -38,6 +39,9 @@ class RuleEngineControllerTest {
 
     @MockitoBean
     private ZoneApiClient zoneApiClient;
+
+    @MockitoBean
+    private OrganizationApiClient organizationApiClient;
 
     @Test
     @DisplayName("환경 관리 화면에 저장소와 그 저장소의 구역이 함께 보인다.")
