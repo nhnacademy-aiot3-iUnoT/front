@@ -1,6 +1,9 @@
 package com.nhnacademy.front.auth.controller;
 
 import com.nhnacademy.front.account.client.AccountApiClient;
+import com.nhnacademy.front.account.dto.AccountRole;
+import com.nhnacademy.front.account.dto.AccountStatus;
+import com.nhnacademy.front.account.dto.response.AccountInfoResponse;
 import com.nhnacademy.front.auth.client.AuthApiClient;
 import com.nhnacademy.front.auth.dto.request.CheckEmailRequest;
 import com.nhnacademy.front.auth.dto.request.LoginRequest;
@@ -17,16 +20,27 @@ import com.nhnacademy.front.organization.client.InvitationApiClient;
 import com.nhnacademy.front.organization.client.OrganizationApiClient;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.Test;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
+import static org.hamcrest.Matchers.containsString;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -36,6 +50,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(AuthController.class)
+@AutoConfigureMockMvc(addFilters = false)
 @Import(PasswordResetFormValidator.class)
 class AuthControllerTest {
 
@@ -63,6 +78,13 @@ class AuthControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name("auth/login"))
                 .andExpect(model().attribute("loginRequest", new LoginRequest()));
+    }
+
+    @Test
+    void reactivatedAccountIsAskedToLoginAgain() throws Exception {
+        mockMvc.perform(get("/login").param("reactivated", ""))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("계정이 재활성화되었습니다. 다시 로그인해주세요.")));
     }
 
     @Test
@@ -119,6 +141,36 @@ class AuthControllerTest {
     }
 
     @Test
+    void adminIsRedirectedToAdminPageAfterLogin() throws Exception {
+        AccountInfoResponse account = new AccountInfoResponse(
+                "admin@example.com",
+                "관리자",
+                AccountRole.ADMIN,
+                AccountStatus.ACTIVE,
+                LocalDateTime.of(2026, 8, 20, 12, 0)
+        );
+        given(accountApiClient.getAccountInfo()).willReturn(account);
+
+        mockMvc.perform(get("/login/success"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name("redirect:/admin"))
+                .andExpect(redirectedUrl("/admin"));
+
+        then(accountApiClient).should().getAccountInfo();
+        then(organizationApiClient).shouldHaveNoInteractions();
+    }
+
+    @Test
+    void inactiveAccountCannotOpenLoginPage() throws Exception {
+        mockMvc.perform(get("/login")
+                        .principal(authentication(AccountStatus.INACTIVE)))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/reactivation"));
+
+        then(accountApiClient).shouldHaveNoInteractions();
+    }
+
+    @Test
     void logoutDeletesAccessTokenCookieAndRedirectsToLogin() throws Exception {
         mockMvc.perform(post("/logout"))
                 .andExpect(status().is3xxRedirection())
@@ -126,6 +178,17 @@ class AuthControllerTest {
                 .andExpect(redirectedUrl("/login"));
 
         then(cookieManager).should().delete(any(HttpServletResponse.class));
+    }
+
+    private JwtAuthenticationToken authentication(AccountStatus status) {
+        Jwt jwt = Jwt.withTokenValue("token")
+                .header("alg", "RS256")
+                .subject(UUID.randomUUID().toString())
+                .issuedAt(Instant.now())
+                .expiresAt(Instant.now().plusSeconds(60))
+                .claim("account_status", status.name())
+                .build();
+        return new JwtAuthenticationToken(jwt, List.of());
     }
 
     @Test
@@ -266,10 +329,30 @@ class AuthControllerTest {
         mockMvc.perform(post("/pwd")
                     .param("email", request.email()))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(view().name("redirect:/login"))
-                .andExpect(redirectedUrl("/login"));
+                .andExpect(view().name("redirect:/forgot-password"))
+                .andExpect(redirectedUrl("/forgot-password"))
+                .andExpect(flash().attribute(
+                        "successMessage",
+                        "비밀번호 재설정 메일 발송 요청을 접수했습니다."
+                ));
 
         then(authApiClient).should().passwordResetToken(request);
+    }
+
+    @Test
+    void passwordResetRequestPageShowsGenericAcceptedMessage() throws Exception {
+        MvcResult result = mockMvc.perform(get("/forgot-password")
+                        .flashAttr(
+                                "successMessage",
+                                "비밀번호 재설정 메일 발송 요청을 접수했습니다."
+                        ))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        Document document = Jsoup.parse(result.getResponse().getContentAsString());
+        assertThat(document.select("#password-reset-request-message")).hasSize(1);
+        assertThat(document.select("#password-reset-request-message").text())
+                .isEqualTo("비밀번호 재설정 메일 발송 요청을 접수했습니다.");
     }
 
 
