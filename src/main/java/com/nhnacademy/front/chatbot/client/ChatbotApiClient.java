@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class ChatbotApiClient {
-    private static final String CHATBOT_PATH = "/api/core/chatbot/chat";
+    private static final String CHATBOT_PATH = "/api/core/chatbot";
     private final GatewayClient gatewayClient;
 
     public ChatResponse chat(ChatRequest request) {

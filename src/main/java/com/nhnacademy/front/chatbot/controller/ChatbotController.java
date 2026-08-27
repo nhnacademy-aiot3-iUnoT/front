@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ChatbotController {
     private final ChatbotApiClient chatbotApiClient;
 
-    @PostMapping("/chat")
+    @PostMapping
     public ChatResponse chat(@Valid @RequestBody ChatRequest request) {
         return chatbotApiClient.chat(request);
     }
