@@ -131,3 +131,15 @@ tbody tr.clickable-row:hover {
 .modal-actions { margin-top: 20px; text-align: right; }
 .modal-actions button { padding: 6px 14px; border-radius: 4px; cursor: pointer; border: 1px solid #cbd5e1; font-weight: 500; font-size: 14px; }
 .modal-actions button:first-child { background-color: #fff; color: #333; margin-right: 6px; }
+
+a.btn-secondary {
+    display: inline-block;
+    text-decoration: none;
+    text-align: center;
+    box-sizing: border-box;
+    vertical-align: middle;
+}
+
+a.btn-secondary:hover {
+    text-decoration: none;
+}
