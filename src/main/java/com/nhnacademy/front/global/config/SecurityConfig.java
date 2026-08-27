@@ -100,7 +100,6 @@ public class SecurityConfig {
     @Bean
     public JwtDecoder jwtDecoder(JwtProperties properties) {
         Assert.hasText(properties.getIssuer(), "security.jwt.issuer must be configured");
-        Assert.notEmpty(properties.getAudiences(), "security.jwt.audiences must not be empty");
         Assert.notEmpty(
                 properties.getAllowedAlgorithms(),
                 "security.jwt.allowed-algorithms must not be empty"
@@ -139,9 +138,6 @@ public class SecurityConfig {
                 timestampValidator,
                 new JwtIssuerValidator(properties.getIssuer())
         ));
-        validators.add(jwt -> jwt.getAudience().stream().anyMatch(properties.getAudiences()::contains)
-                ? OAuth2TokenValidatorResult.success()
-                : validationFailure("JWT audience is not allowed"));
         validators.add(jwt -> jwt.getHeaders().get("kid") instanceof String kid && !kid.isBlank()
                 ? OAuth2TokenValidatorResult.success()
                 : validationFailure("JWT kid header is required"));

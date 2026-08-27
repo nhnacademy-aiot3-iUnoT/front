@@ -29,8 +29,6 @@ juso:
 security:
   jwt:
     issuer: ${JWT_ISSUER:account-api}
-    audiences:
-      - account-api
     access-token-ttl: ${JWT_ACCESS_TOKEN_TTL:30m}
     allowed-algorithms:
       - rs256

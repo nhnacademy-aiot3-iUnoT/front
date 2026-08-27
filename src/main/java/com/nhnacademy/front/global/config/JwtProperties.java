@@ -18,13 +18,9 @@ import java.util.Set;
 @Validated
 @ConfigurationProperties("security.jwt")
 public class JwtProperties {
-
     @Setter
     @NotBlank
     private String issuer;
-
-    @NotEmpty
-    private Set<@NotBlank String> audiences = new LinkedHashSet<>();
 
     @Setter
     @NotNull
@@ -38,12 +34,6 @@ public class JwtProperties {
     @NotEmpty
     private Set<SignatureAlgorithm> allowedAlgorithms =
             new LinkedHashSet<>(Set.of(SignatureAlgorithm.RS256));
-
-    public void setAudiences(Set<String> audiences) {
-        this.audiences = audiences == null
-                ? new LinkedHashSet<>()
-                : new LinkedHashSet<>(audiences);
-    }
 
     @AssertTrue(message = "security.jwt.access-token-ttl must be positive")
     public boolean isAccessTokenTtlPositive() {
