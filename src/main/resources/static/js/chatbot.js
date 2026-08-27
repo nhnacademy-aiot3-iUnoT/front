@@ -49,10 +49,10 @@
                 throw new Error('서버 연결에 실패했습니다.');
             }
             const body = await response.json();
-            if (!response.ok || !body.success) {
-                throw new Error(body.error?.message || '챗봇 응답을 받을 수 없습니다.');
+            if (!response.ok || !body.message) {
+                throw new Error('챗봇 응답을 받을 수 없습니다.');
             }
-            addMessage(body.data.message, 'assistant');
+            addMessage(body.message, 'assistant');
         } catch (error) {
             addMessage(error.message || '챗봇 연결 중 오류가 발생했습니다.', 'assistant');
         }

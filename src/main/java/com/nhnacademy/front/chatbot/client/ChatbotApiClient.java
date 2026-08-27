@@ -13,7 +13,7 @@ public class ChatbotApiClient {
     private static final String CHATBOT_PATH = "/api/core/chatbot/chat";
     private final GatewayClient gatewayClient;
 
-    public ChatResponse chat(String message) {
-        return gatewayClient.post(CHATBOT_PATH, new ChatRequest(message), new ParameterizedTypeReference<>() {});
+    public ChatResponse chat(ChatRequest request) {
+        return gatewayClient.post(CHATBOT_PATH, request, new ParameterizedTypeReference<>() {});
     }
 }
