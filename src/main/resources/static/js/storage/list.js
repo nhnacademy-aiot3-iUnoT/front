@@ -18,9 +18,8 @@ function loadDepartmentsForModal() {
     const container = document.getElementById('department-checkbox-container');
     container.innerHTML = '<span style="color: #888; font-size: 13px;">부서 목록을 불러오는 중...</span>';
 
-    fetch(`/api/core/departments`, {
-        method: 'GET',
-        credentials: 'include'
+    apiFetch(`/api/core/departments`, {
+        method: 'GET'
     })
         .then(response => {
             if (!response.ok) throw new Error('부서 목록을 불러오지 못했습니다.');
@@ -86,12 +85,11 @@ function createStorage() {
         return;
     }
 
-    fetch(`/api/core/storages`, {
+    apiFetch(`/api/core/storages`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        credentials: 'include',
         body: JSON.stringify({
             name: name,
             description: description === '' ? null : description,

@@ -33,3 +33,6 @@ security:
     allowed-algorithms:
       - rs256
     jwk-set-uri: ${JWK_SET_URI:http://localhost:10413/.well-known/jwks.json}
+
+app:
+  api-base-url: ${API_BASE_URL:} # prod 환경에서는 빈 값으로(상대 경로 적용)

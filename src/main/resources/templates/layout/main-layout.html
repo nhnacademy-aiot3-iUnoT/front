@@ -4,6 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <title>iUnoT</title>
+    <meta name="api-base" th:content="${@environment.getProperty('app.api-base-url')}">
+    <script th:src="@{/js/api.js}"></script>
 
     <script>
         const savedTheme = localStorage.getItem("theme");
