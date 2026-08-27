@@ -4,16 +4,13 @@ package com.nhnacademy.front.global.error;
 public enum ErrorCode {
 
     // Account
-    U001,
     A009,
 
     // Organization
     O001,
 
-    // Rule Engine
-    R009,
-
     // Inventory
+    S001,
 
     // Medicine
 
