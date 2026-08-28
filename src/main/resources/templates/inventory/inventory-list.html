@@ -19,10 +19,13 @@
                 <h1>전체 재고</h1>
                 <p class="description">조직에 등록된 의약품 재고와 보관 위치를 확인합니다.</p>
             </div>
-<!--            <button type="button" class="primary-button">＋ 의약품 입고 등록</button>-->
+            <!--            <button type="button" class="primary-button">＋ 의약품 입고 등록</button>-->
             <a th:href="@{/inventory}" class="primary-button">＋ 의약품 입고 등록</a>
         </div>
-
+        <div class="alert alert-success"
+             th:if="${successMessage}"
+             th:text="${successMessage}">
+        </div>
         <section class="inventory-card">
             <form class="toolbar" method="get" th:action="@{/inventories}">
 
@@ -62,7 +65,8 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr th:each="item : ${inventories}" class="inventory-row" th:data-storage-id="${item.storageId}" th:data-pack-unit-id="${item.packUnitId}">
+                    <tr th:each="item : ${inventories}" class="inventory-row" th:data-storage-id="${item.storageId}"
+                        th:data-pack-unit-id="${item.packUnitId}">
                         <td th:text="${item.productName}"></td>
                         <td th:text="${item.itemCode}"></td>
                         <td th:text="${item.expirationDate}"></td>
@@ -83,6 +87,14 @@
 </div>
 <th:block layout:fragment="script">
     <script>
+        const successAlert =
+            document.querySelector(".inventory-page .alert-success");
+
+        if (successAlert) {
+            setTimeout(() => {
+                successAlert.remove();
+            }, 3000);
+        }
         document.querySelectorAll('tbody tr').forEach(row => {
 
             // 추후 경로 수정 필요
