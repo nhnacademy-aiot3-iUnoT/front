@@ -85,7 +85,7 @@ public class InventoryApiClient {
         String path = UriComponentsBuilder
                 .fromPath(
                         CORE_SERVICE
-                                + "/medicine-inventories/{inventoryId}/outbound-target"
+                                + "/inventories/{inventoryId}/outbound-target"
                 )
                 .buildAndExpand(inventoryId)
                 .encode()
@@ -100,7 +100,7 @@ public class InventoryApiClient {
     // 출고 처리
     public void outbound(MedicineOutboundRequest request) {
         gatewayClient.post(
-                CORE_SERVICE + "/medicine-inventories/outbound",
+                CORE_SERVICE + "/inventories/outbound",
                 request
         );
     }

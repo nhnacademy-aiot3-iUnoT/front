@@ -31,11 +31,7 @@ public class InventoryDisposalController {
         if (!model.containsAttribute("disposalRequest")) {
             model.addAttribute(
                     "disposalRequest",
-                    new MedicineDisposalRequest(
-                            null,
-                            null,
-                            null
-                    )
+                    new MedicineDisposalRequest()
             );
         }
 

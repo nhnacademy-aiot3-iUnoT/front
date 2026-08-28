@@ -17,4 +17,7 @@ public record MedicineDisposalRequest(
         @Size(max = 100, message = "상세 사유는 100자 이내여야 합니다.")
         String memo
 ) {
+    public MedicineDisposalRequest() {
+        this(null, null, null);
+    }
 }
