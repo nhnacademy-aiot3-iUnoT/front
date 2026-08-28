@@ -13,4 +13,6 @@ public class EnvironmentEventViewController {
         model.addAttribute("zoneId", zoneId);
         return "zone/environment-event-list";
     }
+
+
 }
