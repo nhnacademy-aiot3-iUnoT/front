@@ -1,7 +1,7 @@
-/* 기본 색상 */
+/* iUnoT 공통 테마: Tabler 기본 스타일과 서비스 공통 컴포넌트를 관리합니다. */
 
+/* 색상 토큰 */
 :root {
-    /* iUnoT 색상 */
     --ink: #1f2d29;
     --ink-soft: #68756f;
 
@@ -24,8 +24,7 @@
 
     --shadow: 0 16px 50px #30403b14;
 
-
-    /* Bootstrap / Tabler에 iUnoT 색상 적용 */
+    /* Tabler / Bootstrap 색상 연결 */
     --bs-primary: var(--teal);
     --bs-primary-rgb: 23, 111, 96;
 
@@ -42,78 +41,47 @@
     --bs-secondary-color: var(--ink-soft);
 }
 
-/* 다크모드 색상 */
-
 [data-bs-theme="dark"] {
-    /* Text */
     --ink: #edf2ef;
     --ink-soft: #a5b0ab;
-
-    /* Background */
     --canvas: #111412;
     --surface: #1a1e1c;
-
-    /* Border */
     --line: #2a302d;
     --line-strong: #3a423e;
-
-    /* Brand */
     --teal: #4b9a87;
     --teal-dark: #3c806f;
     --teal-soft: #1d2c27;
     --mint: #243b33;
-
-    /* Status */
     --danger: #d8756f;
     --danger-soft: #33211f;
-
     --warning: #d1a75a;
     --warning-soft: #30291b;
-
-    /* Shadow */
     --shadow: 0 18px 50px rgb(0 0 0 / 35%);
 
-    /* Bootstrap / Tabler */
     --bs-primary: var(--teal);
     --bs-primary-rgb: 75, 154, 135;
-
     --bs-danger: var(--danger);
     --bs-danger-rgb: 216, 117, 111;
-
     --bs-warning: var(--warning);
     --bs-warning-rgb: 209, 167, 90;
-
     --bs-body-bg: var(--canvas);
     --bs-body-color: var(--ink);
-
     --bs-border-color: var(--line);
     --bs-secondary-color: var(--ink-soft);
 }
 
-
-/* 테마 아이콘 */
-
-.moon-icon {
-    display: inline-block;
-}
-
-.sun-icon {
-    display: none;
-}
-
-[data-bs-theme="dark"] .moon-icon {
-    display: none;
-}
-
-[data-bs-theme="dark"] .sun-icon {
-    display: inline-block;
-}
-
-/* 중복 컴포넌트 */
-
+/* 기본 요소와 Tabler 보정 */
 body {
     background-color: var(--canvas);
     color: var(--ink);
+}
+
+a {
+    color: var(--teal);
+}
+
+a:hover {
+    color: var(--teal-dark);
 }
 
 .navbar {
@@ -142,21 +110,70 @@ body {
     border-color: var(--teal);
 }
 
-a {
-    color: var(--teal);
+/* 공통 페이지 레이아웃 */
+.page-content-panel {
+    padding: 2rem;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    box-shadow: 0 4px 20px #30403b0a;
 }
 
-a:hover {
-    color: var(--teal-dark);
+/* 카드 제목은 바깥에, 본문만 박스 형태로 표시 */
+.card:has(> .plain-card-title) {
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+}
+
+.card-header.plain-card-title {
+    padding: 0 0 1rem;
+    background: transparent;
+    border: 0;
+}
+
+.plain-card-title .card-title {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.plain-card-title + .card-body {
+    overflow: hidden;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+}
+
+/* 헤더 네비게이션 */
+.nav-dropdown-hover {
+    position: relative;
+}
+
+.nav-dropdown-menu {
+    top: 100%;
+    left: 0;
+    right: auto;
+    min-width: 11rem;
+    margin-top: 0;
+    transform: none !important;
+}
+
+.profile-nav-item .dropdown-menu {
+    min-width: 9rem;
+}
+
+@media (min-width: 768px) {
+    .nav-dropdown-hover:hover > .nav-dropdown-menu {
+        display: block;
+    }
 }
 
 /* 버튼 */
-
 .btn-primary {
     --tblr-btn-color: #fff;
     --tblr-btn-bg: var(--teal);
     --tblr-btn-border-color: var(--teal);
-
     background-color: var(--teal);
     border-color: var(--teal);
     color: #fff;
@@ -173,7 +190,6 @@ a:hover {
     --tblr-btn-color: #fff;
     --tblr-btn-bg: var(--danger);
     --tblr-btn-border-color: var(--danger);
-
     background-color: var(--danger);
     border-color: var(--danger);
     color: #fff;
@@ -192,7 +208,6 @@ a:hover {
     --tblr-btn-hover-color: #fff;
     --tblr-btn-hover-bg: var(--teal);
     --tblr-btn-hover-border-color: var(--teal);
-
     color: var(--teal);
     border-color: var(--teal);
 }
@@ -202,6 +217,23 @@ a:hover {
     color: #fff;
     background-color: var(--teal);
     border-color: var(--teal);
+}
+
+/* 아이콘, 페이지네이션, 알림 */
+.moon-icon {
+    display: inline-block;
+}
+
+.sun-icon {
+    display: none;
+}
+
+[data-bs-theme="dark"] .moon-icon {
+    display: none;
+}
+
+[data-bs-theme="dark"] .sun-icon {
+    display: inline-block;
 }
 
 .pagination .page-link {
@@ -218,8 +250,17 @@ a:hover {
     color: var(--teal-dark);
     background-color: var(--teal-soft);
 }
+
 .alert-warning {
     --tblr-alert-color: var(--warning);
     --tblr-alert-bg: var(--warning-soft);
     --tblr-alert-border-color: var(--line-strong);
+}
+
+/* 반응형 */
+@media (max-width: 767.98px) {
+    .page-content-panel {
+        padding: 1rem;
+        border-radius: 12px;
+    }
 }
