@@ -1,6 +1,6 @@
 .container {
     max-width: 1200px;
-    margin: 40px auto;
+    margin: 30px auto;
     padding: 30px;
     background: #ffffff;
     border-radius: 12px;
@@ -10,6 +10,7 @@
 h2 {
     margin-top: 0;
     color: #2c3e50;
+    font-size: 1.5rem;
 }
 
 .filter-section {
@@ -88,6 +89,12 @@ tr:hover {
     background: #f8fafc;
 }
 
+.empty-data {
+    text-align: center;
+    color: #888;
+    padding: 20px;
+}
+
 .pagination {
     display: flex;
     justify-content: center;
@@ -101,4 +108,10 @@ tr:hover {
     background: #fff;
     border-radius: 4px;
     cursor: pointer;
+}
+
+.pagination button.active {
+    background: #2563eb;
+    color: white;
+    border-color: #2563eb;
 }
