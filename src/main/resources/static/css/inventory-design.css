@@ -606,3 +606,30 @@ tbody tr:last-child td {
     border-color: #34423d;
     font-weight: 700;
 }
+
+.header-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.secondary-action-button {
+    display: inline-flex;
+    align-items: center;
+    padding: .65rem 1rem;
+    border: 1px solid var(--line-strong);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--ink);
+    font-size: .875rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color .15s ease, border-color .15s ease;
+}
+
+.secondary-action-button:hover {
+    background: var(--canvas);
+    border-color: var(--teal);
+    color: var(--teal);
+    text-decoration: none;
+}

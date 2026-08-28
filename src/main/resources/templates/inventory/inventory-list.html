@@ -19,8 +19,12 @@
                 <h1>전체 재고</h1>
                 <p class="description">조직에 등록된 의약품 재고와 보관 위치를 확인합니다.</p>
             </div>
-            <!--            <button type="button" class="primary-button">＋ 의약품 입고 등록</button>-->
-            <a th:href="@{/inventory}" class="primary-button">＋ 의약품 입고 등록</a>
+            <div class="header-actions">
+                <a th:href="@{/inventories/under-reviews}" class="secondary-action-button">
+                    ⚠️ 환경 검토 대상 재고
+                </a>
+                <a th:href="@{/inventory}" class="primary-button">＋ 의약품 입고 등록</a>
+            </div>
         </div>
         <div class="alert alert-success"
              th:if="${successMessage}"
@@ -107,7 +111,6 @@
         });
     </script>
 </th:block>
-
 
 </body>
 </html>
