@@ -13,17 +13,11 @@
         <div class="page-header d-print-none mb-4">
             <div class="row align-items-center">
                 <div class="col">
-                    <h2 class="page-title" th:text="${department.name}"> 정보</h2>
+                    <h2 class="page-title" th:text="${department.name}"></h2>
+                    <div class="text-muted">부서의 저장소, 소속 조직원을 관리합니다.</div>
                 </div>
                 <div class="col-auto">
-                    <button type="button" th:if="${memberRole.name == 'ORG_MEMBER'}"
-                            class="btn btn-outline-secondary" onclick="history.back();">
-                        뒤로
-                    </button>
-                    <a class="btn btn-outline-secondary" th:unless="${memberRole.name == 'ORG_MEMBER'}"
-                        th:href="@{/departments}">
-                        부서 목록
-                    </a>
+                    <a class="btn btn-outline-secondary" th:href="@{/departments}">부서 목록</a>
                 </div>
             </div>
         </div>
@@ -44,6 +38,12 @@
                             <textarea id="description" class="form-control" th:field="*{description}" maxlength="255" rows="5" th:readonly="${memberRole.name == 'ORG_MEMBER'}"></textarea>
                             <div class="invalid-feedback"></div>
                             <div class="text-danger" th:errors="*{description}"></div>
+                        </div>
+                        <div th:if="${memberRole.name != 'ORG_MEMBER'}" class="d-flex justify-content-between mt-2">
+                            <div class="form-hint"></div>
+                            <small class="text-muted">
+                                최대 255자
+                            </small>
                         </div>
                         <div class="row"><div class="col-sm-3 text-muted">생성일</div><div class="col-sm-9" th:text="${#temporals.format(department.createdAt, 'yyyy-MM-dd HH:mm')}"></div></div>
                     </div>
@@ -107,6 +107,6 @@
         window.departmentId = /*[[${department.id}]]*/ 0;
         window.assignedMemberIds = /*[[${departmentMembers.![memberId]}]]*/ [];
     </script>
-    <script th:src="@{/js/organization/department-info.js}"></script>
+    <script th:src="@{/js/organization/department/department-info.js}"></script>
 </th:block>
 </html>

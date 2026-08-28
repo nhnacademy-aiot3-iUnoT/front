@@ -6,155 +6,148 @@
 <head>
     <meta charset="UTF-8">
     <title>조직원 관리</title>
-    <link rel="stylesheet" th:href="@{/css/member-list.css}">
 </head>
 
 <body>
 <div layout:fragment="content">
-    <div class="page">
-        <div class="page-wrapper">
-            <div class="container-xl">
-                <div class="page-header mt-3">
-                    <div class="row align-items-center">
-                        <div class="col">
-                            <h2 class="page-title">조직원 관리</h2>
-                            <div class="text-secondary">조직원의 역할과 부서를 관리합니다.</div>
-                        </div>
-                        <div class="col-auto">
-                            <a class="btn btn-primary" th:href="@{/organizations/me/invitations}">조직원 초대</a>
-                        </div>
-                        <div class="col-auto">
-                            <a class="btn btn-outline-secondary" th:href="@{/organizations/me}">조직 정보</a>
-                        </div>
-                    </div>
+    <div class="py-6">
+        <div class="page-header d-print-none mb-4">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h2 class="page-title">조직원 관리</h2>
+                    <div class="text-secondary">조직원의 역할과 부서를 관리합니다.</div>
                 </div>
-
-                <div class="card mt-4">
-                    <div class="card-header">
-                        <ul class="nav nav-tabs card-header-tabs">
-                            <li class="nav-item">
-                                <a class="nav-link"
-                                   th:classappend="${!withoutDepartment} ? 'active'"
-                                   th:href="@{/organizations/me/members}">
-                                    부서 지정 조직원
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link"
-                                   th:classappend="${withoutDepartment} ? 'active'"
-                                   th:href="@{/organizations/me/members(withoutDepartment=true)}">
-                                    부서 대기 조직원
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="card-body">
-                        <form th:action="@{/organizations/me/members}" method="get" class="row g-2">
-                            <input type="hidden" name="withoutDepartment" th:value="${withoutDepartment}">
-                            <div class="col-md-6">
-                                <input type="text" name="email" class="form-control" placeholder="이메일로 검색" th:value="${param.email}">
-                            </div>
-                            <div class="col-md-3" th:if="${!withoutDepartment}">
-                                <select name="role" class="form-select">
-                                    <option value="">전체 역할</option>
-                                    <option th:each="role : ${organizationRoles}"
-                                            th:value="${role}"
-                                            th:text="${role.name() == 'ORG_OWNER' ? 'OWNER' : (role.name() == 'ORG_BOSS' ? 'BOSS' : 'MEMBER')}"
-                                            th:selected="${param.role != null and param.role[0] == role.name()}"></option>
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <button type="submit" class="btn btn-primary w-100">검색</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-
-                <div class="card mt-3">
-                    <div class="table-responsive">
-                        <table class="table table-vcenter card-table member-table">
-                            <thead>
-                            <tr>
-                                <th class="member-email-column">이메일</th>
-                                <th class="member-role-column">역할</th>
-                                <th class="member-date-column">가입일</th>
-                                <th class="member-action-column">관리</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr th:if="${#lists.isEmpty(members.content)}">
-                                <td colspan="4" class="text-center text-secondary py-5"
-                                    th:text="${withoutDepartment} ? '부서 대기 중인 조직원이 없습니다.' : '부서가 지정된 조직원이 없습니다.'">
-                                </td>
-                            </tr>
-                            <tr th:each="member : ${members.content}">
-                                <td class="member-email-cell">
-                                    <div class="fw-medium text-truncate" th:text="${member.email}" th:title="${member.email}"></div>
-                                </td>
-                                <td>
-                                    <span class="badge bg-secondary-lt"
-                                          th:if="${organization.organizationRole.name() != 'ORG_BOSS'}"
-                                          th:text="${member.role.name() == 'ORG_OWNER' ? 'OWNER' : (member.role.name() == 'ORG_BOSS' ? 'BOSS' : 'MEMBER')}"></span>
-
-                                    <form th:if="${organization.organizationRole.name() == 'ORG_BOSS'}"
-                                          th:action="@{/organizations/me/members/{id}/role(id=${member.memberId})}"
-                                          th:method="put">
-                                        <input type="hidden" name="withoutDepartment" th:value="${withoutDepartment}">
-                                        <select class="form-select form-select-sm member-role-select"
-                                                name="role"
-                                                aria-label="조직원 역할"
-                                                th:disabled="${member.role.name() == 'ORG_BOSS'}">
-                                            <option value="ORG_OWNER" th:selected="${member.role.name() == 'ORG_OWNER'}">OWNER</option>
-                                            <option value="ORG_MEMBER" th:selected="${member.role.name() == 'ORG_MEMBER'}">MEMBER</option>
-                                            <option value="ORG_BOSS" th:if="${member.role.name() == 'ORG_BOSS'}" selected>BOSS</option>
-                                        </select>
-                                    </form>
-                                </td>
-                                <td class="text-secondary text-nowrap"
-                                    th:text="${#temporals.format(member.joinedAt, 'yyyy-MM-dd HH:mm')}"></td>
-                                <td>
-                                    <div class="member-actions">
-                                        <button type="button"
-                                                class="btn btn-sm btn-outline-primary assign-department-button"
-                                                th:if="${withoutDepartment and (organization.organizationRole.name() == 'ORG_OWNER' or organization.organizationRole.name() == 'ORG_BOSS') and member.role.name() != 'ORG_BOSS'}"
-                                                th:data-member-id="${member.memberId}"
-                                                th:data-member-email="${member.email}">
-                                            부서 지정
-                                        </button>
-                                        <form th:if="${organization.organizationRole.name() == 'ORG_BOSS' and member.role.name() != 'ORG_BOSS'}"
-                                              th:action="@{/organizations/me/members/{id}(id=${member.memberId})}"
-                                              th:method="delete"
-                                              onsubmit="return confirm('해당 조직원을 삭제하시겠습니까?');">
-                                            <input type="hidden" name="withoutDepartment" th:value="${withoutDepartment}">
-                                            <button type="submit" class="btn btn-sm btn-outline-danger">삭제</button>
-                                        </form>
-                                    </div>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div class="card-footer py-3" th:if="${members.totalPages > 0}">
-                        <ul class="pagination m-0 justify-content-center">
-                            <li class="page-item" th:classappend="${members.page == 0} ? 'disabled'">
-                                <a class="page-link" th:href="@{/organizations/me/members(page=${members.page - 1},size=${members.size},email=${param.email},role=${param.role},withoutDepartment=${withoutDepartment})}">이전</a>
-                            </li>
-                            <li class="page-item" th:each="pageNumber : ${#numbers.sequence(0, members.totalPages - 1)}"
-                                th:classappend="${pageNumber == members.page} ? 'active'">
-                                <a class="page-link" th:text="${pageNumber + 1}"
-                                   th:href="@{/organizations/me/members(page=${pageNumber},size=${members.size},email=${param.email},role=${param.role},withoutDepartment=${withoutDepartment})}"></a>
-                            </li>
-                            <li class="page-item" th:classappend="${members.last} ? 'disabled'">
-                                <a class="page-link" th:href="@{/organizations/me/members(page=${members.page + 1},size=${members.size},email=${param.email},role=${param.role},withoutDepartment=${withoutDepartment})}">다음</a>
-                            </li>
-                        </ul>
-                    </div>
+                <div class="col-auto">
+                    <a class="btn btn-primary" th:href="@{/organizations/me/invitations}">조직원 초대</a>
                 </div>
             </div>
         </div>
-    </div>
 
+        <div th:if="${message}" class="alert alert-success mt-2" th:text="${message}"></div>
+
+        <div class="card mt-5">
+            <div class="card-header">
+                <ul class="nav nav-tabs card-header-tabs">
+                    <li class="nav-item">
+                        <a class="nav-link"
+                           th:classappend="${!withoutDepartment} ? 'active'"
+                           th:href="@{/organizations/me/members}">
+                            부서 지정 조직원
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link"
+                           th:classappend="${withoutDepartment} ? 'active'"
+                           th:href="@{/organizations/me/members(withoutDepartment=true)}">
+                            부서 대기 조직원
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="card-body">
+                <form th:action="@{/organizations/me/members}" method="get" class="row g-2" id="searchByEmailForm">
+                    <input type="hidden" name="withoutDepartment" th:value="${withoutDepartment}">
+                    <div th:classappend="${!withoutDepartment} ? 'col-md-6' : 'col-md-9'">
+                        <input type="text" name="email" class="form-control" placeholder="이메일로 검색" th:value="${param.email}" required>
+                    </div>
+                    <div class="col-md-3" th:if="${!withoutDepartment}">
+                        <select name="role" class="form-select">
+                            <option value="">전체 역할</option>
+                            <option th:each="role : ${organizationRoles}"
+                                    th:value="${role}"
+                                    th:text="${role.name() == 'ORG_OWNER' ? 'OWNER' : (role.name() == 'ORG_BOSS' ? 'BOSS' : 'MEMBER')}"
+                                    th:selected="${param.role != null and param.role[0] == role.name()}"></option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <button type="submit" class="btn btn-primary w-100">검색</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="card mt-3">
+            <div class="table-responsive">
+                <table class="table table-vcenter card-table">
+                    <thead>
+                    <tr>
+                        <th style="width: 30%">이메일</th>
+                        <th style="width: 15%">역할</th>
+                        <th style="width: 30%">가입일</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:if="${#lists.isEmpty(members.content)}">
+                        <td colspan="4" class="text-center text-secondary py-5"
+                            th:text="${withoutDepartment} ? '부서 대기 중인 조직원이 없습니다.' : '부서가 지정된 조직원이 없습니다.'">
+                        </td>
+                    </tr>
+                    <tr th:each="member : ${members.content}">
+                        <td style="max-width: 230px;">
+                            <div class="fw-medium text-truncate" th:text="${member.email}" th:title="${member.email}"></div>
+                        </td>
+                        <td>
+                            <span class="badge bg-secondary-lt"
+                                  th:if="${organization.organizationRole.name() != 'ORG_BOSS'}"
+                                  th:text="${member.role.name() == 'ORG_OWNER' ? 'OWNER' : (member.role.name() == 'ORG_BOSS' ? 'BOSS' : 'MEMBER')}"></span>
+
+                            <form th:if="${organization.organizationRole.name() == 'ORG_BOSS'}"
+                                  th:action="@{/organizations/me/members/{id}/role(id=${member.memberId})}"
+                                  th:method="put">
+                                <input type="hidden" name="withoutDepartment" th:value="${withoutDepartment}">
+                                    <select class="form-select form-select-sm w-auto"
+                                        name="role"
+                                        aria-label="조직원 역할"
+                                        th:disabled="${member.role.name() == 'ORG_BOSS'}">
+                                    <option value="ORG_OWNER" th:selected="${member.role.name() == 'ORG_OWNER'}">OWNER</option>
+                                    <option value="ORG_MEMBER" th:selected="${member.role.name() == 'ORG_MEMBER'}">MEMBER</option>
+                                    <option value="ORG_BOSS" th:if="${member.role.name() == 'ORG_BOSS'}" selected>BOSS</option>
+                                </select>
+                            </form>
+                        </td>
+                        <td class="text-secondary text-nowrap"
+                            th:text="${#temporals.format(member.joinedAt, 'yyyy-MM-dd HH:mm')}"></td>
+                        <td>
+                            <div class="d-flex justify-content-end gap-2">
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-primary assign-department-button"
+                                        th:if="${withoutDepartment and (organization.organizationRole.name() == 'ORG_OWNER' or organization.organizationRole.name() == 'ORG_BOSS') and member.role.name() != 'ORG_BOSS'}"
+                                        th:data-member-id="${member.memberId}"
+                                        th:data-member-email="${member.email}">
+                                    부서 지정
+                                </button>
+                                <form th:if="${organization.organizationRole.name() == 'ORG_BOSS' and member.role.name() != 'ORG_BOSS'}"
+                                      th:action="@{/organizations/me/members/{id}(id=${member.memberId})}"
+                                      th:method="delete"
+                                      onsubmit="return confirm('해당 조직원을 삭제하시겠습니까?');">
+                                    <input type="hidden" name="withoutDepartment" th:value="${withoutDepartment}">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">삭제</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card-footer py-3" th:if="${members.totalPages > 0}">
+                <ul class="pagination m-0 justify-content-center">
+                    <li class="page-item" th:classappend="${members.page == 0} ? 'disabled'">
+                        <a class="page-link" th:href="@{/organizations/me/members(page=${members.page - 1},size=${members.size},email=${param.email},role=${param.role},withoutDepartment=${withoutDepartment})}">이전</a>
+                    </li>
+                    <li class="page-item" th:each="pageNumber : ${#numbers.sequence(0, members.totalPages - 1)}"
+                        th:classappend="${pageNumber == members.page} ? 'active'">
+                        <a class="page-link" th:text="${pageNumber + 1}"
+                           th:href="@{/organizations/me/members(page=${pageNumber},size=${members.size},email=${param.email},role=${param.role},withoutDepartment=${withoutDepartment})}"></a>
+                    </li>
+                    <li class="page-item" th:classappend="${members.last} ? 'disabled'">
+                        <a class="page-link" th:href="@{/organizations/me/members(page=${members.page + 1},size=${members.size},email=${param.email},role=${param.role},withoutDepartment=${withoutDepartment})}">다음</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
     <div th:replace="~{fragments/assign-department-modal :: modal}"></div>
 </div>
 <th:block layout:fragment="script">
