@@ -8,13 +8,14 @@ import com.nhnacademy.front.account.dto.request.UpdateAccountNameRequest;
 import com.nhnacademy.front.account.dto.request.WithdrawAccountRequest;
 import com.nhnacademy.front.account.dto.response.AccountInfoResponse;
 import com.nhnacademy.front.account.validator.PasswordFormValidator;
+import com.nhnacademy.front.auth.service.AuthSessionService;
 import com.nhnacademy.front.global.error.ApiException;
 import com.nhnacademy.front.global.error.ErrorCode;
-import com.nhnacademy.front.global.security.AccessTokenCookieManager;
 import com.nhnacademy.front.organization.client.DepartmentApiClient;
 import com.nhnacademy.front.organization.client.OrganizationMemberApiClient;
 import com.nhnacademy.front.organization.dto.response.DepartmentListResponse;
 import com.nhnacademy.front.organization.dto.response.OrganizationMemberRoleResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -40,7 +41,7 @@ public class AccountController {
     private final DepartmentApiClient departmentApiClient;
     private final OrganizationMemberApiClient memberApiClient;
     private final PasswordFormValidator passwordFormValidator;
-    private final AccessTokenCookieManager cookieManager;
+    private final AuthSessionService authSessionService;
 
     @GetMapping("/mypage")
     public String info(Model model) {
@@ -88,6 +89,7 @@ public class AccountController {
             @Valid @ModelAttribute("reactivationConfirmRequest") ReactivationConfirmRequest request,
             BindingResult bindingResult,
             Model model,
+            HttpServletRequest httpRequest,
             HttpServletResponse response,
             RedirectAttributes redirectAttributes
     ) {
@@ -102,7 +104,7 @@ public class AccountController {
             return "account/reactivation";
         }
 
-        cookieManager.delete(response);
+        authSessionService.revoke(httpRequest, response);
         redirectAttributes.addFlashAttribute(
                 "successMessage",
                 "계정이 재활성화되었습니다. 다시 로그인해주세요."
@@ -175,6 +177,7 @@ public class AccountController {
     public String deleteAccount(
             @Valid @RequestBody WithdrawAccountRequest request,
             BindingResult bindingResult,
+            HttpServletRequest httpRequest,
             HttpServletResponse response
     ) {
         if (bindingResult.hasErrors()) {
@@ -183,7 +186,7 @@ public class AccountController {
 
         accountApiClient.withdraw(request);
 
-        cookieManager.delete(response);
+        authSessionService.revoke(httpRequest, response);
 
         return "redirect:/login";
     }

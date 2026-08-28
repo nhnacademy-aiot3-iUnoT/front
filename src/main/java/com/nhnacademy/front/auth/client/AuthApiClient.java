@@ -2,6 +2,7 @@ package com.nhnacademy.front.auth.client;
 
 import com.nhnacademy.front.auth.dto.request.CheckEmailRequest;
 import com.nhnacademy.front.auth.dto.request.LoginRequest;
+import com.nhnacademy.front.auth.dto.request.RefreshTokenRequest;
 import com.nhnacademy.front.auth.dto.request.ResetPasswordRequest;
 import com.nhnacademy.front.auth.dto.request.ResetPasswordTokenRequest;
 import com.nhnacademy.front.auth.dto.request.SignupRequest;
@@ -14,6 +15,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.ResourceAccessException;
 
 import java.util.Map;
 
@@ -33,6 +35,18 @@ public class AuthApiClient {
 
     public LoginResponse login(@Valid LoginRequest request) {
         return gatewayClient.post(AUTH_SERVICE + "/login", request, LoginResponse.class);
+    }
+
+    public LoginResponse refresh(@Valid RefreshTokenRequest request) {
+        return gatewayClient.post(
+                AUTH_SERVICE + "/refresh",
+                request,
+                LoginResponse.class
+        );
+    }
+
+    public void logout(@Valid RefreshTokenRequest request) {
+        gatewayClient.post(AUTH_SERVICE + "/logout", request);
     }
 
     public SignupResponse signup(@Valid SignupRequest request) {

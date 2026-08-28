@@ -23,7 +23,12 @@ public class CookieAuthenticationEntryPoint implements AuthenticationEntryPoint 
             HttpServletResponse response,
             AuthenticationException authenticationException
     ) throws IOException, ServletException {
-        if (WebUtils.getCookie(request, AccessTokenCookieManager.COOKIE_NAME) != null) {
+        boolean refreshFailed = Boolean.TRUE.equals(request.getAttribute(
+                RefreshTokenAutoRenewFilter.REFRESH_FAILED_ATTRIBUTE
+        ));
+
+        if (!refreshFailed
+                && WebUtils.getCookie(request, AccessTokenCookieManager.COOKIE_NAME) != null) {
             cookieManager.delete(response);
         }
 
