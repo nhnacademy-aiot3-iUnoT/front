@@ -3,6 +3,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
 }
 
 .notification-badge {
@@ -12,14 +15,17 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    min-width: 16px;
-    height: 16px;
-    padding: 0 3px;
+    width: 15px;
+    height: 15px;
+    padding: 0;
+    overflow: visible;
     font-size: 9px;
     font-weight: 700;
-    line-height: 1;
+    line-height: 15px;
+    text-align: center;
     color: #fff;
     background-color: #d63939;
     border-radius: 50px;
     box-shadow: 0 0 0 2px #ffffff;
+    z-index: 1;
 }

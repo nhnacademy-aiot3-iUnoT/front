@@ -1,5 +1,19 @@
 // 추후 확인 필요
 document.addEventListener('DOMContentLoaded', () => {
+    const updateForm = document.querySelector('#departmentUpdateForm');
+
+    if (updateForm) {
+        updateForm.addEventListener('submit', (event) => {
+            clearErrors(updateForm);
+            const validName = validateDepartmentNameField(updateForm.querySelector('#name'));
+            const validDescription = validateDescription(updateForm.querySelector('#description'));
+
+            if (!(validName && validDescription)) {
+                event.preventDefault();
+            }
+        });
+    }
+
     const MIN_SEARCH_LENGTH = 2;
     const SEARCH_DELAY = 400;
     const departmentId = window.departmentId;
