@@ -6,61 +6,63 @@
 <head>
     <meta charset="UTF-8">
     <title>알림 센터</title>
-    <link rel="stylesheet" th:href="@{/css/alert-list.css}">
+    <link rel="stylesheet" th:href="@{/css/status.css}">
 </head>
 <body>
 
 <div layout:fragment="content">
-    <div class="table-container">
-        <!-- 상단 타이틀 및 전체 삭제 버튼 -->
-        <div class="header-flex" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <div style="display: flex; align-items: center; gap: 15px;">
-                <h2>🔔 알림 센터</h2>
-                <!-- 유통기한 임박 재고 페이지로 이동하는 링크 버튼 -->
-                <a th:href="@{/expiring}" class="btn-secondary" style="padding: 6px 12px; background: #e2e8f0; color: #334155; text-decoration: none; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">
-                    ⏳ 임박 재고 조회
-                </a>
+    <div class="py-6">
+        <div class="page-header d-print-none mb-4"><div class="row align-items-center">
+            <div class="col d-flex align-items-center gap-3">
+                <h1 class="page-title">알림 센터</h1>
             </div>
-            <button type="button" class="btn-danger" th:if="${canManage}" onclick="deleteAllAlerts()">전체 삭제</button>
-        </div>
+            <div class="col-auto">
+                <a th:href="@{/expiring}" class="btn btn-outline-secondary">
+                    <i class="ti ti-hourglass-high"></i>임박 재고 조회</a>
+                <button type="button" class="btn btn-outline-danger" th:if="${canManage}" onclick="deleteAllAlerts()">전체 삭제</button>
+            </div>
+        </div></div>
 
-        <!-- 🔍 검색 및 필터 컨트롤 영역 -->
-        <div class="filter-box" style="display: flex; gap: 15px; align-items: center; margin-bottom: 20px; background: #f8fafc; padding: 15px; border-radius: 8px;">
-            <div>
-                <label for="filter-alert-type" style="font-weight: bold; margin-right: 5px;">알림 타입:</label>
-                <select id="filter-alert-type" onchange="loadAlerts(0)" style="padding: 6px; border-radius: 4px; border: 1px solid #cbd5e1;">
+        <div class="page-content-panel">
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="row g-2 align-items-end">
+            <div class="col-md-4">
+                <label for="filter-alert-type" class="form-label">알림 타입</label>
+                <select id="filter-alert-type" class="form-select" onchange="loadAlerts(0)">
                     <option value="">전체 타입</option>
                     <option value="LOW_STOCK">재고 부족 (LOW_STOCK)</option>
                     <option value="ENV_WARNING">환경 경고 (ENV_WARNING)</option>
                     <option value="EXPIRING">유통기한 임박 (EXPIRING)</option>
                 </select>
             </div>
-
-            <div>
-                <label for="filter-is-checked" style="font-weight: bold; margin-right: 5px;">읽음 여부:</label>
-                <select id="filter-is-checked" onchange="loadAlerts(0)" style="padding: 6px; border-radius: 4px; border: 1px solid #cbd5e1;">
+            <div class="col-md-4">
+                <label for="filter-is-checked" class="form-label">읽음 여부</label>
+                <select id="filter-is-checked" class="form-select" onchange="loadAlerts(0)">
                     <option value="false" selected>안 읽은 알림만</option>
                     <option value="true">읽은 알림만</option>
                     <option value="">전체 보기</option>
                 </select>
             </div>
-
-            <div style="margin-left: auto;">
-                <button type="button" class="btn-primary" onclick="markSelectedAsChecked()">선택 읽음 처리</button>
-                <button type="button" class="btn-danger" th:if="${canManage}" onclick="deleteSelectedAlerts()" style="margin-left: 5px;">선택 삭제</button>
+            <div class="col-md-4 d-flex justify-content-md-end gap-2">
+                <button type="button" class="btn btn-primary" onclick="markSelectedAsChecked()">선택 읽음 처리</button>
+                <button type="button" class="btn btn-outline-warning" th:if="${canManage}" onclick="deleteSelectedAlerts()">선택 삭제</button>
+            </div>
+                </div>
             </div>
         </div>
 
-        <!-- 알림 리스트 테이블 -->
-        <table>
+        <div class="card"><div class="table-responsive"><table class="table table-vcenter table-hover card-table">
             <thead>
             <tr>
-                <th style="width: 40px; text-align: center;"><input type="checkbox" id="select-all" onclick="toggleSelectAll(this)"></th>
+                <th class="text-center">
+                    <input type="checkbox" id="select-all" onclick="toggleSelectAll(this)">
+                </th>
                 <th style="width: 120px;">조직 이름</th>
                 <th style="width: 130px;">타입</th>
                 <th>메시지 내용</th>
-                <th style="width: 150px; text-align: center;">발생 일시</th>
-                <th style="width: 90px; text-align: center;">상태</th>
+                <th class="text-center">발생 일시</th>
+                <th class="text-center">상태</th>
             </tr>
             </thead>
             <tbody id="alert-table-body">
@@ -68,12 +70,10 @@
                 <td colspan="6" style="text-align: center; color: #888; padding: 30px;">알림을 불러오는 중입니다...</td>
             </tr>
             </tbody>
-        </table>
+        </table></div></div>
 
-        <!-- 📄 페이지네이션 영역 추가 -->
-        <div id="pagination" class="pagination-container" style="display: flex; justify-content: center; gap: 5px; margin-top: 20px;">
-            <!-- JS로 동적 생성 -->
-        </div>
+        <ul id="pagination" class="pagination m-0 justify-content-center">
+        </ul></div>
     </div>
 </div>
 
