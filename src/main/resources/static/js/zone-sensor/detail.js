@@ -1,12 +1,16 @@
 // 모달 열기
 function openUpdateModal() {
-    document.getElementById('update-modal').style.display = 'flex';
+    const modal = document.getElementById('update-modal');
+    clearErrors(modal);
+    bootstrap.Modal.getOrCreateInstance(modal).show();
     document.getElementById('edit-name').focus();
 }
 
 // 모달 닫기
 function closeUpdateModal() {
-    document.getElementById('update-modal').style.display = 'none';
+    const modal = document.getElementById('update-modal');
+    clearErrors(modal);
+    bootstrap.Modal.getOrCreateInstance(modal).hide();
 }
 
 // 센서 정보 수정 API 호출
@@ -19,21 +23,21 @@ function updateZoneSensor() {
     const name = nameInput.value.trim();
     const description = descInput.value.trim();
 
-    // 클라이언트단 유효성 검사
-    if (!name) {
-        alert('이름을 입력해주세요.');
+    clearErrors(document.getElementById('update-modal'));
+    if (!isRequired(name)) {
+        setError(nameInput, '센서 이름을 입력해주세요.'); nameInput.focus();
+        return;
+    }
+
+    if (!isMaxLength(name, 50)) {
+        setError(nameInput, '센서 이름은 최대 50자까지 입력 가능합니다.');
         nameInput.focus();
         return;
     }
-    if (name.length > 50) {
-        alert('이름은 최대 50자까지 입력 가능합니다.');
-        nameInput.focus();
-        return;
-    }
-    if (description.length > 255) {
-        alert('설명은 최대 255자까지 입력 가능합니다.');
-        descInput.focus();
-        return;
+
+    if (!isMaxLength(description, 255)) {
+        setError(descInput, '설명은 최대 255자까지 입력 가능합니다.');
+        descInput.focus(); return;
     }
 
     apiFetch(`/api/core/zones/${zoneId}/zone-sensors/${sensorId}`, {

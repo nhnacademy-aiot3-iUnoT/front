@@ -1,0 +1,32 @@
+<div th:fragment="modal" class="modal modal-blur fade" id="update-modal" tabindex="-1" aria-hidden="true" th:if="${canManage}">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">센서 정보 수정</h3>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+            </div>
+
+            <div class="modal-body">
+                <input type="hidden" id="edit-zone-id" th:value="${sensor.zoneId}">
+                <input type="hidden" id="edit-sensor-id" th:value="${sensor.zoneSensorId}">
+
+                <div class="mb-3">
+                    <label for="edit-name" class="form-label">이름</label>
+                    <input id="edit-name" class="form-control" type="text" th:value="${sensor.name}" maxlength="50">
+                    <div class="invalid-feedback"></div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="edit-description" class="form-label">설명</label>
+                    <textarea id="edit-description" class="form-control" maxlength="255" th:text="${sensor.description}"></textarea>
+                    <div class="invalid-feedback"></div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">취소</button>
+                <button type="button" class="btn btn-primary" onclick="updateZoneSensor()">저장</button>
+            </div>
+        </div>
+    </div>
+</div>

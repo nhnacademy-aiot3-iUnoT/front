@@ -11,8 +11,7 @@
     transition: transform .2s ease, box-shadow .2s ease;
 }
 
-.clickable-card,
-.clickable-row {
+.clickable-card {
     cursor: pointer;
 }
 
@@ -28,9 +27,4 @@
 
 .range-val-sub {
     font-size: .8125rem;
-}
-
-.desc-box {
-    white-space: pre-wrap;
-    word-break: break-word;
 }

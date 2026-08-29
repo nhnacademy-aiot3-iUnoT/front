@@ -4,7 +4,6 @@ import com.nhnacademy.front.organization.client.ThresholdZoneApiClient;
 import com.nhnacademy.front.organization.client.ZoneThresholdApiClient;
 import com.nhnacademy.front.organization.dto.response.ThresholdSpecResponse;
 import com.nhnacademy.front.organization.client.OrganizationMemberApiClient;
-import com.nhnacademy.front.organization.client.ZoneThresholdApiClient;
 import com.nhnacademy.front.organization.dto.OrganizationRole;
 import com.nhnacademy.front.organization.dto.response.OrganizationMemberRoleResponse;
 import com.nhnacademy.front.organization.dto.response.ZoneThresholdDetailResponse;
@@ -47,7 +46,7 @@ public class ZoneThresholdController {
         model.addAttribute("threshold", threshold);
         model.addAttribute("canManage", canManage);
 
-        return "zone-threshold/detail";
+        return "zone/zone-threshold-detail";
     }
 
 
