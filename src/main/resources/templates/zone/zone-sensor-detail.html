@@ -7,7 +7,6 @@
     <meta charset="UTF-8">
     <title>센서 상세 정보</title>
     <link rel="stylesheet" th:href="@{/css/status.css}">
-    <link rel="stylesheet" th:href="@{/css/zone-sensor-detail.css}">
 </head>
 <body>
 
@@ -48,7 +47,7 @@
                     </div>
                     <div class="row g-0 px-3 py-3">
                         <div class="col-sm-3 text-muted">설명</div>
-                        <div class="col-sm-9 desc-box" th:text="${sensor.description()}">설명 내용</div>
+                        <div class="col-sm-9" th:text="${sensor.description()}">설명 내용</div>
                     </div>
                 </div>
             </div>
