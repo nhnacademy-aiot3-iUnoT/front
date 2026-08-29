@@ -61,7 +61,7 @@ function loadExpiringInventories(page) {
         .catch(error => {
             console.error("데이터 로딩 실패:", error);
             document.getElementById("inventory-table-body").innerHTML =
-                `<tr><td colspan="7" style="text-align: center; color: #dc2626; padding: 30px;">데이터를 불러오는 중 오류가 발생했습니다.</td></tr>`;
+                `<tr><td colspan="7" class="text-center text-danger py-5">데이터를 불러오는 중 오류가 발생했습니다.</td></tr>`;
         });
 }
 
@@ -71,7 +71,7 @@ function renderTable(items, currentPage, size) {
     tbody.innerHTML = "";
 
     if (items.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #888; padding: 30px;">조건에 일치하는 재고가 없습니다.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center text-secondary py-5">조건에 일치하는 재고가 없습니다.</td></tr>`;
         return;
     }
 
@@ -80,13 +80,13 @@ function renderTable(items, currentPage, size) {
 
         const row = document.createElement("tr");
         row.innerHTML = `
-            <td style="text-align: center; color: #64748b;">${rowNumber}</td>
+            <td class="text-center text-secondary">${rowNumber}</td>
             <td>${item.organizationName || '-'}</td>
-            <td>${item.storageName || '-'} / <span style="color: #64748b;">${item.zoneName || '-'}</span></td>
-            <td><strong>${item.medicineName}</strong> <span style="font-size: 0.8rem; color: #64748b;">(${item.packUnitName || ''})</span></td>
-            <td><code>${item.lotNumber}</code></td>
-            <td style="text-align: center;">${item.currentQuantity.toLocaleString()} 개</td>
-            <td style="text-align: center;" class="text-danger">${item.expirationDate}</td>
+            <td>${item.storageName || '-'} / ${item.zoneName || '-'}</td>
+            <td><strong>${item.medicineName}</strong> (${item.packUnitName || ''})</td>
+            <td>${item.lotNumber}</td>
+            <td class="text-center">${item.currentQuantity.toLocaleString()} 개</td>
+            <td class="text-center text-danger fw-bold">${item.expirationDate}</td>
         `;
         tbody.appendChild(row);
     });
@@ -102,27 +102,39 @@ function renderPagination(pageData) {
 
     if (totalPages <= 1) return;
 
+    const prevItem = document.createElement("li");
+    prevItem.className = "page-item";
     const prevButton = document.createElement("button");
+    prevButton.className = "page-link";
     prevButton.innerText = "이전";
     prevButton.disabled = currentPage === 0;
     prevButton.onclick = () => loadExpiringInventories(currentPage - 1);
-    paginationContainer.appendChild(prevButton);
+    prevItem.appendChild(prevButton);
+    paginationContainer.appendChild(prevItem);
 
     for (let i = 0; i < totalPages; i++) {
+        const pageItem = document.createElement("li");
+        pageItem.className = "page-item";
         const pageButton = document.createElement("button");
+        pageButton.className = "page-link";
         pageButton.innerText = i + 1;
         if (i === currentPage) {
-            pageButton.classList.add("active");
+            pageItem.classList.add("active");
         }
         pageButton.onclick = () => loadExpiringInventories(i);
-        paginationContainer.appendChild(pageButton);
+        pageItem.appendChild(pageButton);
+        paginationContainer.appendChild(pageItem);
     }
 
+    const nextItem = document.createElement("li");
+    nextItem.className = "page-item";
     const nextButton = document.createElement("button");
+    nextButton.className = "page-link";
     nextButton.innerText = "다음";
     nextButton.disabled = currentPage >= totalPages - 1;
     nextButton.onclick = () => loadExpiringInventories(currentPage + 1);
-    paginationContainer.appendChild(nextButton);
+    nextItem.appendChild(nextButton);
+    paginationContainer.appendChild(nextItem);
 }
 
 // 검색 조건 초기화

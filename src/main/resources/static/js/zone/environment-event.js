@@ -41,21 +41,18 @@ function renderTable(contentList) {
     tbody.innerHTML = "";
 
     if (!contentList || contentList.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #888; padding: 30px;">조회된 이벤트 내역이 없습니다.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center text-secondary py-5">조회된 이벤트 내역이 없습니다.</td></tr>`;
         return;
     }
 
     contentList.forEach(item => {
         const tr = document.createElement("tr");
 
-        let typeBadgeClass = "";
-        if (item.environmentType === 'TEMPERATURE') typeBadgeClass = "type-temp";
-        else if (item.environmentType === 'HUMIDITY') typeBadgeClass = "type-humi";
-        else typeBadgeClass = "type-illum";
+        const typeBadgeClass = `status-${item.environmentType.toLowerCase()}`;
 
         tr.innerHTML = `
             <td>${item.environmentEventId}</td>
-            <td><span class="badge-type ${typeBadgeClass}">${item.environmentType}</span></td>
+            <td><span class="badge status-badge ${typeBadgeClass}">${item.environmentType}</span></td>
             <td><strong>${item.breachType}</strong></td>
             <td>${item.detectedValue}</td>
             <td>${item.thresholdValue}</td>
@@ -75,12 +72,14 @@ function renderPagination(pageData) {
     if (totalPages <= 1) return;
 
     for (let i = 0; i < totalPages; i++) {
+        const item = document.createElement("li");
+        item.className = `page-item${i === currentPage ? ' active' : ''}`;
         const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "page-link";
         btn.innerText = i + 1;
-        if (i === currentPage) {
-            btn.classList.add("active");
-        }
         btn.onclick = () => fetchEnvironmentEvents(i);
-        paginationBox.appendChild(btn);
+        item.appendChild(btn);
+        paginationBox.appendChild(item);
     }
 }

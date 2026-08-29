@@ -7,7 +7,6 @@
     <meta charset="UTF-8">
     <title>저장소 상세 정보</title>
     <link rel="stylesheet" th:href="@{/css/status.css}">
-    <link rel="stylesheet" th:href="@{/css/storage-detail.css}">
 </head>
 <body>
 
@@ -20,7 +19,7 @@
                         <span class="org-prefix me-1" th:text="${storage.organizationName + ' >'}">조직이름 &gt;</span>
                         <span th:text="${storage.name}">저장소 이름</span>
                     </h1>
-                    <div class="text-secondary">저장소와 소속 구역을 관리합니다.</div>
+                    <div class="text-muted mt-1">저장소와 소속 구역을 관리합니다.</div>
                 </div>
 
                 <div class="col-auto action-buttons" th:if="${canManage}">
@@ -28,7 +27,8 @@
                     <button type="button" class="btn btn-outline-warning" th:text="${storage.status.name() == 'ACTIVE'} ? '비활성화' : '활성화'"
                             th:attr="onclick=|toggleStorageStatus('${storage.storageId}', '${storage.status.name()}')|">상태변경</button>
                     <button type="button" class="btn btn-outline-danger" th:attr="onclick=|deleteStorage('${storage.storageId}')|">삭제</button>
-                    <a th:href="@{/storages/{storageId}/reports/weekly(storageId=${storage.storageId})}" class="btn btn-primary">주간 리포트</a>
+                    <a th:href="@{/storages/{storageId}/reports/weekly(storageId=${storage.storageId})}" class="btn btn-primary">
+                        <i class="ti ti-report"></i>주간 리포트</a>
                 </div>
             </div>
         </div>
@@ -76,8 +76,8 @@
                 <thead>
                 <tr>
                     <th>구역 이름</th>
-                    <th class="center">상태</th>
-                    <th class="center">환경 상태</th>
+                    <th class="text-center">상태</th>
+                    <th class="text-center">환경 상태</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -85,18 +85,17 @@
                     <td colspan="3" style="text-align: center; color: #888; padding: 20px;">등록된 구역이 없습니다.</td>
                 </tr>
 
-                <tr th:each="zone : ${zoneList}"
-                    class="clickable-row">
+                <tr th:each="zone : ${zoneList}" class="clickable-row">
 
                     <td th:onclick="|location.href='/storages/${storage.storageId}/zones/${zone.zoneId}'|" th:text="${zone.name}">구역 이름</td>
 
-                    <td class="center" th:onclick="|location.href='/storages/${storage.storageId}/zones/${zone.zoneId}'|">
+                    <td class="text-center" th:onclick="|location.href='/storages/${storage.storageId}/zones/${zone.zoneId}'|">
                         <span class="badge status-badge"
                               th:classappend="' status-' + ${zone.status.name().toLowerCase()}"
                               th:text="${zone.status.ko}">활성</span>
                     </td>
 
-                    <td class="center" th:onclick="|location.href='/storages/${storage.storageId}/zones/${zone.zoneId}'|">
+                    <td class="text-center" th:onclick="|location.href='/storages/${storage.storageId}/zones/${zone.zoneId}'|">
                         <span class="badge status-badge"
                               th:classappend="' status-' + ${zone.envStatus.name().toLowerCase()}"
                               th:text="${zone.envStatus.ko}">정상</span>
@@ -114,9 +113,9 @@
                 <tr>
                     <th>의약품명</th>
                     <th>포장 단위</th>
-                    <th class="center">최소 재고 임계값</th>
-                    <th class="center">상태 (활성화)</th>
-                    <th class="center" style="width: 150px;" th:if="${canManage}">관리</th>
+                    <th class="text-center">최소 재고 임계값</th>
+                    <th class="text-center">상태 (활성화)</th>
+                    <th class="text-center" style="width: 150px;" th:if="${canManage}">관리</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -128,7 +127,7 @@
                     <td th:text="${threshold.productName}">의약품명</td>
                     <td th:text="${threshold.packUnit}">포장단위</td>
 
-                    <td class="center">
+                    <td class="text-center">
                         <input type="number"
                                th:id="'input-threshold-' + ${threshold.stockThresholdId}"
                                th:value="${threshold.stockThreshold}"
@@ -137,7 +136,7 @@
                                style="width: 80px; padding: 4px; text-align: center; border: 1px solid #cbd5e1; border-radius: 4px;">
                     </td>
 
-                    <td class="center">
+                    <td class="text-center">
                         <input type="checkbox"
                                th:id="'input-active-' + ${threshold.stockThresholdId}"
                                th:checked="${threshold.isActive}"
@@ -145,7 +144,7 @@
                                style="width: 18px; height: 18px; cursor: pointer;">
                     </td>
 
-                    <td class="center" th:if="${canManage}">
+                    <td class="text-center" th:if="${canManage}">
                         <button type="button"
                                 class="btn btn-sm btn-outline-primary"
                                 th:attr="onclick=|updateStockThreshold('${storage.storageId}', '${threshold.stockThresholdId}')|">수정</button>

@@ -27,7 +27,7 @@ function loadAlerts(page = 0) {
             tbody.innerHTML = '';
 
             if (!alerts || alerts.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #888; padding: 30px;">조건에 해당하는 알림이 없습니다.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center text-secondary py-5">조건에 해당하는 알림이 없습니다.</td></tr>`;
                 document.getElementById('pagination').innerHTML = '';
                 return;
             }
@@ -35,18 +35,17 @@ function loadAlerts(page = 0) {
             alerts.forEach(item => {
                 const tr = document.createElement('tr');
                 if (!item.isChecked) {
-                    tr.style.fontWeight = 'bold';
-                    tr.style.backgroundColor = '#f8fafc';
+                    tr.classList.add('fw-bold', 'table-active');
                 }
 
                 tr.innerHTML = `
-                <td style="text-align: center;"><input type="checkbox" class="alert-checkbox" value="${item.alertId}"></td>
+                <td class="text-center"><input type="checkbox" class="alert-checkbox" value="${item.alertId}"></td>
                 <td>${item.organizationName}</td>
-                <td><span class="badge">${formatAlertType(item.alertType)}</span></td>
+                <td><span class="badge status-badge status-warning">${formatAlertType(item.alertType)}</span></td>
                 <td>${item.message}</td>
-                <td style="text-align: center; font-size: 13px; color: #666;">${formatDate(item.createdAt)}</td>
-                <td style="text-align: center;">
-                    <span class="badge" style="background: ${item.isChecked ? '#cbd5e1' : '#ef4444'}; color: white; padding: 2px 6px; border-radius: 4px; font-size: 11px;">
+                <td class="text-center text-secondary small">${formatDate(item.createdAt)}</td>
+                <td class="text-center">
+                    <span class="badge status-badge ${item.isChecked ? 'status-inactive' : 'status-critical'}">
                         ${item.isChecked ? '읽음' : '안읽음'}
                     </span>
                 </td>
@@ -82,9 +81,7 @@ function renderPagination(pageData) {
     for (let i = 0; i < totalPages; i++) {
         const pageBtn = createPageButton(i + 1, i);
         if (i === current) {
-            pageBtn.style.backgroundColor = '#2563eb';
-            pageBtn.style.color = 'white';
-            pageBtn.style.fontWeight = 'bold';
+            pageBtn.classList.add('active');
         }
         paginationEl.appendChild(pageBtn);
     }
@@ -98,13 +95,15 @@ function renderPagination(pageData) {
 
 // 페이지 버튼 생성 헬퍼
 function createPageButton(text, targetPage) {
+    const item = document.createElement('li');
+    item.className = 'page-item';
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.innerText = text;
-    btn.className = 'btn-page';
-    btn.style.cssText = 'padding: 5px 10px; border: 1px solid #cbd5e1; background: #fff; border-radius: 4px; cursor: pointer; font-size: 13px;';
+    btn.className = 'page-link';
     btn.onclick = () => loadAlerts(targetPage);
-    return btn;
+    item.appendChild(btn);
+    return item;
 }
 
 // 타입 한글 변환 헬퍼
