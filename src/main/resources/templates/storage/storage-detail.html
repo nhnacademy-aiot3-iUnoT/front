@@ -20,7 +20,7 @@
                         <span class="org-prefix me-1" th:text="${storage.organizationName + ' >'}">조직이름 &gt;</span>
                         <span th:text="${storage.name}">저장소 이름</span>
                     </h1>
-                    <div class="text-secondary">저장소와 소속 구역을 관리합니다.</div>
+                    <div class="text-muted mt-1">저장소와 소속 구역을 관리합니다.</div>
                 </div>
 
                 <div class="col-auto action-buttons" th:if="${canManage}">
@@ -28,7 +28,8 @@
                     <button type="button" class="btn btn-outline-warning" th:text="${storage.status.name() == 'ACTIVE'} ? '비활성화' : '활성화'"
                             th:attr="onclick=|toggleStorageStatus('${storage.storageId}', '${storage.status.name()}')|">상태변경</button>
                     <button type="button" class="btn btn-outline-danger" th:attr="onclick=|deleteStorage('${storage.storageId}')|">삭제</button>
-                    <a th:href="@{/storages/{storageId}/reports/weekly(storageId=${storage.storageId})}" class="btn btn-primary">주간 리포트</a>
+                    <a th:href="@{/storages/{storageId}/reports/weekly(storageId=${storage.storageId})}" class="btn btn-primary">
+                        <i class="ti ti-report"></i>주간 리포트</a>
                 </div>
             </div>
         </div>
