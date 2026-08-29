@@ -105,6 +105,39 @@ a:hover {
     border-color: var(--line);
 }
 
+.modal-content {
+    background-color: var(--surface);
+    color: var(--ink);
+    border-color: var(--line);
+    box-shadow: var(--shadow);
+}
+
+.modal-header,
+.modal-footer {
+    border-color: var(--line);
+}
+
+.modal-title,
+.modal-body .form-label {
+    color: var(--ink);
+}
+
+.modal .table-responsive {
+    border-color: var(--line) !important;
+}
+
+.modal .table tbody td {
+    color: var(--ink);
+}
+
+.modal .btn-close {
+    filter: var(--bs-btn-close-filter, none);
+}
+
+[data-bs-theme="dark"] .modal .btn-close {
+    filter: invert(1) grayscale(100%) brightness(180%);
+}
+
 .form-control {
     background-color: var(--surface);
     border-color: var(--line);

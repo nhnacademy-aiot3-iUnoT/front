@@ -2,7 +2,6 @@ package com.nhnacademy.front.organization.controller;
 
 import com.nhnacademy.front.organization.client.DepartmentApiClient;
 import com.nhnacademy.front.organization.service.DepartmentPageService;
-import com.nhnacademy.front.organization.dto.response.*;
 import com.nhnacademy.front.organization.dto.request.DepartmentCreateRequest;
 import com.nhnacademy.front.organization.dto.request.DepartmentStatusUpdateRequest;
 import com.nhnacademy.front.organization.dto.request.DepartmentUpdateRequest;
@@ -33,6 +32,7 @@ public class DepartmentController {
     private final DepartmentApiClient departmentApiClient;
     private final DepartmentPageService departmentPageService;
     private final OrganizationMemberApiClient organizationMemberApiClient;
+    private static final String DEPARTMENT_LIST = "organization/department/department-list";
 
     @GetMapping
     public String departmentList(Model model) {
@@ -41,7 +41,7 @@ public class DepartmentController {
         model.addAttribute("departments", departments);
         model.addAttribute("departmentCreateRequest", new DepartmentCreateRequest());
         model.addAttribute("memberRole", organizationMemberApiClient.getRole().role().name());
-        return "organization/department-list";
+        return DEPARTMENT_LIST;
     }
 
     @PostMapping
@@ -52,7 +52,7 @@ public class DepartmentController {
         if (bindingResult.hasErrors()) {
             model.addAttribute("departments", departmentApiClient.getDepartments());
             model.addAttribute("memberRole", organizationMemberApiClient.getRole().role().name());
-            return "organization/department-list";
+            return DEPARTMENT_LIST;
         }
 
         departmentApiClient.createDepartment(request);
@@ -73,7 +73,7 @@ public class DepartmentController {
         model.addAttribute("departmentStorages", page.storages());
         model.addAttribute("departmentMembers", page.members());
 
-        return "organization/department-info";
+        return "organization/department/department-info";
     }
 
     @PutMapping("/{department-id}")
@@ -84,7 +84,7 @@ public class DepartmentController {
                                    RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
             model.addAttribute("department", departmentApiClient.getDepartment(departmentId));
-            return "organization/department-info";
+            return "organization/department/department-info";
         }
 
         departmentApiClient.updateDepartment(departmentId, request);

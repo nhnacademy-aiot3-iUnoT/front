@@ -15,7 +15,7 @@
             <div class="row align-items-center">
                 <div class="col">
                     <h2 class="page-title">조직원 관리</h2>
-                    <div class="text-secondary">조직원의 역할과 부서를 관리합니다.</div>
+                    <div class="text-muted mt-1">조직원의 역할과 부서를 관리합니다.</div>
                 </div>
                 <div class="col-auto">
                     <a class="btn btn-primary" th:href="@{/organizations/me/invitations}">조직원 초대</a>
@@ -148,7 +148,7 @@
             </div>
         </div>
     </div>
-    <div th:replace="~{fragments/assign-department-modal :: modal}"></div>
+    <div th:replace="~{fragments/modal/assign-department-modal :: modal}"></div>
 </div>
 <th:block layout:fragment="script">
     <script th:src="@{/js/organization/member-list.js}"></script>
