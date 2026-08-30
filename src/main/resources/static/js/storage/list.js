@@ -1,6 +1,8 @@
 // 모달 열기
 function openCreateModal() {
-    document.getElementById('create-modal').style.display = 'flex';
+    const modal = document.getElementById('create-modal');
+    clearErrors(modal);
+    bootstrap.Modal.getOrCreateInstance(modal).show();
     document.getElementById('new-name').focus();
 
     loadDepartmentsForModal();
@@ -8,11 +10,22 @@ function openCreateModal() {
 
 // 모달 닫기
 function closeCreateModal() {
-    document.getElementById('create-modal').style.display = 'none';
+    const modal = document.getElementById('create-modal');
+    clearErrors(modal);
+    bootstrap.Modal.getOrCreateInstance(modal).hide();
     document.getElementById('new-name').value = '';
     document.getElementById('new-description').value = '';
     document.getElementById('department-checkbox-container').innerHTML = '';
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    const modal = document.getElementById('create-modal');
+    modal?.addEventListener('hidden.bs.modal', () => {
+        clearErrors(modal);
+        document.getElementById('new-name').value = '';
+        document.getElementById('new-description').value = '';
+    });
+});
 
 function loadDepartmentsForModal() {
     const container = document.getElementById('department-checkbox-container');
@@ -45,7 +58,7 @@ function loadDepartmentsForModal() {
                 checkbox.style.marginRight = '6px';
 
                 label.appendChild(checkbox);
-                label.append(`${dept.name} (${dept.status})`);
+                label.append(`${dept.name}`);
 
                 container.appendChild(label);
             });
@@ -68,19 +81,21 @@ function createStorage() {
         document.querySelectorAll('input[name="departmentIds"]:checked')
     ).map(cb => Number(cb.value));
 
+    clearErrors(document.getElementById('create-modal'));
+
     // 클라이언트단 유효성 검사 (@NotBlank, @Size 대응)
-    if (!name) {
-        alert('저장소 이름을 입력해주세요.');
+    if (!isRequired(name)) {
+        setError(nameInput, '저장소 이름을 입력해주세요.');
         nameInput.focus();
         return;
     }
-    if (name.length > 50) {
-        alert('저장소 이름은 최대 50자까지 입력 가능합니다.');
+    if (!isMaxLength(name, 50)) {
+        setError(nameInput, '저장소 이름은 최대 50자까지 입력 가능합니다.');
         nameInput.focus();
         return;
     }
-    if (description.length > 255) {
-        alert('설명은 최대 255자까지 입력 가능합니다.');
+    if (!isMaxLength(description, 255)) {
+        setError(descInput, '설명은 최대 255자까지 입력 가능합니다.');
         descInput.focus();
         return;
     }
@@ -111,13 +126,3 @@ function createStorage() {
             alert('서버 통신 중 오류가 발생했습니다.');
         });
 }
-
-// 💡 [추가됨] 모달 박스 내부를 클릭했을 때 배경으로 클릭 이벤트가 새어나가는 것 방지
-document.addEventListener("DOMContentLoaded", function() {
-    const modalBox = document.querySelector("#create-modal .modal-box");
-    if (modalBox) {
-        modalBox.addEventListener("click", function(event) {
-            event.stopPropagation();
-        });
-    }
-});

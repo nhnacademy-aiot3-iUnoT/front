@@ -5,7 +5,6 @@ import com.nhnacademy.front.organization.client.ZoneSensorApiClient;
 import com.nhnacademy.front.organization.dto.OrganizationRole;
 import com.nhnacademy.front.organization.dto.response.OrganizationMemberRoleResponse;
 import com.nhnacademy.front.organization.dto.response.ZoneSensorDetailResponse;
-import com.nhnacademy.front.organization.dto.response.ZoneSensorInfoResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -40,6 +39,6 @@ public class ZoneSensorController {
         model.addAttribute("sensor", sensor);
         model.addAttribute("canManage", canManage);
 
-        return "zone-sensor/detail";
+        return "zone/zone-sensor-detail";
     }
 }

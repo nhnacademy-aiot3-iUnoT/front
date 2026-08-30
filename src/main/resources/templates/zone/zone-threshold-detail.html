@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main-layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>임계값 상세 정보</title>
+    <link rel="stylesheet" th:href="@{/css/status.css}">
+</head>
+<body>
+
+<div layout:fragment="content">
+    <div class="py-6">
+        <div class="page-header d-print-none mb-4">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h1 class="page-title">
+                        <span class="org-prefix me-1" th:text="${threshold.organizationName + ' > ' + threshold.storageName + ' > ' + threshold.zoneName + ' > '}">조직이름 &gt; 저장소이름 &gt; 구역이름 &gt; </span>
+                        <span th:text="${threshold.sensorTypeName}">센서 타입 이름</span>
+                    </h1>
+                    <div class="text-muted mt-1">구역에 설정된 센서 임계값을 확인합니다.</div>
+                </div>
+                <div class="col-auto" th:if="${canManage}">
+                <button type="button" th:onclick="'deleteZoneThreshold(' +${threshold.storageId}+ ', ' + ${threshold.zoneId} + ', ' + ${threshold.zoneThresholdId} + ')'"
+                        class="btn btn-outline-danger">삭제
+                </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-content-panel">
+            <div class="card mb-4">
+                <div class="card-header plain-card-title"><h2 class="card-title">센서 임계값 상세 정보</h2></div>
+                <div class="card-body p-0">
+                    <div class="row g-0 border-bottom px-3 py-3">
+                        <div class="col-sm-3 text-muted">임계값 설정 ID</div>
+                        <div class="col-sm-9" th:text="${threshold.zoneThresholdId}">1</div>
+                    </div>
+                    <div class="row g-0 border-bottom px-3 py-3">
+                        <div class="col-sm-3 text-muted">센서 타입 이름</div>
+                        <div class="col-sm-9" th:text="${threshold.sensorTypeName}">온도 센서</div>
+                    </div>
+                    <div class="row g-0 border-bottom px-3 py-3">
+                        <div class="col-sm-3 text-muted">센서 타입 설명</div>
+                        <div class="col-sm-9" th:text="${threshold.sensorTypeDescription()}">설명 없음</div>
+                    </div>
+                    <div class="row g-0 border-bottom px-3 py-3">
+                        <div class="col-sm-3 text-muted">허용 범위</div>
+                        <div class="col-sm-9">
+                            <span th:text="${threshold.minValue}">0</span> ~<span th:text="${threshold.maxValue}">100</span>
+                        </div>
+                    </div>
+                    <div class="row g-0 px-3 py-3">
+                        <div class="col-sm-3 text-muted">임계 시간 (Alert Duration)</div>
+                        <div class="col-sm-9">
+                            <span th:text="${threshold.alertDuration}">30</span>분
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <a th:href="@{/storages/{storageId}/zones/{zoneId}(storageId=${threshold.storageId}, zoneId=${threshold.zoneId})}" class="btn btn-outline-secondary mt-2">← 구역 상세로 돌아가기</a>
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="script">
+    <script th:src="@{/js/zone/zone-threshold-detail.js}"></script>
+</th:block>
+
+</body>
+</html>

@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
-   const form = document.querySelector("#orgSetupForm");
+   const form = document.querySelector("#orgSetupForm, #orgEditForm");
 
    if(!form) {
        return;

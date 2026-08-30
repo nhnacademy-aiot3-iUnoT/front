@@ -96,7 +96,7 @@ function validateDescription(input) {
     const value = input.value;
 
     if(!isMaxLength(value, 255)) {
-        setError(input, "조식 소개는 255자 이내로 작성해야 합니다.");
+        setError(input, "소개/설명은 255자 이내로 작성해야 합니다.");
         return false;
     }
 
@@ -179,6 +179,23 @@ function validateDoorOpenProbabilityField(input) {
 
     if (!isInRange(value, 0, 1)) {
         setError(input, "문 열림 확률은 0 이상 1 이하여야 합니다.");
+        return false;
+    }
+
+    return true;
+}
+
+// 부서명 (필수, 30자)
+function validateDepartmentNameField(input) {
+    const value = input.value.trim();
+
+    if(!isRequired(value)) {
+        setError(input, "부서명은 필수 입력입니다.");
+        return false;
+    }
+
+    if(!isMaxLength(value, 30)) {
+        setError(input, "부서명은 30자 이내로 작성해야합니다.");
         return false;
     }
 

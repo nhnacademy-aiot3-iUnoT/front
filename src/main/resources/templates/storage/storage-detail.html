@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main-layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>저장소 상세 정보</title>
+    <link rel="stylesheet" th:href="@{/css/status.css}">
+</head>
+<body>
+
+<div layout:fragment="content">
+    <div class="py-6">
+        <div class="page-header d-print-none mb-4">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h1 class="page-title">
+                        <span class="org-prefix me-1" th:text="${storage.organizationName + ' >'}">조직이름 &gt;</span>
+                        <span th:text="${storage.name}">저장소 이름</span>
+                    </h1>
+                    <div class="text-muted mt-1">저장소와 소속 구역을 관리합니다.</div>
+                </div>
+
+                <div class="col-auto action-buttons" th:if="${canManage}">
+                    <button type="button" class="btn btn-outline-secondary" onclick="openEditModal()">수정</button>
+                    <button type="button" class="btn btn-outline-warning" th:text="${storage.status.name() == 'ACTIVE'} ? '비활성화' : '활성화'"
+                            th:attr="onclick=|toggleStorageStatus('${storage.storageId}', '${storage.status.name()}')|">상태변경</button>
+                    <button type="button" class="btn btn-outline-danger" th:attr="onclick=|deleteStorage('${storage.storageId}')|">삭제</button>
+                    <a th:href="@{/storages/{storageId}/reports/weekly(storageId=${storage.storageId})}" class="btn btn-primary">
+                        <i class="ti ti-report"></i>주간 리포트</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-content-panel">
+            <div class="card mb-4">
+                <div class="card-header plain-card-title">
+                    <h2 class="card-title">기본 정보</h2>
+                </div>
+                <div class="card-body p-0">
+                    <div class="row g-0 border-bottom px-3 py-3">
+                        <div class="col-sm-3 text-muted">저장소 이름</div>
+                        <div class="col-sm-9" th:text="${storage.name}"></div>
+                    </div>
+                    <div class="row g-0 border-bottom px-3 py-3">
+                        <div class="col-sm-3 text-muted">상태</div>
+                        <div class="col-sm-9">
+                            <span class="badge status-badge" th:classappend="' status-' + ${storage.status.name().toLowerCase()}" th:text="${storage.status.ko}"></span>
+                        </div>
+                    </div>
+                    <div class="row g-0 border-bottom px-3 py-3">
+                        <div class="col-sm-3 text-muted">최초 등록일시</div>
+                        <div class="col-sm-9" th:text="${#temporals.format(storage.createdAt, 'yyyy-MM-dd HH:mm')}"></div>
+                    </div>
+                    <div class="row g-0 border-bottom px-3 py-3">
+                        <div class="col-sm-3 text-muted">최종 수정일시</div>
+                        <div class="col-sm-9">
+                            <span th:if="${storage.updatedAt != null}" th:text="${#temporals.format(storage.updatedAt, 'yyyy-MM-dd HH:mm')}"></span>
+                            <span th:if="${storage.updatedAt == null}">없음</span>
+                        </div>
+                    </div>
+                    <div class="row g-0 px-3 py-3">
+                        <div class="col-sm-3 text-muted">설명</div>
+                        <div class="col-sm-9" th:text="${storage.description()}">설명 없음</div>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="my-6">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h3 class="m-0">소속 구역 목록</h3>
+                <button type="button" class="btn btn-primary" th:if="${canManage}" onclick="openZoneModal()">구역 추가</button>
+            </div>
+                <div class="table-responsive"><table class="table table-vcenter table-hover card-table">
+                <thead>
+                <tr>
+                    <th>구역 이름</th>
+                    <th class="text-center">상태</th>
+                    <th class="text-center">환경 상태</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${#lists.isEmpty(zoneList)}">
+                    <td colspan="3" style="text-align: center; color: #888; padding: 20px;">등록된 구역이 없습니다.</td>
+                </tr>
+
+                <tr th:each="zone : ${zoneList}" class="clickable-row">
+
+                    <td th:onclick="|location.href='/storages/${storage.storageId}/zones/${zone.zoneId}'|" th:text="${zone.name}">구역 이름</td>
+
+                    <td class="text-center" th:onclick="|location.href='/storages/${storage.storageId}/zones/${zone.zoneId}'|">
+                        <span class="badge status-badge"
+                              th:classappend="' status-' + ${zone.status.name().toLowerCase()}"
+                              th:text="${zone.status.ko}">활성</span>
+                    </td>
+
+                    <td class="text-center" th:onclick="|location.href='/storages/${storage.storageId}/zones/${zone.zoneId}'|">
+                        <span class="badge status-badge"
+                              th:classappend="' status-' + ${zone.envStatus.name().toLowerCase()}"
+                              th:text="${zone.envStatus.ko}">정상</span>
+                    </td>
+                </tr>
+                </tbody>
+                </table></div>
+            <hr class="my-6">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h3 class="m-0">최소 재고 임계값 목록</h3>
+                <button type="button" class="btn btn-primary" th:if="${canManage}" onclick="openStockThresholdModal()">최소 재고 추가</button>
+            </div>
+                <div class="table-responsive"><table class="table table-vcenter card-table">
+                <thead>
+                <tr>
+                    <th>의약품명</th>
+                    <th>포장 단위</th>
+                    <th class="text-center">최소 재고 임계값</th>
+                    <th class="text-center">상태 (활성화)</th>
+                    <th class="text-center" style="width: 150px;" th:if="${canManage}">관리</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${#lists.isEmpty(stockThresholdList)}">
+                    <td th:colspan="${canManage} ? 5 : 4" style="text-align: center; color: #888; padding: 20px;">등록된 최소 재고 임계값이 없습니다.</td>
+                </tr>
+
+                <tr th:each="threshold : ${stockThresholdList}" th:id="'threshold-row-' + ${threshold.stockThresholdId}">
+                    <td th:text="${threshold.productName}">의약품명</td>
+                    <td th:text="${threshold.packUnit}">포장단위</td>
+
+                    <td class="text-center">
+                        <input type="number"
+                               th:id="'input-threshold-' + ${threshold.stockThresholdId}"
+                               th:value="${threshold.stockThreshold}"
+                               min="0"
+                               th:readonly="${!canManage}"
+                               style="width: 80px; padding: 4px; text-align: center; border: 1px solid #cbd5e1; border-radius: 4px;">
+                    </td>
+
+                    <td class="text-center">
+                        <input type="checkbox"
+                               th:id="'input-active-' + ${threshold.stockThresholdId}"
+                               th:checked="${threshold.isActive}"
+                               th:disabled="${!canManage}"
+                               style="width: 18px; height: 18px; cursor: pointer;">
+                    </td>
+
+                    <td class="text-center" th:if="${canManage}">
+                        <button type="button"
+                                class="btn btn-sm btn-outline-primary"
+                                th:attr="onclick=|updateStockThreshold('${storage.storageId}', '${threshold.stockThresholdId}')|">수정</button>
+                        <button type="button"
+                                class="btn btn-sm btn-outline-danger"
+                                th:attr="onclick=|deleteStockThreshold('${storage.storageId}', '${threshold.stockThresholdId}')|">삭제</button>
+                    </td>
+                </tr>
+                </tbody>
+                </table></div>
+            <a href="/storages" class="btn btn-outline-secondary mt-4">목록으로 돌아가기</a>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments/modal/storage-edit-modal :: modal}"></div>
+    <div th:replace="~{fragments/modal/zone-create-modal :: modal}"></div>
+    <div th:replace="~{fragments/modal/stock-threshold-create-modal :: modal}"></div>
+</div>
+
+<th:block layout:fragment="script">
+    <script th:src="@{/js/common/validation.js}"></script>
+    <script th:src="@{/js/common/form.js}"></script>
+    <script th:src="@{/js/storage/detail.js}"></script>
+</th:block>
+
+</body>
+</html>
