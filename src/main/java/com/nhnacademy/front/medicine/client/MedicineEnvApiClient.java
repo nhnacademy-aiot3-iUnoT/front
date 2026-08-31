@@ -26,6 +26,14 @@ public class MedicineEnvApiClient {
 
     }
 
+    public void createTypes(Long packageUnitId, MedicineEnvironmentRequest request){
+
+        gatewayClient.post(CORE_SERVICE + "/package-units/" + packageUnitId + "/medicine-environment-types",request);
+
+    }
+
+
+
     //환경유형 수정
     public void updateTypes(Long packageUnitId, MedicineEnvironmentRequest request){
 
