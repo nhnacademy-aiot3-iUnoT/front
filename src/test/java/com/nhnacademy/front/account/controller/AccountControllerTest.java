@@ -10,17 +10,18 @@ import com.nhnacademy.front.account.dto.request.UpdateAccountNameRequest;
 import com.nhnacademy.front.account.dto.request.WithdrawAccountRequest;
 import com.nhnacademy.front.account.dto.response.AccountInfoResponse;
 import com.nhnacademy.front.account.validator.PasswordFormValidator;
+import com.nhnacademy.front.auth.service.AuthSessionService;
 import com.nhnacademy.front.global.config.InactiveAccountInterceptor;
 import com.nhnacademy.front.global.config.SecurityConfig;
 import com.nhnacademy.front.global.config.WebMvcConfig;
 import com.nhnacademy.front.global.error.ApiException;
 import com.nhnacademy.front.global.error.ErrorCode;
-import com.nhnacademy.front.global.security.AccessTokenCookieManager;
 import com.nhnacademy.front.organization.client.DepartmentApiClient;
 import com.nhnacademy.front.organization.client.OrganizationMemberApiClient;
 import com.nhnacademy.front.organization.dto.OrganizationRole;
 import com.nhnacademy.front.organization.dto.response.OrganizationMemberRoleResponse;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.Test;
 import org.jsoup.Jsoup;
@@ -71,7 +72,7 @@ class AccountControllerTest {
     private AccountApiClient accountApiClient;
 
     @MockitoBean
-    private AccessTokenCookieManager cookieManager;
+    private AuthSessionService authSessionService;
 
     @MockitoBean
     private OrganizationMemberApiClient organizationMemberApiClient;
@@ -211,7 +212,10 @@ class AccountControllerTest {
                 ));
 
         then(accountApiClient).should().confirmReactivation(request);
-        then(cookieManager).should().delete(any(HttpServletResponse.class));
+        then(authSessionService).should().revoke(
+                any(HttpServletRequest.class),
+                any(HttpServletResponse.class)
+        );
     }
 
     @Test
@@ -227,7 +231,7 @@ class AccountControllerTest {
                 ));
 
         then(accountApiClient).shouldHaveNoInteractions();
-        then(cookieManager).shouldHaveNoInteractions();
+        then(authSessionService).shouldHaveNoInteractions();
     }
 
     @Test
@@ -247,7 +251,7 @@ class AccountControllerTest {
                 ));
 
         then(accountApiClient).should().confirmReactivation(request);
-        then(cookieManager).shouldHaveNoInteractions();
+        then(authSessionService).shouldHaveNoInteractions();
     }
 
     @Test
@@ -420,7 +424,10 @@ class AccountControllerTest {
                 .andExpect(redirectedUrl("/login"));
 
         then(accountApiClient).should().withdraw(request);
-        then(cookieManager).should().delete(any(HttpServletResponse.class));
+        then(authSessionService).should().revoke(
+                any(HttpServletRequest.class),
+                any(HttpServletResponse.class)
+        );
     }
 
     @Test
@@ -435,7 +442,7 @@ class AccountControllerTest {
                 .andExpect(redirectedUrl("/withdraw"));
 
         then(accountApiClient).shouldHaveNoInteractions();
-        then(cookieManager).shouldHaveNoInteractions();
+        then(authSessionService).shouldHaveNoInteractions();
     }
 
     private JwtAuthenticationToken authentication(AccountStatus status) {
