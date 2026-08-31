@@ -9,6 +9,7 @@ import com.nhnacademy.front.medicine.dto.request.MedicineSearchRequest;
 import com.nhnacademy.front.medicine.dto.response.MedicineEnvironmentTypeResponse;
 import com.nhnacademy.front.medicine.dto.response.MedicineSearchResponse;
 import com.nhnacademy.front.organization.client.StorageApiClient;
+import com.nhnacademy.front.organization.client.ZoneThresholdApiClient;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +31,8 @@ public class MedicineSearchController {
     private final MedicineEnvApiClient medicineEnvApiClient;
     private final StorageApiClient storageApiClient;
     private static final String INBOUND_VIEW= "inventory/inbound";
+    private final ZoneThresholdApiClient zoneThresholdApiClient;
+
 
 
     // 의약품 조회

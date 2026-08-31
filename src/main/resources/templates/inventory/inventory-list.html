@@ -59,7 +59,7 @@
                     <select name="storage-id" class="storage-select">
 
                         <option value="">
-                            전체 저장소
+                            저장소 목록
                         </option>
                         <option th:each="item : ${storages}" th:value="${item.storageId}" th:text="${item.storageName}">
                         </option>

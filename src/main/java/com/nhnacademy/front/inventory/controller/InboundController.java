@@ -6,6 +6,7 @@ import com.nhnacademy.front.medicine.client.MedicineInfoApiClient;
 import com.nhnacademy.front.medicine.dto.response.MedicineDetailResponse;
 import com.nhnacademy.front.organization.client.OrganizationMemberApiClient;
 import com.nhnacademy.front.organization.client.StorageApiClient;
+import com.nhnacademy.front.organization.client.ZoneThresholdApiClient;
 import com.nhnacademy.front.organization.dto.response.StorageInfoResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,7 @@ public class InboundController {
     private final StorageApiClient storageApiClient;
     private final InventoryApiClient inventoryApiClient;
     private final MedicineInfoApiClient medicineInfoApiClient;
+
 
 
     private static final String INBOUND_VIEW = "inventory/inbound";
