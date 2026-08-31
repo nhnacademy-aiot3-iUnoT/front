@@ -39,7 +39,7 @@
         addMessage(question, 'user');
         input.value = '';
         try {
-            const response = await fetch('/api/core/chatbot', {
+            const response = await fetch('/chatbot', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({message: question})

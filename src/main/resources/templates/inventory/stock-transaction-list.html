@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main-layout}">
+
+<head>
+    <title>입출고 내역 | iUnoT</title>
+</head>
+
+<body>
+
+<div layout:fragment="content">
+    <div class="page-header d-print-none mb-3">
+        <div class="row align-items-center">
+            <div class="col">
+                <div class="page-pretitle">재고 관리</div>
+                <h2 class="page-title">입출고 내역</h2>
+                <div class="text-muted mt-1">구역별 입고 · 출고 · 폐기 이력을 확인합니다.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 저장소가 하나도 없으면 조회 자체가 불가능하므로 안내만 보여준다. -->
+    <div class="card" th:if="${#lists.isEmpty(storages)}">
+        <div class="card-body text-center text-muted py-5">
+            <i class="ti ti-building-warehouse fs-1 d-block mb-2"></i>
+            조회할 수 있는 저장소가 없습니다.
+        </div>
+    </div>
+
+    <th:block th:unless="${#lists.isEmpty(storages)}">
+        <div class="card">
+            <!-- 검색 조건. 구역 탭을 눌러도 조건이 유지되도록 zone-id는 hidden으로 함께 넘긴다. -->
+            <div class="card-body border-bottom py-3">
+                <form method="get" th:action="@{/stock-transactions}" class="row g-2 align-items-end">
+                    <input type="hidden" name="zone-id" th:value="${selectedZoneId}">
+
+                    <div class="col-md-3">
+                        <label class="form-label">저장소</label>
+                        <!-- 저장소를 바꾸면 구역이 달라지므로 zone-id를 비우고 다시 보낸다. -->
+                        <select name="storage-id" class="form-select" onchange="clearZoneAndSubmit(this)">
+                            <option th:each="storage : ${storages}"
+                                    th:value="${storage.storageId}"
+                                    th:text="${storage.name}"
+                                    th:selected="${storage.storageId == selectedStorageId}">저장소</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">의약품명</label>
+                        <input type="text" name="medicineName" class="form-control"
+                               placeholder="의약품명 검색" th:value="${medicineName}">
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label">변동 유형</label>
+                        <select name="transactionType" class="form-select">
+                            <option value="">전체</option>
+                            <option th:each="type : ${transactionTypes}"
+                                    th:value="${type.name()}"
+                                    th:text="${type.description}"
+                                    th:selected="${transactionType != null and type == transactionType}">유형</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label">시작일</label>
+                        <input type="date" name="startDate" class="form-control" th:value="${startDate}">
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label">종료일</label>
+                        <input type="date" name="endDate" class="form-control" th:value="${endDate}">
+                    </div>
+
+                    <div class="col-12 d-flex gap-2 justify-content-end">
+                        <a th:href="@{/stock-transactions(storage-id=${selectedStorageId}, zone-id=${selectedZoneId})}"
+                           class="btn btn-link">초기화</a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ti ti-search me-1"></i>조회
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- 구역 탭 -->
+            <div class="card-header" th:unless="${#lists.isEmpty(zones)}">
+                <ul class="nav nav-tabs card-header-tabs" role="tablist">
+                    <li class="nav-item" th:each="zone : ${zones}">
+                        <a class="nav-link"
+                           th:classappend="${zone.zoneId == selectedZoneId} ? 'active'"
+                           th:href="@{/stock-transactions(storage-id=${selectedStorageId}, zone-id=${zone.zoneId},
+                                                          medicineName=${medicineName},
+                                                          transactionType=${transactionType},
+                                                          startDate=${startDate}, endDate=${endDate})}"
+                           th:text="${zone.name}">구역</a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="card-body text-center text-muted py-5" th:if="${#lists.isEmpty(zones)}">
+                이 저장소에는 등록된 구역이 없습니다.
+            </div>
+
+            <th:block th:unless="${#lists.isEmpty(zones)}">
+                <div class="table-responsive">
+                    <table class="table table-vcenter card-table table-hover">
+                        <thead>
+                        <tr>
+                            <th>처리일시</th>
+                            <th>의약품</th>
+                            <th>포장단위</th>
+                            <th>유형</th>
+                            <th class="text-end">수량</th>
+                            <th>사유</th>
+                            <th>처리자</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="item : ${transactions}"
+                            class="stock-transaction-row"
+                            style="cursor: pointer;"
+                            th:attr="data-transaction=${item.stockTransactionId},
+                                     data-medicine=${item.medicineName},
+                                     data-pack-unit=${item.packUnit},
+                                     data-type=${item.transactionType.description},
+                                     data-quantity=${item.quantity},
+                                     data-reason=${item.reason},
+                                     data-memo=${item.memo},
+                                     data-processed-by=${item.processedByName},
+                                     data-processed-at=${item.processedAt}">
+                            <td class="text-muted" th:text="${#temporals.format(item.processedAt, 'yyyy-MM-dd HH:mm')}">2026-08-14 10:45</td>
+                            <td class="fw-medium" th:text="${item.medicineName}">타이레놀정</td>
+                            <td class="text-muted" th:text="${item.packUnit}">10정/PTP</td>
+                            <td>
+                                <span class="badge"
+                                      th:classappend="'bg-' + ${item.transactionType.color} + '-lt'"
+                                      th:text="${item.transactionType.description}">입고</span>
+                            </td>
+                            <td class="text-end fw-bold"
+                                th:classappend="${item.isIncoming()} ? 'text-green' : 'text-red'"
+                                th:text="(${item.isIncoming()} ? '+' : '-') + ${item.quantity}">+120</td>
+                            <td class="text-muted text-truncate" style="max-width: 200px;"
+                                th:text="${item.reason}">정기 입고</td>
+                            <td class="text-muted"
+                                th:text="${item.processedByName != null ? item.processedByName : '-'}">김약사</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="card-body text-center text-muted py-5" th:if="${#lists.isEmpty(transactions)}">
+                    조회된 재고 변동 내역이 없습니다.
+                </div>
+
+                <!-- 페이지네이션 -->
+                <div class="card-footer d-flex align-items-center"
+                     th:if="${totalPages != null and totalPages > 1}">
+                    <p class="m-0 text-muted">
+                        총 <span class="fw-bold" th:text="${totalElements}">0</span>건
+                    </p>
+                    <ul class="pagination m-0 ms-auto">
+                        <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                            <a class="page-link"
+                               th:href="@{/stock-transactions(storage-id=${selectedStorageId}, zone-id=${selectedZoneId},
+                                                              medicineName=${medicineName}, transactionType=${transactionType},
+                                                              startDate=${startDate}, endDate=${endDate},
+                                                              page=${currentPage - 1}, size=${pageSize})}">이전</a>
+                        </li>
+                        <li class="page-item"
+                            th:each="pageNumber : ${#numbers.sequence(0, totalPages - 1)}"
+                            th:classappend="${pageNumber == currentPage} ? 'active'">
+                            <a class="page-link"
+                               th:href="@{/stock-transactions(storage-id=${selectedStorageId}, zone-id=${selectedZoneId},
+                                                              medicineName=${medicineName}, transactionType=${transactionType},
+                                                              startDate=${startDate}, endDate=${endDate},
+                                                              page=${pageNumber}, size=${pageSize})}"
+                               th:text="${pageNumber + 1}">1</a>
+                        </li>
+                        <li class="page-item" th:classappend="${currentPage + 1 >= totalPages} ? 'disabled'">
+                            <a class="page-link"
+                               th:href="@{/stock-transactions(storage-id=${selectedStorageId}, zone-id=${selectedZoneId},
+                                                              medicineName=${medicineName}, transactionType=${transactionType},
+                                                              startDate=${startDate}, endDate=${endDate},
+                                                              page=${currentPage + 1}, size=${pageSize})}">다음</a>
+                        </li>
+                    </ul>
+                </div>
+            </th:block>
+        </div>
+    </th:block>
+
+    <!-- 재고 변동 상세.
+         목록 응답에 상세에 필요한 값이 다 들어 있어서 행의 data 속성을 그대로 읽어 채운다. -->
+    <div class="modal modal-blur fade" id="stock-transaction-modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">재고 변동 상세</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+                </div>
+                <div class="modal-body">
+                    <dl class="row mb-0">
+                        <dt class="col-4 text-muted">처리일시</dt>
+                        <dd class="col-8" id="detail-processed-at">-</dd>
+
+                        <dt class="col-4 text-muted">의약품</dt>
+                        <dd class="col-8" id="detail-medicine">-</dd>
+
+                        <dt class="col-4 text-muted">포장단위</dt>
+                        <dd class="col-8" id="detail-pack-unit">-</dd>
+
+                        <dt class="col-4 text-muted">변동 유형</dt>
+                        <dd class="col-8" id="detail-type">-</dd>
+
+                        <dt class="col-4 text-muted">수량</dt>
+                        <dd class="col-8" id="detail-quantity">-</dd>
+
+                        <dt class="col-4 text-muted">사유</dt>
+                        <dd class="col-8" id="detail-reason">-</dd>
+
+                        <dt class="col-4 text-muted">메모</dt>
+                        <dd class="col-8" id="detail-memo">-</dd>
+
+                        <dt class="col-4 text-muted">처리자</dt>
+                        <dd class="col-8" id="detail-processed-by">-</dd>
+                    </dl>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="script">
+    <script th:src="@{/js/stock-transaction.js}"></script>
+</th:block>
+
+</body>
+</html>

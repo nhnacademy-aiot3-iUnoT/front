@@ -13,6 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Slf4j
 @Controller
@@ -44,7 +45,6 @@ public class OrganizationController {
         );
 
         model.addAttribute("orgUpdateRequest", request);
-
         return "organization/org-edit";
     }
 
@@ -73,7 +73,8 @@ public class OrganizationController {
 
     @PutMapping("/me/edit")
     public String updateOrganization(@Valid @ModelAttribute("orgUpdateRequest") OrgUpdateRequest request,
-                                     BindingResult bindingResult) {
+                                     BindingResult bindingResult,
+                                     RedirectAttributes redirectAttributes) {
         OrgDetailResponse orgInfo = orgApiClient.getOrgInfo();
 
         if (orgInfo.status() == OrganizationStatus.PENDING) {
@@ -85,7 +86,7 @@ public class OrganizationController {
         }
 
         orgApiClient.updateOrg(request);
-
+        redirectAttributes.addFlashAttribute("message", "조직 정보가 수정되었습니다.");
         return "redirect:/organizations/me";
     }
 

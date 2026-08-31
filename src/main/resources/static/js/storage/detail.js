@@ -1,19 +1,35 @@
 // --- 저장소 수정 모달 제어 ---
 function openEditModal() {
-    document.getElementById('edit-modal').style.display = 'flex';
+    const modal = document.getElementById('edit-modal');
+    resetEditForm();
+    clearErrors(modal);
+    bootstrap.Modal.getOrCreateInstance(modal).show();
     document.getElementById('edit-name').focus();
 }
 function closeEditModal() {
-    document.getElementById('edit-modal').style.display = 'none';
+    const modal = document.getElementById('edit-modal');
+    resetEditForm();
+    clearErrors(modal);
+    bootstrap.Modal.getOrCreateInstance(modal).hide();
+}
+
+function resetEditForm() {
+    const nameInput = document.getElementById('edit-name');
+    const descriptionInput = document.getElementById('edit-description');
+
+    nameInput.value = nameInput.dataset.initialValue || '';
+    descriptionInput.value = descriptionInput.dataset.initialValue || '';
 }
 
 // --- 구역 추가 모달 제어 ---
 function openZoneModal() {
-    document.getElementById('zone-modal').style.display = 'flex';
+    bootstrap.Modal.getOrCreateInstance(document.getElementById('zone-modal')).show();
     document.getElementById('zone-name').focus();
 }
 function closeZoneModal() {
-    document.getElementById('zone-modal').style.display = 'none';
+    const modal = document.getElementById('zone-modal');
+    clearErrors(modal);
+    bootstrap.Modal.getOrCreateInstance(modal).hide();
     document.getElementById('zone-name').value = '';
     document.getElementById('zone-description').value = '';
 }
@@ -22,22 +38,32 @@ function closeZoneModal() {
 
 // 1. 저장소 정보 수정
 function updateStorage(storageId) {
-    const name = document.getElementById('edit-name').value.trim();
-    const description = document.getElementById('edit-description').value.trim();
+    const form = document.getElementById('edit-modal');
+    const nameInput = document.getElementById('edit-name');
+    const descriptionInput = document.getElementById('edit-description');
+    const name = nameInput.value.trim();
+    const description = descriptionInput.value.trim();
 
-    if (!name) {
-        alert('저장소 이름을 입력해주세요.');
+    clearErrors(form);
+    if (!isRequired(name)) {
+        setError(nameInput, '저장소 이름을 입력해주세요.');
+        nameInput.focus();
         return;
     }
-    if (name.length > 50) {
-        alert('저장소 이름은 최대 50자까지 입력 가능합니다.');
+    if (!isMaxLength(name, 50)) {
+        setError(nameInput, '저장소 이름은 최대 50자까지 입력 가능합니다.');
+        nameInput.focus();
+        return;
+    }
+    if (!isMaxLength(description, 255)) {
+        setError(descriptionInput, '설명은 최대 255자까지 입력 가능합니다.');
+        descriptionInput.focus();
         return;
     }
 
-    fetch(`/api/core/storages/${storageId}`, {
+    apiFetch(`/api/core/storages/${storageId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({ name: name, description: description === '' ? null : description })
     })
         .then(response => {
@@ -61,10 +87,9 @@ function toggleStorageStatus(storageId, currentStatus) {
 
     if (!confirm(`이 저장소를 ${actionText} 하시겠습니까?`)) return;
 
-    fetch(`/api/core/storages/${storageId}/status`, {
+    apiFetch(`/api/core/storages/${storageId}/status`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({ status: newStatus })
     })
         .then(response => {
@@ -84,9 +109,8 @@ function toggleStorageStatus(storageId, currentStatus) {
 function deleteStorage(storageId) {
     if (!confirm('정말 이 저장소를 삭제하시겠습니까?')) return;
 
-    fetch(`/api/core/storages/${storageId}`, {
-        method: 'DELETE',
-        credentials: 'include'
+    apiFetch(`/api/core/storages/${storageId}`, {
+        method: 'DELETE'
     })
         .then(response => {
             if (response.ok || response.status === 204) {
@@ -110,26 +134,26 @@ function createZone(storageId) {
     const name = nameInput.value.trim();
     const description = descInput.value.trim();
 
-    if (!name) {
-        alert('구역 이름을 입력해야 합니다.');
+    clearErrors(document.getElementById('zone-modal'));
+    if (!isRequired(name)) {
+        setError(nameInput, '구역 이름을 입력해야 합니다.');
         nameInput.focus();
         return;
     }
-    if (name.length > 30) {
-        alert('구역 이름은 최대 30자 입니다.');
+    if (!isMaxLength(name, 30)) {
+        setError(nameInput, '구역 이름은 최대 30자 입니다.');
         nameInput.focus();
         return;
     }
-    if (description.length > 255) {
-        alert('구역 설명은 최대 255자 입니다.');
+    if (!isMaxLength(description, 255)) {
+        setError(descInput, '구역 설명은 최대 255자 입니다.');
         descInput.focus();
         return;
     }
 
-    fetch(`/api/core/storages/${storageId}/zones`, {
+    apiFetch(`/api/core/storages/${storageId}/zones`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({ name: name, description: description === '' ? null : description })
     })
         .then(response => {
@@ -161,12 +185,11 @@ function updateStockThreshold(storageId, thresholdId) {
         return;
     }
 
-    fetch(`/api/core/storages/${storageId}/stock-thresholds/${thresholdId}`, {
+    apiFetch(`/api/core/storages/${storageId}/stock-thresholds/${thresholdId}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
         },
-        credentials: 'include',
         body: JSON.stringify(requestData)
     })
         .then(response => {
@@ -194,9 +217,8 @@ function deleteStockThreshold(storageId, thresholdId) {
         return;
     }
 
-    fetch(`/api/core/storages/${storageId}/stock-thresholds/${thresholdId}`, {
-        method: 'DELETE',
-        credentials: 'include'
+    apiFetch(`/api/core/storages/${storageId}/stock-thresholds/${thresholdId}`, {
+        method: 'DELETE'
     })
         .then(response => {
             if (response.ok || response.status === 204) {
@@ -218,7 +240,9 @@ function deleteStockThreshold(storageId, thresholdId) {
 
 // 최소 재고 추가 모달 열기/닫기
 function openStockThresholdModal() {
-    document.getElementById('stock-threshold-modal').style.display = 'flex';
+    const modal = document.getElementById('stock-threshold-modal');
+    clearErrors(modal);
+    bootstrap.Modal.getOrCreateInstance(modal).show();
     document.getElementById('medicine-search-keyword').value = '';
     document.getElementById('medicine-search-result-body').innerHTML = '<tr><td colspan="3" style="text-align: center; color: #888; padding: 15px;">의약품을 검색해주세요.</td></tr>';
     document.getElementById('selected-package-unit-id').value = '';
@@ -227,21 +251,36 @@ function openStockThresholdModal() {
 }
 
 function closeStockThresholdModal() {
-    document.getElementById('stock-threshold-modal').style.display = 'none';
+    const modal = document.getElementById('stock-threshold-modal');
+    clearErrors(modal);
+    bootstrap.Modal.getOrCreateInstance(modal).hide();
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.modal').forEach(modal => {
+        modal.addEventListener('hidden.bs.modal', () => {
+            clearErrors(modal);
+            if (modal.id === 'edit-modal') {
+                resetEditForm();
+            }
+        });
+    });
+});
 
 // 의약품 검색 API 호출
 function searchMedicines() {
-    const keyword = document.getElementById('medicine-search-keyword').value.trim();
-    if (!keyword) {
-        alert('검색어를 입력해주세요.');
+    const keywordInput = document.getElementById('medicine-search-keyword');
+    const keyword = keywordInput.value.trim();
+    clearErrors(document.getElementById('stock-threshold-modal'));
+
+    if (!isRequired(keyword)) {
+        setError(keywordInput, '검색어를 입력해주세요.');
+        keywordInput.focus();
         return;
     }
 
     // SearchType.PRODUCT_NAME 기준 검색 요청 (필요시 page, size 조절 가능)
-    fetch(`/api/core/medicines?searchType=PRODUCT_NAME&search=${encodeURIComponent(keyword)}&page=0&size=5`, {
-        credentials: 'include'
-    })
+    apiFetch(`/api/core/medicines?searchType=PRODUCT_NAME&search=${encodeURIComponent(keyword)}&page=0&size=5`)
         .then(res => res.json())
         .then(resData => {
             // ApiResponse 구조에 맞게 content 배열 추출 (PageResponse 구조 고려)
@@ -262,7 +301,7 @@ function searchMedicines() {
                 <td style="padding: 6px;">${med.productName} (${med.companyName || ''})</td>
                 <td style="padding: 6px;">${med.packUnit}</td>
                 <td style="padding: 6px; text-align: center;">
-                    <button type="button" class="btn-secondary" style="padding: 2px 6px; font-size: 11px; cursor: pointer;" 
+                    <button type="button" class="btn btn-sm btn-outline-primary"
                         onclick="selectMedicine('${med.packageUnitId}', '${med.productName} (${med.packUnit})')">선택</button>
                 </td>
             `;
@@ -284,14 +323,19 @@ function selectMedicine(packageUnitId, displayName) {
 // 최소 재고 임계값 저장 (POST)
 function saveStockThreshold(storageId) {
     const medicinePackageUnitId = document.getElementById('selected-package-unit-id').value;
-    const stockThreshold = parseInt(document.getElementById('new-stock-threshold').value, 10);
+    const thresholdInput = document.getElementById('new-stock-threshold');
+    const thresholdValue = thresholdInput.value.trim();
+    const stockThreshold = parseInt(thresholdValue, 10);
+
+    clearErrors(document.getElementById('stock-threshold-modal'));
 
     if (!medicinePackageUnitId) {
         alert('등록할 의약품을 선택해주세요.');
         return;
     }
-    if (isNaN(stockThreshold) || stockThreshold < 0) {
-        alert('올바른 최소 재고 개수를 입력해주세요.');
+    if (!isRequired(thresholdValue) || !isNumber(thresholdValue) || stockThreshold < 0) {
+        setError(thresholdInput, '올바른 최소 재고 개수를 입력해주세요.');
+        thresholdInput.focus();
         return;
     }
 
@@ -300,12 +344,11 @@ function saveStockThreshold(storageId) {
         stockThreshold: stockThreshold
     };
 
-    fetch(`/api/core/storages/${storageId}/stock-thresholds`, {
+    apiFetch(`/api/core/storages/${storageId}/stock-thresholds`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        credentials: 'include',
         body: JSON.stringify(requestData)
     })
         .then(response => {

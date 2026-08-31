@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main-layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>구역 환경 이벤트 발생 내역</title>
+    <link rel="stylesheet" th:href="@{/css/status.css}">
+</head>
+<body>
+
+<div layout:fragment="content">
+    <div class="py-6">
+        <input type="hidden" id="zone-id" th:value="${zoneId}">
+
+        <div class="page-header d-print-none mb-4">
+            <h1 class="page-title">구역 환경 이벤트 발생 내역</h1>
+            <div class="text-muted mt-1">해당 구역에서 발생한 임계값 이탈 이벤트 기록입니다.</div>
+        </div>
+
+        <div class="page-content-panel">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="row align-items-end g-3">
+                        <div class="col-md-5">
+                            <label for="search-env-type" class="form-label">환경 타입</label>
+                            <select id="search-env-type" class="form-select">
+                        <option value="">전체</option>
+                        <option value="TEMPERATURE">온도</option>
+                        <option value="HUMIDITY">습도</option>
+                        <option value="ILLUMINANCE">조도</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-5">
+                            <label for="search-breach-type" class="form-label">이탈 유형</label>
+                            <select id="search-breach-type" class="form-select">
+                        <option value="">전체</option>
+                        <option value="ABOVE_MAX">상한 초과</option>
+                        <option value="BELOW_MIN">하한 미달</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-auto">
+                            <button type="button" class="btn btn-primary" onclick="fetchEnvironmentEvents(0)">검색</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        <div class="card">
+            <div class="table-responsive">
+                <table class="table table-vcenter table-hover card-table">
+                    <thead>
+                        <tr>
+                            <th>발생 ID</th>
+                            <th>환경 타입</th>
+                            <th>이탈 유형</th>
+                            <th>감지된 값</th>
+                            <th>임계 기준값</th>
+                            <th>조직 / 저장소 / 구역</th>
+                        </tr>
+                    </thead>
+                    <tbody id="event-table-body">
+                        <tr>
+                            <td colspan="6" class="text-center text-secondary py-5">데이터를 불러오는 중입니다...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <ul id="pagination-box" class="pagination mt-2 justify-content-center"></ul>
+
+        <a th:href="@{/zones/{zoneId}(zoneId=${zoneId})}" class="btn btn-outline-secondary mt-4">← 구역 상세로 돌아가기</a>
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="script">
+    <script th:src="@{/js/zone/environment-event.js}"></script>
+</th:block>
+
+</body>
+</html>

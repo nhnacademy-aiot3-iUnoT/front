@@ -87,6 +87,7 @@ public class SecurityConfig {
                                 EndpointRequest.to("health", "serviceregistry")
                         ).permitAll()
                         .requestMatchers(HttpMethod.POST, "/logout").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/juso/popup").permitAll()
                         .requestMatchers(
                                 "/login",
                                 "/signup",

@@ -35,3 +35,6 @@ security:
     jwk-set-uri: ${JWK_SET_URI:http://localhost:10413/.well-known/jwks.json}
   refresh-token:
     ttl: ${REFRESH_TOKEN_TTL:14d}
+
+app:
+  api-base-url: ${API_BASE_URL:} # prod 환경에서는 빈 값으로(상대 경로 적용)

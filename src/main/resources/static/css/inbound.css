@@ -105,6 +105,7 @@ button, input, select { font: inherit; }
 .search-input-group input,
 .select-field select,
 .input-field input,
+.input-field select,
 .environment-input-group input {
     min-height: 52px;
     border: 1px solid var(--inbound-border);
@@ -115,11 +116,16 @@ button, input, select { font: inherit; }
 }
 
 .search-input-group input,
-.input-field input { width: 100%; padding: 0 16px; }
+.input-field input,
+.input-field select {
+    width: 100%;
+    padding: 0 16px;
+}
 
 .search-input-group input:focus,
 .select-field select:focus,
 .input-field input:focus,
+.input-field select:focus,
 .environment-input-group input:focus {
     border-color: var(--inbound-primary);
     box-shadow: 0 0 0 4px rgba(20, 122, 105, .13);
@@ -539,3 +545,28 @@ button, input, select { font: inherit; }
     filter: brightness(0.95);
 }
 
+
+#transaction-type {
+    width: 100%;
+    min-height: 52px;
+    padding: 0 42px 0 16px;
+
+    border: 1px solid var(--inbound-border);
+    border-radius: 13px;
+
+    background-color: var(--inbound-white);
+    color: var(--inbound-text);
+
+    font-weight: 600;
+    cursor: pointer;
+    outline: none;
+}
+
+#transaction-type:focus {
+    border-color: var(--inbound-primary);
+    box-shadow: 0 0 0 4px rgba(20, 122, 105, .13);
+}
+
+#transaction-type:hover {
+    border-color: #b7c5c0;
+}

@@ -18,6 +18,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -62,8 +63,10 @@ public class OrganizationMemberController {
 
     @DeleteMapping("/{member-id}")
     public String deleteMember(@PathVariable(name = "member-id") Long memberId,
-                               @RequestParam(defaultValue = "false") boolean withoutDepartment) {
+                               @RequestParam(defaultValue = "false") boolean withoutDepartment,
+                               RedirectAttributes redirectAttributes) {
         organizationMemberApiClient.deleteMember(memberId);
+        redirectAttributes.addFlashAttribute("message", "정상적으로 삭제되었습니다.");
         return "redirect:/organizations/me/members?withoutDepartment=" + withoutDepartment;
     }
 
@@ -72,9 +75,11 @@ public class OrganizationMemberController {
      */
     @PostMapping("/{member-id}/departments")
     public String assignMemberDepartments(@PathVariable("member-id") Long memberId,
-                                          @RequestParam(required = false) List<Long> departmentIds) {
+                                          @RequestParam(required = false) List<Long> departmentIds,
+                                          RedirectAttributes redirectAttributes) {
         memberDepartmentApiClient.assignMemberDepartments(memberId, new MemberDepartmentAssignRequest(departmentIds));
-        return "redirect:/organizations/me/members";
+        redirectAttributes.addFlashAttribute("message", "부서가 배정되었습니다.");
+        return "redirect:/organizations/me/members?withoutDepartment=true";
     }
 
     private List<DepartmentListResponse> getActiveDepartments() {

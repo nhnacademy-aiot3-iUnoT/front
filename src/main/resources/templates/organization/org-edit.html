@@ -12,30 +12,18 @@
 <body>
 
 <div layout:fragment="content">
-    <div class="container-xl">
+    <div class="py-6">
         <div class="page-header d-print-none mb-4">
             <div class="row align-items-center">
                 <div class="col">
-                    <h2 class="page-title">
-                        조직 정보 수정
-                    </h2>
-                    <div class="text-muted mt-1">
-                        조직 주소 및 상세 정보를 수정합니다.
-                    </div>
-                </div>
-
-                <div class="col-auto ms-auto">
-                    <a th:href="@{/organizations/me}"
-                       class="btn btn-outline-secondary">
-                        <i class="ti ti-arrow-left me-1"></i>
-                        돌아가기
-                    </a>
+                    <h1 class="page-title">조직 정보 수정</h1>
+                    <div class="text-muted mt-1">조직 주소 및 상세 정보를 수정합니다.</div>
                 </div>
             </div>
         </div>
 
         <div class="row justify-content-center">
-            <div class="col-lg-8">
+            <div class="col-lg-12">
                 <form th:action="@{/organizations/me/edit}" th:object="${orgUpdateRequest}" th:method="put" id="orgEditForm">
                     <div class="card">
                         <div class="card-header">
@@ -69,7 +57,6 @@
                                 </div>
 
                                 <div class="invalid-feedback"></div>
-
                                 <div class="text-danger"
                                     th:errors="*{roadAddress}">
                                 </div>
@@ -85,7 +72,6 @@
                                        th:field="*{zipCode}" placeholder="예: 12345" readonly>
 
                                 <div class="invalid-feedback"></div>
-
                                 <div class="text-danger"
                                      th:errors="*{zipCode}">
                                 </div>
@@ -111,12 +97,12 @@
 
 
                             <div class="mb-3">
-                                <label for="org-description" class="form-label">
-                                    조직 설명
+                                <label for="description" class="form-label">
+                                    조직 정보
                                 </label>
 
-                                <textarea class="form-control" rows="6" maxlength="255" id="org-description"
-                                          th:field="*{description}" placeholder="조직에 대한 간단한 설명을 입력하세요">
+                                <textarea class="form-control" rows="6" maxlength="255" id="description"
+                                          th:field="*{description}" placeholder="조직에 대한 간단한 정보를 작성하세요">
                                 </textarea>
 
                                 <div class="d-flex justify-content-between mt-2">
@@ -155,9 +141,11 @@
     </div>
 </div>
 <th:block layout:fragment="script">
+    <script th:src="@{/js/organization/address-search.js}"></script>
+
     <script th:src="@{/js/common/validation.js}"></script>
     <script th:src="@{/js/common/form.js}"></script>
-    <script th:src="@{/js/organization/address-search.js}"></script>
+    <script th:src="@{/js/common/field-validator.js}"></script>
     <script th:src="@{/js/organization/org-setup.js}"></script>
 </th:block>
 </body>

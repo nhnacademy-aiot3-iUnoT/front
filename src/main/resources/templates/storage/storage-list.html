@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main-layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>저장소 목록</title>
+    <link rel="stylesheet" th:href="@{/css/status.css}">
+    <link rel="stylesheet" th:href="@{/css/storage-list.css}">
+</head>
+<body>
+
+<div layout:fragment="content">
+    <div class="py-6">
+        <div class="page-header d-print-none mb-4">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h2 class="page-title">
+                        <span th:if="${!#lists.isEmpty(storageList)}"
+                              th:text="${storageList[0].organizationName + ' > '}"></span>
+                         저장소 목록
+                    </h2>
+                    <div class="text-muted mt-1">조직의 저장소를 관리합니다.</div>
+                </div>
+                <div class="col-auto">
+                    <button type="button"
+                            th:if="${canManage}"
+                            onclick="openCreateModal()"
+                            class="btn btn-primary">저장소 추가
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mt-5">
+            <div class="table-responsive">
+                <table class="table table-vcenter table-hover card-table">
+            <thead>
+                <tr>
+                    <th>저장소 이름</th>
+                    <th>상태</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:if="${#lists.isEmpty(storageList)}">
+                    <td colspan="2" class="text-center text-secondary py-5">등록된 저장소가 없습니다.</td>
+                </tr>
+
+                <tr th:each="storage : ${storageList}"
+                    class="clickable-row"
+                    th:onclick="'location.href=\'/storages/' + ${storage.storageId} + '\''">
+                    <td th:text="${storage.name}">저장소 이름</td>
+                    <td>
+                        <span class="badge status-badge"
+                              th:classappend="' status-' + ${storage.status.name().toLowerCase()}"
+                              th:text="${storage.status.ko}">활성</span>
+                    </td>
+                </tr>
+            </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments/modal/storage-create-modal :: modal}"></div>
+</div>
+
+<th:block layout:fragment="script">
+    <script th:src="@{/js/common/validation.js}"></script>
+    <script th:src="@{/js/common/form.js}"></script>
+    <script th:src="@{/js/storage/list.js}"></script>
+</th:block>
+
+</body>
+</html>
