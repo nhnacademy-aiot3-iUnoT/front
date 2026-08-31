@@ -58,11 +58,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const zoneMessage = document.querySelector('#zone-message');
     const searchStorageInput = document.querySelector('#search-storage-id');
     const searchZoneInput = document.querySelector('#search-zone-id');
+
+    const savedStorageId = storageSelect?.dataset.selectedId;
+    const savedZoneId = zoneSelect?.dataset.selectedId || selectedZoneInput?.value;
+
+
+
     let selectedZoneThresholds = new Map();
+
+
 
     storageSelect?.addEventListener('change', async () => {
         const storageId = storageSelect.value;
-        const zoneId = zoneSelect.value;
+
 
         // 사용자가 기존 저장소가 아닌 다른 저장소를 선택한 경우
         if (
@@ -80,10 +88,6 @@ document.addEventListener('DOMContentLoaded', () => {
             searchStorageInput.value = storageId;
         }
 
-
-        if(selectedZoneInput){
-            selectedZoneInput.value = zoneId;
-        }
 
         if (searchZoneInput) {
             searchZoneInput.value = '';
@@ -105,6 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
+            console.log('구역 목록 요청:', `/storages/${storageId}/zones`);
             const response = await fetch(`/storages/${storageId}/zones`);
 
             if (!response.ok) {
@@ -136,8 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
             zoneSelect.disabled = false;
 
             // 검색 또는 상세조회 전 선택했던 구역을 다시 선택한다.
-            const savedStorageId = storageSelect.dataset.selectedId;
-            const savedZoneId = zoneSelect.dataset.selectedId || selectedZoneInput?.value;
+
 
             if (savedZoneId && (!savedStorageId || savedStorageId === storageId)) {
                 zoneSelect.value = savedZoneId;
@@ -165,6 +169,14 @@ document.addEventListener('DOMContentLoaded', () => {
     zoneSelect?.addEventListener('change', async () => {
         const zoneId = zoneSelect.value;
 
+
+        console.log('구역 change 실행:', zoneId);
+
+
+        if (selectedZoneInput) {
+            selectedZoneInput.value = zoneId;
+        }
+
         if (searchZoneInput) {
             searchZoneInput.value = zoneId;
         }
@@ -173,11 +185,18 @@ document.addEventListener('DOMContentLoaded', () => {
         updateAllEnvironmentCards();
 
         if (!zoneId) {
+            console.log('zoneId가 비어 있어 조회 중단');
             return;
         }
 
+
+
         try {
+            console.log('임계값 요청:', `/zones/${zoneId}/zone-thresholds`);
+
             const response = await fetch(`/zones/${zoneId}/zone-thresholds`);
+
+            console.log('임계값 응답:', response.status);
 
             if (!response.ok) {
                 throw new Error(`구역 임계값 조회 실패: ${response.status}`);
@@ -352,6 +371,7 @@ document.addEventListener('DOMContentLoaded', () => {
             satisfied ? '기준 충족' : '기준 미충족',
             satisfied ? 'is-satisfied' : 'is-unsatisfied'
         );
+
     }
 
     function updateEnvironmentSummary(loadFailed) {
@@ -422,7 +442,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function isMedicineEnvironmentType(type) {
         return type === 'TEMPERATURE'
             || type === 'HUMIDITY'
-            || type === 'ILLUMINANCE';
+            || type === 'ILLUMINATION';
     }
 
     function getEnvironmentUnit(type) {
@@ -434,7 +454,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return '%';
         }
 
-        if (type === 'ILLUMINANCE') {
+        if (type === 'ILLUMINATION') {
             return 'lx';
         }
 
@@ -450,7 +470,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return '습도';
         }
 
-        if (type === 'ILLUMINANCE') {
+        if (type === 'ILLUMINATION') {
             return '조도';
         }
 
@@ -465,6 +485,21 @@ document.addEventListener('DOMContentLoaded', () => {
                                   }) {
         const minInput = document.getElementById(minId);
         const maxInput = document.getElementById(maxId);
+
+
+        // 해당 환경 기준 입력창이 렌더링되지 않은 경우
+        if (!minInput || !maxInput) {
+            console.log('환경 입력창 없음:', {
+                minId,
+                maxId,
+                minInput,
+                maxInput
+            });
+
+            return () => true;
+        }
+
+
 
         function validate() {
             const minValue = minInput.value.trim();
@@ -623,11 +658,80 @@ document.addEventListener('DOMContentLoaded', () => {
         zoneMessage.hidden = true;
     }
 
+    function updateEnvironmentModalSummary() {
+        const section = document.getElementById(
+            'summaryEnvironmentSection'
+        );
+
+        if (!section) {
+            return;
+        }
+
+        const environmentValues = [
+            {
+                rowId: 'summaryTemperatureRow',
+                summaryId: 'summaryTemperature',
+                minId: 'min-temperature',
+                maxId: 'max-temperature',
+                unit: '℃'
+            },
+            {
+                rowId: 'summaryHumidityRow',
+                summaryId: 'summaryHumidity',
+                minId: 'min-humidity',
+                maxId: 'max-humidity',
+                unit: '%'
+            },
+            {
+                rowId: 'summaryIlluminanceRow',
+                summaryId: 'summaryIlluminance',
+                minId: 'min-illuminance',
+                maxId: 'max-illuminance',
+                unit: 'lx'
+            }
+        ];
+
+        let hasEnvironmentValue = false;
+
+        environmentValues.forEach((environment) => {
+            const row = document.getElementById(environment.rowId);
+            const summary = document.getElementById(
+                environment.summaryId
+            );
+            const minInput = document.getElementById(
+                environment.minId
+            );
+            const maxInput = document.getElementById(
+                environment.maxId
+            );
+
+            if (!row || !summary) {
+                return;
+            }
+
+            const min = minInput?.value.trim() ?? '';
+            const max = maxInput?.value.trim() ?? '';
+
+            // 해당 환경 기준 입력란이 없거나 두 값이 모두 비어 있으면 숨김
+            if (!min && !max) {
+                row.hidden = true;
+                summary.textContent = '';
+                return;
+            }
+
+            summary.textContent =
+                `${min || '-'} ~ ${max || '-'} ${environment.unit}`;
+
+            row.hidden = false;
+            hasEnvironmentValue = true;
+        });
+
+        section.hidden = !hasEnvironmentValue;
+    }
 
 
 
 // 서버가 Model에 넣어준 기존 저장소 선택값을 페이지 진입 시 복원한다.
-    const savedStorageId = storageSelect?.dataset.selectedId;
 
     if (storageSelect && savedStorageId) {
         storageSelect.value = savedStorageId;
@@ -709,6 +813,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             document.getElementById("summaryMemo").textContent =
                 memo;
+
+
+            updateEnvironmentModalSummary();
 
             modal.classList.add("show");
 

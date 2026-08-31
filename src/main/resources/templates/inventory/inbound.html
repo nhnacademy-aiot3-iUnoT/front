@@ -343,7 +343,7 @@
 
                 </article>
 
-                <article class="environment-card" data-environment-type="ILLUMINANCE">
+                <article class="environment-card" data-environment-type="ILLUMINATION">
 
                     <div class="environment-header">
                         <span class="environment-unit">lx</span>
@@ -427,7 +427,7 @@
 
 
 
-                <fieldset class="environment-input-group" data-environment-input data-environment-type="ILLUMINANCE">
+                <fieldset class="environment-input-group" data-environment-input data-environment-type="ILLUMINATION">
                     <legend>조도</legend>
 
                     <label for="min-illuminance">최소</label>
@@ -514,10 +514,12 @@
        </section>
     </div>
 
-
         <div class="form-actions">
+            <a class="back-button" th:href="@{/inventories}">이전</a>
             <button type="button" id="openSummaryButton" th:disabled="${medicine == null}">입고 등록</button>
+
         </div>
+
 
 
     </form>
@@ -570,9 +572,33 @@
                 <span>메모</span>
                 <strong id="summaryMemo"></strong>
             </div>
+
+
+            <div id="summaryEnvironmentSection" hidden>
+                <h3>의약품 환경 기준</h3>
+
+                <div class="summary-item" id="summaryTemperatureRow" hidden>
+                    <span>온도</span>
+                    <strong id="summaryTemperature"></strong>
+                </div>
+
+                <div class="summary-item" id="summaryHumidityRow" hidden>
+                    <span>습도</span>
+                    <strong id="summaryHumidity"></strong>
+                </div>
+
+                <div class="summary-item" id="summaryIlluminanceRow" hidden>
+                    <span>조도</span>
+                    <strong id="summaryIlluminance"></strong>
+                </div>
+            </div>
+
+
+
+
             <div class="model-actions">
             <button type="button" id="closeSummaryButton">
-                수정
+                이전
             </button>
 
             <button type="button" id="confirmInboundButton">
