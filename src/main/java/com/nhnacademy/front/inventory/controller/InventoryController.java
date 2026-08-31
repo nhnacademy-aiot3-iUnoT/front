@@ -61,8 +61,7 @@ public class InventoryController {
                         totalPages - 1);
 
 
-        List<String> departmentNames = departmentApiClient.getDepartments().stream()
-                .filter(d -> d.status() == DepartmentStatus.ACTIVE)
+        List<String> departmentNames = departmentApiClient.getMyDepartments().stream()
                         .map(DepartmentListResponse::name)
                                 .toList();
 
