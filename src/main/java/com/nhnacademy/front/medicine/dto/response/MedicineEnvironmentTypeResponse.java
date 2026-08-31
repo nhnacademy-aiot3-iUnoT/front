@@ -7,6 +7,7 @@ import java.util.List;
 
 public record MedicineEnvironmentTypeResponse(
 
+
         EnvironmentType type,
         BigDecimal min,
         BigDecimal max

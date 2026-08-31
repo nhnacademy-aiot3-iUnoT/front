@@ -23,7 +23,7 @@ public class MedicineInfoApiClient {
     private static final String CORE_SERVICE = "/api/core";
 
     // 의약품 조회
-    public PageResponse<MedicineSearchResponse> getMedicines(MedicineSearchRequest request,int page, int size){
+    public PageResponse<MedicineSearchResponse> getMedicines(MedicineSearchRequest request, int page, int size){
 
 //        log.info("search: {}",request.search());
 //        String path = CORE_SERVICE + "?searchType="+request.searchType() + "&search="+ request.search() + "&page="+page + "&size="+ size;

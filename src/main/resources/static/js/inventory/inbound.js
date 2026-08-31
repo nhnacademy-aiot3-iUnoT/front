@@ -54,6 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // 저장소를 선택하면 해당 저장소의 구역 목록만 JSON으로 조회
     const storageSelect = document.querySelector('#storage-id');
     const zoneSelect = document.querySelector('#zone-id');
+    const selectedZoneInput = document.querySelector('#selected-zone-id');
     const zoneMessage = document.querySelector('#zone-message');
     const searchStorageInput = document.querySelector('#search-storage-id');
     const searchZoneInput = document.querySelector('#search-zone-id');
@@ -61,9 +62,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
     storageSelect?.addEventListener('change', async () => {
         const storageId = storageSelect.value;
+        const zoneId = zoneSelect.value;
 
+        // 사용자가 기존 저장소가 아닌 다른 저장소를 선택한 경우
+        if (
+            selectedZoneInput
+            && savedStorageId
+            && storageId !== savedStorageId
+        ) {
+            selectedZoneInput.value = '';
+            zoneSelect.dataset.selectedId = '';
+        }
+
+
+        // 기존 구역 조회 로직
         if (searchStorageInput) {
             searchStorageInput.value = storageId;
+        }
+
+
+        if(selectedZoneInput){
+            selectedZoneInput.value = zoneId;
         }
 
         if (searchZoneInput) {
@@ -118,7 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // 검색 또는 상세조회 전 선택했던 구역을 다시 선택한다.
             const savedStorageId = storageSelect.dataset.selectedId;
-            const savedZoneId = zoneSelect.dataset.selectedId;
+            const savedZoneId = zoneSelect.dataset.selectedId || selectedZoneInput?.value;
 
             if (savedZoneId && (!savedStorageId || savedStorageId === storageId)) {
                 zoneSelect.value = savedZoneId;
@@ -126,6 +145,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (searchZoneInput) {
                     searchZoneInput.value = savedZoneId;
                 }
+
+                if (selectedZoneInput){
+                    selectedZoneInput.value = savedZoneId;
+
+                }
+
 
                 zoneSelect.dispatchEvent(new Event('change'));
             }
@@ -397,7 +422,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function isMedicineEnvironmentType(type) {
         return type === 'TEMPERATURE'
             || type === 'HUMIDITY'
-            || type === 'ILLUMINATION';
+            || type === 'ILLUMINANCE';
     }
 
     function getEnvironmentUnit(type) {
@@ -409,7 +434,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return '%';
         }
 
-        if (type === 'ILLUMINATION') {
+        if (type === 'ILLUMINANCE') {
             return 'lx';
         }
 
@@ -425,12 +450,134 @@ document.addEventListener('DOMContentLoaded', () => {
             return '습도';
         }
 
-        if (type === 'ILLUMINATION') {
+        if (type === 'ILLUMINANCE') {
             return '조도';
         }
 
         return '환경 기준';
     }
+
+    function createRangeValidator({
+                                      minId,
+                                      maxId,
+                                      pairMessage,
+                                      rangeMessage
+                                  }) {
+        const minInput = document.getElementById(minId);
+        const maxInput = document.getElementById(maxId);
+
+        function validate() {
+            const minValue = minInput.value.trim();
+            const maxValue = maxInput.value.trim();
+
+            // 이전 검증 메시지 제거
+            minInput.setCustomValidity('');
+            maxInput.setCustomValidity('');
+
+            // 둘 다 비어 있으면 정상
+            if (minValue === '' && maxValue === '') {
+                return true;
+            }
+
+            // 최대값만 입력한 경우 → 최소값에 오류 표시
+            if (minValue === '') {
+                minInput.setCustomValidity(pairMessage);
+                return false;
+            }
+
+            // 최소값만 입력한 경우 → 최대값에 오류 표시
+            if (maxValue === '') {
+                maxInput.setCustomValidity(pairMessage);
+                return false;
+            }
+
+            // 최소값이 최대값보다 큰 경우
+            if (Number(minValue) > Number(maxValue)) {
+                maxInput.setCustomValidity(rangeMessage);
+                return false;
+            }
+
+            return true;
+        }
+
+        minInput.addEventListener('input', validate);
+        maxInput.addEventListener('input', validate);
+
+        validate();
+
+        return validate;
+    }
+
+
+    const environmentValidators = [
+        createRangeValidator({
+            minId: 'min-temperature',
+            maxId: 'max-temperature',
+            pairMessage: '온도 최소값과 최대값 모두 입력해주세요.',
+            rangeMessage: '온도 최소값은 최대값보다 클 수 없습니다.'
+        }),
+
+        createRangeValidator({
+            minId: 'min-humidity',
+            maxId: 'max-humidity',
+            pairMessage: '습도 최소값과 최대값 모두 입력해주세요.',
+            rangeMessage: '습도 최소값은 최대값보다 클 수 없습니다.'
+        }),
+
+        createRangeValidator({
+            minId: 'min-illuminance',
+            maxId: 'max-illuminance',
+            pairMessage: '조도 최소값과 최대값 모두 입력해주세요.',
+            rangeMessage: '조도 최소값은 최대값보다 클 수 없습니다.'
+        })
+    ];
+
+
+    const expirationInput =
+        document.getElementById('expiration-date');
+
+    function validateExpirationDate() {
+        if (!expirationInput) {
+            return true;
+        }
+
+        expirationInput.setCustomValidity('');
+
+        if (expirationInput.value === '') {
+            expirationInput.setCustomValidity(
+                '유통기한을 입력해주세요.'
+            );
+
+            return false;
+        }
+
+        if (
+            expirationInput.min
+            && expirationInput.value < expirationInput.min
+        ) {
+            expirationInput.setCustomValidity(
+                '실제 유통기한은 현재 날짜 이후여야 합니다.'
+            );
+
+            return false;
+        }
+
+        return true;
+    }
+
+    expirationInput?.addEventListener(
+        'input',
+        validateExpirationDate
+    );
+
+    expirationInput?.addEventListener(
+        'change',
+        validateExpirationDate
+    );
+
+
+
+
 
     function toNumber(value) {
         if (value == null || value === '') {
@@ -476,6 +623,9 @@ document.addEventListener('DOMContentLoaded', () => {
         zoneMessage.hidden = true;
     }
 
+
+
+
 // 서버가 Model에 넣어준 기존 저장소 선택값을 페이지 진입 시 복원한다.
     const savedStorageId = storageSelect?.dataset.selectedId;
 
@@ -492,14 +642,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeButton = document.getElementById("closeSummaryButton");
     const confirmButton = document.getElementById("confirmInboundButton");
 
+
+
+
     if (form && modal && openButton && closeButton && confirmButton) {
 
         openButton.addEventListener("click", () => {
 
-            if (!form.checkValidity()) {
-                form.reportValidity();
+            environmentValidators.forEach(validate => validate());
+            validateExpirationDate();
+
+            if (!form.reportValidity()) {
                 return;
             }
+
 
             const productName =
                 document.getElementById("selectedProductName")?.textContent.trim() ?? "";
@@ -513,14 +669,21 @@ document.addEventListener('DOMContentLoaded', () => {
             const lotNumber =
                 form.querySelector("[name='lotNumber']")?.value ?? "";
 
+
             const expirationDate =
-                form.querySelector("[name='expirationDate']")?.value ?? "";
+                form.querySelector("[name='expirationDate']").value ?? "";
 
             const quantity =
                 form.querySelector("[name='quantity']")?.value ?? "";
 
+            const transactionTypeSelect = form.querySelector("[name='transactionType']");
+
+            const transactionType = transactionTypeSelect?.options[transactionTypeSelect.selectedIndex]?.text ?? "";
+
+
             const memo =
                 form.querySelector("[name='memo']")?.value ?? "";
+
 
 
             document.getElementById("summaryProductName").textContent =
@@ -541,10 +704,14 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById("summaryQuantity").textContent =
                 quantity;
 
+            document.getElementById("summaryTransactionType").textContent =
+                transactionType;
 
-
+            document.getElementById("summaryMemo").textContent =
+                memo;
 
             modal.classList.add("show");
+
         });
 
         closeButton.addEventListener("click", () => {
