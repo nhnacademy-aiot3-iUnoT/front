@@ -1,12 +1,11 @@
 package com.nhnacademy.front.inventory.client;
 
 import com.nhnacademy.front.global.client.GatewayClient;
+import com.nhnacademy.front.inventory.dto.request.InboundMedicineRequest;
 import com.nhnacademy.front.inventory.dto.request.MedicineDisposalRequest;
 import com.nhnacademy.front.inventory.dto.request.MedicineOutboundRequest;
 import com.nhnacademy.front.inventory.dto.response.MedicineDisposalTargetResponse;
-import com.nhnacademy.front.global.dto.ApiResponse;
 import com.nhnacademy.front.global.dto.PageResponse;
-import com.nhnacademy.front.inventory.dto.request.InboundMedicineRequest;
 import com.nhnacademy.front.inventory.dto.response.InventoriesResponse;
 import com.nhnacademy.front.inventory.dto.response.InventoryInfoResponse;
 import com.nhnacademy.front.inventory.dto.response.MedicineOutboundTargetResponse;
