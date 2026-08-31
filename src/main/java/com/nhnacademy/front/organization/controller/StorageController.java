@@ -45,7 +45,7 @@ public class StorageController {
         model.addAttribute("storageList", storageList);
         model.addAttribute("canManage", canManage);
 
-        return "/storage/storage-list";
+        return "storage/storage-list";
     }
 
     @GetMapping("/{storage-id}")
@@ -67,6 +67,6 @@ public class StorageController {
         model.addAttribute("stockThresholdList", stockThresholdList);
         model.addAttribute("canManage", canManage);
 
-        return "/storage/storage-detail";
+        return "storage/storage-detail";
     }
 }
