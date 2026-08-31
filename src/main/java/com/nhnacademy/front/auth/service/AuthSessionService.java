@@ -27,6 +27,20 @@ public class AuthSessionService {
         log.info("event=refresh_token_cookie_stored");
     }
 
+    public String renew(HttpServletResponse response, String refreshToken) {
+        LoginResponse tokens = authApiClient.refresh(
+                new RefreshTokenRequest(refreshToken)
+        );
+
+        if (!StringUtils.hasText(tokens.accessToken())
+                || !StringUtils.hasText(tokens.refreshToken())) {
+            throw new IllegalStateException("Token refresh response is incomplete");
+        }
+
+        establish(response, tokens);
+        return tokens.accessToken();
+    }
+
     public void revoke(HttpServletRequest request, HttpServletResponse response) {
         String refreshToken = refreshTokenCookieManager.resolve(request);
 

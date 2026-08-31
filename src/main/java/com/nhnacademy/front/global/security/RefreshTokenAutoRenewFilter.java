@@ -1,8 +1,5 @@
 package com.nhnacademy.front.global.security;
 
-import com.nhnacademy.front.auth.client.AuthApiClient;
-import com.nhnacademy.front.auth.dto.request.RefreshTokenRequest;
-import com.nhnacademy.front.auth.dto.response.LoginResponse;
 import com.nhnacademy.front.auth.service.AuthSessionService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -47,7 +44,6 @@ public class RefreshTokenAutoRenewFilter extends OncePerRequestFilter {
     );
 
     private final JwtDecoder jwtDecoder;
-    private final AuthApiClient authApiClient;
     private final AuthSessionService authSessionService;
     private final Clock clock;
 
@@ -86,19 +82,13 @@ public class RefreshTokenAutoRenewFilter extends OncePerRequestFilter {
         );
 
         try {
-            LoginResponse tokens = authApiClient.refresh(
-                    new RefreshTokenRequest(refreshToken)
+            String refreshedAccessToken = authSessionService.renew(
+                    response,
+                    refreshToken
             );
-
-            if (!StringUtils.hasText(tokens.accessToken())
-                    || !StringUtils.hasText(tokens.refreshToken())) {
-                throw new IllegalStateException("Token refresh response is incomplete");
-            }
-
-            authSessionService.establish(response, tokens);
             request.setAttribute(
                     REFRESHED_ACCESS_TOKEN_ATTRIBUTE,
-                    tokens.accessToken()
+                    refreshedAccessToken
             );
 
             log.info(
@@ -133,6 +123,8 @@ public class RefreshTokenAutoRenewFilter extends OncePerRequestFilter {
 
         String path = request.getServletPath();
         return PUBLIC_PATHS.contains(path)
+                || ("POST".equalsIgnoreCase(request.getMethod())
+                    && "/juso/popup".equals(path))
                 || path.startsWith("/pwd/")
                 || path.startsWith("/css/")
                 || path.startsWith("/js/")

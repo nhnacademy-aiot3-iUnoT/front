@@ -16,6 +16,7 @@ import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.boot.test.system.OutputCaptureExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.BDDMockito.willThrow;
@@ -53,6 +54,33 @@ class AuthSessionServiceTest {
                 .contains("event=refresh_token_cookie_stored")
                 .doesNotContain("access-token")
                 .doesNotContain("refresh-token");
+    }
+
+    @Test
+    void renewCallsAccountStoresRotatedTokensAndReturnsAccessToken() {
+        RefreshTokenRequest refreshRequest = new RefreshTokenRequest("old-refresh-token");
+        LoginResponse tokens = new LoginResponse("new-access-token", "new-refresh-token");
+        given(authApiClient.refresh(refreshRequest)).willReturn(tokens);
+
+        String accessToken = authSessionService.renew(response, "old-refresh-token");
+
+        assertThat(accessToken).isEqualTo("new-access-token");
+        then(accessTokenCookieManager).should().add(response, "new-access-token");
+        then(refreshTokenCookieManager).should().add(response, "new-refresh-token");
+    }
+
+    @Test
+    void renewRejectsIncompleteResponseBeforeWritingCookies() {
+        RefreshTokenRequest refreshRequest = new RefreshTokenRequest("old-refresh-token");
+        given(authApiClient.refresh(refreshRequest))
+                .willReturn(new LoginResponse("new-access-token", ""));
+
+        assertThatThrownBy(() -> authSessionService.renew(response, "old-refresh-token"))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("Token refresh response is incomplete");
+
+        then(accessTokenCookieManager).shouldHaveNoInteractions();
+        then(refreshTokenCookieManager).shouldHaveNoInteractions();
     }
 
     @Test

@@ -1,7 +1,6 @@
 package com.nhnacademy.front.global.config;
 
 import com.nhnacademy.front.account.dto.AccountStatus;
-import com.nhnacademy.front.auth.client.AuthApiClient;
 import com.nhnacademy.front.auth.service.AuthSessionService;
 import com.nhnacademy.front.global.security.AccessTokenCookieManager;
 import com.nhnacademy.front.global.security.CookieAuthenticationEntryPoint;
@@ -215,13 +214,11 @@ public class SecurityConfig {
     @Bean
     public RefreshTokenAutoRenewFilter refreshTokenAutoRenewFilter(
             JwtDecoder jwtDecoder,
-            AuthApiClient authApiClient,
             AuthSessionService authSessionService,
             Clock clock
     ) {
         return new RefreshTokenAutoRenewFilter(
                 jwtDecoder,
-                authApiClient,
                 authSessionService,
                 clock
         );

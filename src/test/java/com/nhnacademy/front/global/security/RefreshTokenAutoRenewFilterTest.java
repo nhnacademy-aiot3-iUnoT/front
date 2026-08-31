@@ -1,8 +1,5 @@
 package com.nhnacademy.front.global.security;
 
-import com.nhnacademy.front.auth.client.AuthApiClient;
-import com.nhnacademy.front.auth.dto.request.RefreshTokenRequest;
-import com.nhnacademy.front.auth.dto.response.LoginResponse;
 import com.nhnacademy.front.auth.service.AuthSessionService;
 import jakarta.servlet.FilterChain;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,6 +13,7 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.web.client.ResourceAccessException;
 
 import java.time.Clock;
 import java.time.Instant;
@@ -25,6 +23,9 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.never;
 
 @ExtendWith({MockitoExtension.class, OutputCaptureExtension.class})
 class RefreshTokenAutoRenewFilterTest {
@@ -33,9 +34,6 @@ class RefreshTokenAutoRenewFilterTest {
 
     @Mock
     private JwtDecoder jwtDecoder;
-
-    @Mock
-    private AuthApiClient authApiClient;
 
     @Mock
     private AuthSessionService authSessionService;
@@ -49,7 +47,6 @@ class RefreshTokenAutoRenewFilterTest {
     void setUp() {
         filter = new RefreshTokenAutoRenewFilter(
                 jwtDecoder,
-                authApiClient,
                 authSessionService,
                 Clock.fixed(NOW, ZoneOffset.UTC)
         );
@@ -62,17 +59,16 @@ class RefreshTokenAutoRenewFilterTest {
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/");
         request.setServletPath("/");
         MockHttpServletResponse response = new MockHttpServletResponse();
-        LoginResponse tokens = new LoginResponse("new-access", "new-refresh");
         given(authSessionService.resolveRefreshToken(request)).willReturn("old-refresh");
-        given(authApiClient.refresh(new RefreshTokenRequest("old-refresh")))
-                .willReturn(tokens);
+        given(authSessionService.renew(response, "old-refresh"))
+                .willReturn("new-access");
 
         filter.doFilter(request, response, filterChain);
 
         assertThat(request.getAttribute(
                 RefreshTokenAutoRenewFilter.REFRESHED_ACCESS_TOKEN_ATTRIBUTE
         )).isEqualTo("new-access");
-        then(authSessionService).should().establish(response, tokens);
+        then(authSessionService).should().renew(response, "old-refresh");
         then(filterChain).should().doFilter(request, response);
         assertThat(output)
                 .contains(
@@ -84,7 +80,6 @@ class RefreshTokenAutoRenewFilterTest {
                                 + "accessTokenState=MISSING method=GET path=/"
                 )
                 .doesNotContain("old-refresh")
-                .doesNotContain("new-refresh")
                 .doesNotContain("new-access");
     }
 
@@ -98,7 +93,7 @@ class RefreshTokenAutoRenewFilterTest {
 
         filter.doFilter(request, response, filterChain);
 
-        then(authApiClient).shouldHaveNoInteractions();
+        then(authSessionService).should(never()).renew(any(), anyString());
         then(filterChain).should().doFilter(request, response);
     }
 
@@ -110,8 +105,8 @@ class RefreshTokenAutoRenewFilterTest {
         request.setServletPath("/");
         MockHttpServletResponse response = new MockHttpServletResponse();
         given(authSessionService.resolveRefreshToken(request)).willReturn("old-refresh");
-        given(authApiClient.refresh(new RefreshTokenRequest("old-refresh")))
-                .willThrow(new IllegalStateException("refresh failed"));
+        given(authSessionService.renew(response, "old-refresh"))
+                .willThrow(new ResourceAccessException("gateway unavailable"));
 
         filter.doFilter(request, response, filterChain);
 
@@ -123,7 +118,7 @@ class RefreshTokenAutoRenewFilterTest {
                 .contains(
                         "event=refresh_token_rotation_failed "
                                 + "accessTokenState=MISSING method=GET path=/ "
-                                + "exceptionType=IllegalStateException"
+                                + "exceptionType=ResourceAccessException"
                 )
                 .doesNotContain("old-refresh");
     }
@@ -131,18 +126,32 @@ class RefreshTokenAutoRenewFilterTest {
     @Test
     void expiringAccessRemainsUsableWhenProactiveRefreshFails() throws Exception {
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/");
+        request.setServletPath("/");
         MockHttpServletResponse response = new MockHttpServletResponse();
         given(authSessionService.resolveAccessToken(request)).willReturn("access-token");
         given(jwtDecoder.decode("access-token")).willReturn(jwt(NOW.plusSeconds(10)));
         given(authSessionService.resolveRefreshToken(request)).willReturn("old-refresh");
-        given(authApiClient.refresh(new RefreshTokenRequest("old-refresh")))
-                .willThrow(new IllegalStateException("refresh failed"));
+        given(authSessionService.renew(response, "old-refresh"))
+                .willThrow(new ResourceAccessException("gateway unavailable"));
 
         filter.doFilter(request, response, filterChain);
 
         assertThat(request.getAttribute(
                 RefreshTokenAutoRenewFilter.REFRESH_FAILED_ATTRIBUTE
         )).isNull();
+        assertThat(response.getStatus()).isEqualTo(200);
+        then(filterChain).should().doFilter(request, response);
+    }
+
+    @Test
+    void publicPostPathSkipsRefreshPolicy() throws Exception {
+        MockHttpServletRequest request = new MockHttpServletRequest("POST", "/juso/popup");
+        request.setServletPath("/juso/popup");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        filter.doFilter(request, response, filterChain);
+
+        then(authSessionService).shouldHaveNoInteractions();
         then(filterChain).should().doFilter(request, response);
     }
 
