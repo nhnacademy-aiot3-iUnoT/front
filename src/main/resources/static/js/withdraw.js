@@ -8,9 +8,10 @@ if (!withdrawForm || !passwordInput || !withdrawModalElement || !confirmButton) 
 }
 
 function openWithdrawModal() {
+    clearErrors(withdrawForm);
     passwordInput.setCustomValidity("");
 
-    if (!withdrawForm.reportValidity()) {
+    if (!validateWithdrawPassword() || !withdrawForm.reportValidity()) {
         passwordInput.focus();
         return;
     }
@@ -18,6 +19,24 @@ function openWithdrawModal() {
     bootstrap.Modal
         .getOrCreateInstance(withdrawModalElement)
         .show();
+}
+
+function validateWithdrawPassword() {
+    let message = "";
+
+    if (!isRequired(passwordInput.value)) {
+        message = "비밀번호를 입력해주세요.";
+    } else if (passwordInput.value.length < 6 || !isMaxLength(passwordInput.value, 64)) {
+        message = "비밀번호는 6자 이상 64자 이하여야 합니다.";
+    }
+
+    if (message !== "") {
+        passwordInput.setCustomValidity(message);
+        setError(passwordInput, message);
+        return false;
+    }
+
+    return true;
 }
 
 async function submitWithdraw() {
@@ -68,7 +87,8 @@ async function submitRequest(password) {
 
 passwordInput.addEventListener("input", () => {
     clearErrors(withdrawForm);
-    withdrawForm.querySelector(".invalid-feedback").textContent = "비밀번호를 입력해주세요.";
+    withdrawForm.querySelector(".invalid-feedback").textContent =
+        "비밀번호는 6자 이상 64자 이하여야 합니다.";
     passwordInput.setCustomValidity("");
 });
 

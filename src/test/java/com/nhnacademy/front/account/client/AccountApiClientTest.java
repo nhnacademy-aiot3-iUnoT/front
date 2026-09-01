@@ -3,6 +3,7 @@ package com.nhnacademy.front.account.client;
 import com.nhnacademy.front.account.dto.AccountRole;
 import com.nhnacademy.front.account.dto.AccountStatus;
 import com.nhnacademy.front.account.dto.request.ReactivationConfirmRequest;
+import com.nhnacademy.front.account.dto.request.WithdrawAccountRequest;
 import com.nhnacademy.front.account.dto.response.AccountResponse;
 import com.nhnacademy.front.global.client.GatewayClient;
 import org.junit.jupiter.api.Test;
@@ -64,5 +65,14 @@ class AccountApiClientTest {
                 request,
                 AccountResponse.class
         );
+    }
+
+    @Test
+    void withdrawSendsPasswordInDeleteBody() {
+        WithdrawAccountRequest request = new WithdrawAccountRequest("password");
+
+        accountApiClient.withdraw(request);
+
+        then(gatewayClient).should().delete("/api/accounts/me", request);
     }
 }

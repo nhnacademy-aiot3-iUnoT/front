@@ -50,8 +50,10 @@
                                    name="password"
                                    placeholder="비밀번호를 입력해주세요."
                                    autocomplete="current-password"
+                                   minlength="6"
+                                   maxlength="64"
                                    required>
-                            <div class="invalid-feedback">비밀번호를 입력해주세요.</div>
+                            <div class="invalid-feedback">비밀번호는 6자 이상 64자 이하여야 합니다.</div>
                         </div>
                     </div>
 
@@ -88,6 +90,7 @@
 </div>
 
 <th:block layout:fragment="script">
+    <script th:src="@{/js/common/validation.js}"></script>
     <script th:src="@{/js/common/form.js}"></script>
     <script th:src="@{/js/withdraw.js}"></script>
 </th:block>

@@ -30,7 +30,10 @@
         <div class="page-content-panel">
             <div class="row row-cards">
                 <div class="col-lg-7">
-                    <form th:action="@{/mypage}" th:method="put" th:object="${nameRequest}">
+                    <form id="account-info-form"
+                          th:action="@{/mypage}"
+                          th:method="put"
+                          th:object="${nameRequest}">
                         <div class="card mb-4">
                             <div class="card-header plain-card-title">
                                 <h2 class="card-title">기본 정보</h2>
@@ -42,7 +45,7 @@
                                 </div>
                                 <div class="row g-0 border-bottom px-3 py-3 align-items-center">
                                     <label class="col-sm-3 text-muted mb-2 mb-sm-0" for="name">이름</label>
-                                    <div class="col-sm-9">
+                                    <div class="col-sm-9 mb-3 mb-sm-0">
                                         <input type="text"
                                                id="name"
                                                class="form-control"
@@ -120,5 +123,11 @@
         </div>
     </div>
 </div>
+
+<th:block layout:fragment="script">
+    <script th:src="@{/js/common/validation.js}"></script>
+    <script th:src="@{/js/common/form.js}"></script>
+    <script th:src="@{/js/account-info.js}"></script>
+</th:block>
 </body>
 </html>

@@ -36,8 +36,8 @@ public class AccountApiClient {
         );
     }
 
-    public void withdraw(@Valid WithdrawAccountRequest request) {
-        backendApiClient.delete(ACCOUNT_SERVICE + "/me");
+    public void withdraw(WithdrawAccountRequest request) {
+        backendApiClient.delete(ACCOUNT_SERVICE + "/me", request);
     }
 
     public UpdateAccountResponse changeName(@Valid UpdateAccountNameRequest request) {
