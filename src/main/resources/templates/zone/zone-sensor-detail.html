@@ -23,7 +23,7 @@
             </div>
             <div class="col-auto d-flex gap-2" th:if="${canManage}">
                 <button type="button" onclick="openUpdateModal()" class="btn btn-outline-secondary">수정</button>
-                <button type="button" th:onclick="'deleteZoneSensor(' + ${sensor.zoneId} + ', ' + ${sensor.zoneSensorId} + ')'" class="btn btn-outline-danger">삭제</button>
+                <button type="button" th:onclick="'deleteZoneSensor(' + ${sensor.storageId()} + ', ' + ${sensor.zoneId} + ', ' + ${sensor.zoneSensorId} + ')'" class="btn btn-outline-danger">삭제</button>
             </div>
         </div></div>
 

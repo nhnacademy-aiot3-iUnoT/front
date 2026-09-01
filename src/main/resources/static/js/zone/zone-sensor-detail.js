@@ -67,7 +67,7 @@ function updateZoneSensor() {
 }
 
 // 센서 삭제 API 호출
-function deleteZoneSensor(zoneId, sensorId) {
+function deleteZoneSensor(storageId, zoneId, sensorId) {
     if (!confirm('정말 이 센서를 삭제하시겠습니까?')) {
         return;
     }
@@ -78,7 +78,7 @@ function deleteZoneSensor(zoneId, sensorId) {
         .then(response => {
             if (response.ok || response.status === 204) {
                 alert('센서가 삭제되었습니다.');
-                location.href = `/zones/${zoneId}`;
+                location.href = `/storages/${storageId}/zones/${zoneId}`;
             } else {
                 return response.json().then(err => {
                     alert(err.message || '센서 삭제에 실패했습니다.');
