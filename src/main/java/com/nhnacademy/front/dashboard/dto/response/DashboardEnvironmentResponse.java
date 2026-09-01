@@ -6,7 +6,6 @@ import com.nhnacademy.front.organization.dto.StorageStatus;
 import com.nhnacademy.front.organization.dto.ZoneStatus;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -17,7 +16,6 @@ public record DashboardEnvironmentResponse(
         Long storageId,
         String storageName,
         StorageStatus storageStatus,
-        LocalDate summaryDate,
         List<ZoneEnvironmentResponse> zones
 ) {
 
@@ -82,20 +80,10 @@ public record DashboardEnvironmentResponse(
             BigDecimal thresholdMax,
 
             // 룰엔진의 현재 측정값. 측정 기록이 없으면 null
-            Double currentValue,
-
-            // 현재값이 없을 때 대신 보여줄 어제 평균
-            Double avgValue,
-
-            boolean sensorRegistered
+            Double currentValue
     ) {
-        /** 현재값이 없으면 어제 평균이라도 보여준다. */
-        public Double displayValue() {
-            return currentValue != null ? currentValue : avgValue;
-        }
-
         public boolean hasValue() {
-            return displayValue() != null;
+            return currentValue != null;
         }
 
         public boolean hasThreshold() {
@@ -121,7 +109,7 @@ public record DashboardEnvironmentResponse(
         }
 
         public String valueText() {
-            Double value = displayValue();
+            Double value = currentValue;
 
             if (value == null) {
                 return "—";
@@ -147,7 +135,7 @@ public record DashboardEnvironmentResponse(
 
         /** 임계 범위 안에서 현재값의 위치(%). 색으로 판정하지 않고 위치만 나타낸다. */
         public int gaugePercent() {
-            Double value = displayValue();
+            Double value = currentValue;
 
             if (value == null || thresholdMin == null || thresholdMax == null) {
                 return 0;

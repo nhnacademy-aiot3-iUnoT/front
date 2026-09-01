@@ -40,18 +40,9 @@
                                th:href="@{/(departmentId=0)}">조직 전체 (모든 부서 합산)</a>
 
                             <div class="dropdown-divider"
-                                 th:if="${departments.orgAdmin and !#lists.isEmpty(departments.myDepartments)}"></div>
+                                 th:if="${departments.orgAdmin and !#lists.isEmpty(departments.departments)}"></div>
 
-                            <h6 class="dropdown-header" th:if="${!#lists.isEmpty(departments.myDepartments)}">내 소속 부서</h6>
-                            <a class="dropdown-item" th:each="option : ${departments.myDepartments}"
-                               th:classappend="${option.departmentId == selectedDepartmentId} ? 'active' : ''"
-                               th:href="@{/(departmentId=${option.departmentId})}"
-                               th:text="${option.name}">부서명</a>
-
-                            <h6 class="dropdown-header"
-                                th:if="${departments.orgAdmin and !#lists.isEmpty(departments.otherDepartments)}">그 외 부서 (관리자)</h6>
-                            <a class="dropdown-item"
-                               th:each="option : ${departments.otherDepartments}"
+                            <a class="dropdown-item" th:each="option : ${departments.options}"
                                th:classappend="${option.departmentId == selectedDepartmentId} ? 'active' : ''"
                                th:href="@{/(departmentId=${option.departmentId})}"
                                th:text="${option.name}">부서명</a>
@@ -125,8 +116,6 @@
                 <div class="d-flex flex-wrap gap-3 text-secondary small">
                     <span>선택 저장소 <strong class="text-body" th:text="${environment.storageName}">저장소명</strong></span>
                     <span>상태 <strong class="text-body" th:text="${environment.storageStatus.ko}">활성화</strong></span>
-                    <span th:if="${environment.summaryDate != null}">환경 집계일
-                        <strong class="text-body" th:text="${environment.summaryDate}">-</strong></span>
                 </div>
             </div>
 
@@ -164,8 +153,7 @@
                                                 <strong th:classappend="${sensor.hasValue} ? '' : 'text-secondary'"
                                                         th:text="${sensor.valueText}">-</strong>
                                                 <span class="text-secondary small"
-                                                      th:if="${!sensor.hasValue}"
-                                                      th:text="${sensor.sensorRegistered} ? '측정값 없음' : '센서 미등록'">측정값 없음</span>
+                                                      th:if="${!sensor.hasValue}">측정값 없음</span>
                                                 <!-- 값의 등급을 화면에서 판정하지 않는다. 구역 배지가 서버 판정을 보여준다. -->
                                                 <span class="text-secondary small"
                                                       th:if="${sensor.hasValue}">실시간</span>
