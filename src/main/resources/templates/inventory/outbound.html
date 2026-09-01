@@ -5,16 +5,18 @@
       layout:decorate="~{layout/main-layout}">
 <head>
     <title>의약품 출고 | iUnoT</title>
-    <link rel="stylesheet" th:href="@{/css/outbound-design.css}">
+    <link rel="stylesheet" th:href="@{/css/inventory-design.css}">
 </head>
 <body>
 <div layout:fragment="content">
-    <main class="outbound-page">
-        <div class="outbound-header">
+    <main class="inventory-page detail-page">
+        <div class="detail-heading">
             <div>
                 <p class="breadcrumb">재고 관리 <span>/</span> 의약품 출고</p>
                 <h1>의약품 출고</h1>
-                <p>저장소의 의약품을 선택하고 출고 내역을 등록합니다.</p>
+                <p class="description">
+                    저장소의 의약품을 선택하고 출고 내역을 등록합니다.
+                </p>
             </div>
             <a class="btn btn-outline-secondary"
                th:href="@{/inventories}">
@@ -170,8 +172,6 @@
                 </div>
             </form>
         </section>
-        </form>
-        </section>
 
         <div class="modal modal-blur fade"
              id="outbound-confirm-modal"
@@ -243,8 +243,6 @@
             </div>
         </div>
 
-    </main>
-</div>
     </main>
 </div>
 <th:block layout:fragment="script">

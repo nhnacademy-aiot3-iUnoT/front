@@ -18,13 +18,13 @@
 
 .outbound-header p {
     margin-bottom: 0;
-    color: var(--tblr-secondary-color);
+    color: var(--ink-soft);
 }
 
 .breadcrumb {
     margin: 0;
     font-size: 13px;
-    color: var(--tblr-secondary-color);
+    color: var(--ink-soft);
 }
 
 .breadcrumb span {
@@ -40,9 +40,9 @@
     flex-direction: column;
     gap: 4px;
     padding: 14px 16px;
-    border: 1px solid var(--tblr-border-color);
+    border: 1px solid var(--line);
     border-radius: 8px;
-    background: var(--tblr-bg-surface-secondary);
+    background: var(--canvas);
 }
 
 .fixed-value strong {
@@ -50,7 +50,7 @@
 }
 
 .fixed-value small {
-    color: var(--tblr-secondary-color);
+    color: var(--ink-soft);
 }
 
 .stock-hint {
@@ -60,11 +60,11 @@
     margin-bottom: 20px;
     padding: 14px 16px;
     border-radius: 8px;
-    background: rgba(var(--tblr-primary-rgb), 0.08);
+    background: var(--teal-soft);
 }
 
 .stock-hint strong {
-    color: var(--tblr-primary);
+    color: var(--teal);
     font-size: 18px;
 }
 
