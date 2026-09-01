@@ -15,12 +15,16 @@
     <div class="table-container">
         <div class="header-top">
             <h2 class="main-title">
-                <span class="path-prefix" th:text="${sensor.organizationName + ' > ' + sensor.storageName + ' > ' + sensor.zoneName + ' > '}">조직이름 &gt; 저장소이름 &gt; 구역이름 &gt; </span>
+                <span class="path-prefix"
+                      th:text="${sensor.organizationName + ' > ' + sensor.storageName + ' > ' + sensor.zoneName + ' > '}">조직이름 &gt; 저장소이름 &gt; 구역이름 &gt; </span>
                 <span th:text="${sensor.name}">센서 이름</span>
             </h2>
             <div class="action-buttons" th:if="${canManage}">
                 <button type="button" onclick="openUpdateModal()" class="btn-warning">수정</button>
-                <button type="button" th:onclick="'deleteZoneSensor(' + ${sensor.zoneId} + ', ' + ${sensor.zoneSensorId} + ')'" class="btn-danger">삭제</button>
+                <button type="button"
+                        th:onclick="'deleteZoneSensor(' + ${sensor.storageId} + ', ' + ${sensor.zoneId} + ', ' + ${sensor.zoneSensorId} + ')'"
+                        class="btn-danger">삭제
+                </button>
             </div>
         </div>
 
@@ -29,13 +33,15 @@
         <div class="info-box">
             <p><strong>센서 ID:</strong> <span th:text="${sensor.zoneSensorId}">1</span></p>
             <p><strong>센서 이름:</strong> <span th:text="${sensor.name}">센서 이름</span></p>
-            <p><strong>Device EUI:</strong> <span class="device-eui" th:text="${sensor.deviceEui}">00124B00...</span></p>
+            <p><strong>Device EUI:</strong> <span class="device-eui" th:text="${sensor.deviceEui}">00124B00...</span>
+            </p>
 
             <p><strong>설명:</strong></p>
             <div class="desc-box" th:text="${sensor.description()}">설명 내용</div>
         </div>
 
-        <a th:href="@{/storages/{storageId}/zones/{zoneId}(storageId=${sensor.storageId}, zoneId=${sensor.zoneId})}" class="btn-back">← 구역 상세로 돌아가기</a>
+        <a th:href="@{/storages/{storageId}/zones/{zoneId}(storageId=${sensor.storageId}, zoneId=${sensor.zoneId})}"
+           class="btn-back">← 구역 상세로 돌아가기</a>
     </div>
 
     <!-- 센서 수정 모달 박스 -->
@@ -51,7 +57,8 @@
             <input id="edit-name" type="text" th:value="${sensor.name}" placeholder="센서 이름 (최대 50자)" maxlength="50">
 
             <label for="edit-description">설명</label>
-            <textarea id="edit-description" th:text="${sensor.description}" placeholder="설명 (선택, 최대 255자)" maxlength="255"></textarea>
+            <textarea id="edit-description" th:text="${sensor.description}" placeholder="설명 (선택, 최대 255자)"
+                      maxlength="255"></textarea>
 
             <div class="modal-actions">
                 <button type="button" onclick="closeUpdateModal()">취소</button>
