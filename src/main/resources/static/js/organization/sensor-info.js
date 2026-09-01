@@ -99,14 +99,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const items = groupedHistory.get(type) || [];
         if (!items.length || typeof Chart === "undefined") {
-            empty.style.display = "flex";
-            canvas.style.display = "none";
+            empty.hidden = false;
+            canvas.hidden = true;
             metric.hidden = true;
             return;
         }
 
-        empty.style.display = "none";
-        canvas.style.display = "block";
+        empty.hidden = true;
+        canvas.hidden = false;
         metric.hidden = false;
 
         const unit = displayUnit(items[items.length - 1].unit);
@@ -119,7 +119,7 @@ document.addEventListener("DOMContentLoaded", () => {
         change.textContent = Math.abs(difference) < 0.05
             ? "변화 없음"
             : `${difference > 0 ? "+" : ""}${formatSensorValue(difference)} ${unit}`;
-        change.className = `chart-metric-change ${difference > 0 ? "text-red" : difference < 0 ? "text-blue" : "text-secondary"}`;
+        change.className = `small fw-semibold ${difference > 0 ? "text-red" : difference < 0 ? "text-blue" : "text-secondary"}`;
 
         const styles = getComputedStyle(document.documentElement);
 
@@ -132,14 +132,14 @@ document.addEventListener("DOMContentLoaded", () => {
         const category = sensorCategory(type);
 
         const sensorColors = {
-            temperature: styles.getPropertyValue("--sensor-temperature").trim(),
-            humidity: styles.getPropertyValue("--sensor-humidity").trim(),
-            light: styles.getPropertyValue("--sensor-light").trim(),
-            default: styles.getPropertyValue("--sensor-default").trim()
+            temperature: styles.getPropertyValue("--danger").trim() || "#b54742",
+            humidity: styles.getPropertyValue("--tblr-blue").trim() || "#206bc4",
+            light: styles.getPropertyValue("--warning").trim() || "#94630a",
+            default: styles.getPropertyValue("--teal").trim() || "#176f60"
         };
 
         const primaryColor =
-            sensorColors[category] || sensorColors.default || "#0ca678";
+            sensorColors[category] || sensorColors.default;
 
         chart = new Chart(canvas, {
             type: "line",
@@ -247,9 +247,9 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         doorHistoryListEl.innerHTML = pageEvents.map((event) => `
-            <div class="door-history-item">
-                <i class="ti ti-door"></i>
-                <span>${formatDateTime(event.start)}</span>
+            <div class="list-group-item d-flex align-items-center gap-2 px-0">
+                <i class="ti ti-door text-secondary"></i>
+                <span class="fw-semibold">${formatDateTime(event.start)}</span>
                 ${event.end
             ? `<span class="text-secondary"> ~ ${formatDateTime(event.end)}</span>`
             : `<span class="badge bg-red-lt ms-1">열림 중</span>`}
