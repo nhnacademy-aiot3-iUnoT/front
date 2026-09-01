@@ -6,6 +6,7 @@
 <head>
     <meta charset="UTF-8">
     <title th:text="|${deviceEui} 가상 센서 정보|">가상 센서 정보</title>
+    <link rel="stylesheet" th:href="@{/css/status.css}">
 </head>
 <body>
 <main layout:fragment="content">
@@ -24,18 +25,21 @@
         <div class="row align-items-center">
             <div class="col">
                 <div class="d-flex align-items-center gap-2 mb-2">
-                    <span class="badge bg-green-lt" th:if="${virtualSensor.registered and virtualSensor.active}">
+                    <span class="badge status-badge status-active"
+                          th:if="${virtualSensor.registered and virtualSensor.active}">
                         <span class="status-dot status-dot-animated bg-green me-1"></span>활성화
                     </span>
 
-                    <span class="badge bg-secondary-lt" th:if="${virtualSensor.registered and !virtualSensor.active}">
+                    <span class="badge status-badge status-inactive"
+                          th:if="${virtualSensor.registered and !virtualSensor.active}">
                         <span class="status-dot bg-secondary me-1"></span>비활성화
                     </span>
 
-                    <span class="badge bg-blue-lt" th:if="${virtualSensor.registeredToZone}"
+                    <span class="badge status-badge status-normal" th:if="${virtualSensor.registeredToZone}"
                           th:text="|Zone ${virtualSensor.zoneId} 등록됨|">구역 등록됨</span>
 
-                    <span class="badge bg-orange-lt" th:if="${virtualSensor.registered and !virtualSensor.registeredToZone}">
+                    <span class="badge status-badge status-warning"
+                          th:if="${virtualSensor.registered and !virtualSensor.registeredToZone}">
                         구역 미등록
                     </span>
                 </div>

@@ -53,6 +53,10 @@ public class VirtualSensorController {
     @GetMapping("/create")
     public String showCreateForm(Model model) {
         model.addAttribute("edit", false);
+        model.addAttribute(
+                "virtualSensorRequest",
+                new VirtualSensorCreateRequest(null, 60L, null)
+        );
 
         return FORM_VIEW;
     }
@@ -62,7 +66,7 @@ public class VirtualSensorController {
      */
     @PostMapping
     public String createVirtualSensor(
-            @Valid @ModelAttribute VirtualSensorCreateRequest request,
+            @Valid @ModelAttribute("virtualSensorRequest") VirtualSensorCreateRequest request,
             BindingResult result,
             Model model
     ) {
@@ -113,6 +117,13 @@ public class VirtualSensorController {
         model.addAttribute("edit", true);
         model.addAttribute("deviceEui", deviceEui);
         model.addAttribute("virtualSensor", virtualSensor);
+        model.addAttribute(
+                "virtualSensorRequest",
+                new VirtualSensorUpdateRequest(
+                        virtualSensor.measurementIntervalSeconds(),
+                        virtualSensor.virtualSensorValues()
+                )
+        );
 
         return FORM_VIEW;
     }
@@ -123,7 +134,7 @@ public class VirtualSensorController {
     @PutMapping("/{device-eui}")
     public String updateVirtualSensor(
             @PathVariable("device-eui") String deviceEui,
-            @Valid @ModelAttribute VirtualSensorUpdateRequest request,
+            @Valid @ModelAttribute("virtualSensorRequest") VirtualSensorUpdateRequest request,
             BindingResult result,
             Model model
     ) {
