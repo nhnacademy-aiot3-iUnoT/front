@@ -69,10 +69,10 @@
                                    : sensor.measurementIntervalSeconds + '초'}">-</td>
 
                     <td>
-                        <span class="badge bg-blue-lt" th:if="${sensor.registeredToZone}"
+                        <span class="badge status-badge status-normal" th:if="${sensor.registeredToZone}"
                               th:text="|Zone ${sensor.zoneId}|">Zone</span>
 
-                        <span class="badge bg-orange-lt" th:if="${!sensor.registeredToZone}">
+                        <span class="badge status-badge status-warning" th:if="${!sensor.registeredToZone}">
                             미등록
                         </span>
                     </td>
