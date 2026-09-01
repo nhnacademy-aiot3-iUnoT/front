@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main-layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>대시보드 - iUnoT</title>
+    <link rel="stylesheet" th:href="@{/css/status.css}">
+</head>
+<body>
+<div layout:fragment="content">
+
+    <!-- 페이지 헤더 : 조직명 · 부서명 -->
+    <div class="page-header mt-3">
+        <div class="row align-items-center">
+            <div class="col">
+                <!-- 조직명 -->
+                <div class="d-flex align-items-center flex-wrap gap-2">
+                    <h1 class="page-title h1 mb-0" th:text="${organizationName}">조직명</h1>
+                    <span class="badge status-badge status-active"
+                          th:if="${departments != null and departments.orgAdmin}">조직 관리자</span>
+                </div>
+
+                <!-- 부서명 -->
+                <div class="d-flex align-items-center flex-wrap gap-3 mt-2">
+                    <div class="h2 mb-0"
+                         th:text="${orgWide} ? '조직 전체'
+                                  : (${selectedDepartmentName} ?: '부서 종합 현황')">부서명</div>
+
+                    <!-- 부서 전환 -->
+                    <div class="dropdown" th:if="${departments != null}">
+                        <button type="button" class="btn btn-outline-secondary dropdown-toggle"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="ti ti-switch-horizontal me-1"></i>부서 전환
+                        </button>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" th:if="${departments.orgAdmin}"
+                               th:classappend="${orgWide} ? 'active' : ''"
+                               th:href="@{/(departmentId=0)}">조직 전체 (모든 부서 합산)</a>
+
+                            <div class="dropdown-divider"
+                                 th:if="${departments.orgAdmin and !#lists.isEmpty(departments.myDepartments)}"></div>
+
+                            <h6 class="dropdown-header" th:if="${!#lists.isEmpty(departments.myDepartments)}">내 소속 부서</h6>
+                            <a class="dropdown-item" th:each="option : ${departments.myDepartments}"
+                               th:classappend="${option.departmentId == selectedDepartmentId} ? 'active' : ''"
+                               th:href="@{/(departmentId=${option.departmentId})}"
+                               th:text="${option.name}">부서명</a>
+
+                            <h6 class="dropdown-header"
+                                th:if="${departments.orgAdmin and !#lists.isEmpty(departments.otherDepartments)}">그 외 부서 (관리자)</h6>
+                            <a class="dropdown-item"
+                               th:each="option : ${departments.otherDepartments}"
+                               th:classappend="${option.departmentId == selectedDepartmentId} ? 'active' : ''"
+                               th:href="@{/(departmentId=${option.departmentId})}"
+                               th:text="${option.name}">부서명</a>
+                        </div>
+                    </div>
+
+                    <span class="badge bg-green-lt" th:if="${selectedDepartmentId != null}"
+                          th:text="'담당 저장소 ' + ${storageCount} + '곳'">담당 저장소</span>
+                    <span class="badge bg-green-lt" th:if="${orgWide}"
+                          th:text="'조직 전체 저장소 ' + ${storageCount} + '곳'">조직 전체 저장소</span>
+                </div>
+
+                <div class="text-secondary mt-2">
+                    <strong>부서 종합 현황</strong> ·
+                    <span th:if="${orgWide}">조직 전체 저장소의 입·출고와 유통기한, 환경 상태를 합산해 보여줍니다.</span>
+                    <span th:unless="${orgWide}">이 부서에 배정된 저장소의 입·출고와 유통기한, 환경 상태입니다.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 조회 범위가 없을 때 -->
+    <div class="card" th:unless="${hasScope}">
+        <div class="empty">
+            <div class="empty-icon"><i class="ti ti-building-community icon"></i></div>
+            <p class="empty-title">표시할 부서가 없습니다</p>
+            <p class="empty-subtitle text-secondary">
+                조직에 소속되어 있는지, 부서가 배정되어 있는지 확인해 주세요.
+            </p>
+        </div>
+    </div>
+
+    <th:block th:if="${hasScope}">
+
+        <!-- KPI : 네 장이 같은 모양이라 조각 하나를 재사용한다 -->
+        <div class="row row-deck row-cards">
+            <th:block th:replace="~{fragments/dashboard-kpi :: kpi('총 입고', 'ti-arrow-down', 'green',
+                                          ${summary?.inbound}, '개', '건', false)}"></th:block>
+            <th:block th:replace="~{fragments/dashboard-kpi :: kpi('총 출고', 'ti-arrow-up', 'azure',
+                                          ${summary?.outbound}, '개', '건', false)}"></th:block>
+            <th:block th:replace="~{fragments/dashboard-kpi :: kpi('유통기한 임박', 'ti-clock-hour-4', 'yellow',
+                                          ${summary?.expiring}, '품목', null, true)}"></th:block>
+            <th:block th:replace="~{fragments/dashboard-kpi :: kpi('환경 이탈 알림', 'ti-alert-triangle', 'red',
+                                          ${summary?.envAlert}, '건', '미확인', true)}"></th:block>
+        </div>
+
+        <!-- 저장소 환경 현황 -->
+        <div class="card mt-3">
+            <div class="card-header">
+                <h3 class="card-title">저장소 환경 현황</h3>
+                <div class="card-actions d-flex align-items-center flex-wrap gap-2">
+                    <span class="badge bg-green-lt" th:text="'정상 ' + ${normalZoneCount ?: 0}">정상 0</span>
+                    <span class="badge bg-yellow-lt" th:text="'경고 ' + ${warningZoneCount ?: 0}">경고 0</span>
+                    <span class="badge bg-red-lt" th:text="'위험 ' + ${dangerZoneCount ?: 0}">위험 0</span>
+
+                    <form th:action="@{/}" method="get">
+                        <input type="hidden" name="departmentId"
+                               th:value="${orgWide} ? 0 : ${selectedDepartmentId}">
+                        <select name="storageId" class="form-select w-auto"
+                                onchange="this.form.submit()" th:if="${!#lists.isEmpty(storages)}">
+                            <option th:each="storage : ${storages}"
+                                    th:value="${storage.storageId}"
+                                    th:text="${storage.name}"
+                                    th:selected="${storage.storageId == selectedStorageId}">저장소명</option>
+                        </select>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card-body border-bottom py-2" th:if="${environment != null}">
+                <div class="d-flex flex-wrap gap-3 text-secondary small">
+                    <span>선택 저장소 <strong class="text-body" th:text="${environment.storageName}">저장소명</strong></span>
+                    <span>상태 <strong class="text-body" th:text="${environment.storageStatus.ko}">활성화</strong></span>
+                    <span th:if="${environment.summaryDate != null}">환경 집계일
+                        <strong class="text-body" th:text="${environment.summaryDate}">-</strong></span>
+                </div>
+            </div>
+
+            <div class="empty" th:if="${environment == null}">
+                <p class="empty-title">표시할 환경 정보가 없습니다</p>
+                <p class="empty-subtitle text-secondary">
+                    부서에 배정된 저장소와 센서 등록 상태를 확인해 주세요.
+                </p>
+            </div>
+
+            <div class="card-body" th:if="${environment != null and !#lists.isEmpty(environment.zones)}">
+                <div class="row row-deck row-cards">
+                    <div class="col-md-6 col-xl-4" th:each="zone : ${environment.zones}">
+                        <div class="card">
+                            <div class="card-status-start" th:classappend="'bg-' + ${zone.status.color}"></div>
+                            <div class="card-header py-2">
+                                <h4 class="card-title mb-0">
+                                    <i class="ti ti-box me-1"></i><span th:text="${zone.name}">구역명</span>
+                                </h4>
+                                <div class="card-actions">
+                                    <span class="badge" th:classappend="'bg-' + ${zone.status.color} + '-lt'"
+                                          th:text="${zone.status.ko}">정상</span>
+                                </div>
+                            </div>
+
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item py-2" th:each="sensor : ${zone.sensors}">
+                                    <div class="row align-items-center g-2">
+                                        <div class="col-4 text-secondary small">
+                                            <span th:text="${sensor.icon}">🌡</span>
+                                            <span th:text="${sensor.label}">온도</span>
+                                        </div>
+                                        <div class="col-8">
+                                            <div class="d-flex align-items-baseline justify-content-between">
+                                                <strong th:classappend="${sensor.hasValue} ? '' : 'text-secondary'"
+                                                        th:text="${sensor.valueText}">-</strong>
+                                                <span class="text-secondary small"
+                                                      th:if="${!sensor.hasValue}"
+                                                      th:text="${sensor.sensorRegistered} ? '측정값 없음' : '센서 미등록'">측정값 없음</span>
+                                                <!-- 값의 등급을 화면에서 판정하지 않는다. 구역 배지가 서버 판정을 보여준다. -->
+                                                <span class="text-secondary small"
+                                                      th:if="${sensor.hasValue}">실시간</span>
+                                            </div>
+                                            <!-- 막대는 기준 범위 안에서의 위치만 나타낸다. 색으로 판정하지 않는다. -->
+                                            <div class="progress progress-sm mt-1" th:if="${sensor.hasThreshold}">
+                                                <div class="progress-bar bg-primary"
+                                                     th:style="'width:' + ${sensor.gaugePercent} + '%'"></div>
+                                            </div>
+                                            <div class="text-secondary small" th:text="${sensor.rangeText}">기준</div>
+                                        </div>
+                                    </div>
+                                </li>
+
+                                <li class="list-group-item py-2" th:if="${zone.doorMeasured}">
+                                    <div class="row align-items-center g-2">
+                                        <div class="col-4 text-secondary small">
+                                            <span th:text="${zone.doorIcon}">🚪</span> 문 상태
+                                        </div>
+                                        <div class="col-8">
+                                            <div class="d-flex align-items-baseline justify-content-between">
+                                                <strong th:text="${zone.doorText}">닫힘</strong>
+                                                <span class="text-secondary small">실시간</span>
+                                            </div>
+                                            <div class="text-secondary small">문 열림 여부</div>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+
+                            <div class="card-footer py-2 d-flex align-items-center">
+                                <span class="text-secondary small" th:if="${zone.hasSensor}"
+                                      th:text="'센서 ' + ${zone.measuredCount} + ' / ' + ${zone.sensorCount} + '개 측정'">센서 측정</span>
+                                <span class="text-secondary small" th:unless="${zone.hasSensor}">연동된 센서가 없습니다</span>
+                                <a class="ms-auto small"
+                                   th:href="@{/storages/{storageId}/zones/{zoneId}/sensorInfo(storageId=${environment.storageId}, zoneId=${zone.zoneId})}">
+                                    센서 상세 <i class="ti ti-arrow-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-footer d-flex align-items-center">
+                <span class="text-secondary small">저장소를 선택하면 해당 저장소의 구역 센서 현황이 표시됩니다</span>
+                <a class="ms-auto" th:href="@{/environmentMonitoring}">
+                    환경관리로 이동 <i class="ti ti-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- 임박 의약품 + AI 리포트 -->
+        <div class="row row-deck row-cards mt-3">
+            <div class="col-lg-7">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">유통기한 임박 의약품</h3>
+                        <div class="card-actions d-flex gap-2" th:if="${expiring != null}">
+                            <span class="badge bg-red-lt" th:text="'D-7 이내 ' + ${expiring.within7Count}">D-7</span>
+                            <span class="badge bg-yellow-lt" th:text="'D-30 이내 ' + ${expiring.within30Count}">D-30</span>
+                        </div>
+                    </div>
+
+                    <div class="empty" th:if="${expiring == null or #lists.isEmpty(expiring.items)}">
+                        <p class="empty-title">임박한 의약품이 없습니다</p>
+                        <p class="empty-subtitle text-secondary">30일 이내 유통기한이 도래하는 재고가 없습니다.</p>
+                    </div>
+
+                    <div class="table-responsive" th:if="${expiring != null and !#lists.isEmpty(expiring.items)}">
+                        <table class="table table-vcenter card-table">
+                            <thead>
+                            <tr>
+                                <th>저장소 / 구역</th>
+                                <th>의약품명 (단위)</th>
+                                <th>LOT</th>
+                                <th class="text-end">수량</th>
+                                <th class="text-center">유통기한</th>
+                                <th class="text-center">잔여</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="item : ${expiring.items}">
+                                <td class="text-nowrap">
+                                    <div th:text="${item.storageName}">저장소</div>
+                                    <div class="text-secondary small" th:text="${item.zoneName}">구역</div>
+                                </td>
+                                <td>
+                                    <strong th:text="${item.medicineName}">의약품명</strong>
+                                    <span class="text-secondary" th:text="'(' + ${item.packUnitName} + ')'">(단위)</span>
+                                </td>
+                                <td class="text-secondary text-nowrap" th:text="${item.lotNumber} ?: '-'">LOT</td>
+                                <td class="text-end" th:text="${item.currentQuantity}">0</td>
+                                <td class="text-center text-nowrap" th:text="${item.expirationDate}">2026-01-01</td>
+                                <td class="text-center">
+                                    <span class="badge"
+                                          th:classappend="${item.urgent} ? 'bg-red-lt' : 'bg-yellow-lt'"
+                                          th:text="${item.ddayText}">D-0</span>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="card-footer d-flex align-items-center">
+                        <span class="text-secondary small" th:if="${expiring != null}"
+                              th:text="'30일 이내 임박 ' + ${expiring.within30Count} + '품목 중 ' + ${#lists.size(expiring.items)} + '건 표시'">
+                        </span>
+                        <div class="ms-auto d-flex align-items-center gap-3">
+                            <a th:href="@{/expiring}">임박 목록 전체 보기</a>
+                            <a th:href="@{/inventories}">재고관리로 이동 <i class="ti ti-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">AI 리포트</h3>
+                        <div class="card-actions">
+                            <form th:action="@{/}" method="get">
+                                <input type="hidden" name="departmentId"
+                                       th:value="${orgWide} ? 0 : ${selectedDepartmentId}">
+                                <input type="hidden" name="storageId" th:value="${selectedStorageId}">
+                                <select name="reportStorageId" class="form-select w-auto"
+                                        onchange="this.form.submit()" th:if="${!#lists.isEmpty(storages)}">
+                                    <option th:each="storage : ${storages}"
+                                            th:value="${storage.storageId}"
+                                            th:text="${storage.name}"
+                                            th:selected="${storage.storageId == selectedReportStorageId}">저장소명</option>
+                                </select>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="ai-summary p-3 rounded">
+                            <div class="d-flex align-items-center gap-1 mb-2 fw-bold small">
+                                <i class="ti ti-sparkles"></i>
+                                <span th:if="${weeklyReport != null}"
+                                      th:text="'주간 요약 · ' + ${weeklyReport.periodStart} + ' ~ ' + ${weeklyReport.periodEnd}">주간 요약</span>
+                                <span th:if="${weeklyReport == null}"
+                                      th:text="'주간 요약 · ' + ${reportPeriodStart} + ' ~ ' + ${reportPeriodEnd}">주간 요약</span>
+                            </div>
+
+                            <span th:if="${weeklyReport != null and weeklyReport.aiSummary != null}"
+                                  th:text="${weeklyReport.aiSummary}">요약 내용</span>
+
+                            <span th:if="${weeklyReport != null and weeklyReport.aiSummary == null}"
+                                  th:text="${weeklyReport.aiSummaryStatus != null}
+                                           ? 'AI 요약 ' + ${weeklyReport.aiSummaryStatus.description} + ' 상태입니다.'
+                                           : 'AI 요약이 아직 생성되지 않았습니다.'">
+                            </span>
+
+                            <span th:if="${weeklyReport == null}">
+                                해당 주차의 리포트가 아직 생성되지 않았습니다. 저장소 상세에서 리포트를 생성할 수 있습니다.
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="card-footer d-flex align-items-center">
+                        <span class="text-secondary small">저장소별 주간 리포트 · 매주 월요일 자동 생성</span>
+                        <a class="ms-auto" th:if="${selectedReportStorageId != null}"
+                           th:href="@{/storages/{storageId}/reports/weekly(storageId=${selectedReportStorageId})}">
+                            상세 리포트 <i class="ti ti-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </th:block>
+</div>
+</body>
+</html>
