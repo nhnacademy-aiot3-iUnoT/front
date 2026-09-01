@@ -11,7 +11,6 @@ import com.nhnacademy.front.auth.dto.response.LoginResponse;
 import com.nhnacademy.front.auth.dto.response.ResetPasswordResponse;
 import com.nhnacademy.front.auth.dto.response.SignupResponse;
 import com.nhnacademy.front.global.client.GatewayClient;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
@@ -33,11 +32,11 @@ public class AuthApiClient {
         return gatewayClient.getRaw(JWKS_PATH, new ParameterizedTypeReference<>() {});
     }
 
-    public LoginResponse login(@Valid LoginRequest request) {
+    public LoginResponse login(LoginRequest request) {
         return gatewayClient.post(AUTH_SERVICE + "/login", request, LoginResponse.class);
     }
 
-    public LoginResponse refresh(@Valid RefreshTokenRequest request) {
+    public LoginResponse refresh(RefreshTokenRequest request) {
         return gatewayClient.post(
                 AUTH_SERVICE + "/refresh",
                 request,
@@ -45,15 +44,15 @@ public class AuthApiClient {
         );
     }
 
-    public void logout(@Valid RefreshTokenRequest request) {
+    public void logout(RefreshTokenRequest request) {
         gatewayClient.post(AUTH_SERVICE + "/logout", request);
     }
 
-    public SignupResponse signup(@Valid SignupRequest request) {
+    public SignupResponse signup(SignupRequest request) {
         return gatewayClient.post(ACCOUNT_SERVICE, request, SignupResponse.class);
     }
 
-    public CheckEmailResponse checkEmail(@Valid CheckEmailRequest request) {
+    public CheckEmailResponse checkEmail(CheckEmailRequest request) {
         return gatewayClient.post(
                 ACCOUNT_SERVICE + "/check-email",
                 request,
@@ -62,13 +61,13 @@ public class AuthApiClient {
     }
 
     public void passwordResetToken(
-            @Valid ResetPasswordTokenRequest request
+            ResetPasswordTokenRequest request
     ) {
         gatewayClient.post(ACCOUNT_SERVICE + "/pwd", request);
     }
 
     public ResetPasswordResponse resetPassword(
-            @Valid ResetPasswordRequest request,
+            ResetPasswordRequest request,
             String token
     ) {
         return gatewayClient.post(

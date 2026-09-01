@@ -8,7 +8,6 @@ import com.nhnacademy.front.account.dto.response.AccountInfoResponse;
 import com.nhnacademy.front.account.dto.response.AccountResponse;
 import com.nhnacademy.front.account.dto.response.UpdateAccountResponse;
 import com.nhnacademy.front.global.client.GatewayClient;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -27,7 +26,7 @@ public class AccountApiClient {
     }
 
     public AccountResponse confirmReactivation(
-            @Valid ReactivationConfirmRequest request
+            ReactivationConfirmRequest request
     ) {
         return backendApiClient.post(
                 ACCOUNT_SERVICE + "/me/reactivation/confirm",
@@ -40,11 +39,11 @@ public class AccountApiClient {
         backendApiClient.delete(ACCOUNT_SERVICE + "/me", request);
     }
 
-    public UpdateAccountResponse changeName(@Valid UpdateAccountNameRequest request) {
+    public UpdateAccountResponse changeName(UpdateAccountNameRequest request) {
         return backendApiClient.put(ACCOUNT_SERVICE + "/me", request, UpdateAccountResponse.class);
     }
 
-    public UpdateAccountResponse changePassword(@Valid ChangeOwnPasswordRequest request) {
+    public UpdateAccountResponse changePassword(ChangeOwnPasswordRequest request) {
         return backendApiClient.put(ACCOUNT_SERVICE + "/me/pwd", request, UpdateAccountResponse.class);
     }
 
