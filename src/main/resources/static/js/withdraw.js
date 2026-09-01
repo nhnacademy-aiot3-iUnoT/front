@@ -1,9 +1,15 @@
 const withdrawForm = document.getElementById("withdraw-form");
-const passwordInput = withdrawForm.querySelector('input[name="password"]');
+const passwordInput = withdrawForm?.querySelector('input[name="password"]');
 const withdrawModalElement = document.getElementById("withdrawModal");
-const submitButton = withdrawModalElement.querySelector(".btn-danger");
+const confirmButton = document.getElementById("withdraw-confirm-btn");
+
+if (!withdrawForm || !passwordInput || !withdrawModalElement || !confirmButton) {
+    throw new Error("회원탈퇴 폼을 찾을 수 없습니다.");
+}
 
 function openWithdrawModal() {
+    passwordInput.setCustomValidity("");
+
     if (!withdrawForm.reportValidity()) {
         passwordInput.focus();
         return;
@@ -15,7 +21,7 @@ function openWithdrawModal() {
 }
 
 async function submitWithdraw() {
-    submitButton.disabled = true;
+    confirmButton.disabled = true;
 
     try {
         await submitRequest(passwordInput.value);
@@ -28,11 +34,12 @@ async function submitWithdraw() {
             .hide();
 
         passwordInput.setCustomValidity(error.message);
+        setError(passwordInput, error.message);
         passwordInput.reportValidity();
         passwordInput.setCustomValidity("");
         passwordInput.select();
     } finally {
-        submitButton.disabled = false;
+        confirmButton.disabled = false;
     }
 }
 
@@ -59,7 +66,15 @@ async function submitRequest(password) {
     }
 }
 
+passwordInput.addEventListener("input", () => {
+    clearErrors(withdrawForm);
+    withdrawForm.querySelector(".invalid-feedback").textContent = "비밀번호를 입력해주세요.";
+    passwordInput.setCustomValidity("");
+});
+
 withdrawForm.addEventListener("submit", event => {
     event.preventDefault();
     openWithdrawModal();
 });
+
+confirmButton.addEventListener("click", submitWithdraw);

@@ -1,144 +1,130 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/auth-layout}">
 
 <head>
     <title>회원가입</title>
-    <link rel="stylesheet" th:href="@{/css/auth.css}">
 </head>
 <body>
-
 <div layout:fragment="content">
-    <div class="container vh-100 d-flex align-items-center justify-content-center">
-        <div class="card border-0 login-card">
-            <div class="card-body p-0">
-                <div class="row g-0 align-items-center">
-                    <div class="col-lg-5">
-                        <div class="brand-section d-flex flex-column justify-content-center align-items-center text-center pt-4 pb-5">
-                            <img th:src="@{/img/profile.png}" class="brand-character mb-3" alt="iUnoT">
+    <div class="container min-vh-100 d-flex align-items-center py-5">
+        <div class="row justify-content-center w-100 mx-0">
+            <div class="col-12 col-xl-9">
+                <div class="card border-0 shadow-lg overflow-hidden">
+                    <div class="card-body p-0">
+                        <div class="row g-0 align-items-stretch">
+                            <div class="col-lg-5">
+                                <div class="h-100 d-flex flex-column justify-content-center align-items-center text-center p-4 p-lg-5 bg-body-tertiary">
+                                    <img th:src="@{/img/profile.png}" class="img-fluid w-50 mb-3" alt="iUnoT">
+                                    <h1 class="fw-bold mb-2">iUnoT</h1>
+                                    <p class="text-secondary mb-0">의약품 환경 · 재고 관리 시스템</p>
+                                    <p class="text-muted small mt-2 mb-0">
+                                        온·습도, 유통기한, 재고를 하나의 플랫폼에서 관리하세요.
+                                    </p>
+                                </div>
+                            </div>
 
-                            <h1 class="fw-bold mb-2">
-                                iUnoT
-                            </h1>
+                            <div class="col-lg-7">
+                                <div class="p-4 p-lg-5">
+                                    <h1 class="fw-bold mb-4">회원가입</h1>
 
-                            <p class="text-secondary mb-0">
-                                의약품 환경 · 재고 관리 시스템
-                            </p>
+                                    <form id="signup-form" th:action="@{/signup}" th:object="${signupRequest}" method="post">
+                                        <input type="hidden" th:field="*{inviteToken}">
 
-                            <p class="text-muted small mt-2">
-                                온·습도, 유통기한, 재고를 하나의 플랫폼에서 관리하세요.
-                            </p>
-
-                        </div>
-                    </div>
-
-                    <div class="col-lg-7">
-                        <div class="login-section p-5">
-                            <h1 class="fw-bold mb-4">회원가입</h1>
-
-                            <form id="signup-form" th:action="@{/signup}" th:object="${signupRequest}" method="post">
-
-                                <input type="hidden" th:field="*{inviteToken}">
-
-                                <div class="mb-3">
-                                    <label class="form-label">
-                                        이메일
-                                    </label>
-                                    <div class="input-group">
-                                        <input type="email"
-                                               id="email"
-                                               th:field="*{email}"
-                                               class="form-control form-control-lg rounded-3"
-                                               th:classappend="${#fields.hasErrors('email')} ? 'is-invalid'"
-                                               placeholder="test@example.com"
-                                               maxlength="254"
-                                               required>
-
-                                        <button type="button"
-                                                id="emailCheck"
-                                                class="btn btn-outline-secondary">
-                                            중복확인
-                                        </button>
-
-                                        <div id="email-feedback" class="invalid-feedback">
-                                            이메일을 입력해주세요.
+                                        <div class="mb-3">
+                                            <label class="form-label required" for="email">이메일</label>
+                                            <div class="input-group">
+                                                <input type="email"
+                                                       id="email"
+                                                       th:field="*{email}"
+                                                       class="form-control form-control-lg"
+                                                       th:classappend="${#fields.hasErrors('email')} ? 'is-invalid'"
+                                                       placeholder="test@example.com"
+                                                       maxlength="254"
+                                                       autocomplete="username"
+                                                       required>
+                                                <button type="button"
+                                                        id="emailCheck"
+                                                        class="btn btn-outline-secondary">중복확인</button>
+                                                <div id="email-feedback" class="invalid-feedback">이메일을 입력해주세요.</div>
+                                            </div>
                                         </div>
-                                    </div>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">
-                                        비밀번호
-                                    </label>
-                                    <input id="pwd"
-                                           type="password"
-                                           th:field="*{password}"
-                                           class="form-control form-control-lg rounded-3"
-                                           th:classappend="${#fields.hasErrors('password')} ? 'is-invalid'"
-                                           minlength="6"
-                                           maxlength="64"
-                                           placeholder="********"
-                                           required>
 
-                                    <div class="invalid-feedback"
-                                         th:if="${#fields.hasErrors('password')}"
-                                         th:errors="*{password}">
-                                        비밀번호를 입력해주세요.
-                                    </div>
-                                </div>
+                                        <div class="mb-3">
+                                            <label class="form-label required" for="pwd">비밀번호</label>
+                                            <input id="pwd"
+                                                   type="password"
+                                                   th:field="*{password}"
+                                                   class="form-control form-control-lg"
+                                                   th:classappend="${#fields.hasErrors('password')} ? 'is-invalid'"
+                                                   minlength="6"
+                                                   maxlength="64"
+                                                   autocomplete="new-password"
+                                                   placeholder="********"
+                                                   required>
+                                            <div class="invalid-feedback"
+                                                 th:if="${#fields.hasErrors('password')}"
+                                                 th:errors="*{password}">
+                                                비밀번호를 입력해주세요.
+                                            </div>
+                                        </div>
 
-                                <div class="mb-3">
-                                    <label class="form-label">
-                                        비밀번호 재확인
-                                    </label>
-                                    <input id="pwd-check"
-                                           type="password"
-                                           class="form-control form-control-lg rounded-3"
-                                           minlength="6"
-                                           maxlength="64"
-                                           placeholder="********"
-                                           required>
-                                    <div class="invalid-feedback">
-                                        비밀번호가 일치하지 않습니다.
-                                    </div>
-                                </div>
+                                        <div class="mb-3">
+                                            <label class="form-label required" for="pwd-check">비밀번호 재확인</label>
+                                            <input id="pwd-check"
+                                                   type="password"
+                                                   class="form-control form-control-lg"
+                                                   minlength="6"
+                                                   maxlength="64"
+                                                   autocomplete="new-password"
+                                                   placeholder="********"
+                                                   required>
+                                            <div class="invalid-feedback">비밀번호가 일치하지 않습니다.</div>
+                                        </div>
 
-                                <div class="mb-3">
-                                    <label class="form-label">
-                                        이름
-                                    </label>
-                                    <input class="form-control form-control-lg rounded-3"
-                                           th:field="*{name}"
-                                           th:classappend="${#fields.hasErrors('name')} ? 'is-invalid'"
-                                           maxlength="100"
-                                           placeholder="홍길동" required>
-                                    <div class="invalid-feedback"
-                                         th:if="${#fields.hasErrors('name')}"
-                                         th:errors="*{name}">
-                                        이름을 입력해주세요.
-                                    </div>
-                                </div>
+                                        <div class="mb-3">
+                                            <label class="form-label required" for="name">이름</label>
+                                            <input id="name"
+                                                   class="form-control form-control-lg"
+                                                   th:field="*{name}"
+                                                   th:classappend="${#fields.hasErrors('name')} ? 'is-invalid'"
+                                                   maxlength="100"
+                                                   autocomplete="name"
+                                                   placeholder="홍길동"
+                                                   required>
+                                            <div class="invalid-feedback"
+                                                 th:if="${#fields.hasErrors('name')}"
+                                                 th:errors="*{name}">
+                                                이름을 입력해주세요.
+                                            </div>
+                                        </div>
 
-                                <button type="submit"
-                                        id="signup-submit"
-                                        class="btn btn-primary btn-lg w-100"
-                                        disabled>
-                                    회원가입
-                                </button>
+                                        <button type="submit"
+                                                id="signup-submit"
+                                                class="btn btn-primary btn-lg w-100"
+                                                disabled>회원가입</button>
 
-                                <div class="text-center text-secondary mt-3">
-                                    이미 계정이 있으신가요?
-                                    <a href="/login" tabindex="-1" class="link-secondary">로그인</a>
+                                        <div class="text-center text-secondary mt-3">
+                                            이미 계정이 있으신가요?
+                                            <a th:href="@{/login}" class="link-secondary">로그인</a>
+                                        </div>
+                                    </form>
                                 </div>
-                            </form>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <script th:src="@{/js/signup.js}"></script>
 </div>
 
+<th:block layout:fragment="script">
+    <script th:src="@{/js/common/validation.js}"></script>
+    <script th:src="@{/js/common/form.js}"></script>
+    <script th:src="@{/js/signup.js}"></script>
+</th:block>
 </body>
 </html>

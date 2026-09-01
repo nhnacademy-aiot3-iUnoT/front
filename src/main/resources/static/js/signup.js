@@ -1,8 +1,8 @@
 const pwdInput = document.getElementById("pwd");
 const pwdCheckInput = document.getElementById("pwd-check");
+const pwdCheckFeedback = pwdCheckInput.closest(".mb-3").querySelector(".invalid-feedback");
 const emailInput = document.getElementById("email");
 const emailCheckButton = document.getElementById("emailCheck");
-const emailFeedback = document.getElementById("email-feedback");
 const signupForm = document.getElementById("signup-form");
 const submitButton = document.getElementById("signup-submit");
 let verifiedEmail = null;
@@ -10,15 +10,18 @@ let emailCheckPromise = null;
 
 function checkPwdEquals() {
     const isEqual = pwdInput.value === pwdCheckInput.value;
-
-    pwdCheckInput.classList.toggle(
-        "is-invalid",
-        !isEqual && pwdInput.value !== "" && pwdCheckInput.value !== ""
-    );
+    const shouldShowError = !isEqual && pwdInput.value !== "" && pwdCheckInput.value !== "";
 
     pwdCheckInput.setCustomValidity(
         isEqual ? "" : "비밀번호가 일치하지 않습니다."
     );
+
+    if (shouldShowError) {
+        setError(pwdCheckInput, "비밀번호가 일치하지 않습니다.");
+    } else {
+        pwdCheckInput.classList.remove("is-invalid");
+        pwdCheckFeedback.classList.remove("d-block");
+    }
 
     return isEqual;
 }
@@ -28,10 +31,9 @@ pwdCheckInput.addEventListener("input", checkPwdEquals);
 
 
 function setEmailInvalid(message) {
-    emailInput.classList.add("is-invalid");
+    setError(emailInput, message);
     emailInput.classList.remove("is-valid");
     emailInput.setCustomValidity(message);
-    emailFeedback.textContent = message;
     verifiedEmail = null;
     submitButton.disabled = true;
 }

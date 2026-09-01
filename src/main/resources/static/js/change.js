@@ -5,6 +5,11 @@ const confirmPasswordInput = document.getElementById("confirm-password");
 const newPasswordFeedback = document.getElementById("new-password-feedback");
 const confirmPasswordFeedback = document.getElementById("confirm-password-feedback");
 
+if (!changePasswordForm || !currentPasswordInput || !newPasswordInput || !confirmPasswordInput
+    || !newPasswordFeedback || !confirmPasswordFeedback) {
+    throw new Error("비밀번호 변경 폼을 찾을 수 없습니다.");
+}
+
 function validatePasswordRelationship() {
     const currentPassword = currentPasswordInput.value;
     const newPassword = newPasswordInput.value;
@@ -16,21 +21,22 @@ function validatePasswordRelationship() {
     if (currentPassword !== "" && currentPassword === newPassword) {
         const message = "새 비밀번호는 기존 비밀번호와 달라야 합니다.";
         newPasswordInput.setCustomValidity(message);
-        newPasswordFeedback.textContent = message;
+        setError(newPasswordInput, message);
     } else {
+        newPasswordInput.classList.remove("is-invalid");
+        newPasswordFeedback.classList.remove("d-block");
         newPasswordFeedback.textContent = "새 비밀번호는 6자 이상 64자 이하여야 합니다.";
     }
 
     if (newPassword !== "" && confirmPassword !== "" && newPassword !== confirmPassword) {
         const message = "새 비밀번호가 일치하지 않습니다.";
         confirmPasswordInput.setCustomValidity(message);
-        confirmPasswordFeedback.textContent = message;
+        setError(confirmPasswordInput, message);
     } else {
+        confirmPasswordInput.classList.remove("is-invalid");
+        confirmPasswordFeedback.classList.remove("d-block");
         confirmPasswordFeedback.textContent = "새 비밀번호를 다시 입력해주세요.";
     }
-
-    newPasswordInput.classList.toggle("is-invalid", newPasswordInput.validity.customError);
-    confirmPasswordInput.classList.toggle("is-invalid", confirmPasswordInput.validity.customError);
 }
 
 [currentPasswordInput, newPasswordInput, confirmPasswordInput].forEach(input => {
