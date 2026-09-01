@@ -6,185 +6,195 @@
 <head>
     <meta charset="UTF-8">
     <title th:text="|Zone ${zoneId} 상세 환경 정보|">상세 환경 정보</title>
-    <link rel="stylesheet" th:href="@{/css/sensor-info.css}">
+    <link rel="stylesheet" th:href="@{/css/status.css}">
 </head>
 <body>
-<main layout:fragment="content" class="zone-detail">
-    <nav aria-label="breadcrumb" class="mb-3">
-        <ol class="breadcrumb breadcrumb-arrows mb-0">
-            <li class="breadcrumb-item"><a href="/">환경관리</a></li>
-            <li class="breadcrumb-item"><span th:text="|저장소 ${storageId}|">저장소</span></li>
-            <li class="breadcrumb-item active" aria-current="page" th:text="|Zone ${zoneId}|">Zone</li>
-        </ol>
-    </nav>
+<main layout:fragment="content">
+    <div class="py-6">
+        <nav aria-label="breadcrumb" class="mb-3">
+            <ol class="breadcrumb breadcrumb-arrows mb-0">
+                <li class="breadcrumb-item"><a href="/">환경관리</a></li>
+                <li class="breadcrumb-item"><span th:text="|저장소 ${storageId}|">저장소</span></li>
+                <li class="breadcrumb-item active" aria-current="page" th:text="|Zone ${zoneId}|">Zone</li>
+            </ol>
+        </nav>
 
-    <header class="zone-heading">
-        <div>
-            <!-- 센서 데이터 연결상태 보여주는 div -->
-            <div class="d-flex align-items-center gap-2 mb-2">
-                <span class="zone-icon"><i class="ti ti-map-pin"></i></span>
-                <span class="badge bg-green-lt" th:if="${latestSensors != null and !latestSensors.isEmpty()}">
-                    <span class="status-dot status-dot-animated bg-green me-1"></span>연결됨
-                </span>
-                <span class="badge bg-secondary-lt" th:if="${latestSensors == null or latestSensors.isEmpty()}">
-                    <span class="status-dot status-dot-animated bg-secondary me-1"></span>미연결</span>
+        <div class="page-header d-print-none mb-4">
+            <div class="row align-items-center">
+                <div class="col">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <span class="badge status-badge status-active"
+                              th:if="${latestSensors != null and !latestSensors.isEmpty()}">
+                            <span class="status-dot status-dot-animated bg-green me-1"></span>연결됨
+                        </span>
+                        <span class="badge status-badge status-inactive"
+                              th:if="${latestSensors == null or latestSensors.isEmpty()}">
+                            <span class="status-dot bg-secondary me-1"></span>미연결
+                        </span>
+                    </div>
+                    <h2 class="page-title" th:text="|Zone ${zoneId} 환경 정보|">Zone 환경 정보</h2>
+                    <div class="text-muted mt-1">센서의 최신 측정값과 최근 24시간 이력을 확인합니다.</div>
+                </div>
+                <div class="col-auto">
+                    <button type="button" class="btn btn-outline-secondary" id="refresh-button">
+                        <i class="ti ti-refresh me-1"></i>새로고침
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="alert alert-danger" role="alert" th:if="${latestSensorsErrorMessage != null}">
+            <div th:text="${latestSensorsErrorMessage}">최신 센서 데이터를 불러오지 못했습니다.</div>
+        </div>
+
+        <section class="mb-4" aria-labelledby="latest-sensor-title">
+            <div class="d-flex align-items-end justify-content-between gap-3 mb-3">
+                <div>
+                    <h3 class="mb-1" id="latest-sensor-title">센서 최신 데이터</h3>
+                    <p class="text-secondary mb-0">각 센서별 최신 측정값입니다.</p>
+                </div>
+                <span class="badge bg-secondary-lt"
+                      th:text="|${latestSensors == null ? 0 : latestSensors.size()}개 센서|">0개 센서</span>
             </div>
 
-            <h2 class="page-title" th:text="|Zone ${zoneId} 환경 정보|">Zone 환경 정보</h2>
-        </div>
+            <div class="row row-cards" th:if="${latestSensors != null and !latestSensors.isEmpty()}">
+                <div class="col-12 col-sm-6 col-xl-3" th:each="sensor : ${latestSensors}">
+                    <article class="card sensor-card h-100" th:attr="data-sensor-type=${sensor.sensorType}">
+                        <div class="card-body">
+                            <span class="avatar avatar-md"
+                                  th:classappend="${sensor.sensorType == 'temperature'} ? ' bg-orange-lt'
+                                                  : (${sensor.sensorType == 'humidity'} ? ' bg-blue-lt'
+                                                  : (${sensor.sensorType == 'illumination'} ? ' bg-yellow-lt'
+                                                  : (${sensor.sensorType == 'door'} ? ' bg-teal-lt' : ' bg-secondary-lt')))"
+                                  aria-hidden="true">
+                                <i class="ti ti-temperature" th:if="${sensor.sensorType == 'temperature'}"></i>
+                                <i class="ti ti-droplet" th:if="${sensor.sensorType == 'humidity'}"></i>
+                                <i class="ti ti-sun" th:if="${sensor.sensorType == 'illumination'}"></i>
+                                <i class="ti ti-door" th:if="${sensor.sensorType == 'door'}"></i>
+                                <i class="ti ti-activity"
+                                   th:if="${sensor.sensorType != 'temperature'
+                                           and sensor.sensorType != 'humidity'
+                                           and sensor.sensorType != 'illumination'
+                                           and sensor.sensorType != 'door'}"></i>
+                            </span>
 
-        <div class="d-flex gap-2">
-            <!-- 새로고침 버튼 -->
-            <button type="button" class="btn btn-outline-secondary" id="refresh-button">
-                <i class="ti ti-refresh me-1">새로고침</i>
-            </button>
-        </div>
+                            <div class="sensor-name subheader mt-3" th:text="${sensor.sensorType}">센서 타입</div>
+                            <div class="d-flex align-items-baseline gap-1 my-2">
+                                <strong class="h1 mb-0"
+                                        th:if="${sensor.sensorType == 'door'}"
+                                        th:classappend="${sensor.value == null ? '' : (sensor.value >= 0.5 ? ' text-red' : ' text-blue')}"
+                                        th:text="${sensor.value == null ? '-' : (sensor.value >= 0.5 ? '문 열림' : '문 닫힘')}">
+                                </strong>
+                                <strong class="h1 mb-0"
+                                        th:unless="${sensor.sensorType == 'door'}"
+                                        th:text="${sensor.value == null ? '-' : #numbers.formatDecimal(sensor.value, 1, 1)}">
+                                </strong>
+                                <span class="text-secondary"
+                                      th:if="${sensor.sensorType != 'door' and sensor.unit != null and !sensor.unit.isBlank()}"
+                                      th:text="${sensor.unit}"></span>
+                            </div>
 
-    </header>
-
-    <!-- 센서 정보 조회오류 -->
-    <div class="alert alert-danger" role="alert" th:if="${latestSensorsErrorMessage != null}">
-        <div th:text="${latestSensorsErrorMessage}">최신 센서 데이터를 불러오지 못했습니다.</div>
-    </div>
-
-    <!-- 센서별 가장 최근 데이터를 보여주는 Dashboard -->
-    <section class="sensor-summary" aria-labelledby="latest-sensor-title">
-
-        <div class="section-heading">
-            <div>
-                <h3 id="latest-sensor-title">센서 최신 데이터</h3>
-                <p>각 센서별 최신 측정값입니다.</p>
-            </div>
-            <span class="sensor-count" th:text="|${latestSensors == null ? 0 : latestSensors.size()}개 센서|">0개 센서</span>
-        </div>
-
-        <div class="row row-cards" th:if="${latestSensors != null and !latestSensors.isEmpty()}">
-            <div class="col-12 col-sm-6 col-xl-3" th:each="sensor : ${latestSensors}">
-                <article class="card sensor-card h-100" th:attr="data-sensor-type=${sensor.sensorType}">
-                    <div class="card-body">
-                        <div class="d-flex align-items-start justify-content-between">
-                            <div class="sensor-card-icon">
-                                <i class="ti ti-temperature sensor-icon-temperature"></i>
-                                <i class="ti ti-droplet sensor-icon-humidity"></i>
-                                <i class="ti ti-door sensor-icon-door"></i>
-                                <i class="ti ti-sun sensor-icon-light"></i>
-                                <i class="ti ti-activity sensor-icon-default"></i>
+                            <div class="d-flex align-items-center gap-1 text-secondary small">
+                                <i class="ti ti-clock"></i>
+                                <time th:text="${sensor.measuredAt}" th:datetime="${sensor.measuredAt}">측정 시간</time>
                             </div>
                         </div>
-                        <div class="sensor-name" th:text="${sensor.sensorType}">센서 타입</div>
-                        <div class="sensor-value">
-                            <!-- 문 센서: 부동소수점 오차를 감안해 임계값(0.5)으로 비교한다 -->
-                            <strong th:if="${sensor.sensorType == 'door'}"
-                                    th:class="${sensor.value == null ? '' : (sensor.value >= 0.5 ? 'text-red' : 'text-blue')}"
-                                    th:text="${sensor.value == null ? '-' : (sensor.value >= 0.5 ? '문 열림' : '문 닫힘')}">
-                            </strong>
+                    </article>
+                </div>
+            </div>
 
-                            <!-- 일반 센서 -->
-                            <strong th:unless="${sensor.sensorType == 'door'}"
-                                    th:text="${sensor.value == null ? '-' : #numbers.formatDecimal(sensor.value, 1, 1)}">
-                            </strong>
+            <div class="card" th:if="${latestSensors == null or latestSensors.isEmpty()}">
+                <div class="card-body text-center py-5">
+                    <i class="ti ti-device-desktop-off fs-1 text-secondary"></i>
+                    <h4 class="mt-3 mb-1">수집된 센서 데이터가 없습니다</h4>
+                    <p class="text-secondary mb-0">센서 연결 상태를 확인한 뒤 다시 시도해 주세요.</p>
+                </div>
+            </div>
+        </section>
 
-                            <!-- 센서 단위  -->
-                            <span th:if="${sensor.sensorType != 'door' and sensor.unit != null and !sensor.unit.isBlank()}"
-                                  th:text="${sensor.unit}">
-                            </span>
+        <div class="alert alert-danger" role="alert" th:if="${sensorHistoryErrorMessage != null}">
+            <div th:text="${sensorHistoryErrorMessage}">센서 이력 데이터를 불러오지 못했습니다.</div>
+        </div>
+
+        <section class="card" aria-labelledby="sensor-chart-title">
+            <div class="card-header">
+                <div class="row align-items-end g-3 w-100">
+                    <div class="col">
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <h3 class="card-title" id="sensor-chart-title">센서 데이터 그래프</h3>
+                            <span class="badge bg-blue-lt">최근 24시간</span>
                         </div>
-                        <div class="sensor-updated">
-                            <i class="ti ti-clock"></i>
-                            <time th:text="${sensor.measuredAt}" th:datetime="${sensor.measuredAt}">측정 시간</time>
+                        <p class="text-secondary mb-0">센서를 선택해 시간대별 측정값을 확인할 수 있습니다.</p>
+                    </div>
+                    <div class="col-12 col-md-4 col-lg-3">
+                        <label class="form-label" for="sensor-select">센서 종류</label>
+                        <select class="form-select" id="sensor-select" aria-label="그래프에 표시할 센서 선택">
+                            <option value="">센서를 선택하세요</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <div id="chart-metric" hidden>
+                    <div class="d-flex align-items-baseline gap-2 mb-3">
+                        <span class="text-secondary small">최근 측정값</span>
+                        <strong class="h3 mb-0" id="chart-latest-value">-</strong>
+                        <span class="small fw-semibold" id="chart-change"></span>
+                    </div>
+                </div>
+                <div class="ratio ratio-21x9 rounded bg-body-tertiary overflow-hidden" id="chart-wrap">
+                    <canvas id="sensor-chart" role="img"
+                            aria-label="선택한 센서의 최근 24시간 측정값 그래프" hidden></canvas>
+                    <div class="text-secondary text-center" id="chart-empty">
+                        <div class="d-flex h-100 flex-column align-items-center justify-content-center">
+                            <i class="ti ti-chart-line fs-1 mb-2"></i>
+                            <p class="mb-0">표시할 센서 이력이 없습니다.</p>
                         </div>
                     </div>
-                </article>
+                </div>
             </div>
-        </div>
+        </section>
 
-        <!-- 최근 센서데이터 하나도 없는경우 Dashboard -->
-        <div class="empty-state card" th:if="${latestSensors == null or latestSensors.isEmpty()}">
-            <div class="empty-state-icon"><i class="ti ti-device-desktop-off"></i></div>
-            <h4>수집된 센서 데이터가 없습니다</h4>
-            <p>센서 연결 상태를 확인한 뒤 다시 시도해 주세요.</p>
-        </div>
-    </section>
+        <section class="card mt-4" id="door-history-section" aria-labelledby="door-history-title" hidden>
+            <div class="card-header">
+                <div>
+                    <div class="d-flex align-items-center gap-2 mb-1">
+                        <h3 class="card-title" id="door-history-title">문 열림 기록</h3>
+                        <span class="badge bg-purple-lt" id="door-history-count">0건</span>
+                    </div>
+                    <p class="text-secondary mb-0">최근 24시간 동안 문 열림이 감지된 시간입니다.</p>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="list-group list-group-flush" id="door-history-list"></div>
+                <div class="mt-3" id="door-history-pagination" hidden>
+                    <div class="d-flex align-items-center justify-content-between gap-3">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" id="door-history-prev">
+                            <i class="ti ti-chevron-left"></i> 이전
+                        </button>
+                        <span class="text-secondary small" id="door-history-page-info">1 / 1</span>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" id="door-history-next">
+                            다음 <i class="ti ti-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-    <!-- 센서 이력 정보 오류 -->
-    <div class="alert alert-danger" role="alert" th:if="${sensorHistoryErrorMessage != null}">
-        <div th:text="${sensorHistoryErrorMessage}">센서 이력 데이터를 불러오지 못했습니다.</div>
+        <div id="sensor-history-data" hidden aria-hidden="true">
+            <span th:each="history : ${sensorHistory}"
+                  th:attr="data-sensor-type=${history.sensorType},
+                           data-unit=${history.unit},
+                           data-time=${history.time},
+                           data-value=${history.value}"></span>
+        </div>
     </div>
+</main>
 
-    <!-- 하루간 센서종류별 그래프 Dashboard (문 센서는 평균 집계가 의미 없어 그래프 대상에서 제외됨, JS에서 처리) -->
-    <section class="card chart-card" aria-labelledby="sensor-chart-title">
-        <div class="card-header chart-header">
-            <div>
-                <div class="chart-title-row">
-                    <h3 class="card-title" id="sensor-chart-title">센서 데이터 그래프</h3>
-                    <span class="badge bg-blue-lt">최근 24시간</span>
-                </div>
-                <p class="text-secondary mb-0">센서를 선택해 시간대별 측정값을 확인할 수 있습니다.</p>
-            </div>
-
-            <!-- 그래프에 표시할 센서 종류 선택 -->
-            <div class="chart-filter">
-                <label for="sensor-select">센서 종류</label>
-                <select class="form-select" id="sensor-select" aria-label="그래프에 표시할 센서 선택">
-                    <option value="">센서를 선택하세요</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="card-body chart-body">
-            <div class="chart-metric" id="chart-metric" hidden>
-                <span class="chart-metric-label">최근 측정값</span>
-                <strong id="chart-latest-value">-</strong>
-                <span class="chart-metric-change" id="chart-change"></span>
-            </div>
-            <div class="chart-wrap" id="chart-wrap">
-                <canvas id="sensor-chart" role="img" aria-label="선택한 센서의 최근 24시간 측정값 그래프"></canvas>
-                <div class="chart-empty" id="chart-empty">
-                    <i class="ti ti-chart-line"></i>
-                    <p>표시할 센서 이력이 없습니다.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- 문 열림 이력: door 센서 데이터가 있을 때만 JS에서 표시(hidden 해제) -->
-    <section class="card door-history-card" id="door-history-section" aria-labelledby="door-history-title" hidden>
-        <div class="card-header door-history-header">
-            <div>
-                <div class="chart-title-row">
-                    <h3 class="card-title" id="door-history-title">문 열림 기록</h3>
-                    <span class="badge bg-purple-lt" id="door-history-count">0건</span>
-                </div>
-                <p class="text-secondary mb-0">최근 24시간 동안 문 열림이 감지된 시간입니다.</p>
-            </div>
-        </div>
-        <div class="card-body">
-            <div class="door-history-list" id="door-history-list"></div>
-            <div class="door-history-pagination" id="door-history-pagination" hidden>
-                <button type="button" class="btn btn-sm btn-outline-secondary" id="door-history-prev">
-                    <i class="ti ti-chevron-left"></i> 이전
-                </button>
-                <span class="door-history-page-info" id="door-history-page-info">1 / 1</span>
-                <button type="button" class="btn btn-sm btn-outline-secondary" id="door-history-next">
-                    다음 <i class="ti ti-chevron-right"></i>
-                </button>
-            </div>
-        </div>
-    </section>
-
-    <!-- 그래프/문 열림 기록에 사용할 센서 이력 데이터를 JavaScript에 전달 -->
-    <div id="sensor-history-data" hidden aria-hidden="true">
-        <span th:each="history : ${sensorHistory}"
-              th:attr="data-sensor-type=${history.sensorType},
-                       data-unit=${history.unit},
-                       data-time=${history.time},
-                       data-value=${history.value}">
-        </span>
-    </div>
-
-    <!-- 그래프 라이브러리와 페이지 동작에 필요한 JavaScript 로드 -->
+<th:block layout:fragment="script">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
     <script th:src="@{/js/organization/sensor-info.js}"></script>
-</main>
+</th:block>
 </body>
 </html>
