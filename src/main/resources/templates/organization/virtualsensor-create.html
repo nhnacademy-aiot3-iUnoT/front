@@ -43,7 +43,8 @@
 
     <div class="row row-cards">
         <div class="col-12">
-            <form id="virtualSensorCreateForm" th:method="${edit} ? 'put' : 'post'"
+            <form id="virtualSensorCreateForm" th:object="${virtualSensorRequest}"
+                  th:method="${edit} ? 'put' : 'post'"
                   th:action="${edit}
                           ? @{/virtual-sensors/{deviceEui}(deviceEui=${deviceEui})}
                           : @{/virtual-sensors}">
@@ -65,21 +66,24 @@
                                         디바이스 EUI
                                     </label>
 
+                                    <th:block th:if="${!edit}">
+                                        <input type="text" class="form-control" maxlength="64"
+                                               placeholder="예: device-eui-virtual-21" required
+                                               th:field="*{deviceEui}">
+                                        <div class="invalid-feedback"></div>
+                                        <div class="text-danger" th:errors="*{deviceEui}"></div>
+                                        <small class="form-hint">
+                                            영문·숫자와 <code>-</code>, <code>_</code> 만 사용할 수 있습니다.
+                                        </small>
+                                    </th:block>
+
                                     <!-- 수정 모드에서는 디바이스 EUI를 바꿀 수 없다 -->
-                                    <input type="text" class="form-control" id="deviceEui" name="deviceEui"
-                                           maxlength="64" placeholder="예: device-eui-virtual-21" required
-                                           th:value="${virtualSensor != null ? virtualSensor.deviceEui : ''}"
-                                           th:readonly="${edit}">
-
-                                    <div class="invalid-feedback"></div>
-
-                                    <small class="form-hint" th:if="${!edit}">
-                                        영문·숫자와 <code>-</code>, <code>_</code> 만 사용할 수 있습니다.
-                                    </small>
-
-                                    <small class="form-hint" th:if="${edit}">
-                                        디바이스 EUI는 수정할 수 없습니다.
-                                    </small>
+                                    <th:block th:if="${edit}">
+                                        <input type="text" class="form-control" id="deviceEui" name="deviceEui"
+                                               maxlength="64" th:value="${deviceEui}" readonly>
+                                        <div class="invalid-feedback"></div>
+                                        <small class="form-hint">디바이스 EUI는 수정할 수 없습니다.</small>
+                                    </th:block>
                                 </div>
                             </div>
 
@@ -89,11 +93,11 @@
                                         측정 주기 (초)
                                     </label>
 
-                                    <input type="number" class="form-control" id="measurementIntervalSeconds"
-                                           name="measurementIntervalSeconds" min="1" step="1" required
-                                           th:value="${virtualSensor != null ? virtualSensor.measurementIntervalSeconds : 60}">
+                                    <input type="number" class="form-control" min="1" step="1" required
+                                           th:field="*{measurementIntervalSeconds}">
 
                                     <div class="invalid-feedback"></div>
+                                    <div class="text-danger" th:errors="*{measurementIntervalSeconds}"></div>
 
                                     <small class="form-hint">
                                         1초 이상. 너무 짧으면 데이터가 빠르게 쌓입니다.
@@ -185,6 +189,12 @@
                             </div>
 
                             <div class="invalid-feedback d-block" id="sensorTypeFeedback" hidden></div>
+                            <div class="text-danger" th:errors="*{virtualSensorValues}"></div>
+                            <th:block th:if="*{virtualSensorValues != null}">
+                                <div class="text-danger" th:errors="*{virtualSensorValues.valueMap}"></div>
+                                <div class="text-danger"
+                                     th:errors="*{virtualSensorValues.sensorModeConfigurationValid}"></div>
+                            </th:block>
                         </div>
 
                         <div class="card card-body text-center py-5" id="sensorConfigEmpty">
@@ -245,6 +255,9 @@
                                                    ? virtualSensor.virtualSensorValues.temperature.fixedValue : 25}">
                                 <div class="invalid-feedback"></div>
                             </div>
+                            <div class="text-danger"
+                                 th:each="error : ${#fields.errors('virtualSensorValues.valueMap[TEMPERATURE].*')}"
+                                 th:text="${error}"></div>
                         </div>
 
                         <div class="border rounded p-3 mb-3" data-sensor-fields="HUMIDITY">
@@ -297,6 +310,9 @@
                                                    ? virtualSensor.virtualSensorValues.humidity.fixedValue : 50}">
                                 <div class="invalid-feedback"></div>
                             </div>
+                            <div class="text-danger"
+                                 th:each="error : ${#fields.errors('virtualSensorValues.valueMap[HUMIDITY].*')}"
+                                 th:text="${error}"></div>
                         </div>
 
                         <div class="border rounded p-3 mb-3" data-sensor-fields="ILLUMINATION">
@@ -349,6 +365,9 @@
                                                    ? virtualSensor.virtualSensorValues.illumination.fixedValue : 125}">
                                 <div class="invalid-feedback"></div>
                             </div>
+                            <div class="text-danger"
+                                 th:each="error : ${#fields.errors('virtualSensorValues.valueMap[ILLUMINATION].*')}"
+                                 th:text="${error}"></div>
                         </div>
 
                         <div class="border rounded p-3 mb-3" data-sensor-fields="DOOR">
@@ -394,6 +413,9 @@
                                                                     and virtualSensor.virtualSensorValues.door.fixedValue == 1}">열림</option>
                                 </select>
                             </div>
+                            <div class="text-danger"
+                                 th:each="error : ${#fields.errors('virtualSensorValues.valueMap[DOOR].*')}"
+                                 th:text="${error}"></div>
                         </div>
                         </div>
                     </div>

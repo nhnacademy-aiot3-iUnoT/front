@@ -30,6 +30,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -122,7 +123,48 @@ class VirtualSensorControllerTest {
                         .param("deviceEui", "")
                         .param("measurementIntervalSeconds", "10"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("organization/virtualsensor-create"));
+                .andExpect(view().name("organization/virtualsensor-create"))
+                .andExpect(content().string(containsString("deviceEui는 필수입니다.")))
+                .andExpect(content().string(containsString("센서 타입을 하나 이상 선택해야 합니다.")));
+    }
+
+    @Test
+    @DisplayName("센서값 설정이 잘못되면 중첩 Spring Validation 메시지를 보여준다")
+    void createVirtualSensorRejectsInvalidSensorConfiguration() throws Exception {
+        mockMvc.perform(post("/virtual-sensors")
+                        .param("deviceEui", DEVICE_EUI)
+                        .param("measurementIntervalSeconds", "10")
+                        .param("virtualSensorValues.valueMap[TEMPERATURE].mode", "RANGE")
+                        .param("virtualSensorValues.valueMap[TEMPERATURE].min", "30")
+                        .param("virtualSensorValues.valueMap[TEMPERATURE].max", "20"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("organization/virtualsensor-create"))
+                .andExpect(content().string(containsString("생성 모드에 맞는 값을 입력해야 합니다.")));
+    }
+
+    @Test
+    @DisplayName("수정 화면에 현재 설정과 Spring Validation 대상을 제공한다")
+    void showUpdateForm() throws Exception {
+        given(ruleEngineApiClient.getVirtualSensorData(ORGANIZATION_ID, DEVICE_EUI))
+                .willReturn(virtualSensor(DEVICE_EUI, 11L));
+
+        mockMvc.perform(get("/virtual-sensors/{deviceEui}/edit", DEVICE_EUI))
+                .andExpect(status().isOk())
+                .andExpect(view().name("organization/virtualsensor-create"))
+                .andExpect(content().string(containsString(DEVICE_EUI)));
+    }
+
+    @Test
+    @DisplayName("수정값이 잘못되면 Spring Validation 메시지를 보여준다")
+    void updateVirtualSensorRejectsInvalidInput() throws Exception {
+        given(ruleEngineApiClient.getVirtualSensorData(ORGANIZATION_ID, DEVICE_EUI))
+                .willReturn(virtualSensor(DEVICE_EUI, 11L));
+
+        mockMvc.perform(put("/virtual-sensors/{deviceEui}", DEVICE_EUI)
+                        .param("measurementIntervalSeconds", "0"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("organization/virtualsensor-create"))
+                .andExpect(content().string(containsString("측정 주기는 1초 이상이어야 합니다.")));
     }
 
     @Test
