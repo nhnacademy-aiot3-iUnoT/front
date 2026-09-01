@@ -353,6 +353,14 @@ a:hover {
     background-color: var(--teal-soft);
 }
 
+
+
+.ai-summary {
+    background-color: var(--teal-soft);
+    border: 1px solid var(--mint);
+    line-height: 1.65;
+}
+
 .alert-warning {
     --tblr-alert-color: var(--warning);
     --tblr-alert-bg: var(--warning-soft);
