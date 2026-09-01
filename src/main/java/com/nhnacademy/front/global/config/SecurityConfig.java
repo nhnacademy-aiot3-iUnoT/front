@@ -1,11 +1,14 @@
 package com.nhnacademy.front.global.config;
 
 import com.nhnacademy.front.account.dto.AccountStatus;
+import com.nhnacademy.front.auth.service.AuthSessionService;
 import com.nhnacademy.front.global.security.AccessTokenCookieManager;
 import com.nhnacademy.front.global.security.CookieAuthenticationEntryPoint;
 import com.nhnacademy.front.global.security.PageAccessDeniedHandler;
+import com.nhnacademy.front.global.security.RefreshTokenAutoRenewFilter;
 import jakarta.servlet.http.Cookie;
 import org.springframework.boot.security.autoconfigure.actuate.web.servlet.EndpointRequest;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -26,6 +29,7 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.oauth2.server.resource.web.BearerTokenResolver;
+import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -49,7 +53,8 @@ public class SecurityConfig {
             JwtAuthenticationConverter converter,
             BearerTokenResolver bearerTokenResolver,
             CookieAuthenticationEntryPoint authenticationEntryPoint,
-            PageAccessDeniedHandler accessDeniedHandler
+            PageAccessDeniedHandler accessDeniedHandler,
+            RefreshTokenAutoRenewFilter refreshTokenAutoRenewFilter
     ) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
@@ -72,11 +77,15 @@ public class SecurityConfig {
                         .authenticationEntryPoint(authenticationEntryPoint)
                         .accessDeniedHandler(accessDeniedHandler)
                 )
+                .addFilterBefore(
+                        refreshTokenAutoRenewFilter,
+                        BearerTokenAuthenticationFilter.class
+                )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 EndpointRequest.to("health", "serviceregistry")
                         ).permitAll()
-                        .requestMatchers(HttpMethod.POST, "/juso/popup").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/logout", "/juso/popup").permitAll()
                         .requestMatchers(
                                 "/login",
                                 "/signup",
@@ -176,11 +185,54 @@ public class SecurityConfig {
     @Bean
     public BearerTokenResolver bearerTokenResolver() {
         return request -> {
+            if (Boolean.TRUE.equals(request.getAttribute(
+                    RefreshTokenAutoRenewFilter.REFRESH_FAILED_ATTRIBUTE
+            ))) {
+                return null;
+            }
+
+            Object refreshedAccessToken = request.getAttribute(
+                    RefreshTokenAutoRenewFilter.REFRESHED_ACCESS_TOKEN_ATTRIBUTE
+            );
+            if (refreshedAccessToken instanceof String token
+                    && StringUtils.hasText(token)) {
+                return token;
+            }
+
+            if ("POST".equalsIgnoreCase(request.getMethod())
+                    && "/logout".equals(request.getServletPath())) {
+                return null;
+            }
+
             Cookie cookie = WebUtils.getCookie(request, AccessTokenCookieManager.COOKIE_NAME);
             return cookie != null && StringUtils.hasText(cookie.getValue())
                     ? cookie.getValue()
                     : null;
         };
+    }
+
+    @Bean
+    public RefreshTokenAutoRenewFilter refreshTokenAutoRenewFilter(
+            JwtDecoder jwtDecoder,
+            AuthSessionService authSessionService,
+            Clock clock
+    ) {
+        return new RefreshTokenAutoRenewFilter(
+                jwtDecoder,
+                authSessionService,
+                clock
+        );
+    }
+
+    @Bean
+    public FilterRegistrationBean<RefreshTokenAutoRenewFilter>
+            refreshTokenAutoRenewFilterRegistration(
+                    RefreshTokenAutoRenewFilter filter
+            ) {
+        FilterRegistrationBean<RefreshTokenAutoRenewFilter> registration =
+                new FilterRegistrationBean<>(filter);
+        registration.setEnabled(false);
+        return registration;
     }
 
     @Bean

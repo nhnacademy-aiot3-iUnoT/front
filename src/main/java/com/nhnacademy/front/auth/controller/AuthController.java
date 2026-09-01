@@ -12,12 +12,13 @@ import com.nhnacademy.front.auth.dto.request.ResetPasswordRequest;
 import com.nhnacademy.front.auth.dto.request.ResetPasswordTokenRequest;
 import com.nhnacademy.front.auth.dto.request.SignupRequest;
 import com.nhnacademy.front.auth.dto.response.LoginResponse;
+import com.nhnacademy.front.auth.service.AuthSessionService;
 import com.nhnacademy.front.auth.validator.PasswordResetFormValidator;
 import com.nhnacademy.front.global.dto.ApiResponse;
-import com.nhnacademy.front.global.security.AccessTokenCookieManager;
 import com.nhnacademy.front.organization.client.InvitationApiClient;
 import com.nhnacademy.front.organization.client.OrganizationApiClient;
 import com.nhnacademy.front.organization.dto.response.OrgDetailResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -43,7 +44,7 @@ public class AuthController {
 
     private final InvitationApiClient invitationApiClient;
     private final PasswordResetFormValidator passwordResetFormValidator;
-    private final AccessTokenCookieManager cookieManager;
+    private final AuthSessionService authSessionService;
 
     @GetMapping("/login")
     public String login(Model model, Principal principal) {
@@ -93,14 +94,17 @@ public class AuthController {
 
         LoginResponse loginResponse = authApiClient.login(request);
 
-        cookieManager.add(response, loginResponse.accessToken());
+        authSessionService.establish(response, loginResponse);
 
         return "redirect:/login/success";
     }
 
     @PostMapping("/logout")
-    public String logout(HttpServletResponse response) {
-        cookieManager.delete(response);
+    public String logout(
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) {
+        authSessionService.revoke(request, response);
 
         return "redirect:/login";
     }
