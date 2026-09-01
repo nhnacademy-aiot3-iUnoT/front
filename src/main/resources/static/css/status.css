@@ -3,12 +3,12 @@
     padding: 0.4rem 0.65rem;
 }
 
-.status-pending, .status-used, .status-warning {
+.status-pending, .status-used, .status-warning, .status-illuminance {
     color: var(--warning);
     background-color: var(--warning-soft);
 }
 
-.status-active {
+.status-active, .status-normal {
     color: var(--teal-dark);
     background-color: var(--mint);
 }
@@ -18,7 +18,12 @@
     background-color: var(--line);
 }
 
-.status-suspended, .status-canceled, .status-closed, .status-locked {
+.status-suspended, .status-canceled, .status-closed, .status-locked, .status-critical, .status-temperature {
     color: var(--danger);
     background-color: var(--danger-soft);
+}
+
+.status-humidity {
+    color: #0369a1;
+    background-color: #e0f2fe;
 }

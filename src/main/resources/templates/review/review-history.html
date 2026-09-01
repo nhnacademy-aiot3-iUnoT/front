@@ -11,20 +11,20 @@
 <body>
 
 <div layout:fragment="content">
-    <div class="container" style="max-width: 1200px; margin: 0 auto; background: #ffffff; padding: 25px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+    <div class="container">
         <h2>📋 환경 검토 내역 조회</h2>
 
         <!-- 상단 필터 및 저장소 선택 영역 -->
-        <div class="filter-section" style="margin: 20px 0; display: flex; gap: 10px; align-items: center;">
-            <label for="storageSelect"><strong>저장소 선택:</strong></label>
-            <select id="storageSelect" style="padding: 8px; border-radius: 4px; border: 1px solid #ccc; min-width: 200px;">
-                <option value="">전체 저장소 (내 부서)</option>
+        <div class="filter-section">
+            <label for="storageSelect">저장소 선택:</label>
+            <select id="storageSelect">
+                <option value="">내 부서에 포함된 전체 저장소</option>
             </select>
             <button type="button" id="searchBtn" class="btn-primary">조회</button>
         </div>
 
         <!-- 검토 내역 목록 테이블 -->
-        <div class="table-container" style="overflow-x: auto;">
+        <div class="table-container">
             <table>
                 <thead>
                 <tr>
@@ -38,14 +38,14 @@
                 </thead>
                 <tbody id="historyTableBody">
                 <tr>
-                    <td colspan="6" style="text-align: center; color: #888; padding: 20px;">데이터를 불러오는 중입니다...</td>
+                    <td colspan="6" class="empty-data">데이터를 불러오는 중입니다...</td>
                 </tr>
                 </tbody>
             </table>
         </div>
 
         <!-- 페이징 영역 -->
-        <div class="pagination" id="pagination" style="display: flex; justify-content: center; gap: 5px; margin-top: 20px;"></div>
+        <div class="pagination" id="pagination"></div>
     </div>
 </div>
 

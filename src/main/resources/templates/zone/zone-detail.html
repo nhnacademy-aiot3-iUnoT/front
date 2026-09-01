@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main-layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>구역 상세 정보</title>
+    <link rel="stylesheet" th:href="@{/css/status.css}">
+    <link rel="stylesheet" th:href="@{/css/zone-detail.css}">
+</head>
+<body>
+
+<div layout:fragment="content">
+    <div class="py-6">
+        <div class="page-header d-print-none mb-4">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h1 class="page-title">
+                        <span class="org-prefix me-1" th:text="${zone.organizationName + ' > ' + zone.storageName + ' >'}">조직이름 &gt; 저장소이름 &gt;</span>
+                        <span th:text="${zone.name}">구역 이름</span>
+                    </h1>
+                    <div class="text-muted mt-1">구역의 상태와 환경 정보를 관리합니다.</div>
+                </div>
+                <div class="col-auto d-flex align-items-center gap-2">
+                    <div th:if="${canManage}">
+                        <button type="button" class="btn btn-outline-secondary" onclick="openEditZoneModal()">수정</button>
+                        <button type="button" id="btn-toggle-status" class="btn btn-outline-warning"
+                                th:attr="data-storage-id=${zone.storageId}, data-zone-id=${zone.zoneId}, data-status=${zone.status.name()}"
+                                onclick="onToggleZoneStatusClick(this)"
+                                th:text="${zone.status.name() == 'ACTIVE'} ? '비활성화' : '활성화'">상태변경</button>
+                        <button type="button" id="btn-delete-zone" class="btn btn-outline-danger"
+                                th:attr="data-storage-id=${zone.storageId}, data-zone-id=${zone.zoneId}"
+                                onclick="onDeleteZoneClick(this)">삭제</button>
+                    </div>
+                    <a th:href="@{/storages/{storageId}/zones/{zoneId}/environment-events(storageId=${zone.storageId()}, zoneId=${zone.zoneId})}" class="btn btn-primary">
+                        <i class="ti ti-speakerphone"></i>이벤트 내역
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-content-panel">
+        <div class="card mb-4">
+            <div class="card-header plain-card-title"><h2 class="card-title">기본 정보</h2></div>
+            <div class="card-body p-0">
+                <div class="row g-0 border-bottom px-3 py-3">
+                    <div class="col-sm-3 text-muted">구역 이름</div>
+                    <div class="col-sm-9" th:text="${zone.name}">구역 이름</div>
+                </div>
+                <div class="row g-0 border-bottom px-3 py-3">
+                    <div class="col-sm-3 text-muted">상태</div>
+                    <div class="col-sm-9">
+                        <span class="badge status-badge" th:classappend="' status-' + ${zone.status.name().toLowerCase()}" th:text="${zone.status.ko}">활성</span>
+                    </div>
+                </div>
+                <div class="row g-0 border-bottom px-3 py-3">
+                    <div class="col-sm-3 text-muted">환경 상태</div>
+                    <div class="col-sm-9">
+                        <span class="badge status-badge" th:classappend="' status-' + ${zone.envStatus.name().toLowerCase()}" th:text="${zone.envStatus.ko}">정상</span>
+                    </div>
+                </div>
+                <div class="row g-0 border-bottom px-3 py-3">
+                    <div class="col-sm-3 text-muted">설명</div>
+                    <div class="col-sm-9" th:text="${zone.description()}">설명 없음</div>
+                </div>
+                <div class="row g-0 border-bottom px-3 py-3">
+                    <div class="col-sm-3 text-muted">최초 등록일시</div>
+                    <div class="col-sm-9" th:text="${#temporals.format(zone.createdAt, 'yyyy-MM-dd HH:mm')}">2026-06-07 12:00</div>
+                </div>
+                <div class="row g-0 px-3 py-3"><div class="col-sm-3 text-muted">최종 수정일시</div><div class="col-sm-9"><span th:if="${zone.updatedAt != null}" th:text="${#temporals.format(zone.updatedAt, 'yyyy-MM-dd HH:mm')}">2026-06-07 12:00</span><span th:if="${zone.updatedAt == null}">없음</span></div></div>
+            </div>
+        </div>
+
+        <hr class="my-6">
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3 class="m-0">구역 임계값 목록</h3>
+            <button type="button" class="btn btn-primary" th:if="${canManage}" onclick="openThresholdModal()">임계값 설정</button>
+        </div>
+
+        <div class="empty-state" th:if="${#lists.isEmpty(thresholdList)}">
+            등록된 임계값이 없습니다.
+        </div>
+
+        <div class="threshold-grid" th:unless="${#lists.isEmpty(thresholdList)}">
+            <div class="threshold-card clickable-card"
+                 th:each="threshold : ${thresholdList}"
+                 th:onclick="|location.href='/zones/${zone.zoneId}/zone-thresholds/${threshold.zoneThresholdId}'|">
+                <div class="sensor-type" th:text="${threshold.sensorTypeName}">센서 타입</div>
+                <div class="range-val range-val-main">
+                    임계 범위: <strong th:text="${threshold.minValue}">0</strong> ~ <strong th:text="${threshold.maxValue}">0</strong>
+                </div>
+                <div class="range-val range-val-sub">
+                    지연 시간: <span th:text="${threshold.alertDuration}">0</span>초
+                </div>
+            </div>
+        </div>
+
+        <hr class="my-6">
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3 class="m-0">소속 센서 목록</h3>
+            <button type="button" class="btn btn-primary" th:if="${canManage}" onclick="openSensorModal()">센서 추가</button>
+        </div>
+
+        <div class="table-responsive"><table class="table table-vcenter table-hover card-table">
+            <thead>
+            <tr>
+                <th>센서 이름</th>
+                <th>Device EUI</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:if="${#lists.isEmpty(sensorList)}">
+                <td colspan="2" class="empty-state">등록된 센서가 없습니다.</td>
+            </tr>
+            <tr th:each="sensor : ${sensorList}" class="clickable-row"
+                th:onclick="|location.href='/zones/${zone.zoneId}/zone-sensors/${sensor.zoneSensorId}'|">
+                <td th:text="${sensor.name}">센서 이름</td>
+                <td th:text="${sensor.deviceEui}">EUI-0000</td>
+            </tr>
+            </tbody>
+        </table></div>
+
+        <a th:href="@{/storages/{storageId}(storageId=${zone.storageId})}" class="btn btn-outline-secondary mt-4">← 저장소 상세로 돌아가기</a>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments/modal/zone-detail-modal :: modal}"></div>
+</div>
+
+<th:block layout:fragment="script">
+    <script th:src="@{/js/common/validation.js}"></script>
+    <script th:src="@{/js/common/form.js}"></script>
+    <script th:src="@{/js/zone/zone-detail.js}"></script>
+</th:block>
+
+</body>
+</html>

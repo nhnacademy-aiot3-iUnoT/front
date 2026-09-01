@@ -1,52 +1,79 @@
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f8f9fa;
-    margin: 0;
-    padding: 20px;
-    color: #333;
-}
-
 .container {
     max-width: 1200px;
-    margin: 0 auto;
-    background: #ffffff;
-    padding: 25px;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    margin: 30px auto;
+    padding: 30px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
 }
 
-h2 {
-    margin-top: 0;
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.page-header h2 {
+    margin: 0;
     color: #2c3e50;
+    font-size: 1.5rem;
 }
 
 .filter-section {
-    margin-bottom: 20px;
     display: flex;
-    gap: 10px;
+    gap: 15px;
+    margin-bottom: 25px;
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
     align-items: center;
 }
 
+.filter-section label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #555;
+}
+
 .filter-section select {
-    padding: 8px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background: #fff;
+    font-size: 14px;
     min-width: 200px;
 }
 
-button {
-    padding: 8px 16px;
+.btn-primary {
+    padding: 8px 20px;
+    background: #2563eb;
+    color: white;
     border: none;
-    border-radius: 4px;
+    border-radius: 6px;
     cursor: pointer;
-    font-weight: bold;
+    font-weight: 600;
+    height: 38px;
 }
 
-.btn-primary { background-color: #007bff; color: white; }
-.btn-primary:hover { background-color: #0056b3; }
+.btn-primary:hover {
+    background: #1d4ed8;
+}
 
-.btn-success { background-color: #28a745; color: white; width: 100%; padding: 12px; margin-top: 10px;}
-.btn-success:hover { background-color: #218838; }
+.btn-secondary {
+    padding: 8px 16px;
+    border: 1px solid #ddd;
+    background: #fff;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    color: #4b5563;
+    height: 38px;
+}
+
+.btn-secondary:hover {
+    background: #f3f4f6;
+}
 
 .table-container {
     overflow-x: auto;
@@ -59,20 +86,51 @@ table {
 }
 
 th, td {
-    padding: 12px;
+    padding: 12px 15px;
     text-align: left;
-    border-bottom: 1px solid #dee2e6;
+    border-bottom: 1px solid #eee;
     font-size: 14px;
 }
 
 th {
-    background-color: #f1f3f5;
-    color: #495057;
+    background: #f1f5f9;
+    color: #334155;
+    font-weight: 600;
 }
 
-/* 모달 스타일 */
-.modal {
-    display: none;
+tr:hover {
+    background: #f8fafc;
+}
+
+.empty-data {
+    text-align: center;
+    color: #888;
+    padding: 20px;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    margin-top: 30px;
+}
+
+.pagination button {
+    padding: 6px 12px;
+    border: 1px solid #ddd;
+    background: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.pagination button.active {
+    background: #2563eb;
+    color: white;
+    border-color: #2563eb;
+}
+
+/* 모달 관련 스타일 */
+.modal-wrapper {
     position: fixed;
     z-index: 1000;
     left: 0;
@@ -82,41 +140,106 @@ th {
     background-color: rgba(0,0,0,0.5);
 }
 
-.modal-content {
+.modal-backdrop {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.modal-box {
     background-color: #fff;
     margin: 5% auto;
-    padding: 20px;
+    padding: 25px;
     border-radius: 8px;
     width: 700px;
     max-width: 90%;
+    position: relative;
+    z-index: 1001;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.modal-header h3 {
+    margin: 0;
+    color: #2c3e50;
 }
 
 .close {
-    color: #aaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
+    font-size: 24px;
     cursor: pointer;
+    color: #aaa;
 }
 
-.close:hover { color: #000; }
+.close:hover {
+    color: #000;
+}
+
+.modal-desc {
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 15px;
+}
 
 .event-table-container {
     max-height: 200px;
     overflow-y: auto;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
     border: 1px solid #dee2e6;
+    border-radius: 4px;
 }
 
-.form-group {
+.event-table-container th {
+    background-color: #f1f3f5;
+    font-size: 13px;
+    padding: 10px;
+}
+
+.event-table-container td {
+    font-size: 13px;
+    padding: 10px;
+}
+
+.form-group-radio {
     margin-bottom: 15px;
 }
 
-.form-group textarea {
+.form-label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #333;
+    font-size: 14px;
+}
+
+.radio-group {
+    display: flex;
+    gap: 20px;
+    cursor: pointer;
+}
+
+.form-group-memo {
+    margin-bottom: 20px;
+}
+
+.form-group-memo textarea {
     width: 100%;
     height: 80px;
-    padding: 8px;
+    padding: 10px;
     border: 1px solid #ccc;
     border-radius: 4px;
     resize: none;
+    box-sizing: border-box;
+    font-family: inherit;
+}
+
+.btn-full {
+    width: 100%;
+    padding: 12px;
+    font-size: 15px;
 }

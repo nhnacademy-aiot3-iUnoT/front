@@ -57,7 +57,7 @@
                 </div>
 
                 <div class="meta-item">
-                    <span class="meta-label">마약코드</span>
+                    <span class="meta-label">마약류 구분</span>
                     <span class="meta-value" th:text="${medicineInfo.narcoticKindCode == null ? '해당없음' : medicineInfo.narcoticKindCode}"></span>
                 </div>
             </div>
@@ -74,7 +74,7 @@
                 <strong class="total-stock" th:text="|총 ${totalQuantity}정|">총 180정</strong>
             </div>
             <div class="stock-table-wrap">
-                <table class="stock-table" th:each="item : ${inventories}">
+                <table class="stock-table">
                     <thead>
                     <tr>
                         <th>보관 구역</th>
@@ -86,7 +86,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr>
+                    <tr th:each="item : ${inventories}">
                         <td th:text="${item.zoneName}">A-03 상온 보관구역 · 선반 2</td>
                         <td th:text="${item.lotNumber}"></td>
                         <td th:text="${item.expirationDate}"></td>
@@ -107,7 +107,7 @@
                        th:href="@{/inventories/storages/{storageId}/pack-units/{packUnitId}(storageId=${inventory.storageId},packUnitId=${inventory.medicinePackUnitId},page=${currentPage - 1}, size=${pageSize})}">
                         이전</a>
 
-                    <a th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}"
+                    <a th:each="pageNum : ${#numbers.sequence(startPage, endPage)}"
                        th:href="@{/inventories/storages/{storageId}/pack-units/{packUnitId}(storageId=${inventory.storageId},packUnitId=${inventory.medicinePackUnitId},page=${pageNum},size=${pageSize})}"
                        th:text="${pageNum + 1}"
                        th:classappend="${pageNum == currentPage} ? ' active'">1</a>

@@ -59,6 +59,23 @@ class CookieAuthenticationEntryPointTest {
     }
 
     @Test
+    void refreshFailureDoesNotDeleteCookieThatConcurrentRefreshMayReplace() throws Exception {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setCookies(new Cookie(AccessTokenCookieManager.COOKIE_NAME, "expired-token"));
+        request.setAttribute(
+                RefreshTokenAutoRenewFilter.REFRESH_FAILED_ATTRIBUTE,
+                Boolean.TRUE
+        );
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        entryPoint.commence(request, response, new BadCredentialsException("refresh failed"));
+
+        assertThat(response.getStatus()).isEqualTo(302);
+        assertThat(response.getRedirectedUrl()).isEqualTo("/login");
+        assertThat(response.getHeader(HttpHeaders.SET_COOKIE)).isNull();
+    }
+
+    @Test
     void accessTokenCookieUsesConfiguredTtl() {
         MockHttpServletResponse response = new MockHttpServletResponse();
 

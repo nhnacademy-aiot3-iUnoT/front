@@ -22,7 +22,8 @@ function loadStorages() {
                 result.data.forEach(storage => {
                     const option = document.createElement("option");
                     option.value = storage.storageId;
-                    option.textContent = `${storage.name} (${storage.organizationName})`;
+                    // 저장소 이름만 표시하도록 수정
+                    option.textContent = storage.name;
                     select.appendChild(option);
                 });
             }
@@ -55,8 +56,9 @@ function renderInventoryTable(items) {
     const tbody = document.getElementById("inventoryTableBody");
     tbody.innerHTML = "";
 
+    // 데이터가 없을 때 명확하게 안내 문구 출력
     if (!items || items.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: #888; padding: 20px;">검토 대상 재고가 없습니다.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: #888; padding: 30px;">검토 대상 재고가 없습니다.</td></tr>`;
         return;
     }
 
@@ -102,7 +104,7 @@ function renderPagination(pageData) {
     prevBtn.onclick = () => loadUnderReviewInventories(page - 1);
     pagination.appendChild(prevBtn);
 
-    // 페이지 번호 표시 (간단히 현재 페이지 / 전체 페이지 표시 또는 번호 나열)
+    // 페이지 번호 표시
     const pageInfo = document.createElement("span");
     pageInfo.style.alignSelf = "center";
     pageInfo.style.padding = "0 10px";

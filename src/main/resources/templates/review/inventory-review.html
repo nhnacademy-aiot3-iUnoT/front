@@ -6,26 +6,32 @@
 <head>
     <meta charset="UTF-8">
     <title>환경 검토 대상 재고 관리</title>
-    <!-- 기존 CSS 경로 유지 -->
     <link rel="stylesheet" th:href="@{/css/inventory-review.css}">
 </head>
 <body>
 
 <div layout:fragment="content">
-    <div class="container" style="max-width: 1200px; margin: 0 auto; background: #ffffff; padding: 25px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-        <h2>📦 환경 검토 대상 재고 관리</h2>
+    <div class="container">
+
+        <!-- 타이틀 및 내역 페이지 이동 버튼 영역 -->
+        <div class="page-header">
+            <h2>📦 환경 검토 대상 재고 관리</h2>
+            <button type="button" class="btn-secondary" onclick="location.href='/environment-reviews'">
+                📋 검토 내역 조회
+            </button>
+        </div>
 
         <!-- 상단 필터 및 저장소 선택 영역 -->
-        <div class="filter-section" style="margin: 20px 0; display: flex; gap: 10px; align-items: center;">
-            <label for="storageSelect"><strong>저장소 선택:</strong></label>
-            <select id="storageSelect" style="padding: 8px; border-radius: 4px; border: 1px solid #ccc; min-width: 200px;">
-                <option value="">전체 저장소 (내 부서)</option>
+        <div class="filter-section">
+            <label for="storageSelect">저장소 선택:</label>
+            <select id="storageSelect">
+                <option value="">내 부서에 포함된 전체 저장소</option>
             </select>
             <button type="button" id="searchBtn" class="btn-primary">조회</button>
         </div>
 
         <!-- 재고 목록 테이블 -->
-        <div class="table-container" style="overflow-x: auto;">
+        <div class="table-container">
             <table>
                 <thead>
                 <tr>
@@ -41,35 +47,35 @@
                 </thead>
                 <tbody id="inventoryTableBody">
                 <tr>
-                    <td colspan="8" style="text-align: center; color: #888; padding: 20px;">데이터를 불러오는 중입니다...</td>
+                    <td colspan="8" class="empty-data">데이터를 불러오는 중입니다...</td>
                 </tr>
                 </tbody>
             </table>
         </div>
 
         <!-- 페이징 영역 -->
-        <div class="pagination" id="pagination" style="display: flex; justify-content: center; gap: 5px; margin-top: 20px;"></div>
+        <div class="pagination" id="pagination"></div>
     </div>
 
     <!-- ================= 모달 영역 ================= -->
-    <div id="eventModal" class="modal-wrapper" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);">
-        <div class="modal-backdrop" onclick="closeEventModal()" style="position: absolute; width: 100%; height: 100%;"></div>
-        <div class="modal-box" style="background-color: #fff; margin: 5% auto; padding: 25px; border-radius: 8px; width: 700px; max-width: 90%; position: relative; z-index: 1001; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                <h3 style="margin: 0;">🚨 재고 환경 이벤트 검토</h3>
-                <span class="close" onclick="closeEventModal()" style="font-size: 24px; cursor: pointer; color: #aaa;">&times;</span>
+    <div id="eventModal" class="modal-wrapper" style="display: none;">
+        <div class="modal-backdrop" onclick="closeEventModal()"></div>
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>🚨 재고 환경 이벤트 검토</h3>
+                <span class="close" onclick="closeEventModal()">&times;</span>
             </div>
-            <p style="color: #666; font-size: 14px; margin-bottom: 15px;">마지막 검토일 이후 발생한 환경 이상 내역입니다.</p>
+            <p class="modal-desc">마지막 검토일 이후 발생한 환경 이상 내역입니다.</p>
 
-            <div class="event-table-container" style="max-height: 200px; overflow-y: auto; margin-bottom: 20px; border: 1px solid #dee2e6; border-radius: 4px;">
-                <table style="width: 100%; border-collapse: collapse;">
+            <div class="event-table-container">
+                <table>
                     <thead>
-                    <tr style="background-color: #f1f3f5;">
-                        <th style="padding: 10px; border-bottom: 1px solid #dee2e6; text-align: left; font-size: 13px;">이벤트 타입</th>
-                        <th style="padding: 10px; border-bottom: 1px solid #dee2e6; text-align: left; font-size: 13px;">위반 유형</th>
-                        <th style="padding: 10px; border-bottom: 1px solid #dee2e6; text-align: left; font-size: 13px;">측정값</th>
-                        <th style="padding: 10px; border-bottom: 1px solid #dee2e6; text-align: left; font-size: 13px;">기준값</th>
-                        <th style="padding: 10px; border-bottom: 1px solid #dee2e6; text-align: left; font-size: 13px;">발생 일시</th>
+                    <tr>
+                        <th>이벤트 타입</th>
+                        <th>위반 유형</th>
+                        <th>측정값</th>
+                        <th>기준값</th>
+                        <th>발생 일시</th>
                     </tr>
                     </thead>
                     <tbody id="eventTableBody">
@@ -79,18 +85,18 @@
             </div>
 
             <div class="review-form">
-                <div style="margin-bottom: 15px;">
-                    <label style="display: block; margin-bottom: 8px; font-weight: bold;">처리 유형:</label>
-                    <div style="display: flex; gap: 20px;">
-                        <label style="cursor: pointer;"><input type="radio" name="isOut" value="false" checked> 정상 처리</label>
-                        <label style="cursor: pointer;"><input type="radio" name="isOut" value="true"> 폐기 처리</label>
+                <div class="form-group-radio">
+                    <label class="form-label">처리 유형:</label>
+                    <div class="radio-group">
+                        <label><input type="radio" name="isOut" value="false" checked> 정상 처리</label>
+                        <label><input type="radio" name="isOut" value="true"> 폐기 처리</label>
                     </div>
                 </div>
-                <div style="margin-bottom: 20px;">
-                    <label for="memoInput" style="display: block; margin-bottom: 8px; font-weight: bold;">메모 (선택, 최대 255자):</label>
-                    <textarea id="memoInput" maxlength="255" placeholder="검토 의견을 입력하세요" style="width: 100%; height: 80px; padding: 10px; border: 1px solid #ccc; border-radius: 4px; resize: none; box-sizing: border-box;"></textarea>
+                <div class="form-group-memo">
+                    <label for="memoInput" class="form-label">메모 (선택, 최대 255자):</label>
+                    <textarea id="memoInput" maxlength="255" placeholder="검토 의견을 입력하세요"></textarea>
                 </div>
-                <button type="button" id="submitReviewBtn" class="btn-primary" style="width: 100%; padding: 12px; font-size: 15px;">검토 완료 처리</button>
+                <button type="button" id="submitReviewBtn" class="btn-primary btn-full">검토 완료 처리</button>
             </div>
         </div>
     </div>

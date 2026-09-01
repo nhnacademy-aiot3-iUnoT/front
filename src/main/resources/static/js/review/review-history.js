@@ -19,7 +19,7 @@ function loadStorages() {
                 result.data.forEach(storage => {
                     const option = document.createElement("option");
                     option.value = storage.storageId;
-                    option.textContent = `${storage.name} (${storage.organizationName})`;
+                    option.textContent = storage.name;
                     select.appendChild(option);
                 });
             }
@@ -53,7 +53,7 @@ function renderHistoryTable(items) {
     tbody.innerHTML = "";
 
     if (!items || items.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #888; padding: 20px;">검토 내역이 없습니다.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #888; padding: 30px;">검토 내역이 없습니다.</td></tr>`;
         return;
     }
 

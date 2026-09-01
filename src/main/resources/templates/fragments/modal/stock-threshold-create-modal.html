@@ -1,0 +1,49 @@
+<div th:fragment="modal" class="modal modal-blur fade" id="stock-threshold-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">최소 재고 임계값 추가</h3>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+            </div>
+            <div class="modal-body">
+                <label class="form-label">의약품 검색</label>
+                <div class="mb-3">
+                    <div class="input-group">
+                        <input id="medicine-search-keyword" class="form-control" type="text" placeholder="의약품 상품명 입력">
+                        <button type="button" class="btn btn-outline-primary" onclick="searchMedicines()">검색</button>
+                    </div>
+                    <div class="invalid-feedback"></div>
+                </div>
+                <div class="table-responsive border rounded mb-3">
+                    <table class="table table-vcenter card-table mb-0">
+                        <thead>
+                            <tr>
+                                <th>상품명</th>
+                                <th>포장단위</th>
+                                <th class="text-center">선택</th>
+                            </tr>
+                        </thead>
+                        <tbody id="medicine-search-result-body">
+                            <tr>
+                                <td colspan="3" class="text-center text-secondary py-3">의약품을 검색해주세요.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <input type="hidden" id="selected-package-unit-id">
+                <p class="text-secondary mb-3">
+                    선택된 의약품: <strong id="selected-medicine-label">없음</strong>
+                </p>
+                <div class="mb-3">
+                <label for="new-stock-threshold" class="form-label">최소 재고 개수</label>
+                <input id="new-stock-threshold" class="form-control" type="number" min="0" placeholder="최소 재고 개수 입력">
+                <div class="invalid-feedback"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">취소</button>
+                <button type="button" class="btn btn-primary" th:attr="onclick=|saveStockThreshold('${storage.storageId}')|">등록</button>
+            </div>
+        </div>
+    </div>
+</div>

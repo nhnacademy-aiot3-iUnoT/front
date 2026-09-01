@@ -1,8 +1,7 @@
 package com.nhnacademy.front.global.config;
 
-import jakarta.servlet.ServletRequest;
+import com.nhnacademy.front.global.security.RefreshTokenAutoRenewFilter;
 import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequestExecution;
@@ -17,11 +16,17 @@ import org.springframework.web.util.WebUtils;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Set;
 
 @Component
 public class AccessTokenInterceptor implements ClientHttpRequestInterceptor {
 
     private static final String ACCESS_TOKEN_COOKIE = "access_token";
+    private static final Set<String> ACCESS_TOKEN_EXCLUDED_PATHS = Set.of(
+            "/api/auth/login",
+            "/api/auth/refresh",
+            "/api/auth/logout"
+    );
 
     @Override
     public ClientHttpResponse intercept(
@@ -29,12 +34,25 @@ public class AccessTokenInterceptor implements ClientHttpRequestInterceptor {
             byte[] body,
             ClientHttpRequestExecution execution
     ) throws IOException {
+        if (ACCESS_TOKEN_EXCLUDED_PATHS.contains(request.getURI().getPath())) {
+            return execution.execute(request, body);
+        }
+
         var requestAttributes =
                 RequestContextHolder.getRequestAttributes();
 
         if (requestAttributes instanceof ServletRequestAttributes attributes) {
-            Cookie[] cookies = attributes.getRequest().getCookies();
+            Object refreshedAccessToken = attributes.getRequest().getAttribute(
+                    RefreshTokenAutoRenewFilter.REFRESHED_ACCESS_TOKEN_ATTRIBUTE
+            );
 
+            if (refreshedAccessToken instanceof String token
+                    && StringUtils.hasText(token)) {
+                request.getHeaders().setBearerAuth(token);
+                return execution.execute(request, body);
+            }
+
+            Cookie[] cookies = attributes.getRequest().getCookies();
             if (cookies != null) {
                 Arrays.stream(cookies)
                         .filter(cookie ->
