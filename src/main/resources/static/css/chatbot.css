@@ -167,3 +167,32 @@
         height: min(600px, calc(100vh - 6rem));
     }
 }
+
+.chatbot-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 9px;
+    background: #d64545;
+    color: #fff;
+    font-size: 11px;
+    line-height: 18px;
+    text-align: center;
+    font-weight: 600;
+}
+
+.chatbot-note {
+    border-left: 3px solid #9aa5ab;
+    padding-left: 10px;
+}
+
+.chatbot-note.severity-warn {
+    border-left-color: #d9903a;
+}
+
+.chatbot-note.severity-critical {
+    border-left-color: #d64545;
+}
