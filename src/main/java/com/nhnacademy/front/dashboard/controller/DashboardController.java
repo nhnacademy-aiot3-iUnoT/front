@@ -35,8 +35,6 @@ public class DashboardController {
 
     private static final String DASHBOARD_VIEW = "dashboard/main";
     private static final int EXPIRING_ROW_SIZE = 5;
-
-    /** 드롭다운에서 "조직 전체"를 고르면 이 값이 넘어온다. 서버에는 departmentId 없이 요청한다. */
     private static final long ORG_WIDE = 0L;
 
     private final DashboardApiClient dashboardApiClient;
@@ -89,7 +87,7 @@ public class DashboardController {
 
         addEnvironment(model, selectedStorageId);
 
-        // AI 리포트는 환경 현황과 독립적으로 저장소를 고를 수 있다
+        // AI 리포트를 탭다운 형식으로 저장소를 선택하여 확인
         Long selectedReportStorageId = resolveStorageId(storages, reportStorageId);
         model.addAttribute("selectedReportStorageId", selectedReportStorageId);
 
@@ -98,9 +96,7 @@ public class DashboardController {
         return DASHBOARD_VIEW;
     }
 
-    /**
-     * 부서 목록 조회
-     */
+    // 선택가능한 부서 목록 조회
     private DashboardDepartmentsResponse departments() {
         try {
             DashboardDepartmentsResponse departments = dashboardApiClient.getDepartments();
@@ -113,10 +109,12 @@ public class DashboardController {
         }
     }
 
+    // 조회 실패시 빈리스트 조회
     private DashboardDepartmentsResponse emptyDepartments() {
         return new DashboardDepartmentsResponse(false, null, List.of(), List.of());
     }
 
+    // 선택한 부서 OR 조직의 전체 요약 정보 조회
     private void addSummary(Model model, Long departmentId) {
         try {
             DashboardSummaryResponse summary = dashboardApiClient.getSummary(departmentId);
@@ -127,6 +125,7 @@ public class DashboardController {
         }
     }
 
+    // 부서 OR 조직의 유통기한의 임박한 의약품 조회
     private void addExpiring(Model model, Long departmentId) {
         try {
             DashboardExpiringResponse expiring =
@@ -138,6 +137,7 @@ public class DashboardController {
         }
     }
 
+    // 선택한 저장소의 환경현황 조회
     private void addEnvironment(Model model, Long storageId) {
         if (storageId == null) {
             model.addAttribute("environment", null);
@@ -157,6 +157,7 @@ public class DashboardController {
         }
     }
 
+    // 해당 저장소의 지난주 AI 리포트 조회
     private void addWeeklyReport(Model model, Long storageId) {
         LocalDate lastMonday = LocalDate.now().with(DayOfWeek.MONDAY).minusWeeks(1);
         model.addAttribute("reportPeriodStart", lastMonday);
@@ -176,6 +177,7 @@ public class DashboardController {
         }
     }
 
+    // 특정 부서에 속한 저장소목록 조회
     private List<StorageDepartmentResponse> storages(Long departmentId) {
         if (departmentId == null) {
             return List.of();
@@ -192,7 +194,7 @@ public class DashboardController {
         }
     }
 
-    /** 조직 전체 조회일 때는 부서와 무관하게 조직의 모든 저장소를 쓴다. */
+    // 해당 조직의 전체 저장소 목록조회
     private List<StorageDepartmentResponse> organizationStorages() {
         try {
             List<StorageInfoResponse> storages = storageApiClient.getStorages();
@@ -212,7 +214,7 @@ public class DashboardController {
         }
     }
 
-    /** 요청 파라미터가 없거나 접근 가능한 부서가 아니면 내 첫 부서를 고른다. */
+    // 내가 속한 부서 ID 결정
     private Long resolveDepartmentId(DashboardDepartmentsResponse departments, Long requested) {
         List<DepartmentOptionResponse> selectable = selectableDepartments(departments);
 
@@ -224,6 +226,7 @@ public class DashboardController {
         return selectable.isEmpty() ? null : selectable.getFirst().departmentId();
     }
 
+    // 관리자용 전체 부서 선택 목록 생성
     private List<DepartmentOptionResponse> selectableDepartments(DashboardDepartmentsResponse departments) {
         List<DepartmentOptionResponse> mine = departments.myDepartments() == null
                 ? List.of() : departments.myDepartments();
@@ -233,6 +236,7 @@ public class DashboardController {
         return Stream.concat(mine.stream(), others.stream()).toList();
     }
 
+    // 저장소 ID 결정
     private Long resolveStorageId(List<StorageDepartmentResponse> storages, Long requested) {
         if (storages.isEmpty()) {
             return null;
@@ -246,6 +250,7 @@ public class DashboardController {
         return storages.getFirst().storageId();
     }
 
+    // 부서ID로 부서명 조회
     private String departmentName(DashboardDepartmentsResponse departments, Long departmentId) {
         if (departmentId == null) {
             return null;
