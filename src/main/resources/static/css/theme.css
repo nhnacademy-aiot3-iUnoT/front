@@ -353,6 +353,9 @@ a:hover {
     background-color: var(--teal-soft);
 }
 
+.card-status-start {
+    z-index: 1;
+}
 
 
 .ai-summary {
