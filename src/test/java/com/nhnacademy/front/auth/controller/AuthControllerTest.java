@@ -13,11 +13,12 @@ import com.nhnacademy.front.auth.dto.request.ResetPasswordTokenRequest;
 import com.nhnacademy.front.auth.dto.request.SignupRequest;
 import com.nhnacademy.front.auth.dto.response.CheckEmailResponse;
 import com.nhnacademy.front.auth.dto.response.LoginResponse;
+import com.nhnacademy.front.auth.service.AuthSessionService;
 import com.nhnacademy.front.auth.dto.response.SignupResponse;
 import com.nhnacademy.front.auth.validator.PasswordResetFormValidator;
-import com.nhnacademy.front.global.security.AccessTokenCookieManager;
 import com.nhnacademy.front.organization.client.InvitationApiClient;
 import com.nhnacademy.front.organization.client.OrganizationApiClient;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.Test;
 import org.jsoup.Jsoup;
@@ -61,7 +62,7 @@ class AuthControllerTest {
     private AuthApiClient authApiClient;
 
     @MockitoBean
-    private AccessTokenCookieManager cookieManager;
+    private AuthSessionService authSessionService;
 
     @MockitoBean
     private AccountApiClient accountApiClient;
@@ -122,7 +123,7 @@ class AuthControllerTest {
     @Test
     void loginAddsAccessTokenCookieAndRedirectsToSuccessPage() throws Exception {
         LoginRequest request = new LoginRequest("test@test.com", "password");
-        LoginResponse response = new LoginResponse("access-token");
+        LoginResponse response = new LoginResponse("access-token", "refresh-token");
 
         given(authApiClient.login(request)).willReturn(response);
 
@@ -134,9 +135,9 @@ class AuthControllerTest {
                 .andExpect(redirectedUrl("/login/success"));
 
         then(authApiClient).should().login(request);
-        then(cookieManager).should().add(
+        then(authSessionService).should().establish(
                 any(HttpServletResponse.class),
-                eq(response.accessToken())
+                eq(response)
         );
     }
 
@@ -177,7 +178,10 @@ class AuthControllerTest {
                 .andExpect(view().name("redirect:/login"))
                 .andExpect(redirectedUrl("/login"));
 
-        then(cookieManager).should().delete(any(HttpServletResponse.class));
+        then(authSessionService).should().revoke(
+                any(HttpServletRequest.class),
+                any(HttpServletResponse.class)
+        );
     }
 
     private JwtAuthenticationToken authentication(AccountStatus status) {

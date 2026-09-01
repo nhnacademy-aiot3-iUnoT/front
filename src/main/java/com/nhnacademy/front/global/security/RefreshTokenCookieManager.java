@@ -1,6 +1,6 @@
 package com.nhnacademy.front.global.security;
 
-import com.nhnacademy.front.global.config.JwtProperties;
+import com.nhnacademy.front.global.config.RefreshTokenProperties;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -14,24 +14,24 @@ import org.springframework.web.util.WebUtils;
 import java.time.Duration;
 
 @Component
-public class AccessTokenCookieManager {
+public class RefreshTokenCookieManager {
 
-    public static final String COOKIE_NAME = "access_token";
+    public static final String COOKIE_NAME = "refresh_token";
 
     private final boolean secure;
-    private final Duration accessTokenTtl;
+    private final Duration refreshTokenTtl;
 
-    public AccessTokenCookieManager(
+    public RefreshTokenCookieManager(
             @Value("${cookie.secure:false}") boolean secure,
-            JwtProperties jwtProperties
+            RefreshTokenProperties properties
     ) {
         this.secure = secure;
-        this.accessTokenTtl = jwtProperties.getAccessTokenTtl();
+        this.refreshTokenTtl = properties.getTtl();
     }
 
-    public void add(HttpServletResponse response, String accessToken) {
-        ResponseCookie cookie = baseCookie(accessToken)
-                .maxAge(accessTokenTtl)
+    public void add(HttpServletResponse response, String refreshToken) {
+        ResponseCookie cookie = baseCookie(refreshToken)
+                .maxAge(refreshTokenTtl)
                 .build();
 
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
