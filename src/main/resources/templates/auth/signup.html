@@ -48,7 +48,11 @@
                                                 <button type="button"
                                                         id="emailCheck"
                                                         class="btn btn-outline-secondary">중복확인</button>
-                                                <div id="email-feedback" class="invalid-feedback">이메일을 입력해주세요.</div>
+                                                <div id="email-feedback"
+                                                     class="invalid-feedback"
+                                                     th:text="${#fields.hasErrors('email') ? #fields.errors('email')[0] : '이메일을 입력해주세요.'}">
+                                                    이메일을 입력해주세요.
+                                                </div>
                                             </div>
                                         </div>
 
@@ -65,9 +69,8 @@
                                                    placeholder="********"
                                                    required>
                                             <div class="invalid-feedback"
-                                                 th:if="${#fields.hasErrors('password')}"
-                                                 th:errors="*{password}">
-                                                비밀번호를 입력해주세요.
+                                                 th:text="${#fields.hasErrors('password') ? #fields.errors('password')[0] : '비밀번호는 6자 이상 64자 이하여야 합니다.'}">
+                                                비밀번호는 6자 이상 64자 이하여야 합니다.
                                             </div>
                                         </div>
 
@@ -75,13 +78,18 @@
                                             <label class="form-label required" for="pwd-check">비밀번호 재확인</label>
                                             <input id="pwd-check"
                                                    type="password"
+                                                   th:field="*{confirmPassword}"
                                                    class="form-control form-control-lg"
+                                                   th:classappend="${#fields.hasErrors('confirmPassword')} ? 'is-invalid'"
                                                    minlength="6"
                                                    maxlength="64"
                                                    autocomplete="new-password"
                                                    placeholder="********"
                                                    required>
-                                            <div class="invalid-feedback">비밀번호가 일치하지 않습니다.</div>
+                                            <div class="invalid-feedback"
+                                                 th:text="${#fields.hasErrors('confirmPassword') ? #fields.errors('confirmPassword')[0] : '비밀번호를 다시 입력해주세요.'}">
+                                                비밀번호를 다시 입력해주세요.
+                                            </div>
                                         </div>
 
                                         <div class="mb-3">
@@ -95,8 +103,7 @@
                                                    placeholder="홍길동"
                                                    required>
                                             <div class="invalid-feedback"
-                                                 th:if="${#fields.hasErrors('name')}"
-                                                 th:errors="*{name}">
+                                                 th:text="${#fields.hasErrors('name') ? #fields.errors('name')[0] : '이름을 입력해주세요.'}">
                                                 이름을 입력해주세요.
                                             </div>
                                         </div>

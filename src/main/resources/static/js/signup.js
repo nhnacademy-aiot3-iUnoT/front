@@ -1,47 +1,107 @@
-const pwdInput = document.getElementById("pwd");
-const pwdCheckInput = document.getElementById("pwd-check");
-const pwdCheckFeedback = pwdCheckInput.closest(".mb-3").querySelector(".invalid-feedback");
+const signupForm = document.getElementById("signup-form");
 const emailInput = document.getElementById("email");
 const emailCheckButton = document.getElementById("emailCheck");
-const signupForm = document.getElementById("signup-form");
+const passwordInput = document.getElementById("pwd");
+const confirmPasswordInput = document.getElementById("pwd-check");
+const nameInput = document.getElementById("name");
 const submitButton = document.getElementById("signup-submit");
 let verifiedEmail = null;
 let emailCheckPromise = null;
 
-function checkPwdEquals() {
-    const isEqual = pwdInput.value === pwdCheckInput.value;
-    const shouldShowError = !isEqual && pwdInput.value !== "" && pwdCheckInput.value !== "";
-
-    pwdCheckInput.setCustomValidity(
-        isEqual ? "" : "비밀번호가 일치하지 않습니다."
-    );
-
-    if (shouldShowError) {
-        setError(pwdCheckInput, "비밀번호가 일치하지 않습니다.");
-    } else {
-        pwdCheckInput.classList.remove("is-invalid");
-        pwdCheckFeedback.classList.remove("d-block");
-    }
-
-    return isEqual;
+if (!signupForm
+    || !emailInput
+    || !emailCheckButton
+    || !passwordInput
+    || !confirmPasswordInput
+    || !nameInput
+    || !submitButton) {
+    throw new Error("회원가입 폼을 찾을 수 없습니다.");
 }
 
-pwdInput.addEventListener("input", checkPwdEquals);
-pwdCheckInput.addEventListener("input", checkPwdEquals);
+function resetSignupField(input, defaultMessage) {
+    input.setCustomValidity("");
+    input.classList.remove("is-invalid");
 
+    const feedback = input.closest(".mb-3")?.querySelector(".invalid-feedback");
+    if (feedback) {
+        feedback.classList.remove("d-block");
+        feedback.textContent = defaultMessage;
+    }
+}
+
+function invalidateSignupField(input, message) {
+    input.setCustomValidity(message);
+    setError(input, message);
+    return false;
+}
+
+function validateSignupEmail() {
+    const value = emailInput.value;
+
+    if (!isRequired(value)) {
+        return invalidateSignupField(emailInput, "이메일을 입력해주세요.");
+    }
+
+    if (!isMaxLength(value, 254)) {
+        return invalidateSignupField(emailInput, "이메일은 254자 이하여야 합니다.");
+    }
+
+    if (!isEmail(value)) {
+        return invalidateSignupField(emailInput, "올바른 이메일 형식이 아닙니다.");
+    }
+
+    return true;
+}
+
+function validateSignupPassword(input, requiredMessage, lengthMessage) {
+    if (!isRequired(input.value)) {
+        return invalidateSignupField(input, requiredMessage);
+    }
+
+    if (input.value.length < 6 || !isMaxLength(input.value, 64)) {
+        return invalidateSignupField(input, lengthMessage);
+    }
+
+    return true;
+}
+
+function validateSignupName() {
+    if (!isRequired(nameInput.value)) {
+        return invalidateSignupField(nameInput, "이름을 입력해주세요.");
+    }
+
+    if (!isMaxLength(nameInput.value, 100)) {
+        return invalidateSignupField(nameInput, "이름은 100자 이하여야 합니다.");
+    }
+
+    return true;
+}
+
+function validatePasswordConfirmation() {
+    const confirmPasswordValid = validateSignupPassword(
+        confirmPasswordInput,
+        "비밀번호를 다시 입력해주세요.",
+        "비밀번호 확인은 6자 이상 64자 이하여야 합니다."
+    );
+
+    if (confirmPasswordValid && passwordInput.value !== confirmPasswordInput.value) {
+        return invalidateSignupField(confirmPasswordInput, "비밀번호가 일치하지 않습니다.");
+    }
+
+    return confirmPasswordValid;
+}
 
 function setEmailInvalid(message) {
-    setError(emailInput, message);
+    invalidateSignupField(emailInput, message);
     emailInput.classList.remove("is-valid");
-    emailInput.setCustomValidity(message);
     verifiedEmail = null;
     submitButton.disabled = true;
 }
 
 function setEmailValid(checkedEmail) {
-    emailInput.classList.remove("is-invalid");
+    resetSignupField(emailInput, "이메일을 입력해주세요.");
     emailInput.classList.add("is-valid");
-    emailInput.setCustomValidity("");
+    emailInput.value = checkedEmail;
     verifiedEmail = checkedEmail;
     submitButton.disabled = false;
 }
@@ -49,14 +109,9 @@ function setEmailValid(checkedEmail) {
 async function checkEmail() {
     const checkedEmail = emailInput.value.trim();
 
-    emailInput.setCustomValidity("");
+    resetSignupField(emailInput, "이메일을 입력해주세요.");
 
-    if (!emailInput.validity.valid) {
-        const message = emailInput.validity.valueMissing
-            ? "이메일을 입력해주세요."
-            : "올바른 이메일 형식으로 입력해주세요.";
-
-        setEmailInvalid(message);
+    if (!validateSignupEmail()) {
         return false;
     }
 
@@ -121,9 +176,19 @@ emailCheckButton.addEventListener("click", startEmailCheck);
 emailInput.addEventListener("input", () => {
     verifiedEmail = null;
     submitButton.disabled = true;
-    emailInput.classList.remove("is-valid", "is-invalid");
-    emailInput.setCustomValidity("");
+    emailInput.classList.remove("is-valid");
+    resetSignupField(emailInput, "이메일을 입력해주세요.");
 });
+
+passwordInput.addEventListener("input", () => {
+    resetSignupField(passwordInput, "비밀번호는 6자 이상 64자 이하여야 합니다.");
+    resetSignupField(confirmPasswordInput, "비밀번호를 다시 입력해주세요.");
+});
+confirmPasswordInput.addEventListener("input", () => resetSignupField(
+    confirmPasswordInput,
+    "비밀번호를 다시 입력해주세요."
+));
+nameInput.addEventListener("input", () => resetSignupField(nameInput, "이름을 입력해주세요."));
 
 signupForm.addEventListener("submit", async event => {
     event.preventDefault();
@@ -133,16 +198,29 @@ signupForm.addEventListener("submit", async event => {
         await emailCheckPromise;
     }
 
-    if (verifiedEmail !== emailInput.value.trim()) {
+    passwordInput.setCustomValidity("");
+    confirmPasswordInput.setCustomValidity("");
+    nameInput.setCustomValidity("");
+
+    const emailValid = validateSignupEmail();
+    let valid = emailValid;
+
+    if (emailValid && verifiedEmail !== emailInput.value.trim()) {
         setEmailInvalid("이메일 중복 확인이 필요합니다.");
-        emailInput.reportValidity();
-        return;
+        valid = false;
     }
 
-    checkPwdEquals();
+    valid = validateSignupPassword(
+        passwordInput,
+        "비밀번호를 입력해주세요.",
+        "비밀번호는 6자 이상 64자 이하여야 합니다."
+    ) && valid;
+    valid = validatePasswordConfirmation() && valid;
+    valid = validateSignupName() && valid;
+    signupForm.classList.add("was-validated");
 
-    if (!signupForm.reportValidity()) {
-        submitButton.disabled = false;
+    if (!valid || !signupForm.reportValidity()) {
+        submitButton.disabled = verifiedEmail === null;
         return;
     }
 

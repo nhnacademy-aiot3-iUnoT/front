@@ -10,10 +10,12 @@ import com.nhnacademy.front.auth.dto.request.LoginRequest;
 import com.nhnacademy.front.auth.dto.request.ResetPasswordFormRequest;
 import com.nhnacademy.front.auth.dto.request.ResetPasswordRequest;
 import com.nhnacademy.front.auth.dto.request.ResetPasswordTokenRequest;
+import com.nhnacademy.front.auth.dto.request.SignupFormRequest;
 import com.nhnacademy.front.auth.dto.request.SignupRequest;
 import com.nhnacademy.front.auth.dto.response.LoginResponse;
 import com.nhnacademy.front.auth.service.AuthSessionService;
 import com.nhnacademy.front.auth.validator.PasswordResetFormValidator;
+import com.nhnacademy.front.auth.validator.SignupFormValidator;
 import com.nhnacademy.front.global.dto.ApiResponse;
 import com.nhnacademy.front.organization.client.InvitationApiClient;
 import com.nhnacademy.front.organization.client.OrganizationApiClient;
@@ -44,6 +46,7 @@ public class AuthController {
 
     private final InvitationApiClient invitationApiClient;
     private final PasswordResetFormValidator passwordResetFormValidator;
+    private final SignupFormValidator signupFormValidator;
     private final AuthSessionService authSessionService;
 
     @GetMapping("/login")
@@ -119,7 +122,7 @@ public class AuthController {
 
         model.addAttribute(
                 "signupRequest",
-                new SignupRequest(token, "", "", "")
+                new SignupFormRequest(token, "", "", "", "")
         );
 
         return "auth/signup";
@@ -127,18 +130,24 @@ public class AuthController {
 
     @PostMapping("/signup")
     public String signupPost(
-            @Valid @ModelAttribute("signupRequest") SignupRequest request,
+            @Valid @ModelAttribute("signupRequest") SignupFormRequest request,
             BindingResult bindingResult
     ) {
+        signupFormValidator.validate(request, bindingResult);
+
         if (bindingResult.hasErrors()) {
             return "auth/signup";
         }
 
-        log.info("Signup Token: {}", request.inviteToken());
         log.info("Signup Email: {}", request.email());
         log.info("Signup Name: {}", request.name());
 
-        authApiClient.signup(request);
+        authApiClient.signup(new SignupRequest(
+                request.inviteToken(),
+                request.email(),
+                request.name(),
+                request.password()
+        ));
 
         return "redirect:/login";
     }
@@ -166,12 +175,12 @@ public class AuthController {
 
     @PostMapping("/pwd")
     public String passwordResetToken(
-            @Valid ResetPasswordTokenRequest request,
+            @Valid @ModelAttribute("resetPasswordTokenRequest") ResetPasswordTokenRequest request,
             BindingResult bindingResult,
             RedirectAttributes redirectAttributes
     ) {
         if (bindingResult.hasErrors()) {
-            return "redirect:/forgot-password";
+            return "auth/forgot-password";
         }
 
         authApiClient.passwordResetToken(request);
