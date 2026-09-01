@@ -67,7 +67,7 @@
                                     </label>
 
                                     <th:block th:if="${!edit}">
-                                        <input type="text" class="form-control" maxlength="64"
+                                        <input type="text" class="form-control" id="deviceEui" maxlength="64"
                                                placeholder="예: device-eui-virtual-21" required
                                                th:field="*{deviceEui}">
                                         <div class="invalid-feedback"></div>
@@ -79,7 +79,7 @@
 
                                     <!-- 수정 모드에서는 디바이스 EUI를 바꿀 수 없다 -->
                                     <th:block th:if="${edit}">
-                                        <input type="text" class="form-control" id="deviceEui" name="deviceEui"
+                                        <input type="text" class="form-control" th:id="'deviceEui'" name="deviceEui"
                                                maxlength="64" th:value="${deviceEui}" readonly>
                                         <div class="invalid-feedback"></div>
                                         <small class="form-hint">디바이스 EUI는 수정할 수 없습니다.</small>
@@ -93,7 +93,8 @@
                                         측정 주기 (초)
                                     </label>
 
-                                    <input type="number" class="form-control" min="1" step="1" required
+                                    <input type="number" class="form-control" id="measurementIntervalSeconds"
+                                           min="1" step="1" required
                                            th:field="*{measurementIntervalSeconds}">
 
                                     <div class="invalid-feedback"></div>
@@ -116,9 +117,10 @@
                     </div>
 
                     <div class="card-body">
-                        <div class="mb-4" id="sensorTypeSelection">
+                        <fieldset class="mb-4" id="sensorTypeSelection">
+                            <legend class="visually-hidden">생성할 센서 타입</legend>
                             <div class="d-flex align-items-center justify-content-between gap-3 mb-3">
-                                <label class="form-label required mb-0">생성할 센서 타입</label>
+                                <span class="form-label required mb-0" aria-hidden="true">생성할 센서 타입</span>
                                 <span id="selectedSensorCount" class="badge bg-secondary-lt" aria-live="polite">0개 선택</span>
                             </div>
 
@@ -195,7 +197,7 @@
                                 <div class="text-danger"
                                      th:errors="*{virtualSensorValues.sensorModeConfigurationValid}"></div>
                             </th:block>
-                        </div>
+                        </fieldset>
 
                         <div class="card card-body text-center py-5" id="sensorConfigEmpty">
                             <div class="mb-2"><i class="ti ti-pointer fs-1 text-secondary"></i></div>
@@ -228,7 +230,7 @@
                             <div class="row" data-mode-fields="RANGE">
                                 <div class="col-md-6 mb-3">
                                     <div class="input-group">
-                                        <span class="input-group-text">최소</span>
+                                        <label class="input-group-text" for="temperatureMin">최소</label>
                                         <input type="number" class="form-control" id="temperatureMin"
                                                name="virtualSensorValues.valueMap[TEMPERATURE].min" step="0.1" required
                                                th:value="${virtualSensor != null and virtualSensor.virtualSensorValues.temperature != null
@@ -238,7 +240,7 @@
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <div class="input-group">
-                                        <span class="input-group-text">최대</span>
+                                        <label class="input-group-text" for="temperatureMax">최대</label>
                                         <input type="number" class="form-control" id="temperatureMax"
                                                name="virtualSensorValues.valueMap[TEMPERATURE].max" step="0.1" required
                                                th:value="${virtualSensor != null and virtualSensor.virtualSensorValues.temperature != null
@@ -283,7 +285,7 @@
                             <div class="row" data-mode-fields="RANGE">
                                 <div class="col-md-6 mb-3">
                                     <div class="input-group">
-                                        <span class="input-group-text">최소</span>
+                                        <label class="input-group-text" for="humidityMin">최소</label>
                                         <input type="number" class="form-control" id="humidityMin"
                                                name="virtualSensorValues.valueMap[HUMIDITY].min" step="0.1" required
                                                th:value="${virtualSensor != null and virtualSensor.virtualSensorValues.humidity != null
@@ -293,7 +295,7 @@
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <div class="input-group">
-                                        <span class="input-group-text">최대</span>
+                                        <label class="input-group-text" for="humidityMax">최대</label>
                                         <input type="number" class="form-control" id="humidityMax"
                                                name="virtualSensorValues.valueMap[HUMIDITY].max" step="0.1" required
                                                th:value="${virtualSensor != null and virtualSensor.virtualSensorValues.humidity != null
@@ -338,7 +340,7 @@
                             <div class="row" data-mode-fields="RANGE">
                                 <div class="col-md-6 mb-3">
                                     <div class="input-group">
-                                        <span class="input-group-text">최소</span>
+                                        <label class="input-group-text" for="illuminationMin">최소</label>
                                         <input type="number" class="form-control" id="illuminationMin"
                                                name="virtualSensorValues.valueMap[ILLUMINATION].min" step="1" required
                                                th:value="${virtualSensor != null and virtualSensor.virtualSensorValues.illumination != null
@@ -348,7 +350,7 @@
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <div class="input-group">
-                                        <span class="input-group-text">최대</span>
+                                        <label class="input-group-text" for="illuminationMax">최대</label>
                                         <input type="number" class="form-control" id="illuminationMax"
                                                name="virtualSensorValues.valueMap[ILLUMINATION].max" step="1" required
                                                th:value="${virtualSensor != null and virtualSensor.virtualSensorValues.illumination != null
