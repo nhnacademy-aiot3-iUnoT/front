@@ -5,7 +5,6 @@ import java.util.List;
 
 public record DashboardExpiringResponse(
         List<ExpiringItemResponse> items,
-        long totalCount,
         long within7Count,
         long within30Count
 ) {

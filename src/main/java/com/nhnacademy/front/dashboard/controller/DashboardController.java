@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Stream;
 
 /**
  * 메인 대시보드 화면
@@ -49,7 +48,7 @@ public class DashboardController {
             @RequestParam(required = false) Long reportStorageId,
             Model model
     ) {
-        DashboardDepartmentsResponse departments = departments();
+        DashboardDepartmentsResponse departments = departments(); // 조회가능한 부서목록 조회
 
         // 관리자가 "조직 전체"를 고른 경우 부서 없이(=조직 전체) 집계한다
         boolean orgWide = departmentId != null
@@ -70,8 +69,8 @@ public class DashboardController {
         boolean hasScope = orgWide || selectedDepartmentId != null;
 
         if (hasScope) {
-            addSummary(model, selectedDepartmentId);
-            addExpiring(model, selectedDepartmentId);
+            addSummary(model, selectedDepartmentId); // 해당 부서의 요약 정보 조회
+            addExpiring(model, selectedDepartmentId); // 해당 부서의 유통기한 임박한 의약품 조회
         }
 
         model.addAttribute("hasScope", hasScope);
@@ -79,19 +78,20 @@ public class DashboardController {
         List<StorageDepartmentResponse> storages = orgWide
                 ? organizationStorages()
                 : storages(selectedDepartmentId);
-        Long selectedStorageId = resolveStorageId(storages, storageId);
+
+        Long selectedStorageId = resolveStorageId(storages, storageId); // 선택된 저장소 Id
 
         model.addAttribute("storages", storages);
         model.addAttribute("selectedStorageId", selectedStorageId);
         model.addAttribute("storageCount", storages.size());
 
-        addEnvironment(model, selectedStorageId);
+        addEnvironment(model, selectedStorageId); // 선태된 저장소의 환경정보 조회
 
-        // AI 리포트를 탭다운 형식으로 저장소를 선택하여 확인
+
         Long selectedReportStorageId = resolveStorageId(storages, reportStorageId);
         model.addAttribute("selectedReportStorageId", selectedReportStorageId);
 
-        addWeeklyReport(model, selectedReportStorageId);
+        addWeeklyReport(model, selectedReportStorageId); // 선택된 저장소의 AI 리포트 조회
 
         return DASHBOARD_VIEW;
     }
@@ -111,7 +111,7 @@ public class DashboardController {
 
     // 조회 실패시 빈리스트 조회
     private DashboardDepartmentsResponse emptyDepartments() {
-        return new DashboardDepartmentsResponse(false, null, List.of(), List.of());
+        return new DashboardDepartmentsResponse(false, null, List.of());
     }
 
     // 선택한 부서 OR 조직의 전체 요약 정보 조회
@@ -216,7 +216,7 @@ public class DashboardController {
 
     // 내가 속한 부서 ID 결정
     private Long resolveDepartmentId(DashboardDepartmentsResponse departments, Long requested) {
-        List<DepartmentOptionResponse> selectable = selectableDepartments(departments);
+        List<DepartmentOptionResponse> selectable = departments.options();
 
         if (requested != null
                 && selectable.stream().anyMatch(option -> option.departmentId().equals(requested))) {
@@ -224,16 +224,6 @@ public class DashboardController {
         }
 
         return selectable.isEmpty() ? null : selectable.getFirst().departmentId();
-    }
-
-    // 관리자용 전체 부서 선택 목록 생성
-    private List<DepartmentOptionResponse> selectableDepartments(DashboardDepartmentsResponse departments) {
-        List<DepartmentOptionResponse> mine = departments.myDepartments() == null
-                ? List.of() : departments.myDepartments();
-        List<DepartmentOptionResponse> others = departments.otherDepartments() == null
-                ? List.of() : departments.otherDepartments();
-
-        return Stream.concat(mine.stream(), others.stream()).toList();
     }
 
     // 저장소 ID 결정
@@ -256,7 +246,7 @@ public class DashboardController {
             return null;
         }
 
-        return selectableDepartments(departments).stream()
+        return departments.options().stream()
                 .filter(option -> option.departmentId().equals(departmentId))
                 .map(DepartmentOptionResponse::name)
                 .findFirst()

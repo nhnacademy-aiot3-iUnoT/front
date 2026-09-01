@@ -109,7 +109,7 @@ class DashboardControllerTest {
     @DisplayName("소속 부서가 없으면 안내 문구만 보인다.")
     void dashboard_NoDepartment_RendersEmptyState() throws Exception {
         given(dashboardApiClient.getDepartments()).willReturn(
-                new DashboardDepartmentsResponse(false, "NHN 메디컬센터", List.of(), List.of()));
+                new DashboardDepartmentsResponse(false, "NHN 메디컬센터", List.of()));
 
         mockMvc.perform(get("/"))
                 .andExpect(status().isOk())
@@ -141,8 +141,10 @@ class DashboardControllerTest {
     private DashboardDepartmentsResponse departments() {
         return new DashboardDepartmentsResponse(
                 true, "NHN 메디컬센터",
-                List.of(new DepartmentOptionResponse(10L, "약제부 · 조제파트")),
-                List.of(new DepartmentOptionResponse(20L, "내과"))
+                List.of(
+                        new DepartmentOptionResponse(10L, "약제부 · 조제파트"),
+                        new DepartmentOptionResponse(20L, "내과")
+                )
         );
     }
 
@@ -162,19 +164,19 @@ class DashboardControllerTest {
                         "인슐린주 100IU/ml", "10ml", "NHN 메디컬센터",
                         "본원 냉장창고", "냉장 보관실 A",
                         "LOT-24A118", LocalDate.now().plusDays(3), 24)),
-                17L, 4L, 17L
+                4L, 17L
         );
     }
 
     private DashboardEnvironmentResponse environment() {
         return new DashboardEnvironmentResponse(
-                100L, "본원 냉장창고", StorageStatus.ACTIVE, LocalDate.now().minusDays(1),
+                100L, "본원 냉장창고", StorageStatus.ACTIVE,
                 List.of(new ZoneEnvironmentResponse(
                         11L, "냉장 보관실 A", ZoneStatus.ACTIVE, EnvStatus.CRITICAL,
                         List.of(
                                 // 현재 10.4℃ 로 상한 8.0 초과
-                                new SensorEnvironmentResponse("TEMPERATURE", "℃", new BigDecimal("2.0"), new BigDecimal("8.0"), 10.4, 5.2, true),
-                                new SensorEnvironmentResponse("HUMIDITY", "%", new BigDecimal("35"), new BigDecimal("60"), 48.0, 48.0, true)
+                                new SensorEnvironmentResponse("TEMPERATURE", "℃", new BigDecimal("2.0"), new BigDecimal("8.0"), 10.4),
+                                new SensorEnvironmentResponse("HUMIDITY", "%", new BigDecimal("35"), new BigDecimal("60"), 48.0)
                         ),
                         true))
         );
@@ -208,7 +210,7 @@ class DashboardControllerTest {
     @DisplayName("선택할 부서가 없으면 요약·임박 API를 아예 호출하지 않는다.")
     void dashboard_NoDepartment_SkipsWidgetCalls() throws Exception {
         given(dashboardApiClient.getDepartments()).willReturn(
-                new DashboardDepartmentsResponse(false, "NHN 메디컬센터", List.of(), List.of()));
+                new DashboardDepartmentsResponse(false, "NHN 메디컬센터", List.of()));
 
         mockMvc.perform(get("/"))
                 .andExpect(status().isOk());
@@ -230,13 +232,13 @@ class DashboardControllerTest {
         // 임계값은 없지만 측정값은 들어오는 구역 (서버가 이미 합쳐서 내려준다)
         given(dashboardApiClient.getEnvironment(100L)).willReturn(
                 new DashboardEnvironmentResponse(
-                        100L, "본원 냉장창고", StorageStatus.ACTIVE, null,
+                        100L, "본원 냉장창고", StorageStatus.ACTIVE,
                         List.of(new ZoneEnvironmentResponse(
                                 11L, "상온 보관실", ZoneStatus.ACTIVE, EnvStatus.NORMAL,
                                 List.of(
-                                        new SensorEnvironmentResponse("temperature", "C", null, null, 22.4, null, true),
-                                        new SensorEnvironmentResponse("humidity", "%", null, null, 53.0, null, true),
-                                        new SensorEnvironmentResponse("illumination", "lux", null, null, 310.0, null, true)
+                                        new SensorEnvironmentResponse("temperature", "C", null, null, 22.4),
+                                        new SensorEnvironmentResponse("humidity", "%", null, null, 53.0),
+                                        new SensorEnvironmentResponse("illumination", "lux", null, null, 310.0)
                                 ),
                                 true))));
         given(reportApiClient.getWeeklyReport(anyLong(), any(LocalDate.class))).willReturn(report());
@@ -288,10 +290,10 @@ class DashboardControllerTest {
         // 조도에 임계값 100 ~ 500 lux 가 등록된 구역
         given(dashboardApiClient.getEnvironment(100L)).willReturn(
                 new DashboardEnvironmentResponse(
-                        100L, "본원 냉장창고", StorageStatus.ACTIVE, LocalDate.now().minusDays(1),
+                        100L, "본원 냉장창고", StorageStatus.ACTIVE,
                         List.of(new ZoneEnvironmentResponse(
                                 11L, "상온 보관실", ZoneStatus.ACTIVE, EnvStatus.NORMAL,
-                                List.of(new SensorEnvironmentResponse("ILLUMINATION", "lux", new BigDecimal("100"), new BigDecimal("500"), 310.0, 310.0, true)),
+                                List.of(new SensorEnvironmentResponse("ILLUMINATION", "lux", new BigDecimal("100"), new BigDecimal("500"), 310.0)),
                                 null))));
         given(reportApiClient.getWeeklyReport(anyLong(), any(LocalDate.class))).willReturn(report());
 
@@ -315,10 +317,10 @@ class DashboardControllerTest {
         ));
         given(dashboardApiClient.getEnvironment(100L)).willReturn(
                 new DashboardEnvironmentResponse(
-                        100L, "본원 냉장창고", StorageStatus.ACTIVE, LocalDate.now().minusDays(1),
+                        100L, "본원 냉장창고", StorageStatus.ACTIVE,
                         List.of(new ZoneEnvironmentResponse(
                                 11L, "상온 보관실", ZoneStatus.ACTIVE, EnvStatus.CRITICAL,
-                                List.of(new SensorEnvironmentResponse("ILLUMINATION", "lux", new BigDecimal("100"), new BigDecimal("500"), 820.0, 310.0, true)),
+                                List.of(new SensorEnvironmentResponse("ILLUMINATION", "lux", new BigDecimal("100"), new BigDecimal("500"), 820.0)),
                                 null))));
         given(reportApiClient.getWeeklyReport(anyLong(), any(LocalDate.class))).willReturn(report());
 
@@ -340,11 +342,11 @@ class DashboardControllerTest {
         ));
         given(dashboardApiClient.getEnvironment(100L)).willReturn(
                 new DashboardEnvironmentResponse(
-                        100L, "본원 냉장창고", StorageStatus.ACTIVE, LocalDate.now().minusDays(1),
+                        100L, "본원 냉장창고", StorageStatus.ACTIVE,
                         List.of(new ZoneEnvironmentResponse(
                                 11L, "상온 보관실", ZoneStatus.ACTIVE, EnvStatus.NORMAL,
                                 // 현재 820 lux 로 상한 500 을 넘지만 서버 판정은 정상
-                                List.of(new SensorEnvironmentResponse("ILLUMINATION", "lux", new BigDecimal("100"), new BigDecimal("500"), 820.0, 310.0, true)),
+                                List.of(new SensorEnvironmentResponse("ILLUMINATION", "lux", new BigDecimal("100"), new BigDecimal("500"), 820.0)),
                                 null))));
         given(reportApiClient.getWeeklyReport(anyLong(), any(LocalDate.class))).willReturn(report());
 
@@ -391,8 +393,7 @@ class DashboardControllerTest {
     void dashboard_OrgWide_NotAvailableForMember() throws Exception {
         given(dashboardApiClient.getDepartments()).willReturn(
                 new DashboardDepartmentsResponse(false, "NHN 메디컬센터",
-                        List.of(new DepartmentOptionResponse(10L, "약제부 · 조제파트")),
-                        List.of()));
+                        List.of(new DepartmentOptionResponse(10L, "약제부 · 조제파트"))));
         given(dashboardApiClient.getSummary(10L)).willReturn(summary());
         given(dashboardApiClient.getExpiring(anyLong(), anyInt())).willReturn(expiring());
         given(storageDepartmentApiClient.getStorages(10L)).willReturn(List.of());
@@ -405,5 +406,25 @@ class DashboardControllerTest {
                 .andExpect(content().string(not(containsString("모든 부서 합산"))));
 
         then(storageApiClient).should(never()).getStorages();
+    }
+
+    @Test
+    @DisplayName("관리자 드롭다운에는 조직 전체와 조직의 모든 부서가 함께 나열된다.")
+    void dashboard_AdminDropdown_ListsOrgWideAndEveryDepartment() throws Exception {
+        given(dashboardApiClient.getDepartments()).willReturn(departments());
+        given(dashboardApiClient.getSummary(anyLong())).willReturn(summary());
+        given(dashboardApiClient.getExpiring(anyLong(), anyInt())).willReturn(expiring());
+        given(storageDepartmentApiClient.getStorages(anyLong())).willReturn(List.of());
+
+        mockMvc.perform(get("/"))
+                .andExpect(status().isOk())
+                // 합산 항목
+                .andExpect(content().string(containsString("모든 부서 합산")))
+                .andExpect(content().string(containsString("departmentId=0")))
+                // 부서별 항목 (내 소속 + 그 외 구분 없이 전부)
+                .andExpect(content().string(containsString("약제부 · 조제파트")))
+                .andExpect(content().string(containsString("내과")))
+                .andExpect(content().string(containsString("departmentId=10")))
+                .andExpect(content().string(containsString("departmentId=20")));
     }
 }
