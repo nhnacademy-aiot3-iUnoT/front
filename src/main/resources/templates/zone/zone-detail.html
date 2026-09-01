@@ -33,7 +33,7 @@
                                 th:attr="data-storage-id=${zone.storageId}, data-zone-id=${zone.zoneId}"
                                 onclick="onDeleteZoneClick(this)">삭제</button>
                     </div>
-                    <a th:href="@{/zones/{zoneId}/environment-events(zoneId=${zone.zoneId})}" class="btn btn-primary">
+                    <a th:href="@{/storages/{storageId}/zones/{zoneId}/environment-events(storageId=${zone.storageId()}, zoneId=${zone.zoneId})}" class="btn btn-primary">
                         <i class="ti ti-speakerphone"></i>이벤트 내역
                     </a>
                 </div>

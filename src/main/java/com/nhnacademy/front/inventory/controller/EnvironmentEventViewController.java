@@ -8,9 +8,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 @Controller
 public class EnvironmentEventViewController {
 
-    @GetMapping("/zones/{zone-id}/environment-events")
-    public String environmentEventPage(@PathVariable(name = "zone-id") Long zoneId, Model model){
+    @GetMapping("/storages/{storage-id}/zones/{zone-id}/environment-events")
+    public String environmentEventPage(
+            @PathVariable(name = "zone-id") Long zoneId,
+            @PathVariable(name = "storage-id") Long storageId,
+            Model model
+    ){
         model.addAttribute("zoneId", zoneId);
+        model.addAttribute("storageId", storageId);
         return "zone/environment-event-list";
     }
 

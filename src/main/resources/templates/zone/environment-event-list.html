@@ -13,6 +13,7 @@
 <div layout:fragment="content">
     <div class="py-6">
         <input type="hidden" id="zone-id" th:value="${zoneId}">
+        <input type="hidden" id="storage-id" th:value="${storageId}">
 
         <div class="page-header d-print-none mb-4">
             <h1 class="page-title">구역 환경 이벤트 발생 내역</h1>
@@ -73,7 +74,7 @@
 
         <ul id="pagination-box" class="pagination mt-2 justify-content-center"></ul>
 
-        <a th:href="@{/zones/{zoneId}(zoneId=${zoneId})}" class="btn btn-outline-secondary mt-4">← 구역 상세로 돌아가기</a>
+        <a th:href="@{/storages/{storageId}/zones/{zoneId}(storageId=${storageId}, zoneId=${zoneId})}" class="btn btn-outline-secondary mt-4">← 구역 상세로 돌아가기</a>
         </div>
     </div>
 </div>
