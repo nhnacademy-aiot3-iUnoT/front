@@ -66,7 +66,7 @@ async function submitRequest(password) {
         body: JSON.stringify({ password })
     });
 
-    if (!response.ok) {
+    if (response.status !== 204) {
         let message = "회원탈퇴에 실패했습니다.";
 
         try {
