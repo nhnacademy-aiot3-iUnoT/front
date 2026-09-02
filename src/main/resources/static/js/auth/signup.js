@@ -18,36 +18,22 @@ if (!signupForm
     throw new Error("회원가입 폼을 찾을 수 없습니다.");
 }
 
-function resetSignupField(input, defaultMessage) {
-    input.setCustomValidity("");
-    input.classList.remove("is-invalid");
-
-    const feedback = input.closest(".mb-3")?.querySelector(".invalid-feedback");
-    if (feedback) {
-        feedback.classList.remove("d-block");
-        feedback.textContent = defaultMessage;
-    }
-}
-
-function invalidateSignupField(input, message) {
-    input.setCustomValidity(message);
-    setError(input, message);
-    return false;
-}
-
 function validateSignupEmail() {
     const value = emailInput.value;
 
     if (!isRequired(value)) {
-        return invalidateSignupField(emailInput, "이메일을 입력해주세요.");
+        setError(emailInput, "이메일을 입력해주세요.");
+        return false;
     }
 
     if (!isMaxLength(value, 254)) {
-        return invalidateSignupField(emailInput, "이메일은 254자 이하여야 합니다.");
+        setError(emailInput, "이메일은 254자 이하여야 합니다.");
+        return false;
     }
 
     if (!isEmail(value)) {
-        return invalidateSignupField(emailInput, "올바른 이메일 형식이 아닙니다.");
+        setError(emailInput, "올바른 이메일 형식이 아닙니다.");
+        return false;
     }
 
     return true;
@@ -55,11 +41,13 @@ function validateSignupEmail() {
 
 function validateSignupPassword(input, requiredMessage, lengthMessage) {
     if (!isRequired(input.value)) {
-        return invalidateSignupField(input, requiredMessage);
+        setError(input, requiredMessage);
+        return false;
     }
 
-    if (input.value.length < 6 || !isMaxLength(input.value, 64)) {
-        return invalidateSignupField(input, lengthMessage);
+    if (!isLengthInRange(input.value, 6, 64)) {
+        setError(input, lengthMessage);
+        return false;
     }
 
     return true;
@@ -67,11 +55,13 @@ function validateSignupPassword(input, requiredMessage, lengthMessage) {
 
 function validateSignupName() {
     if (!isRequired(nameInput.value)) {
-        return invalidateSignupField(nameInput, "이름을 입력해주세요.");
+        setError(nameInput, "이름을 입력해주세요.");
+        return false;
     }
 
     if (!isMaxLength(nameInput.value, 100)) {
-        return invalidateSignupField(nameInput, "이름은 100자 이하여야 합니다.");
+        setError(nameInput, "이름은 100자 이하여야 합니다.");
+        return false;
     }
 
     return true;
@@ -85,21 +75,22 @@ function validatePasswordConfirmation() {
     );
 
     if (confirmPasswordValid && passwordInput.value !== confirmPasswordInput.value) {
-        return invalidateSignupField(confirmPasswordInput, "비밀번호가 일치하지 않습니다.");
+        setError(confirmPasswordInput, "비밀번호가 일치하지 않습니다.");
+        return false;
     }
 
     return confirmPasswordValid;
 }
 
 function setEmailInvalid(message) {
-    invalidateSignupField(emailInput, message);
+    setError(emailInput, message);
     emailInput.classList.remove("is-valid");
     verifiedEmail = null;
     submitButton.disabled = true;
 }
 
 function setEmailValid(checkedEmail) {
-    resetSignupField(emailInput, "이메일을 입력해주세요.");
+    clearError(emailInput, "이메일을 입력해주세요.");
     emailInput.classList.add("is-valid");
     emailInput.value = checkedEmail;
     verifiedEmail = checkedEmail;
@@ -109,7 +100,7 @@ function setEmailValid(checkedEmail) {
 async function checkEmail() {
     const checkedEmail = emailInput.value.trim();
 
-    resetSignupField(emailInput, "이메일을 입력해주세요.");
+    clearError(emailInput, "이메일을 입력해주세요.");
 
     if (!validateSignupEmail()) {
         return false;
@@ -177,18 +168,18 @@ emailInput.addEventListener("input", () => {
     verifiedEmail = null;
     submitButton.disabled = true;
     emailInput.classList.remove("is-valid");
-    resetSignupField(emailInput, "이메일을 입력해주세요.");
+    clearError(emailInput, "이메일을 입력해주세요.");
 });
 
 passwordInput.addEventListener("input", () => {
-    resetSignupField(passwordInput, "비밀번호는 6자 이상 64자 이하여야 합니다.");
-    resetSignupField(confirmPasswordInput, "비밀번호를 다시 입력해주세요.");
+    clearError(passwordInput, "비밀번호는 6자 이상 64자 이하여야 합니다.");
+    clearError(confirmPasswordInput, "비밀번호를 다시 입력해주세요.");
 });
-confirmPasswordInput.addEventListener("input", () => resetSignupField(
+confirmPasswordInput.addEventListener("input", () => clearError(
     confirmPasswordInput,
     "비밀번호를 다시 입력해주세요."
 ));
-nameInput.addEventListener("input", () => resetSignupField(nameInput, "이름을 입력해주세요."));
+nameInput.addEventListener("input", () => clearError(nameInput, "이름을 입력해주세요."));
 
 signupForm.addEventListener("submit", async event => {
     event.preventDefault();
@@ -197,10 +188,6 @@ signupForm.addEventListener("submit", async event => {
     if (emailCheckPromise) {
         await emailCheckPromise;
     }
-
-    passwordInput.setCustomValidity("");
-    confirmPasswordInput.setCustomValidity("");
-    nameInput.setCustomValidity("");
 
     const emailValid = validateSignupEmail();
     let valid = emailValid;

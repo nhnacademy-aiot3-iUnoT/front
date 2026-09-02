@@ -9,8 +9,7 @@ function validateAccountName() {
     const value = accountNameInput.value;
     let message = "";
 
-    clearErrors(accountInfoForm);
-    accountNameInput.setCustomValidity("");
+    clearError(accountNameInput);
 
     if (!isRequired(value)) {
         message = "이름을 입력해주세요.";
@@ -19,7 +18,6 @@ function validateAccountName() {
     }
 
     if (message !== "") {
-        accountNameInput.setCustomValidity(message);
         setError(accountNameInput, message);
         return false;
     }
@@ -28,8 +26,7 @@ function validateAccountName() {
 }
 
 accountNameInput.addEventListener("input", () => {
-    accountNameInput.setCustomValidity("");
-    accountNameInput.classList.remove("is-invalid");
+    clearError(accountNameInput);
 });
 
 accountInfoForm.addEventListener("submit", event => {

@@ -17,17 +17,29 @@ function setError(input, message) {
     feedback.classList.add("d-block");
 }
 
-function clearErrors(form) {
-    if (!form) {
+function clearError(input, defaultMessage = "") {
+    if (!input) {
         return;
     }
 
-    form.querySelectorAll(".form-control")
-        .forEach(input => input.classList.remove("is-invalid"));
+    input.classList.remove("is-invalid");
 
-    form.querySelectorAll(".invalid-feedback")
-        .forEach(feedback => {
-            feedback.textContent = "";
-            feedback.classList.remove("d-block");
-        });
+    const fieldGroup = input.closest(".mb-3, .mb-4");
+    const feedback = fieldGroup?.querySelector(".invalid-feedback");
+
+    if (!feedback) {
+        return;
+    }
+
+    feedback.textContent = defaultMessage;
+    feedback.classList.remove("d-block");
+}
+
+function clearErrors(container) {
+    if (!container) {
+        return;
+    }
+
+    container.querySelectorAll(".is-invalid")
+        .forEach(input => clearError(input));
 }

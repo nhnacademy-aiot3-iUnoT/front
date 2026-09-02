@@ -1,33 +1,19 @@
-function resetAuthField(input, defaultMessage) {
-    input.setCustomValidity("");
-    input.classList.remove("is-invalid");
-
-    const feedback = input.closest(".mb-3, .mb-4")?.querySelector(".invalid-feedback");
-    if (feedback) {
-        feedback.classList.remove("d-block");
-        feedback.textContent = defaultMessage;
-    }
-}
-
-function invalidateAuthField(input, message) {
-    input.setCustomValidity(message);
-    setError(input, message);
-    return false;
-}
-
 function validateAuthEmail(input) {
     const value = input.value;
 
     if (!isRequired(value)) {
-        return invalidateAuthField(input, "이메일을 입력해주세요.");
+        setError(input, "이메일을 입력해주세요.");
+        return false;
     }
 
     if (!isMaxLength(value, 254)) {
-        return invalidateAuthField(input, "이메일은 254자 이하여야 합니다.");
+        setError(input, "이메일은 254자 이하여야 합니다.");
+        return false;
     }
 
     if (!isEmail(value)) {
-        return invalidateAuthField(input, "올바른 이메일 형식이 아닙니다.");
+        setError(input, "올바른 이메일 형식이 아닙니다.");
+        return false;
     }
 
     return true;
@@ -37,11 +23,13 @@ function validateAuthPassword(input, requiredMessage, lengthMessage) {
     const value = input.value;
 
     if (!isRequired(value)) {
-        return invalidateAuthField(input, requiredMessage);
+        setError(input, requiredMessage);
+        return false;
     }
 
-    if (value.length < 6 || !isMaxLength(value, 64)) {
-        return invalidateAuthField(input, lengthMessage);
+    if (!isLengthInRange(value, 6, 64)) {
+        setError(input, lengthMessage);
+        return false;
     }
 
     return true;
@@ -53,16 +41,14 @@ if (loginForm) {
     const emailInput = document.getElementById("email");
     const passwordInput = document.getElementById("password");
 
-    emailInput.addEventListener("input", () => resetAuthField(emailInput, "이메일을 입력해주세요."));
-    passwordInput.addEventListener("input", () => resetAuthField(
+    emailInput.addEventListener("input", () => clearError(emailInput, "이메일을 입력해주세요."));
+    passwordInput.addEventListener("input", () => clearError(
         passwordInput,
         "비밀번호는 6자 이상 64자 이하여야 합니다."
     ));
 
     loginForm.addEventListener("submit", event => {
         clearErrors(loginForm);
-        emailInput.setCustomValidity("");
-        passwordInput.setCustomValidity("");
 
         const emailValid = validateAuthEmail(emailInput);
         const passwordValid = validateAuthPassword(
@@ -86,11 +72,10 @@ const forgotPasswordForm = document.getElementById("forgot-password-form");
 if (forgotPasswordForm) {
     const emailInput = document.getElementById("email");
 
-    emailInput.addEventListener("input", () => resetAuthField(emailInput, "이메일을 입력해주세요."));
+    emailInput.addEventListener("input", () => clearError(emailInput, "이메일을 입력해주세요."));
 
     forgotPasswordForm.addEventListener("submit", event => {
-        clearErrors(forgotPasswordForm);
-        emailInput.setCustomValidity("");
+        clearError(emailInput);
         forgotPasswordForm.classList.add("was-validated");
 
         if (!validateAuthEmail(emailInput) || !forgotPasswordForm.checkValidity()) {
@@ -107,19 +92,17 @@ if (resetPasswordForm) {
     const newPasswordInput = document.getElementById("new-password");
     const confirmPasswordInput = document.getElementById("confirm-password");
 
-    newPasswordInput.addEventListener("input", () => resetAuthField(
+    newPasswordInput.addEventListener("input", () => clearError(
         newPasswordInput,
         "새 비밀번호는 6자 이상 64자 이하여야 합니다."
     ));
-    confirmPasswordInput.addEventListener("input", () => resetAuthField(
+    confirmPasswordInput.addEventListener("input", () => clearError(
         confirmPasswordInput,
         "새 비밀번호를 다시 입력해주세요."
     ));
 
     resetPasswordForm.addEventListener("submit", event => {
         clearErrors(resetPasswordForm);
-        newPasswordInput.setCustomValidity("");
-        confirmPasswordInput.setCustomValidity("");
 
         const newPasswordValid = validateAuthPassword(
             newPasswordInput,
@@ -136,10 +119,11 @@ if (resetPasswordForm) {
         if (newPasswordValid
             && confirmPasswordValid
             && newPasswordInput.value !== confirmPasswordInput.value) {
-            passwordsMatch = invalidateAuthField(
+            setError(
                 confirmPasswordInput,
                 "새 비밀번호가 일치하지 않습니다."
             );
+            passwordsMatch = false;
         }
 
         resetPasswordForm.classList.add("was-validated");
