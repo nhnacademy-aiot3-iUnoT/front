@@ -209,6 +209,10 @@ a:hover {
 }
 
 /* 공통 페이지 레이아웃 */
+.page-body > .container-xl {
+    max-width: 1140px;
+}
+
 .page-content-panel {
     padding: 2rem;
     background: var(--surface);

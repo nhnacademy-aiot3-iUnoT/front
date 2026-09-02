@@ -77,17 +77,69 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
 
-    reasonSelect.addEventListener(
-        "change",
-        updateMemoField
-    );
+    reasonSelect.addEventListener("change", () => {
+        updateMemoField();
+        clearFieldError(reasonSelect);
+        clearFieldError(memoInput);
+
+        validateRequiredSelectField(
+            reasonSelect,
+            "출고 사유"
+        );
+    });
 
     updateMemoField();
 
+    quantityInput.addEventListener("input", () => {
+        clearFieldError(quantityInput);
+
+        validateInventoryQuantityField(
+            quantityInput,
+            Number(quantityInput.max)
+        );
+    });
+
+    memoInput.addEventListener("input", () => {
+        clearFieldError(memoInput);
+
+        validateConditionalMemoField(
+            memoInput,
+            requiresMemo(),
+            reasonSelect.value === "STORAGE_TRANSFER"
+                ? "이관 목적지"
+                : "상세 사유"
+        );
+    });
+
     form.addEventListener("submit", event => {
         event.preventDefault();
+        clearErrors(form);
 
-        if (!form.reportValidity()) {
+        const maxQuantity = Number(quantityInput.max);
+        const memoRequired = requiresMemo();
+
+        const quantityValid =
+            validateInventoryQuantityField(
+                quantityInput,
+                maxQuantity
+            );
+
+        const reasonValid =
+            validateRequiredSelectField(
+                reasonSelect,
+                "출고 사유"
+            );
+
+        const memoValid =
+            validateConditionalMemoField(
+                memoInput,
+                memoRequired,
+                reasonSelect.value === "STORAGE_TRANSFER"
+                    ? "이관 목적지"
+                    : "상세 사유"
+            );
+
+        if (!(quantityValid && reasonValid && memoValid)) {
             return;
         }
 
@@ -102,11 +154,9 @@ document.addEventListener("DOMContentLoaded", () => {
         confirmReason.textContent =
             selectedReason.text.trim();
 
-        const showMemo = requiresMemo();
-
-        confirmMemoRow.hidden = !showMemo;
+        confirmMemoRow.hidden = !memoRequired;
         confirmMemo.textContent =
-            showMemo
+            memoRequired
                 ? memoInput.value.trim()
                 : "";
 
