@@ -94,9 +94,12 @@
             <div class="card-header">
                 <h3 class="card-title">저장소 환경 현황</h3>
                 <div class="card-actions d-flex align-items-center flex-wrap gap-2">
-                    <span class="badge bg-green-lt" th:text="'정상 ' + ${normalZoneCount ?: 0}">정상 0</span>
-                    <span class="badge bg-yellow-lt" th:text="'경고 ' + ${warningZoneCount ?: 0}">경고 0</span>
-                    <span class="badge bg-red-lt" th:text="'위험 ' + ${dangerZoneCount ?: 0}">위험 0</span>
+                    <span class="badge status-badge status-normal"
+                          th:text="'정상 ' + ${normalZoneCount ?: 0}">정상 0</span>
+                    <span class="badge status-badge status-warning"
+                          th:text="'경고 ' + ${warningZoneCount ?: 0}">경고 0</span>
+                    <span class="badge status-badge status-critical"
+                          th:text="'위험 ' + ${dangerZoneCount ?: 0}">위험 0</span>
 
                     <form th:action="@{/}" method="get">
                         <input type="hidden" name="departmentId"
@@ -130,13 +133,15 @@
                 <div class="row row-deck row-cards">
                     <div class="col-md-6 col-xl-4" th:each="zone : ${environment.zones}">
                         <div class="card">
-                            <div class="card-status-start" th:classappend="'bg-' + ${zone.status.color}"></div>
+                            <div class="card-status-start"
+                                 th:classappend="' status-' + ${zone.status.name().toLowerCase()}"></div>
                             <div class="card-header py-2">
                                 <h4 class="card-title mb-0">
                                     <i class="ti ti-box me-1"></i><span th:text="${zone.name}">구역명</span>
                                 </h4>
                                 <div class="card-actions">
-                                    <span class="badge" th:classappend="'bg-' + ${zone.status.color} + '-lt'"
+                                    <span class="badge status-badge"
+                                          th:classappend="' status-' + ${zone.status.name().toLowerCase()}"
                                           th:text="${zone.status.ko}">정상</span>
                                 </div>
                             </div>

@@ -355,7 +355,7 @@ class DashboardControllerTest {
                 .andExpect(content().string(containsString("820lux")))
                 // 화면이 값으로 등급을 만들지 않는다 (구역 카드가 위험으로 바뀌지 않음)
                 .andExpect(content().string(not(containsString("상한 초과"))))
-                .andExpect(content().string(not(containsString("card-status-start bg-red"))));
+                .andExpect(content().string(not(containsString("card-status-start status-critical"))));
     }
 
     @Test

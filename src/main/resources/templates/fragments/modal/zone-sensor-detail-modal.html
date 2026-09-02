@@ -11,7 +11,7 @@
                 <input type="hidden" id="edit-sensor-id" th:value="${sensor.zoneSensorId}">
 
                 <div class="mb-3">
-                    <label for="edit-name" class="form-label">이름</label>
+                    <label for="edit-name" class="form-label required">이름</label>
                     <input id="edit-name" class="form-control" type="text" th:value="${sensor.name}" maxlength="50">
                     <div class="invalid-feedback"></div>
                 </div>
