@@ -112,7 +112,7 @@ class AccountControllerTest {
         Document document = Jsoup.parse(result.getResponse().getContentAsString());
         assertThat(document.select("form#account-info-form input#name[required][maxlength=100]"))
                 .hasSize(1);
-        assertThat(document.select("script[src=/js/account-info.js]"))
+        assertThat(document.select("script[src=/js/account/account-info.js]"))
                 .hasSize(1);
 
         then(accountApiClient).should().getAccountInfo();
@@ -324,7 +324,7 @@ class AccountControllerTest {
         assertThat(document.select(
                 "form#change-password-form input[type=password][required][minlength=6][maxlength=64]"
         )).hasSize(3);
-        assertThat(document.select("script[src=/js/change.js]"))
+        assertThat(document.select("script[src=/js/account/change.js]"))
                 .hasSize(1);
     }
 
@@ -429,7 +429,7 @@ class AccountControllerTest {
         assertThat(document.select(
                 "form#withdraw-form input#password[required][minlength=6][maxlength=64]"
         )).hasSize(1);
-        assertThat(document.select("script[src=/js/withdraw.js]"))
+        assertThat(document.select("script[src=/js/account/withdraw.js]"))
                 .hasSize(1);
     }
 

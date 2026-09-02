@@ -89,7 +89,7 @@ class AuthControllerTest {
         assertThat(document.select(
                 "form#login-form input#password[required][minlength=6][maxlength=64]"
         )).hasSize(1);
-        assertThat(document.select("script[src=/js/auth-validation.js]"))
+        assertThat(document.select("script[src=/js/auth/auth-validation.js]"))
                 .hasSize(1);
     }
 
@@ -239,7 +239,7 @@ class AuthControllerTest {
         assertThat(document.select("form#signup-form input[name=confirmPassword]"
                 + "[required][minlength=6][maxlength=64]"))
                 .hasSize(1);
-        assertThat(document.select("script[src=/js/signup.js]"))
+        assertThat(document.select("script[src=/js/auth/signup.js]"))
                 .hasSize(1);
 
         then(invitationApiClient).should().verifyToken("inviteToken");
@@ -389,7 +389,7 @@ class AuthControllerTest {
         assertThat(document.select(
                 "form#forgot-password-form input#email[required][maxlength=254]"
         )).hasSize(1);
-        assertThat(document.select("script[src=/js/auth-validation.js]"))
+        assertThat(document.select("script[src=/js/auth/auth-validation.js]"))
                 .hasSize(1);
     }
 
@@ -460,7 +460,7 @@ class AuthControllerTest {
         assertThat(document.select(
                 "form#reset-password-form input[type=password][required][minlength=6][maxlength=64]"
         )).hasSize(2);
-        assertThat(document.select("script[src=/js/auth-validation.js]"))
+        assertThat(document.select("script[src=/js/auth/auth-validation.js]"))
                 .hasSize(1);
 
     }
