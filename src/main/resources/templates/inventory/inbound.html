@@ -397,12 +397,12 @@
                     <legend>온도</legend>
 
                     <label for="min-temperature">최소</label>
-                    <input type="number" step="0.01" id="min-temperature" data-environment-min th:field="*{medicineEnvironmentRequest.minTemperature}">
+                    <input type="number" step="0.01" id="min-temperature" data-environment-min th:field="*{medicineEnvironmentRequest.minTemperature}" min="0">
                     <span>℃</span>
 
                     <span aria-hidden="true">-</span>
                     <label for="max-temperature">최대</label>
-                    <input type="number" step="0.01" id="max-temperature" data-environment-max th:field="*{medicineEnvironmentRequest.maxTemperature}">
+                    <input type="number" step="0.01" id="max-temperature" data-environment-max th:field="*{medicineEnvironmentRequest.maxTemperature}" min="0">
 
                     <span>℃</span>
 
@@ -414,11 +414,11 @@
                     <legend>습도</legend>
 
                     <label for="min-humidity">최소</label>
-                    <input type="number" step="0.01" id="min-humidity" data-environment-min th:field="*{medicineEnvironmentRequest.minHumidity}">
+                    <input type="number" step="0.01" id="min-humidity" data-environment-min th:field="*{medicineEnvironmentRequest.minHumidity}" min="0" max="100">
                     <span>%</span>
                     <span aria-hidden="true">-</span>
                     <label for="max-humidity">최대</label>
-                    <input type="number" step="0.01" id="max-humidity" data-environment-max th:field="*{medicineEnvironmentRequest.maxHumidity}">
+                    <input type="number" step="0.01" id="max-humidity" data-environment-max th:field="*{medicineEnvironmentRequest.maxHumidity}" min="0" max="100">
                     <span>%</span>
 
                 </fieldset>
@@ -431,11 +431,11 @@
                     <legend>조도</legend>
 
                     <label for="min-illuminance">최소</label>
-                    <input type="number" step="0.01" id="min-illuminance" data-environment-min th:field="*{medicineEnvironmentRequest.minIlluminance}">
+                    <input type="number" step="0.01" id="min-illuminance" data-environment-min th:field="*{medicineEnvironmentRequest.minIlluminance}" min="0">
                     <span>lx</span>
                     <span aria-hidden="true">-</span>
                     <label for="max-illuminance">최대</label>
-                    <input type="number" step="0.01" id="max-illuminance" data-environment-max th:field="*{medicineEnvironmentRequest.maxIlluminance}">
+                    <input type="number" step="0.01" id="max-illuminance" data-environment-max th:field="*{medicineEnvironmentRequest.maxIlluminance}" min="0">
                     <span>lx</span>
 
                 </fieldset>
