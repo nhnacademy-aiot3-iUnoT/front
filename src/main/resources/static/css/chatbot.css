@@ -196,3 +196,114 @@
 .chatbot-note.severity-critical {
     border-left-color: #d64545;
 }
+
+.chatbot-note-link {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.chatbot-note-link:hover {
+    background: rgba(0, 0, 0, 0.03);
+}
+
+/* 작업 점검 알림 */
+.chatbot-tabs {
+    display: flex;
+    gap: 0.25rem;
+    padding: 0 0.75rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.chatbot-tab {
+    position: relative;
+    padding: 0.6rem 0.75rem;
+    border: 0;
+    background: none;
+    font-size: 0.85rem;
+    color: #64748b;
+    cursor: pointer;
+}
+
+.chatbot-tab.is-active {
+    color: var(--teal);
+    font-weight: 600;
+    box-shadow: inset 0 -2px 0 var(--teal);
+}
+
+.chatbot-tab-badge,
+.chatbot-badge {
+    display: inline-block;
+    min-width: 18px;
+    padding: 0 5px;
+    border-radius: 9px;
+    background: #d64545;
+    color: #fff;
+    font-size: 11px;
+    line-height: 18px;
+    text-align: center;
+    font-weight: 600;
+}
+
+.chatbot-tab-badge {
+    margin-left: 0.35rem;
+}
+
+.chatbot-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    height: 18px;
+}
+
+.chatbot-notes {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.chatbot-notes-empty {
+    margin: 1.5rem 0;
+    text-align: center;
+    font-size: 0.82rem;
+    color: #94a3b8;
+}
+
+.chatbot-note {
+    display: block;
+    padding: 0.7rem 0.8rem;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-left: 4px solid #9aa5ab;
+    border-radius: 8px;
+    background: #fff;
+    color: inherit;
+    text-decoration: none;
+}
+
+.chatbot-note.severity-warn {
+    border-left-color: #d9903a;
+}
+
+.chatbot-note.severity-critical {
+    border-left-color: #d64545;
+}
+
+a.chatbot-note:hover {
+    background: #f8fafc;
+}
+
+.chatbot-note-body {
+    margin: 0 0 0.35rem;
+    font-size: 0.8rem;
+    line-height: 1.55;
+    color: #334155;
+}
+
+.chatbot-note-meta {
+    font-size: 0.72rem;
+    color: #94a3b8;
+}

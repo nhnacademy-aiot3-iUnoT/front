@@ -7,6 +7,7 @@ public record AssistantNoteResponse(
         String severity,
         String message,
         String targetType,
+        Long targetStorageId,
         Long targetId,
         boolean read,
         LocalDateTime createdAt
