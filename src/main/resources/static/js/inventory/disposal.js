@@ -46,8 +46,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     reasonSelect.addEventListener("change", () => {
         updateMemoField();
-        clearFieldError(reasonSelect);
-        clearFieldError(memoInput);
+        clearError(reasonSelect);
+        clearError(memoInput);
 
         validateRequiredSelectField(
             reasonSelect,
@@ -58,7 +58,7 @@ document.addEventListener("DOMContentLoaded", () => {
     updateMemoField();
 
     quantityInput.addEventListener("input", () => {
-        clearFieldError(quantityInput);
+        clearError(quantityInput);
 
         validateInventoryQuantityField(
             quantityInput,
@@ -67,7 +67,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     memoInput.addEventListener("input", () => {
-        clearFieldError(memoInput);
+        clearError(memoInput);
 
         validateConditionalMemoField(
             memoInput,
