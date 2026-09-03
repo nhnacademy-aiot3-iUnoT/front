@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main-layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>센서 상세 정보</title>
+</head>
+<body>
+
+<div layout:fragment="content">
+    <div class="table-container">
+        <div class="header-top">
+            <h2 class="main-title">
+                <span class="path-prefix"
+                      th:text="${sensor.organizationName + ' > ' + sensor.storageName + ' > ' + sensor.zoneName + ' > '}">조직이름 &gt; 저장소이름 &gt; 구역이름 &gt; </span>
+                <span th:text="${sensor.name}">센서 이름</span>
+            </h2>
+            <div class="action-buttons" th:if="${canManage}">
+                <button type="button" onclick="openUpdateModal()" class="btn-warning">수정</button>
+                <button type="button"
+                        th:onclick="'deleteZoneSensor(' + ${sensor.storageId} + ', ' + ${sensor.zoneId} + ', ' + ${sensor.zoneSensorId} + ')'"
+                        class="btn-danger">삭제
+                </button>
+            </div>
+        </div>
+
+        <h2 class="section-title">📡 센서 상세 정보</h2>
+
+        <div class="info-box">
+            <p><strong>센서 ID:</strong> <span th:text="${sensor.zoneSensorId}">1</span></p>
+            <p><strong>센서 이름:</strong> <span th:text="${sensor.name}">센서 이름</span></p>
+            <p><strong>Device EUI:</strong> <span class="device-eui" th:text="${sensor.deviceEui}">00124B00...</span>
+            </p>
+
+            <p><strong>설명:</strong></p>
+            <div class="desc-box" th:text="${sensor.description()}">설명 내용</div>
+        </div>
+
+        <a th:href="@{/storages/{storageId}/zones/{zoneId}(storageId=${sensor.storageId}, zoneId=${sensor.zoneId})}"
+           class="btn-back">← 구역 상세로 돌아가기</a>
+    </div>
+
+    <!-- 센서 수정 모달 박스 -->
+    <div id="update-modal" class="modal modal-blur fade" tabindex="-1" aria-hidden="true" th:if="${canManage}">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title">센서 정보 수정</h3>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+                </div>
+
+                <div class="modal-body">
+                    <input type="hidden" id="edit-zone-id" th:value="${sensor.zoneId}">
+                    <input type="hidden" id="edit-sensor-id" th:value="${sensor.zoneSensorId}">
+
+                    <div class="mb-3">
+                        <label for="edit-name" class="form-label required">이름</label>
+                        <input id="edit-name" class="form-control" type="text" th:value="${sensor.name}"
+                               maxlength="50" placeholder="센서 이름을 입력해주세요">
+                        <div class="invalid-feedback"></div>
+                        <div class="d-flex justify-content-end mt-2">
+                            <small class="text-muted">최대 50자</small>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="edit-description" class="form-label">설명</label>
+                        <textarea id="edit-description" class="form-control" maxlength="255"
+                                  placeholder="센서 설명을 입력해주세요." th:text="${sensor.description}"></textarea>
+                        <div class="invalid-feedback"></div>
+                        <div class="d-flex justify-content-end mt-2">
+                            <small class="text-muted">최대 255자</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-primary" onclick="updateZoneSensor()">저장</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 페이지 전용 JS 선언부 -->
+<th:block layout:fragment="script">
+    <script th:src="@{/js/common/validation.js}"></script>
+    <script th:src="@{/js/common/form.js}"></script>
+    <script th:src="@{/js/zone/zone-sensor-detail.js}"></script>
+</th:block>
+
+</body>
+</html>
