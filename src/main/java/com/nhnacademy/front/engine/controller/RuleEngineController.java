@@ -71,7 +71,9 @@ public class RuleEngineController {
             @PathVariable("zone-id") Long zoneId,
             Model model
     ) {
-        addZoneAttributes(model, storageId, zoneId);
+        String zoneName = zoneApiClient.getZone(storageId, zoneId).name();
+        String storageName = storageApiClient.getStorage(storageId).name();
+        addZoneAttributes(model, storageName, zoneName);
 
         Long organizationId = myOrganizationId();
 
@@ -118,10 +120,10 @@ public class RuleEngineController {
 
     private void addZoneAttributes(
             Model model,
-            Long storageId,
-            Long zoneId
+            String storageName,
+            String zoneName
     ) {
-        model.addAttribute("storageId", storageId);
-        model.addAttribute("zoneId", zoneId);
+        model.addAttribute("storageName", storageName);
+        model.addAttribute("zoneName", zoneName);
     }
 }

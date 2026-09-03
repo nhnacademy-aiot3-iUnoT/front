@@ -209,6 +209,10 @@ a:hover {
 }
 
 /* 공통 페이지 레이아웃 */
+.page-body > .container-xl {
+    max-width: 1140px;
+}
+
 .page-content-panel {
     padding: 2rem;
     background: var(--surface);
@@ -347,6 +351,16 @@ a:hover {
 .pagination .page-link:hover {
     color: var(--teal-dark);
     background-color: var(--teal-soft);
+}
+
+.card-status-start {
+    z-index: 1;
+}
+
+.ai-summary {
+    background-color: var(--teal-soft);
+    border: 1px solid var(--mint);
+    line-height: 1.65;
 }
 
 .alert-warning {

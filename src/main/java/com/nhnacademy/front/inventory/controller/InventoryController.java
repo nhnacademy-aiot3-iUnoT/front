@@ -11,7 +11,7 @@ import com.nhnacademy.front.inventory.service.InventoryFrontService;
 import com.nhnacademy.front.medicine.client.MedicineInfoApiClient;
 import com.nhnacademy.front.organization.client.DepartmentApiClient;
 import com.nhnacademy.front.organization.client.OrganizationMemberApiClient;
-import com.nhnacademy.front.organization.dto.DepartmentStatus;
+
 import com.nhnacademy.front.organization.dto.OrganizationRole;
 import com.nhnacademy.front.organization.dto.response.DepartmentListResponse;
 import lombok.RequiredArgsConstructor;
@@ -90,7 +90,6 @@ public class InventoryController {
 
 
         return "inventory/inventory-list";
-
     }
 
 

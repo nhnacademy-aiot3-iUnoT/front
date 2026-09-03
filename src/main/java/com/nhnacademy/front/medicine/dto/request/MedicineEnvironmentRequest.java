@@ -15,7 +15,6 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class MedicineEnvironmentRequest {
 
-
     private BigDecimal minTemperature;
     private BigDecimal maxTemperature;
 

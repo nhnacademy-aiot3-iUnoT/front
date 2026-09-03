@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="kpi(title, icon, color, metric, unit, subLabel, badWhenUp)"
+     class="col-sm-6 col-lg-3">
+    <div class="card">
+        <div class="card-body">
+            <div class="d-flex align-items-center mb-3">
+                    <span class="avatar avatar-sm me-2" th:classappend="'bg-' + ${color} + '-lt'">
+                        <i class="ti" th:classappend="${icon}"></i>
+                    </span>
+                <div class="subheader" th:text="${title}">지표</div>
+            </div>
+
+            <div class="d-flex align-items-baseline">
+                <div class="h1 mb-0 me-2"
+                     th:text="${metric == null} ? '-' : ${#numbers.formatInteger(metric.value, 0, 'COMMA')}">0
+                </div>
+                <div class="text-secondary" th:if="${metric != null}">
+                    <span th:text="${unit}">개</span>
+                    <span th:if="${subLabel != null}"
+                          th:text="'· ' + ${subLabel == '미확인'
+                                                ? subLabel + ' ' + metric.subValue
+                                                : metric.subValue + subLabel}">· 32건</span>
+                </div>
+            </div>
+
+            <div class="d-flex align-items-center mt-2" th:if="${metric != null}">
+                    <span th:classappend="${metric.flat} ? 'text-secondary'
+                                          : ((${metric.up} == ${badWhenUp}) ? 'text-danger' : 'text-green')">
+                        <i class="ti" th:classappend="${metric.flat} ? 'ti-minus'
+                                                      : (${metric.up} ? 'ti-trending-up' : 'ti-trending-down')"></i>
+                        <strong th:text="${metric.absDiff} + ${unit}">0</strong>
+                        <span th:if="${metric.hasRate}" th:text="'(' + ${metric.rateText} + ')'">(0%)</span>
+                    </span>
+                <span class="text-secondary ms-2">전일 대비</span>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

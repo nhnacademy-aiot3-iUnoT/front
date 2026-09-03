@@ -41,10 +41,12 @@ public class MedicineEnvApiClient {
 
     }
 
-    // 환경유형 삭제
-    public void deleteTypes(Long standardId){
 
-        gatewayClient.delete(CORE_SERVICE + "/medicine-environment-standards/"+ standardId);
+
+    // 환경유형 삭제
+    public void deleteTypes(Long packUnitId){
+
+        gatewayClient.delete(CORE_SERVICE + "/package-units/" + packUnitId + "/medicine-environment-standards");
     }
 
 

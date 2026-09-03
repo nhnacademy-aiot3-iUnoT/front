@@ -8,6 +8,8 @@
     background-color: var(--warning-soft);
 }
 
+
+
 .status-active, .status-normal {
     color: var(--teal-dark);
     background-color: var(--mint);
@@ -26,4 +28,21 @@
 .status-humidity {
     color: #0369a1;
     background-color: #e0f2fe;
+}
+
+
+.card-status-start.status-active, .card-status-start.status-normal {
+    background-color: var(--teal);
+}
+
+.card-status-start.status-pending, .card-status-start.status-warning {
+    background-color: var(--warning);
+}
+
+.card-status-start.status-critical, .card-status-start.status-closed {
+    background-color: var(--danger);
+}
+
+.card-status-start.status-inactive {
+    background-color: var(--line-strong);
 }
