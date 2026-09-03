@@ -5,96 +5,78 @@
       layout:decorate="~{layout/main-layout}">
 <head>
     <title>의약품 출고 | iUnoT</title>
-    <link rel="stylesheet" th:href="@{/css/outbound-design.css}">
 </head>
 <body>
 <div layout:fragment="content">
-    <main class="outbound-page">
-        <div class="outbound-header">
-            <div>
-                <p class="breadcrumb">재고 관리 <span>/</span> 의약품 출고</p>
-                <h1>의약품 출고</h1>
-                <p>저장소의 의약품을 선택하고 출고 내역을 등록합니다.</p>
+    <main class="py-6">
+        <div class="page-header d-print-none mb-4">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h2 class="page-title">의약품 출고</h2>
+                    <div class="text-muted mt-1">저장소의 의약품을 선택하고 출고 내역을 등록합니다.</div>
+                </div>
+                <div class="col-auto">
+                    <a class="btn btn-outline-secondary" th:href="@{/inventories}">재고 목록</a>
+                </div>
             </div>
-            <a class="btn btn-outline-secondary"
-               th:href="@{/inventories}">
-                재고 목록
-            </a>
         </div>
 
-        <section class="card outbound-form-card">
+        <section class="card mt-5">
             <div class="card-header">
                 <h2 class="card-title">출고 정보</h2>
             </div>
             <form id="outbound-form"
                   th:action="@{/inventories/{inventory-id}/outbound(inventory-id=${target.inventoryId})}"
                   th:object="${outboundRequest}"
-                  method="post">
+                  method="post"
+                  novalidate>
+                <input type="hidden" th:field="*{medicinePackageUnitId}">
+                <input type="hidden" th:field="*{zoneId}">
 
-                <input type="hidden"
-                       th:field="*{medicinePackageUnitId}">
-
-                <input type="hidden"
-                       th:field="*{zoneId}">
                 <div class="card-body">
                     <div class="mb-3">
                         <label class="form-label">의약품</label>
-
-                        <div class="fixed-value">
-                            <strong th:text="${target.productName}">
-                                의약품명
-                            </strong>
-                            <small>
-            <span th:text="${target.itemCode}">
-                품목기준코드
-            </span>
+                        <div class="border rounded bg-secondary-lt p-3">
+                            <div class="fw-bold" th:text="${target.productName}">의약품명</div>
+                            <div class="small text-muted mt-1">
+                                <span th:text="${target.itemCode}">품목기준코드</span>
                                 <span> · </span>
-                                <span th:text="${target.packUnit}">
-                포장 단위
-            </span>
-                            </small>
+                                <span th:text="${target.packUnit}">포장 단위</span>
+                            </div>
                         </div>
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label">출고 저장소</label>
-
-                        <div class="fixed-value">
-                            <strong th:text="${target.storageName}">
-                                저장소명
-                            </strong>
-
-                            <small th:text="${target.zoneName}">
-                                구역명
-                            </small>
+                        <div class="border rounded bg-secondary-lt p-3">
+                            <div class="fw-bold" th:text="${target.storageName}">저장소명</div>
+                            <div class="small text-muted mt-1" th:text="${target.zoneName}">구역명</div>
                         </div>
                     </div>
 
-                    <div class="stock-hint">
-                        <span>출고 가능 수량</span>
-
-                        <div class="d-flex align-items-center">
-                            <strong>
-                                <span th:text="${target.availableQuantity}">0</span>
-                                <span class="ms-1">개</span>
-                            </strong>
-
-                            <span class="text-muted mx-2">|</span>
-
-                            <span class="text-muted">포장 단위</span>
-
-                            <span class="fw-semibold ms-2"
-                                  th:text="${target.packUnit}">
-                            </span>
+                    <div class="card card-sm bg-primary-lt border-0 mb-3">
+                        <div class="card-body d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-2 py-3">
+                            <span class="fw-semibold">출고 가능 수량</span>
+                            <div class="d-flex align-items-center">
+                                <strong class="text-primary fs-3">
+                                    <span th:text="${target.availableQuantity}">0</span>
+                                    <span class="ms-1">개</span>
+                                </strong>
+                                <span class="text-muted mx-2">|</span>
+                                <span class="text-muted">포장 단위</span>
+                                <span class="fw-semibold ms-2" th:text="${target.packUnit}"></span>
+                            </div>
                         </div>
+                    </div>
+
+                    <div class="alert alert-warning" role="alert"
+                         th:if="${target.availableQuantity <= 0}">
+                        출고 가능한 재고가 없습니다.
                     </div>
 
                     <div class="row g-3">
-                        <div class="col-sm-6">
-                            <label class="form-label"
-                                   for="outbound-quantity">
-                                출고 수량
-                            </label>
+                        <div class="col-sm-6 mb-3">
+                            <label class="form-label" for="outbound-quantity">출고 수량</label>
                             <input id="outbound-quantity"
                                    class="form-control"
                                    th:classappend="${#fields.hasErrors('quantity')} ? ' is-invalid'"
@@ -104,73 +86,58 @@
                                    th:field="*{quantity}"
                                    placeholder="수량 입력"
                                    required>
-
-                            <div class="invalid-feedback"
-                                 th:errors="*{quantity}">
-                            </div>
+                            <div class="invalid-feedback"></div>
+                            <div class="text-danger" th:errors="*{quantity}"></div>
                         </div>
-                        <div class="col-sm-6">
-                            <label class="form-label"
-                                   for="outbound-reason">
-                                출고 사유
-                            </label>
 
+                        <div class="col-sm-6 mb-3">
+                            <label class="form-label" for="outbound-reason">출고 사유</label>
                             <select id="outbound-reason"
                                     class="form-select"
-                                    th:classappend="${#fields.hasErrors('reason')}? ' is-invalid'"
+                                    th:classappend="${#fields.hasErrors('reason')} ? ' is-invalid'"
                                     th:field="*{reason}"
                                     required>
-
                                 <option value="">출고 사유 선택</option>
                                 <option value="DISPENSING">조제·처방 출고</option>
                                 <option value="STORAGE_TRANSFER">저장소 이동</option>
                                 <option value="RETURN_TO_SUPPLIER">공급처 반품</option>
                                 <option value="OTHER">기타</option>
                             </select>
-
-                            <div class="invalid-feedback"
-                                 th:errors="*{reason}">
-                            </div>
+                            <div class="invalid-feedback"></div>
+                            <div class="text-danger" th:errors="*{reason}"></div>
                         </div>
                     </div>
 
                     <div id="outbound-memo-group"
-                         class="mt-3"
+                         class="mb-3 mt-3"
                          th:hidden="${outboundRequest.reason != 'OTHER'
-             and outboundRequest.reason != 'STORAGE_TRANSFER'}">
-
-                        <label class="form-label"
-                               for="outbound-memo">
+                             and outboundRequest.reason != 'STORAGE_TRANSFER'}">
+                        <label class="form-label" for="outbound-memo">
                             <span id="outbound-memo-label">상세 내용</span>
                             <span class="text-danger">(필수)</span>
                         </label>
-
                         <textarea id="outbound-memo"
                                   class="form-control"
-                                  th:classappend="${#fields.hasErrors('memo')}
-                      ? ' is-invalid'"
+                                  th:classappend="${#fields.hasErrors('memo')} ? ' is-invalid'"
                                   rows="3"
                                   th:field="*{memo}"
                                   th:disabled="${outboundRequest.reason != 'OTHER'
-                      and outboundRequest.reason != 'STORAGE_TRANSFER'}"
+                                      and outboundRequest.reason != 'STORAGE_TRANSFER'}"
                                   maxlength="100"
-                                  placeholder="상세 내용을 입력하세요.">
-    </textarea>
-
-                        <div class="invalid-feedback"
-                             th:errors="*{memo}">
-                        </div>
+                                  placeholder="상세 내용을 입력하세요."></textarea>
+                        <div class="invalid-feedback"></div>
+                        <div class="text-danger" th:errors="*{memo}"></div>
                     </div>
                 </div>
-                <div class="card-footer text-end">
+
+                <div class="card-footer py-3 d-flex justify-content-end">
                     <button type="submit"
-                            class="btn btn-primary">
+                            class="btn btn-primary"
+                            th:disabled="${target.availableQuantity <= 0}">
                         출고 등록
                     </button>
                 </div>
             </form>
-        </section>
-        </form>
         </section>
 
         <div class="modal modal-blur fade"
@@ -178,76 +145,42 @@
              tabindex="-1"
              aria-labelledby="outbound-confirm-title"
              aria-hidden="true">
-
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
-
                     <div class="modal-header">
-                        <h3 class="modal-title"
-                            id="outbound-confirm-title">
-                            출고 처리 확인
-                        </h3>
-
-                        <button type="button"
-                                class="btn-close"
-                                data-bs-dismiss="modal"
-                                aria-label="닫기">
-                        </button>
+                        <h3 class="modal-title" id="outbound-confirm-title">출고 처리 확인</h3>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
                     </div>
-
                     <div class="modal-body">
-                        <p>
-                            선택한 수량을 출고하시겠습니까?
-                            출고 처리 후에는 되돌릴 수 없습니다.
-                        </p>
-
-                        <div class="fixed-value">
-                            <strong th:text="${target.productName}">
-                                의약품명
-                            </strong>
-
-                            <small>
+                        <p>선택한 수량을 출고하시겠습니까? 출고 처리 후에는 되돌릴 수 없습니다.</p>
+                        <div class="border rounded bg-secondary-lt p-3">
+                            <div class="fw-bold" th:text="${target.productName}">의약품명</div>
+                            <div class="small text-muted mt-2">
                                 출고 수량:
                                 <span id="confirm-outbound-quantity"></span>
                                 <span th:text="${target.packUnit}">개</span>
-                            </small>
-
-                            <small>
-                                출고 사유:
-                                <span id="confirm-outbound-reason"></span>
-                            </small>
-
-                            <small id="confirm-outbound-memo-row"
-                                   hidden>
-                                상세 내용:
-                                <span id="confirm-outbound-memo"></span>
-                            </small>
+                            </div>
+                            <div class="small text-muted mt-1">
+                                출고 사유: <span id="confirm-outbound-reason"></span>
+                            </div>
+                            <div class="small text-muted mt-1" id="confirm-outbound-memo-row" hidden>
+                                상세 내용: <span id="confirm-outbound-memo"></span>
+                            </div>
                         </div>
                     </div>
-
                     <div class="modal-footer">
-                        <button type="button"
-                                class="btn btn-outline-secondary"
-                                data-bs-dismiss="modal">
-                            취소
-                        </button>
-
-                        <button type="button"
-                                id="confirm-outbound-button"
-                                class="btn btn-primary">
-                            출고하기
-                        </button>
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">취소</button>
+                        <button type="button" id="confirm-outbound-button" class="btn btn-primary">출고하기</button>
                     </div>
-
                 </div>
             </div>
         </div>
-
-    </main>
-</div>
     </main>
 </div>
 <th:block layout:fragment="script">
+    <script th:src="@{/js/common/validation.js}"></script>
+    <script th:src="@{/js/common/form.js}"></script>
+    <script th:src="@{/js/common/field-validator.js}"></script>
     <script th:src="@{/js/inventory/outbound.js}"></script>
 </th:block>
 </body>
