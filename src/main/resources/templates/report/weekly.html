@@ -9,426 +9,439 @@
     <title>주간 리포트 - iUnoT</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/weekSelect/weekSelect.css">
-    <link rel="stylesheet" th:href="@{/css/report.css}">
 </head>
 
 <body>
 <div layout:fragment="content">
-    <div class="page">
-        <div class="page-wrapper">
-            <div class="container-xl">
-
-                <div class="page-header mt-3">
-                    <div class="row align-items-center">
-                        <div class="col">
-                            <div class="d-flex align-items-center gap-2">
-                                <h2 class="page-title mb-0">
-                                    <i class="ti ti-report-analytics me-2"></i>주간 리포트
-                                </h2>
-                                <a th:href="@{/storages/{storageId}(storageId=${storageId})}" class="btn btn-outline-secondary btn-sm" title="저장소 상세로 돌아가기">
-                                    <i class="ti ti-arrow-left me-1"></i>저장소로 돌아가기
-                                </a>
-                            </div>
-                            <div class="text-muted mt-1" th:if="${report != null}">
-                                집계 기간: <span class="badge bg-blue-lt text-blue fs-4" th:text="${report.periodStart + ' ~ ' + report.periodEnd}"></span>
-                                <span class="badge bg-green-lt text-green ms-2" th:if="${isLatestWeek}">
+    <div class="py-6">
+        <div class="page-header d-print-none mb-4">
+            <div class="row align-items-center">
+                <div class="col">
+                    <div class="d-flex align-items-center gap-2">
+                        <h2 class="page-title mb-0">
+                            주간 리포트
+                        </h2>
+                        <a th:href="@{/storages/{storageId}(storageId=${storageId})}"
+                           class="btn btn-outline-secondary btn-sm"
+                           title="저장소 상세로 돌아가기">
+                            <i class="ti ti-arrow-left me-1"></i>
+                            저장소로 돌아가기
+                        </a>
+                    </div>
+                    <div class="text-muted mt-1" th:if="${report != null}">
+                        집계 기간: <span class="badge bg-blue-lt text-blue fs-4"
+                                     th:text="${report.periodStart + ' ~ ' + report.periodEnd}"></span>
+                        <span class="badge bg-green-lt text-green ms-2" th:if="${isLatestWeek}">
                                     <i class="ti ti-check me-1"></i>최근 마감 주차
                                 </span>
-                            </div>
-                            <div class="text-muted mt-1" th:if="${report == null}">
-                                선택 기간: <span class="badge bg-secondary-lt text-secondary fs-4" th:text="${currentMonday + ' ~ ' + currentMonday.plusDays(6)}"></span>
-                                <span class="badge bg-azure-lt text-azure ms-2" th:if="${isLatestWeek}">
+                    </div>
+                    <div class="text-muted mt-1" th:if="${report == null}">
+                        선택 기간: <span class="badge bg-secondary-lt text-secondary fs-4"
+                                     th:text="${currentMonday + ' ~ ' + currentMonday.plusDays(6)}"></span>
+                        <span class="badge bg-azure-lt text-azure ms-2" th:if="${isLatestWeek}">
                                     <i class="ti ti-info-circle me-1"></i>최근 마감 주차 (미생성)
                                 </span>
-                            </div>
-                        </div>
+                    </div>
+                </div>
 
-                        <div class="col-auto ms-auto d-print-none d-flex align-items-center gap-2">
-                            <div class="btn-group">
-                                <a th:href="@{/storages/{storageId}/reports/weekly(storageId=${storageId}, periodStart=${prevMonday})}" class="btn btn-outline-secondary btn-icon" title="이전 주">
-                                    <i class="ti ti-chevron-left"></i>
-                                </a>
-                                <a th:href="@{/storages/{storageId}/reports/weekly(storageId=${storageId}, periodStart=${lastMonday})}"
-                                   class="btn btn-outline-secondary"
-                                   th:classappend="${isLatestWeek} ? 'active' : ''">
-                                    최근 주차
-                                </a>
-                                <a th:href="@{/storages/{storageId}/reports/weekly(storageId=${storageId}, periodStart=${nextMonday})}"
-                                   class="btn btn-outline-secondary btn-icon"
-                                   th:classappend="${!hasFuture} ? 'disabled' : ''"
-                                   th:attr="aria-disabled=${!hasFuture} ? 'true' : 'false'"
-                                   title="다음 주">
-                                    <i class="ti ti-chevron-right"></i>
-                                </a>
-                            </div>
+                <div class="col-auto ms-auto d-print-none d-flex align-items-center gap-2">
+                    <div class="btn-group">
+                        <a th:href="@{/storages/{storageId}/reports/weekly(storageId=${storageId}, periodStart=${prevMonday})}"
+                           class="btn btn-outline-secondary btn-icon" title="이전 주">
+                            <i class="ti ti-chevron-left"></i>
+                        </a>
+                        <a th:href="@{/storages/{storageId}/reports/weekly(storageId=${storageId}, periodStart=${lastMonday})}"
+                           class="btn btn-outline-secondary"
+                           th:classappend="${isLatestWeek} ? 'active' : ''">
+                            최근 주차
+                        </a>
+                        <a th:href="@{/storages/{storageId}/reports/weekly(storageId=${storageId}, periodStart=${nextMonday})}"
+                           class="btn btn-outline-secondary btn-icon"
+                           th:classappend="${!hasFuture} ? 'disabled' : ''"
+                           th:attr="aria-disabled=${!hasFuture} ? 'true' : 'false'"
+                           title="다음 주">
+                            <i class="ti ti-chevron-right"></i>
+                        </a>
+                    </div>
 
-                            <div class="input-icon week-picker-container">
+                    <div class="input-icon">
                                 <span class="input-icon-addon">
                                     <i class="ti ti-calendar text-primary"></i>
                                 </span>
-                                <input type="text" id="week-picker" class="form-control form-control-sm"
-                                       th:data-current-start="${currentMonday}"
-                                       th:data-max-date="${lastSunday}"
-                                       th:data-storage-id="${storageId}"
-                                       placeholder="주차 선택" readonly>
-                            </div>
+                        <input type="text" id="week-picker" class="form-control form-control-sm"
+                               th:data-current-start="${currentMonday}"
+                               th:data-max-date="${lastSunday}"
+                               th:data-storage-id="${storageId}"
+                               placeholder="주차 선택" readonly>
+                    </div>
 
-                            <form th:if="${report != null}"
-                                  th:action="@{/storages/{storageId}/reports/{id}/recreations(storageId=${storageId}, id=${report.reportId})}"
-                                  method="post" class="d-inline">
-                                <input type="hidden" name="periodStart" th:value="${currentMonday}">
-                                <button type="submit" class="btn btn-outline-primary"
-                                        title="재고 집계와 환경 데이터를 다시 수집하고 AI 요약을 새로 만듭니다"
-                                        onclick="return confirm('리포트를 재생성합니다. 기존 AI 요약은 새로 생성된 내용으로 대체됩니다. 진행할까요?');">
-                                    <i class="ti ti-refresh me-1"></i>리포트 재생성
-                                </button>
-                            </form>
+                    <form th:if="${report != null}"
+                          th:action="@{/storages/{storageId}/reports/{id}/recreations(storageId=${storageId}, id=${report.reportId})}"
+                          method="post" class="d-inline">
+                        <input type="hidden" name="periodStart" th:value="${currentMonday}">
+                        <button type="submit" class="btn btn-outline-primary"
+                                title="재고 집계와 환경 데이터를 다시 수집하고 AI 요약을 새로 만듭니다"
+                                onclick="return confirm('리포트를 재생성합니다. 기존 AI 요약은 새로 생성된 내용으로 대체됩니다. 진행할까요?');">
+                            <i class="ti ti-refresh me-1"></i>리포트 재생성
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="alert alert-danger alert-dismissible mt-3" role="alert" th:if="${errorMessage}">
+            <div class="d-flex">
+                <div>
+                    <i class="ti ti-alert-circle fs-2 me-2"></i>
+                </div>
+                <div th:text="${errorMessage}"></div>
+            </div>
+        </div>
+
+        <div class="card mt-5" th:if="${report == null}">
+            <div class="empty py-5">
+                <div class="empty-icon text-primary mb-3">
+                    <i class="ti ti-file-analytics fs-1"></i>
+                </div>
+                <p class="empty-title fs-2">주간 리포트가 아직 생성되지 않았습니다</p>
+                <p class="empty-subtitle text-muted fs-3">
+                    해당 주간(<span class="fw-bold text-dark"
+                                th:text="${currentMonday + ' ~ ' + currentMonday.plusDays(6)}"></span>)의 의약품 입고, 사용 및 폐기
+                    데이터를 집계하고 AI 분석을 시작합니다.
+                </p>
+                <div class="empty-action mt-4">
+                    <form th:action="@{/storages/{storageId}/reports/weekly(storageId=${storageId})}" method="post">
+                        <input type="hidden" name="periodStart" th:value="${currentMonday}">
+                        <button type="submit" class="btn btn-primary btn-lg shadow-sm">
+                            <i class="ti ti-sparkles me-2"></i>이 주차의 리포트 생성하기
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div th:if="${report != null}">
+            <div class="card mt-5 border-start border-3 border-primary shadow-sm"
+                 th:if="${report.aiSummaryStatus != null and report.aiSummaryStatus.name() == 'COMPLETED'}">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <h3 class="card-title text-primary d-flex align-items-center mb-0">
+                            <i class="ti ti-sparkles me-2 fs-2"></i>AI 주간 재고 분석 요약
+                        </h3>
+                        <form th:action="@{/storages/{storageId}/reports/{id}/ai-summary/retry(storageId=${storageId}, id=${report.reportId})}"
+                              method="post" class="d-inline">
+                            <input type="hidden" name="periodStart" th:value="${currentMonday}">
+                            <button type="submit" class="btn btn-sm btn-outline-primary" title="AI 요약 재생성">
+                                <i class="ti ti-refresh me-1"></i>재생성
+                            </button>
+                        </form>
+                    </div>
+                    <div class="ps-1 lh-lg text-secondary"
+                         th:text="${report.aiSummary}">
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-5 border-info-subtle bg-info-lt"
+                 th:if="${report.aiSummaryStatus == null or report.aiSummaryStatus.name() == 'PENDING' or report.aiSummaryStatus.name() == 'PROGRESS'}">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center text-info">
+                            <div class="spinner-border spinner-border-sm text-info me-2" role="status"></div>
+                            <span class="fw-medium">AI가 주간 재고 데이터를 요약 분석하고 있습니다. 잠시 후 [새로고침] 버튼을 눌러주세요.</span>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-outline-info" onclick="location.reload();"
+                                title="새로고침">
+                            <i class="ti ti-refresh me-1"></i>새로고침
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-5 border-danger-subtle bg-danger-lt"
+                 th:if="${report.aiSummaryStatus != null and report.aiSummaryStatus.name() == 'FAILED'}">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center text-danger">
+                            <i class="ti ti-alert-triangle fs-2 me-2"></i>
+                            <div>
+                                <div class="fw-bold">AI 요약 생성에 실패했습니다.</div>
+                                <div class="small text-muted">일시적인 API 오류 또는 네트워크 지연일 수 있습니다.</div>
+                            </div>
+                        </div>
+                        <form th:action="@{/storages/{storageId}/reports/{id}/ai-summary/retry(storageId=${storageId}, id=${report.reportId})}"
+                              method="post" class="d-inline">
+                            <input type="hidden" name="periodStart" th:value="${currentMonday}">
+                            <button type="submit" class="btn btn-sm btn-danger">
+                                <i class="ti ti-rotate-clockwise me-1"></i>AI 요약 다시 시도
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row row-cards mt-1">
+                <!-- 입고 내역 -->
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header bg-primary-lt">
+                            <h3 class="card-title text-primary d-flex align-items-center">
+                                <i class="ti ti-package-import me-2 fs-2"></i>입고 내역
+                            </h3>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-vcenter card-table table-hover">
+                                <thead>
+                                <tr>
+                                    <th>의약품명</th>
+                                    <th>규격 / 포장단위</th>
+                                    <th class="text-end">입고 수량</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="item : ${report.items}" th:if="${item.reportItemType.name() == 'INBOUND'}">
+                                    <td class="fw-medium" th:text="${item.medicineName}">타이레놀정</td>
+                                    <td class="text-muted" th:text="${item.packUnit}">10정</td>
+                                    <td class="text-end fw-bold text-primary"
+                                        th:text="${#numbers.formatInteger(item.quantity, 0, 'COMMA')} + ' 개'">100 개
+                                    </td>
+                                </tr>
+                                <tr th:if="${#lists.isEmpty(report.items.?[reportItemType.name() == 'INBOUND'])}">
+                                    <td colspan="3" class="text-center text-muted py-4">
+                                        <i class="ti ti-inbox fs-2 d-block mb-1 text-muted"></i>
+                                        해당 주간에 발생한 입고 내역이 없습니다.
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
 
-                <div class="alert alert-danger alert-dismissible mt-3" role="alert" th:if="${errorMessage}">
-                    <div class="d-flex">
-                        <div>
-                            <i class="ti ti-alert-circle fs-2 me-2"></i>
+                <!-- 사용 내역 -->
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header bg-success-lt">
+                            <h3 class="card-title text-success d-flex align-items-center">
+                                <i class="ti ti-package-export me-2 fs-2"></i>사용 내역
+                            </h3>
                         </div>
-                        <div th:text="${errorMessage}"></div>
+                        <div class="table-responsive">
+                            <table class="table table-vcenter card-table table-hover">
+                                <thead>
+                                <tr>
+                                    <th>의약품명</th>
+                                    <th>규격 / 포장단위</th>
+                                    <th class="text-end">사용 수량</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="item : ${report.items}"
+                                    th:if="${item.reportItemType.name() == 'OUTBOUND'}">
+                                    <td class="fw-medium" th:text="${item.medicineName}">타이레놀정</td>
+                                    <td class="text-muted" th:text="${item.packUnit}">10정</td>
+                                    <td class="text-end fw-bold text-success"
+                                        th:text="${#numbers.formatInteger(item.quantity, 0, 'COMMA')} + ' 개'">42 개
+                                    </td>
+                                </tr>
+                                <tr th:if="${#lists.isEmpty(report.items.?[reportItemType.name() == 'OUTBOUND'])}">
+                                    <td colspan="3" class="text-center text-muted py-4">
+                                        <i class="ti ti-inbox fs-2 d-block mb-1 text-muted"></i>
+                                        해당 주간에 발생한 사용 내역이 없습니다.
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
 
-                <div class="card mt-3" th:if="${report == null}">
-                    <div class="empty py-5">
-                        <div class="empty-icon text-primary mb-3">
-                            <i class="ti ti-file-analytics fs-1"></i>
+                <!-- 폐기 내역 -->
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header bg-danger-lt">
+                            <h3 class="card-title text-danger d-flex align-items-center">
+                                <i class="ti ti-trash me-2 fs-2"></i>폐기 내역
+                            </h3>
                         </div>
-                        <p class="empty-title fs-2">주간 리포트가 아직 생성되지 않았습니다</p>
-                        <p class="empty-subtitle text-muted fs-3">
-                            해당 주간(<span class="fw-bold text-dark" th:text="${currentMonday + ' ~ ' + currentMonday.plusDays(6)}"></span>)의 의약품 입고, 사용 및 폐기 데이터를 집계하고 AI 분석을 시작합니다.
-                        </p>
-                        <div class="empty-action mt-4">
-                            <form th:action="@{/storages/{storageId}/reports/weekly(storageId=${storageId})}" method="post">
-                                <input type="hidden" name="periodStart" th:value="${currentMonday}">
-                                <button type="submit" class="btn btn-primary btn-lg shadow-sm">
-                                    <i class="ti ti-sparkles me-2"></i>이 주차의 리포트 생성하기
-                                </button>
-                            </form>
+                        <div class="table-responsive">
+                            <table class="table table-vcenter card-table table-hover">
+                                <thead>
+                                <tr>
+                                    <th>의약품명</th>
+                                    <th>규격 / 포장단위</th>
+                                    <th class="text-end">폐기 수량</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="item : ${report.items}"
+                                    th:if="${item.reportItemType.name() == 'DISPOSAL'}">
+                                    <td class="fw-medium" th:text="${item.medicineName}">소독용에탄올</td>
+                                    <td class="text-muted" th:text="${item.packUnit}">250ml</td>
+                                    <td class="text-end fw-bold text-danger"
+                                        th:text="${#numbers.formatInteger(item.quantity, 0, 'COMMA')} + ' 개'">5 개
+                                    </td>
+                                </tr>
+                                <tr th:if="${#lists.isEmpty(report.items.?[reportItemType.name() == 'DISPOSAL'])}">
+                                    <td colspan="3" class="text-center text-muted py-4">
+                                        <i class="ti ti-shield-check fs-2 d-block mb-1 text-muted"></i>
+                                        해당 주간에 발생한 폐기 내역이 없습니다.
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <div th:if="${report != null}">
-                    <div class="card mt-3 border-start border-3 border-primary shadow-sm"
-                         th:if="${report.aiSummaryStatus != null and report.aiSummaryStatus.name() == 'COMPLETED'}">
-                        <div class="card-body">
-                            <div class="d-flex align-items-center justify-content-between mb-3">
-                                <h3 class="card-title text-primary d-flex align-items-center mb-0">
-                                    <i class="ti ti-sparkles me-2 fs-2"></i>AI 주간 재고 분석 요약
-                                </h3>
-                                <form th:action="@{/storages/{storageId}/reports/{id}/ai-summary/retry(storageId=${storageId}, id=${report.reportId})}" method="post" class="d-inline">
-                                    <input type="hidden" name="periodStart" th:value="${currentMonday}">
-                                    <button type="submit" class="btn btn-sm btn-outline-primary" title="AI 요약 재생성">
-                                        <i class="ti ti-refresh me-1"></i>재생성
-                                    </button>
-                                </form>
-                            </div>
-                            <div class="ps-1 ai-summary-text"
-                                 th:text="${report.aiSummary}">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card mt-3 border-info-subtle bg-info-lt"
-                         th:if="${report.aiSummaryStatus == null or report.aiSummaryStatus.name() == 'PENDING' or report.aiSummaryStatus.name() == 'PROGRESS'}">
-                        <div class="card-body">
-                            <div class="d-flex align-items-center justify-content-between">
-                                <div class="d-flex align-items-center text-info">
-                                    <div class="spinner-border spinner-border-sm text-info me-2" role="status"></div>
-                                    <span class="fw-medium">AI가 주간 재고 데이터를 요약 분석하고 있습니다. 잠시 후 [새로고침] 버튼을 눌러주세요.</span>
-                                </div>
-                                <button type="button" class="btn btn-sm btn-outline-info" onclick="location.reload();" title="새로고침">
-                                    <i class="ti ti-refresh me-1"></i>새로고침
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card mt-3 border-danger-subtle bg-danger-lt"
-                         th:if="${report.aiSummaryStatus != null and report.aiSummaryStatus.name() == 'FAILED'}">
-                        <div class="card-body">
-                            <div class="d-flex align-items-center justify-content-between">
-                                <div class="d-flex align-items-center text-danger">
-                                    <i class="ti ti-alert-triangle fs-2 me-2"></i>
-                                    <div>
-                                        <div class="fw-bold">AI 요약 생성에 실패했습니다.</div>
-                                        <div class="small text-muted">일시적인 API 오류 또는 네트워크 지연일 수 있습니다.</div>
-                                    </div>
-                                </div>
-                                <form th:action="@{/storages/{storageId}/reports/{id}/ai-summary/retry(storageId=${storageId}, id=${report.reportId})}" method="post" class="d-inline">
-                                    <input type="hidden" name="periodStart" th:value="${currentMonday}">
-                                    <button type="submit" class="btn btn-sm btn-danger">
-                                        <i class="ti ti-rotate-clockwise me-1"></i>AI 요약 다시 시도
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row row-cards mt-1">
-                        <!-- 입고 내역 -->
-                        <div class="col-md-4">
-                            <div class="card">
-                                <div class="card-header bg-primary-lt">
-                                    <h3 class="card-title text-primary d-flex align-items-center">
-                                        <i class="ti ti-package-import me-2 fs-2"></i>입고 내역
-                                    </h3>
-                                </div>
-                                <div class="table-responsive">
-                                    <table class="table table-vcenter card-table table-hover">
-                                        <thead>
-                                            <tr>
-                                                <th>의약품명</th>
-                                                <th>규격 / 포장단위</th>
-                                                <th class="text-end">입고 수량</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr th:each="item : ${report.items}" th:if="${item.reportItemType.name() == 'INBOUND'}">
-                                                <td class="fw-medium" th:text="${item.medicineName}">타이레놀정</td>
-                                                <td class="text-muted" th:text="${item.packUnit}">10정</td>
-                                                <td class="text-end fw-bold text-primary" th:text="${#numbers.formatInteger(item.quantity, 0, 'COMMA')} + ' 개'">100 개</td>
-                                            </tr>
-                                            <tr th:if="${#lists.isEmpty(report.items.?[reportItemType.name() == 'INBOUND'])}">
-                                                <td colspan="3" class="text-center text-muted py-4">
-                                                    <i class="ti ti-inbox fs-2 d-block mb-1 text-muted"></i>
-                                                    해당 주간에 발생한 입고 내역이 없습니다.
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
+            <!-- 보관 환경 (구역별) -->
+            <div class="row row-cards mt-1" th:if="${report.hasEnvironment()}">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header bg-azure-lt">
+                            <h3 class="card-title text-azure d-flex align-items-center">
+                                <i class="ti ti-temperature me-2 fs-2"></i>보관 환경
+                            </h3>
+                            <div class="card-actions text-muted small">
+                                구역을 선택해 일평균 추이와 기간 요약을 확인합니다.
                             </div>
                         </div>
 
-                        <!-- 사용 내역 -->
-                        <div class="col-md-4">
-                            <div class="card">
-                                <div class="card-header bg-success-lt">
-                                    <h3 class="card-title text-success d-flex align-items-center">
-                                        <i class="ti ti-package-export me-2 fs-2"></i>사용 내역
-                                    </h3>
-                                </div>
-                                <div class="table-responsive">
-                                    <table class="table table-vcenter card-table table-hover">
-                                        <thead>
-                                            <tr>
-                                                <th>의약품명</th>
-                                                <th>규격 / 포장단위</th>
-                                                <th class="text-end">사용 수량</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr th:each="item : ${report.items}" th:if="${item.reportItemType.name() == 'OUTBOUND'}">
-                                                <td class="fw-medium" th:text="${item.medicineName}">타이레놀정</td>
-                                                <td class="text-muted" th:text="${item.packUnit}">10정</td>
-                                                <td class="text-end fw-bold text-success" th:text="${#numbers.formatInteger(item.quantity, 0, 'COMMA')} + ' 개'">42 개</td>
-                                            </tr>
-                                            <tr th:if="${#lists.isEmpty(report.items.?[reportItemType.name() == 'OUTBOUND'])}">
-                                                <td colspan="3" class="text-center text-muted py-4">
-                                                    <i class="ti ti-inbox fs-2 d-block mb-1 text-muted"></i>
-                                                    해당 주간에 발생한 사용 내역이 없습니다.
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
+                        <!-- 구역 탭 -->
+                        <div class="card-header">
+                            <ul class="nav nav-tabs card-header-tabs" role="tablist">
+                                <li class="nav-item" role="presentation"
+                                    th:each="zone, zoneStat : ${zoneEnvironments}">
+                                    <a class="nav-link d-flex align-items-center"
+                                       th:classappend="${zoneStat.first} ? 'active'"
+                                       data-bs-toggle="tab"
+                                       th:href="'#zone-pane-' + ${zone.zoneId}"
+                                       role="tab">
+                                        <span th:text="${zone.zoneName}">냉장 보관실</span>
+                                        <span class="badge bg-red text-white ms-2"
+                                              th:if="${zone.hasOutOfRange()}"
+                                              th:text="${zone.outOfRangeSensorCount()}"
+                                              title="기준을 벗어난 센서 수">1</span>
+                                    </a>
+                                </li>
+                            </ul>
                         </div>
 
-                        <!-- 폐기 내역 -->
-                        <div class="col-md-4">
-                            <div class="card">
-                                <div class="card-header bg-danger-lt">
-                                    <h3 class="card-title text-danger d-flex align-items-center">
-                                        <i class="ti ti-trash me-2 fs-2"></i>폐기 내역
-                                    </h3>
-                                </div>
-                                <div class="table-responsive">
-                                    <table class="table table-vcenter card-table table-hover">
-                                        <thead>
-                                            <tr>
-                                                <th>의약품명</th>
-                                                <th>규격 / 포장단위</th>
-                                                <th class="text-end">폐기 수량</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr th:each="item : ${report.items}" th:if="${item.reportItemType.name() == 'DISPOSAL'}">
-                                                <td class="fw-medium" th:text="${item.medicineName}">소독용에탄올</td>
-                                                <td class="text-muted" th:text="${item.packUnit}">250ml</td>
-                                                <td class="text-end fw-bold text-danger" th:text="${#numbers.formatInteger(item.quantity, 0, 'COMMA')} + ' 개'">5 개</td>
-                                            </tr>
-                                            <tr th:if="${#lists.isEmpty(report.items.?[reportItemType.name() == 'DISPOSAL'])}">
-                                                <td colspan="3" class="text-center text-muted py-4">
-                                                    <i class="ti ti-shield-check fs-2 d-block mb-1 text-muted"></i>
-                                                    해당 주간에 발생한 폐기 내역이 없습니다.
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                        <!-- 차트 데이터. 표는 Thymeleaf가 그리고 차트는 이 값을 읽는다.
+                             data 속성은 Thymeleaf가 이스케이프하므로 스크립트 삽입 위험이 없다. -->
+                        <div class="card-body"
+                             id="environment-root"
+                             th:attr="data-environments=${environmentJson}, data-doors=${doorJson}">
+                            <div class="tab-content">
+                                <div th:each="zone, zoneStat : ${zoneEnvironments}"
+                                     class="tab-pane"
+                                     th:classappend="${zoneStat.first} ? 'active show'"
+                                     th:id="'zone-pane-' + ${zone.zoneId}"
+                                     role="tabpanel">
 
-                    <!-- 보관 환경 (구역별) -->
-                    <div class="row row-cards mt-1" th:if="${report.hasEnvironment()}">
-                        <div class="col-12">
-                            <div class="card">
-                                <div class="card-header bg-azure-lt">
-                                    <h3 class="card-title text-azure d-flex align-items-center">
-                                        <i class="ti ti-temperature me-2 fs-2"></i>보관 환경
-                                    </h3>
-                                    <div class="card-actions text-muted small">
-                                        구역을 선택해 일평균 추이와 기간 요약을 확인합니다.
-                                    </div>
-                                </div>
-
-                                <!-- 구역 탭 -->
-                                <div class="card-header">
-                                    <ul class="nav nav-tabs card-header-tabs" role="tablist">
-                                        <li class="nav-item" role="presentation"
-                                            th:each="zone, zoneStat : ${zoneEnvironments}">
-                                            <a class="nav-link d-flex align-items-center"
-                                               th:classappend="${zoneStat.first} ? 'active'"
-                                               data-bs-toggle="tab"
-                                               th:href="'#zone-pane-' + ${zone.zoneId}"
-                                               role="tab">
-                                                <span th:text="${zone.zoneName}">냉장 보관실</span>
-                                                <span class="badge bg-red text-white ms-2"
-                                                      th:if="${zone.hasOutOfRange()}"
-                                                      th:text="${zone.outOfRangeSensorCount()}"
-                                                      title="기준을 벗어난 센서 수">1</span>
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
-
-                                <!-- 차트 데이터. 표는 Thymeleaf가 그리고 차트는 이 값을 읽는다.
-                                     data 속성은 Thymeleaf가 이스케이프하므로 스크립트 삽입 위험이 없다. -->
-                                <div class="card-body"
-                                     id="environment-root"
-                                     th:attr="data-environments=${environmentJson}, data-doors=${doorJson}">
-                                    <div class="tab-content">
-                                        <div th:each="zone, zoneStat : ${zoneEnvironments}"
-                                             class="tab-pane"
-                                             th:classappend="${zoneStat.first} ? 'active show'"
-                                             th:id="'zone-pane-' + ${zone.zoneId}"
-                                             role="tabpanel">
-
-                                            <!-- 센서별 일평균 추이 -->
-                                            <div th:each="env, envStat : ${zone.sensors}"
-                                                 th:class="${envStat.last} ? 'env-chart-block' : 'env-chart-block mb-4'">
-                                                <div class="d-flex align-items-center justify-content-between mb-2">
-                                                    <div class="fw-medium">
-                                                        <span th:text="${env.sensorType}">TEMPERATURE</span>
-                                                        <span class="text-muted" th:if="${env.unit != null}"
-                                                              th:text="' (' + ${env.unit} + ')'"> (°C)</span>
-                                                    </div>
-                                                    <span class="badge bg-red-lt" th:if="${env.hasOutOfRange()}"
-                                                          th:text="'기준 이탈 ' + ${env.outOfRangeDays} + '일'">기준 이탈 2일</span>
-                                                    <span class="badge bg-green-lt"
-                                                          th:if="${!env.hasOutOfRange() and env.hasThreshold()}">기준 이내</span>
-                                                    <span class="badge bg-secondary-lt"
-                                                          th:if="${!env.hasThreshold()}">기준 미설정</span>
-                                                </div>
-
-                                                <div class="env-chart">
-                                                    <canvas class="env-chart-canvas"
-                                                            th:attr="data-zone-id=${env.zoneId}, data-sensor-type=${env.sensorType}"></canvas>
-                                                </div>
+                                    <!-- 센서별 일평균 추이 -->
+                                    <div th:each="env, envStat : ${zone.sensors}"
+                                         th:class="${envStat.last ? '' : 'mb-4'}">
+                                        <div class="d-flex align-items-center justify-content-between mb-2">
+                                            <div class="fw-medium">
+                                                <span th:text="${env.sensorType}">TEMPERATURE</span>
+                                                <span class="text-muted" th:if="${env.unit != null}"
+                                                      th:text="' (' + ${env.unit} + ')'"> (°C)</span>
                                             </div>
+                                            <span class="badge bg-red-lt" th:if="${env.hasOutOfRange()}"
+                                                  th:text="'기준 이탈 ' + ${env.outOfRangeDays} + '일'">기준 이탈 2일</span>
+                                            <span class="badge bg-green-lt"
+                                                  th:if="${!env.hasOutOfRange() and env.hasThreshold()}">기준 이내</span>
+                                            <span class="badge bg-secondary-lt"
+                                                  th:if="${!env.hasThreshold()}">기준 미설정</span>
+                                        </div>
 
-                                            <!-- 기간 요약 -->
-                                            <div class="table-responsive mt-3">
-                                                <table class="table table-vcenter card-table table-hover">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>센서</th>
-                                                            <th class="text-end">평균</th>
-                                                            <th class="text-end">범위</th>
-                                                            <th class="text-end">기준</th>
-                                                            <th class="text-end">이탈</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <tr th:each="env : ${zone.sensors}"
-                                                            th:classappend="${env.hasOutOfRange()} ? 'table-danger' : ''">
-                                                            <td class="fw-medium">
-                                                                <span th:text="${env.sensorType}">TEMPERATURE</span>
-                                                                <span class="text-muted" th:if="${env.unit != null}"
-                                                                      th:text="' (' + ${env.unit} + ')'"> (°C)</span>
-                                                            </td>
-                                                            <td class="text-end fw-bold" th:text="${env.avgValue}">5.2</td>
-                                                            <td class="text-end text-muted"
-                                                                th:text="${env.minValue} + ' ~ ' + ${env.maxValue}">3.9 ~ 10.4</td>
-                                                            <td class="text-end text-muted">
-                                                                <span th:if="${!env.hasThreshold()}">미설정</span>
-                                                                <th:block th:if="${env.hasThreshold()}">
-                                                                    <span th:text="${env.thresholdMin != null ? env.thresholdMin : '제한없음'}">2.0</span>
-                                                                    <span> ~ </span>
-                                                                    <span th:text="${env.thresholdMax != null ? env.thresholdMax : '제한없음'}">8.0</span>
-                                                                </th:block>
-                                                            </td>
-                                                            <td class="text-end">
-                                                                <span class="text-muted" th:if="${!env.hasOutOfRange()}">없음</span>
-                                                                <span class="text-danger fw-bold" th:if="${env.hasOutOfRange()}"
-                                                                      th:text="${env.outOfRangeDays} + ' / ' + ${env.measuredDays} + '일'">2 / 7일</span>
-                                                            </td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                            </div>
+                                        <div>
+                                            <canvas class="env-chart-canvas"
+                                                    th:attr="data-zone-id=${env.zoneId}, data-sensor-type=${env.sensorType}"></canvas>
+                                        </div>
+                                    </div>
 
-                                            <!-- 문 개폐 -->
-                                            <div class="mt-3" th:if="${zone.hasDoor()}">
-                                                <div class="hr-text hr-text-left">문 개폐</div>
-                                                <!-- 센서 차트와 x축을 맞춰 세로로 비교할 수 있게 아래에 둔다. -->
-                                                <div class="env-chart env-chart-door mt-2">
-                                                    <canvas class="door-chart-canvas"
-                                                            th:attr="data-zone-id=${zone.zoneId}"></canvas>
-                                                </div>
+                                    <!-- 기간 요약 -->
+                                    <div class="table-responsive mt-3">
+                                        <table class="table table-vcenter card-table table-hover">
+                                            <thead>
+                                            <tr>
+                                                <th>센서</th>
+                                                <th class="text-end">평균</th>
+                                                <th class="text-end">범위</th>
+                                                <th class="text-end">기준</th>
+                                                <th class="text-end">이탈</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr th:each="env : ${zone.sensors}"
+                                                th:classappend="${env.hasOutOfRange()} ? 'table-danger' : ''">
+                                                <td class="fw-medium">
+                                                    <span th:text="${env.sensorType}">TEMPERATURE</span>
+                                                    <span class="text-muted" th:if="${env.unit != null}"
+                                                          th:text="' (' + ${env.unit} + ')'"> (°C)</span>
+                                                </td>
+                                                <td class="text-end fw-bold" th:text="${env.avgValue}">5.2</td>
+                                                <td class="text-end text-muted"
+                                                    th:text="${env.minValue} + ' ~ ' + ${env.maxValue}">3.9 ~ 10.4
+                                                </td>
+                                                <td class="text-end text-muted">
+                                                    <span th:if="${!env.hasThreshold()}">미설정</span>
+                                                    <th:block th:if="${env.hasThreshold()}">
+                                                        <span th:text="${env.thresholdMin != null ? env.thresholdMin : '제한없음'}">2.0</span>
+                                                        <span> ~ </span>
+                                                        <span th:text="${env.thresholdMax != null ? env.thresholdMax : '제한없음'}">8.0</span>
+                                                    </th:block>
+                                                </td>
+                                                <td class="text-end">
+                                                    <span class="text-muted" th:if="${!env.hasOutOfRange()}">없음</span>
+                                                    <span class="text-danger fw-bold" th:if="${env.hasOutOfRange()}"
+                                                          th:text="${env.outOfRangeDays} + ' / ' + ${env.measuredDays} + '일'">2 / 7일</span>
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
 
-                                                <div class="row g-2">
-                                                    <div class="col-md-4">
-                                                        <div class="card card-sm">
-                                                            <div class="card-body">
-                                                                <div class="text-muted small">
-                                                                    총 <span class="fw-bold text-teal"
-                                                                             th:text="${zone.door.totalOpenCount}">144</span>회 ·
-                                                                    누적 <span class="fw-bold text-teal"
-                                                                             th:text="${zone.door.totalOpenMinutes}">255</span>분
-                                                                </div>
-                                                                <div class="text-muted small"
-                                                                     th:text="${zone.door.measuredDays} + '일 측정'">7일 측정</div>
-                                                            </div>
+                                    <!-- 문 개폐 -->
+                                    <div class="mt-3" th:if="${zone.hasDoor()}">
+                                        <div class="hr-text hr-text-left">문 개폐</div>
+                                        <!-- 센서 차트와 x축을 맞춰 세로로 비교할 수 있게 아래에 둔다. -->
+                                        <div class="mt-2">
+                                            <canvas class="door-chart-canvas"
+                                                    th:attr="data-zone-id=${zone.zoneId}"></canvas>
+                                        </div>
+
+                                        <div class="row g-2">
+                                            <div class="col-md-4">
+                                                <div class="card card-sm">
+                                                    <div class="card-body">
+                                                        <div class="text-muted small">
+                                                            총 <span class="fw-bold text-teal"
+                                                                    th:text="${zone.door.totalOpenCount}">144</span>회 ·
+                                                            누적 <span class="fw-bold text-teal"
+                                                                     th:text="${zone.door.totalOpenMinutes}">255</span>분
+                                                        </div>
+                                                        <div class="text-muted small"
+                                                             th:text="${zone.door.measuredDays} + '일 측정'">7일 측정
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-
-                                            <!-- 문 센서가 없는 구역임을 명시한다. 개폐 0회와 구분하기 위함이다. -->
-                                            <div class="text-muted small mt-3" th:if="${!zone.hasDoor()}">
-                                                이 구역에는 문 센서가 없습니다.
-                                            </div>
                                         </div>
+                                    </div>
+
+                                    <!-- 문 센서가 없는 구역임을 명시한다. 개폐 0회와 구분하기 위함이다. -->
+                                    <div class="text-muted small mt-3" th:if="${!zone.hasDoor()}">
+                                        이 구역에는 문 센서가 없습니다.
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-
                 </div>
-
             </div>
         </div>
     </div>

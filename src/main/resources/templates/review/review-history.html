@@ -6,48 +6,75 @@
 <head>
     <meta charset="UTF-8">
     <title>환경 검토 내역 조회</title>
-    <link rel="stylesheet" th:href="@{/css/review-history.css}">
 </head>
 <body>
 
 <div layout:fragment="content">
-    <div class="container">
-        <h2>📋 환경 검토 내역 조회</h2>
+        <main class="py-6">
+            <div class="page-header d-print-none mb-4">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h2 class="page-title">환경 검토 내역 조회</h2>
+                        <div class="text-muted mt-1">
+                            환경 검토가 완료된 재고의 처리 이력을 확인합니다.
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <a class="btn btn-outline-secondary"
+                           th:href="@{/inventories/under-reviews}">
+                            <i class="ti ti-arrow-left me-1"></i>
+                            검토 대상 재고 관리로
+                        </a>
+                    </div>
+                </div>
+            </div>
 
-        <!-- 상단 필터 및 저장소 선택 영역 -->
-        <div class="filter-section">
-            <label for="storageSelect">저장소 선택:</label>
-            <select id="storageSelect">
-                <option value="">내 부서에 포함된 전체 저장소</option>
-            </select>
-            <button type="button" id="searchBtn" class="btn-primary">조회</button>
-        </div>
+            <section class="card mt-5">
+                <div class="card-body border-bottom py-3">
+                    <div class="row g-2 align-items-end">
+                        <div class="col-md-6">
+                            <label for="storageSelect" class="form-label">저장소</label>
+                            <select id="storageSelect" class="form-select">
+                                <option value="">내 부서에 포함된 전체 저장소</option>
+                            </select>
+                        </div>
 
-        <!-- 검토 내역 목록 테이블 -->
-        <div class="table-container">
-            <table>
-                <thead>
-                <tr>
-                    <th>제품명</th>
-                    <th>포장단위</th>
-                    <th>처리 유형</th>
-                    <th>검토 일시</th>
-                    <th>검토자 ID</th>
-                    <th>상세보기</th>
-                </tr>
-                </thead>
-                <tbody id="historyTableBody">
-                <tr>
-                    <td colspan="6" class="empty-data">데이터를 불러오는 중입니다...</td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
+                        <div class="col-auto">
+                            <button type="button" id="searchBtn" class="btn btn-primary">
+                                조회
+                            </button>
+                        </div>
+                    </div>
+                </div>
 
-        <!-- 페이징 영역 -->
-        <div class="pagination" id="pagination"></div>
+                <div class="table-responsive">
+                    <table class="table table-vcenter table-hover card-table">
+                        <thead>
+                        <tr>
+                            <th>제품명</th>
+                            <th>포장단위</th>
+                            <th>처리 유형</th>
+                            <th>검토 일시</th>
+                            <th>검토자 ID</th>
+                            <th class="text-end">관리</th>
+                        </tr>
+                        </thead>
+                        <tbody id="historyTableBody">
+                        <tr>
+                            <td colspan="6" class="text-center text-secondary py-5">
+                                데이터를 불러오는 중입니다.
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="card-footer py-3">
+                    <ul class="pagination m-0 justify-content-center" id="pagination"></ul>
+                </div>
+            </section>
+        </main>
     </div>
-</div>
 
 <th:block layout:fragment="script">
     <script th:src="@{/js/review/review-history.js}"></script>
