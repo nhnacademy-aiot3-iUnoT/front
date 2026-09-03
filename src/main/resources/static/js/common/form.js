@@ -17,7 +17,16 @@ function setError(input, message) {
     feedback.classList.add("d-block");
 }
 
-function clearError(input, defaultMessage = "") {
+function clearFeedback(feedback) {
+    if (!feedback) {
+        return;
+    }
+
+    feedback.textContent = "";
+    feedback.classList.remove("d-block");
+}
+
+function clearError(input) {
     if (!input) {
         return;
     }
@@ -25,21 +34,17 @@ function clearError(input, defaultMessage = "") {
     input.classList.remove("is-invalid");
 
     const fieldGroup = input.closest(".mb-3, .mb-4");
-    const feedback = fieldGroup?.querySelector(".invalid-feedback");
-
-    if (!feedback) {
-        return;
-    }
-
-    feedback.textContent = defaultMessage;
-    feedback.classList.remove("d-block");
+    clearFeedback(fieldGroup?.querySelector(".invalid-feedback"));
 }
 
-function clearErrors(container) {
-    if (!container) {
+function clearErrors(form) {
+    if (!form) {
         return;
     }
 
-    container.querySelectorAll(".is-invalid")
-        .forEach(input => clearError(input));
+    form.querySelectorAll(".form-control, .form-select")
+        .forEach(input => input.classList.remove("is-invalid"));
+
+    form.querySelectorAll(".invalid-feedback")
+        .forEach(clearFeedback);
 }

@@ -201,3 +201,50 @@ function validateDepartmentNameField(input) {
 
     return true;
 }
+
+// 재고 수량 필드 검증
+function validateInventoryQuantityField(input, maxQuantity) {
+    const value = input.value.trim();
+
+    if (!isRequired(value)) {
+        setError(input, "수량을 입력해주세요.");
+        return false;
+    }
+
+    if (!isPositiveInteger(value)) {
+        setError(input, "수량은 1개 이상의 정수로 입력해주세요.");
+        return false;
+    }
+
+    if (!isInRange(value, 1, maxQuantity)) {
+        setError(input, `수량은 1개 이상 ${maxQuantity}개 이하로 입력해주세요.`);
+        return false;
+    }
+
+    return true;
+}
+
+function validateRequiredSelectField(input, label) {
+    if (!isRequired(input.value)) {
+        setError(input, `${label} 선택이 필요합니다.`);
+        return false;
+    }
+
+    return true;
+}
+
+function validateConditionalMemoField(input, required, label, maxLength = 100) {
+    const value = input.value.trim();
+
+    if (required && !isRequired(value)) {
+        setError(input, `${label} 입력이 필요합니다.`);
+        return false;
+    }
+
+    if (!isMaxLength(value, maxLength)) {
+        setError(input, `${label}: ${maxLength}자 이내로 입력해주세요.`);
+        return false;
+    }
+
+    return true;
+}

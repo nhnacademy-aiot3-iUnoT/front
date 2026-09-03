@@ -24,8 +24,8 @@ public class MedicineEnvController {
 
     private final MedicineEnvApiClient medicineEnvApiClient;
     private final MedicineInfoApiClient medicineInfoApiClient;
-    private static final String ENV_VIEW = "inventory/medicine-env-list";
-    private static final String REDIRECT_STANDARD = "redirect:/pack-units/environment-standards";
+    private static final String ENV_VIEW = "inventory/medicine-env";
+    private static final String REDIRECT_INVENTORIES = "redirect:/inventories";
 
 
     @GetMapping("/environment-standards")
@@ -44,14 +44,14 @@ public class MedicineEnvController {
     ){
 
         if(bindingResult.hasErrors()){
-            return REDIRECT_STANDARD;
+            return ENV_VIEW;
         }
 
 
         PageResponse<MedicineSearchResponse> medicines = medicineInfoApiClient.getMedicines(request,page,size);
 
         model.addAttribute("medicineSearchRequest",request);
-        model.addAttribute("medicines",medicines.content());
+        model.addAttribute("medicines",medicines);
         model.addAttribute("currentPage",medicines.page());
         model.addAttribute("totalPages",medicines.totalPages());
         model.addAttribute("pageSize",medicines.size());
@@ -60,14 +60,18 @@ public class MedicineEnvController {
     }
 
 
+
     // 선택 의약품 정보/환경기준 조회
     @GetMapping("/{pack-unit-id}/environment-standards")
-    public String getStandards(@PathVariable(name="pack-unit-id")Long packUnitId, Model model){
+    public String getStandards(@PathVariable(name="pack-unit-id")Long packUnitId,
+                               Model model){
 
 
         List<MedicineEnvironmentTypeResponse> environmentTypes = medicineEnvApiClient.getTypes(packUnitId);
 
 
+        model.addAttribute("packUnitId",packUnitId);
+        model.addAttribute("medicineEnvironmentRequest",new MedicineEnvironmentRequest());
         model.addAttribute("medicine",medicineInfoApiClient.getMedicine(packUnitId));
         model.addAttribute("environmentTypes",environmentTypes);
 
@@ -84,12 +88,12 @@ public class MedicineEnvController {
                                   ){
 
         if(bindingResult.hasErrors()){
-            return REDIRECT_STANDARD;
+            return ENV_VIEW;
         }
 
         medicineEnvApiClient.createTypes(packUnitId,request);
 
-        return REDIRECT_STANDARD;
+        return REDIRECT_INVENTORIES;
 
     }
 
@@ -102,23 +106,23 @@ public class MedicineEnvController {
                                   ){
 
         if(bindingResult.hasErrors()){
-            return REDIRECT_STANDARD;
+            return ENV_VIEW;
         }
 
         medicineEnvApiClient.updateTypes(packUnitId,request);
 
-        return REDIRECT_STANDARD;
+        return REDIRECT_INVENTORIES;
 
     }
 
 
     // 환경기준 삭제
-    @DeleteMapping("/environment-standards/{environment-standard-id}")
-    public String deleteStandards(@PathVariable(name = "environment-standard-id") Long standardId){
+    @DeleteMapping("/{pack-unit-id}/environment-standards")
+    public String deleteStandards(@PathVariable(name = "pack-unit-id") Long packUnitId){
 
-        medicineEnvApiClient.deleteTypes(standardId);
+        medicineEnvApiClient.deleteTypes(packUnitId);
 
-        return REDIRECT_STANDARD;
+        return REDIRECT_INVENTORIES;
     }
 
 

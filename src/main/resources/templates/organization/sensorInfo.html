@@ -5,7 +5,7 @@
       layout:decorate="~{layout/main-layout}">
 <head>
     <meta charset="UTF-8">
-    <title th:text="|Zone ${zoneId} 상세 환경 정보|">상세 환경 정보</title>
+    <title th:text="|Zone ${zoneName} 상세 환경 정보|">상세 환경 정보</title>
     <link rel="stylesheet" th:href="@{/css/status.css}">
 </head>
 <body>
@@ -14,8 +14,8 @@
         <nav aria-label="breadcrumb" class="mb-3">
             <ol class="breadcrumb breadcrumb-arrows mb-0">
                 <li class="breadcrumb-item"><a href="/">환경관리</a></li>
-                <li class="breadcrumb-item"><span th:text="|저장소 ${storageId}|">저장소</span></li>
-                <li class="breadcrumb-item active" aria-current="page" th:text="|Zone ${zoneId}|">Zone</li>
+                <li class="breadcrumb-item"><span th:text="|${storageName}|">저장소</span></li>
+                <li class="breadcrumb-item active" aria-current="page" th:text="| ${zoneName}|">Zone</li>
             </ol>
         </nav>
 
@@ -32,7 +32,7 @@
                             <span class="status-dot bg-secondary me-1"></span>미연결
                         </span>
                     </div>
-                    <h2 class="page-title" th:text="|Zone ${zoneId} 환경 정보|">Zone 환경 정보</h2>
+                    <h2 class="page-title" th:text="|${zoneName} 환경 정보|">Zone 환경 정보</h2>
                     <div class="text-muted mt-1">센서의 최신 측정값과 최근 24시간 이력을 확인합니다.</div>
                 </div>
                 <div class="col-auto">
