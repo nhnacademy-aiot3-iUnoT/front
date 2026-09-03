@@ -203,7 +203,6 @@ function validateDepartmentNameField(input) {
 }
 
 // 재고 수량 필드 검증
-// 재고 수량 필드 검증
 function validateInventoryQuantityField(input, maxQuantity) {
     if (maxQuantity < 1) {
         setError(input, "처리 가능한 재고가 없습니다.");
