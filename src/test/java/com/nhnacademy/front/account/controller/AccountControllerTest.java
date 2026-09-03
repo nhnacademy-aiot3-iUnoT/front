@@ -114,6 +114,16 @@ class AccountControllerTest {
                 .hasSize(1);
         assertThat(document.select("script[src=/js/account/account-info.js]"))
                 .hasSize(1);
+        assertThat(document.select(
+                "#session-controls[data-duration-seconds=1800]"
+                        + "[data-refresh-url=/refresh][data-login-url=/login]"
+        )).hasSize(1);
+        assertThat(document.select("#session-timer")).hasSize(1);
+        assertThat(document.select("button#session-extend-button")).hasSize(1);
+        assertThat(document.select("form#session-logout-form[action=/logout][method=post]"))
+                .hasSize(1);
+        assertThat(document.select("script[src=/js/auth/session.js]"))
+                .hasSize(1);
 
         then(accountApiClient).should().getAccountInfo();
     }

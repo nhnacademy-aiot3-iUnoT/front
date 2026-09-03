@@ -46,6 +46,7 @@
                 </ul>
 
                 <div class="navbar-nav flex-row order-md-last">
+                    <div th:replace="~{fragments/session-control :: control}"></div>
 
                     <div class="nav-item me-3 position-relative">
                         <a href="/alerts" class="nav-link px-2 text-reset notification-link" title="알림함">
@@ -70,7 +71,10 @@
                     </div>
 
                     <div class="nav-item">
-                        <form th:action="@{/logout}" method="post" class="m-0">
+                        <form id="session-logout-form"
+                              th:action="@{/logout}"
+                              method="post"
+                              class="m-0">
                             <button type="submit" class="btn btn-outline-secondary btn-sm">
                                 로그아웃
                             </button>
