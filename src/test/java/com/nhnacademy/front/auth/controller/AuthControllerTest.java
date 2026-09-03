@@ -213,6 +213,44 @@ class AuthControllerTest {
         );
     }
 
+    @Test
+    void refreshRotatesTokensAndReturnsNoContent() throws Exception {
+        given(authSessionService.renew(
+                any(HttpServletRequest.class),
+                any(HttpServletResponse.class)
+        )).willReturn(true);
+
+        mockMvc.perform(post("/refresh"))
+                .andExpect(status().isNoContent());
+
+        then(authSessionService).should().renew(
+                any(HttpServletRequest.class),
+                any(HttpServletResponse.class)
+        );
+    }
+
+    @Test
+    void refreshWithoutRefreshCookieReturnsUnauthorized() throws Exception {
+        given(authSessionService.renew(
+                any(HttpServletRequest.class),
+                any(HttpServletResponse.class)
+        )).willReturn(false);
+
+        mockMvc.perform(post("/refresh"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void refreshFailureReturnsUnauthorized() throws Exception {
+        given(authSessionService.renew(
+                any(HttpServletRequest.class),
+                any(HttpServletResponse.class)
+        )).willThrow(new IllegalStateException("refresh failed"));
+
+        mockMvc.perform(post("/refresh"))
+                .andExpect(status().isUnauthorized());
+    }
+
     private JwtAuthenticationToken authentication(AccountStatus status) {
         Jwt jwt = Jwt.withTokenValue("token")
                 .header("alg", "RS256")

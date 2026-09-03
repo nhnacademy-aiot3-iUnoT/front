@@ -25,6 +25,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -110,6 +111,23 @@ public class AuthController {
         authSessionService.revoke(request, response);
 
         return "redirect:/login";
+    }
+
+    @PostMapping("/refresh")
+    @ResponseBody
+    public ResponseEntity<Void> refresh(
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) {
+        try {
+            if (authSessionService.renew(request, response)) {
+                return ResponseEntity.noContent().build();
+            }
+        } catch (RuntimeException exception) {
+            // 연장 실패는 브라우저가 다시 로그인하도록 401로 응답한다.
+        }
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
     @GetMapping("/signup")

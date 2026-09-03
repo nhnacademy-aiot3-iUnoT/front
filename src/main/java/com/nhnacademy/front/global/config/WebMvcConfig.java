@@ -18,6 +18,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .excludePathPatterns(
                         "/reactivation",
                         "/reactivation/**",
+                        "/refresh",
                         "/logout",
                         "/css/**",
                         "/js/**",

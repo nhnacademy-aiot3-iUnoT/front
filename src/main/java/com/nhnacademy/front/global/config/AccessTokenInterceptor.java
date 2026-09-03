@@ -1,6 +1,5 @@
 package com.nhnacademy.front.global.config;
 
-import com.nhnacademy.front.global.security.RefreshTokenAutoRenewFilter;
 import jakarta.servlet.http.Cookie;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpRequest;
@@ -42,16 +41,6 @@ public class AccessTokenInterceptor implements ClientHttpRequestInterceptor {
                 RequestContextHolder.getRequestAttributes();
 
         if (requestAttributes instanceof ServletRequestAttributes attributes) {
-            Object refreshedAccessToken = attributes.getRequest().getAttribute(
-                    RefreshTokenAutoRenewFilter.REFRESHED_ACCESS_TOKEN_ATTRIBUTE
-            );
-
-            if (refreshedAccessToken instanceof String token
-                    && StringUtils.hasText(token)) {
-                request.getHeaders().setBearerAuth(token);
-                return execution.execute(request, body);
-            }
-
             Cookie[] cookies = attributes.getRequest().getCookies();
             if (cookies != null) {
                 Arrays.stream(cookies)
