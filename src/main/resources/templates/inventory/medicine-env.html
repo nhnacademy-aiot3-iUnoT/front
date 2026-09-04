@@ -102,7 +102,7 @@
                     이전
                 </a>
 
-                <a th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}"
+                <a th:each="pageNum : ${#numbers.sequence(startPage, endPage)}"
                    th:href="@{/pack-units(searchType=${medicineSearchRequest.searchType},
                    search=${medicineSearchRequest.search},
                    page=${pageNum},
@@ -131,9 +131,13 @@
 
 
     <section class="current-environment-section" th:if="${medicine != null}">
-        <div class="section-title">
-            <h3>환경기준 변경</h3>
-            <p>변경할 환경기준을 입력해 주세요.</p>
+        <div class="section-title current-environment-title">
+            <div class="section-title-text">
+
+                <h3>환경기준 변경</h3>
+                <p>변경할 환경기준을 입력해 주세요.</p>
+            </div>
+
 
         <form method="post"
               class="delete-environment-form"
@@ -210,8 +214,7 @@
             <form method="post" class="environment-form" th:action="@{/pack-units/{packUnitId}/environment-standards(packUnitId=${packUnitId})}"
                 th:object="${medicineEnvironmentRequest}">
 
-                <input type="hidden" name="_method" value="put" th:if="${environmentTypes != null and
-                    !#lists.isEmpty(environmentTypes)}">
+                <input type="hidden" name="_method" value="put" th:if="${environmentTypes != null and !#lists.isEmpty(environmentTypes)}">
 
 
                 <div class="criteria-grid">
@@ -374,6 +377,11 @@
         </div>
 
     </section>
+
+
+        <a th:href="@{/inventories}" class="back-button">
+            이전
+        </a>
 
 
 

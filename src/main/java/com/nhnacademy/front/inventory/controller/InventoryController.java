@@ -3,15 +3,12 @@ package com.nhnacademy.front.inventory.controller;
 import com.nhnacademy.front.global.dto.PageResponse;
 import com.nhnacademy.front.inventory.client.InventoryApiClient;
 import com.nhnacademy.front.inventory.dto.response.InventoriesResponse;
-
 import com.nhnacademy.front.inventory.dto.response.InventoryDetailResponse;
 import com.nhnacademy.front.inventory.dto.response.InventoryInfoResponse;
 import com.nhnacademy.front.inventory.service.InventoryFrontService;
-
 import com.nhnacademy.front.medicine.client.MedicineInfoApiClient;
 import com.nhnacademy.front.organization.client.DepartmentApiClient;
 import com.nhnacademy.front.organization.client.OrganizationMemberApiClient;
-
 import com.nhnacademy.front.organization.dto.OrganizationRole;
 import com.nhnacademy.front.organization.dto.response.DepartmentListResponse;
 import lombok.RequiredArgsConstructor;
