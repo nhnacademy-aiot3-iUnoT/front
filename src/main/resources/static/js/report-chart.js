@@ -176,7 +176,7 @@ document.addEventListener("DOMContentLoaded", () => {
             data: { labels, datasets },
             options: {
                 responsive: true,
-                maintainAspectRatio: false,
+                maintainAspectRatio: true,
                 interaction: { intersect: false, mode: "index" },
                 plugins: {
                     legend: {
@@ -277,7 +277,7 @@ document.addEventListener("DOMContentLoaded", () => {
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: false,
+                maintainAspectRatio: true,
                 interaction: { intersect: false, mode: "index" },
                 plugins: {
                     legend: {

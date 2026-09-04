@@ -85,7 +85,8 @@
                                    th:max="${target.availableQuantity}"
                                    th:field="*{quantity}"
                                    placeholder="수량 입력"
-                                   required>
+                                   required
+                                   th:disabled="${target.availableQuantity <= 0}">
                             <div class="invalid-feedback"></div>
                             <div class="text-danger" th:errors="*{quantity}"></div>
                         </div>

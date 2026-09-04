@@ -58,7 +58,7 @@ function renderInventoryTable(items) {
 
     // 데이터가 없을 때 명확하게 안내 문구 출력
     if (!items || items.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: #888; padding: 30px;">검토 대상 재고가 없습니다.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8" class="text-center text-muted py-5">검토 대상 재고가 없습니다.</td></tr>`;
         return;
     }
 
@@ -75,7 +75,7 @@ function renderInventoryTable(items) {
             <td>${item.storageName} / ${item.zoneName}</td>
             <td>${lastReviewFormatted}</td>
             <td>
-                <button type="button" class="btn-primary" 
+                <button type="button" class="btn btn-primary btn-sm"
                     onclick="openEventModal(${item.inventoryId}, ${item.zoneId}, '${item.lastReviewAt || ''}')">
                     검토하기
                 </button>
@@ -97,27 +97,24 @@ function renderPagination(pageData) {
     // 이전 버튼
     const prevBtn = document.createElement("button");
     prevBtn.type = "button";
-    prevBtn.textContent = "◀ 이전";
-    prevBtn.className = "btn-secondary";
+    prevBtn.textContent = "이전";
+    prevBtn.className = "btn btn-outline-secondary btn-sm";
     prevBtn.disabled = page === 0;
-    prevBtn.style.opacity = page === 0 ? "0.5" : "1";
     prevBtn.onclick = () => loadUnderReviewInventories(page - 1);
     pagination.appendChild(prevBtn);
 
-    // 페이지 번호 표시
     const pageInfo = document.createElement("span");
-    pageInfo.style.alignSelf = "center";
-    pageInfo.style.padding = "0 10px";
+    pageInfo.className = "text-muted align-self-center px-2";
     pageInfo.textContent = `${page + 1} / ${totalPages}`;
     pagination.appendChild(pageInfo);
 
-    // 다음 버튼
     const nextBtn = document.createElement("button");
     nextBtn.type = "button";
-    nextBtn.textContent = "다음 ▶";
-    nextBtn.className = "btn-secondary";
+    nextBtn.textContent = "다음";
+    nextBtn.className = "btn btn-outline-secondary btn-sm";
     nextBtn.disabled = last;
-    nextBtn.style.opacity = last ? "0.5" : "1";
+    nextBtn.onclick = () => loadUnderReviewInventories(page + 1);
+    pagination.appendChild(nextBtn);
     nextBtn.onclick = () => loadUnderReviewInventories(page + 1);
     pagination.appendChild(nextBtn);
 }
@@ -129,19 +126,25 @@ function openEventModal(inventoryId, zoneId, lastReviewAt) {
     document.getElementById("memoInput").value = "";
     document.querySelector('input[name="isOut"][value="false"]').checked = true;
 
-    apiFetch(`/api/core/environment-events`, {
+    const params = new URLSearchParams({
+        zoneId: zoneId
+    });
+
+    if (lastReviewAt && lastReviewAt !== 'null' && lastReviewAt !== 'undefined') {
+        params.append('lastReviewAt', lastReviewAt);
+    }
+
+    apiFetch(`/api/core/environment-events?${params.toString()}`, {
         method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            zoneId: zoneId,
-            lastReviewAt: lastReviewAt ? lastReviewAt : null
-        })
+        headers: { 'Content-Type': 'application/json' }
     })
         .then(res => res.json())
         .then(result => {
             if (result.success) {
                 renderEventTable(result.data);
-                document.getElementById('eventModal').style.display = 'block';
+                bootstrap.Modal
+                    .getOrCreateInstance(document.getElementById("eventModal"))
+                    .show();
             } else {
                 alert('환경 이벤트 목록을 불러오지 못했습니다.');
             }
@@ -153,7 +156,9 @@ function openEventModal(inventoryId, zoneId, lastReviewAt) {
 }
 
 function closeEventModal() {
-    document.getElementById('eventModal').style.display = 'none';
+    bootstrap.Modal
+        .getOrCreateInstance(document.getElementById("eventModal"))
+        .hide();
 }
 
 function renderEventTable(events) {
@@ -161,18 +166,18 @@ function renderEventTable(events) {
     tbody.innerHTML = "";
 
     if (!events || events.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #888; padding: 15px;">발생한 환경 이벤트가 없습니다.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted py-4">발생한 환경 이벤트가 없습니다.</td></tr>`;
         return;
     }
 
     events.forEach(event => {
         const row = document.createElement("tr");
         row.innerHTML = `
-            <td style="padding: 10px; border-bottom: 1px solid #dee2e6; font-size: 13px;">${event.environmentType}</td>
-            <td style="padding: 10px; border-bottom: 1px solid #dee2e6; font-size: 13px;">${event.breachType}</td>
-            <td style="padding: 10px; border-bottom: 1px solid #dee2e6; font-size: 13px;">${event.detectedValue}</td>
-            <td style="padding: 10px; border-bottom: 1px solid #dee2e6; font-size: 13px;">${event.thresholdValue}</td>
-            <td style="padding: 10px; border-bottom: 1px solid #dee2e6; font-size: 13px;">${event.createdAt.replace('T', ' ')}</td>
+                        <td>${event.environmentType}</td>
+            <td>${event.breachType}</td>
+            <td>${event.detectedValue}</td>
+            <td>${event.thresholdValue}</td>
+            <td>${event.createdAt.replace('T', ' ')}</td>
         `;
         tbody.appendChild(row);
     });

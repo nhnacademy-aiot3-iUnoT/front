@@ -53,29 +53,40 @@ function renderHistoryTable(items) {
     tbody.innerHTML = "";
 
     if (!items || items.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #888; padding: 30px;">검토 내역이 없습니다.</td></tr>`;
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="6" class="text-center text-secondary py-5">
+                    검토 내역이 없습니다.
+                </td>
+            </tr>
+        `;
         return;
     }
 
     items.forEach(item => {
         const row = document.createElement("tr");
-        const createdAtFormatted = item.createdAt ? item.createdAt.replace('T', ' ') : '-';
+        const createdAtFormatted =
+            item.createdAt ? item.createdAt.replace("T", " ") : "-";
+
         const statusBadge = item.isOut
-            ? `<span style="color: #d9534f; font-weight: bold;">폐기 처리</span>`
-            : `<span style="color: #5cb85c; font-weight: bold;">정상 처리</span>`;
+            ? `<span class="badge bg-danger-lt text-danger">폐기 처리</span>`
+            : `<span class="badge bg-success-lt text-success">정상 처리</span>`;
 
         row.innerHTML = `
-            <td>${item.productName}</td>
-            <td>${item.packUnit}</td>
+            <td class="fw-medium">${item.productName}</td>
+            <td class="text-secondary">${item.packUnit}</td>
             <td>${statusBadge}</td>
-            <td>${createdAtFormatted}</td>
-            <td>${item.reviewerId}</td>
-            <td>
-                <button type="button" class="btn-secondary" onclick="location.href='/environment-reviews/${item.environmentReviewId}'">
+            <td class="text-secondary">${createdAtFormatted}</td>
+            <td class="text-secondary">${item.reviewerId}</td>
+            <td class="text-end">
+                <button type="button"
+                        class="btn btn-sm btn-outline-secondary"
+                        onclick="location.href='/environment-reviews/${item.environmentReviewId}'">
                     상세보기
                 </button>
             </td>
         `;
+
         tbody.appendChild(row);
     });
 }
@@ -86,29 +97,37 @@ function renderPagination(pageData) {
     pagination.innerHTML = "";
 
     const { page, totalPages, last } = pageData;
-    if (totalPages <= 1) return;
 
-    const prevBtn = document.createElement("button");
-    prevBtn.type = "button";
-    prevBtn.textContent = "◀ 이전";
-    prevBtn.className = "btn-secondary";
-    prevBtn.disabled = page === 0;
-    prevBtn.style.opacity = page === 0 ? "0.5" : "1";
-    prevBtn.onclick = () => loadReviewHistories(page - 1);
-    pagination.appendChild(prevBtn);
+    if (totalPages <= 1) {
+        return;
+    }
+
+    const appendControl = (label, disabled, onClick) => {
+        const item = document.createElement("li");
+        item.className = `page-item${disabled ? " disabled" : ""}`;
+
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "page-link";
+        button.textContent = label;
+        button.disabled = disabled;
+        button.onclick = onClick;
+
+        item.appendChild(button);
+        pagination.appendChild(item);
+    };
+
+    appendControl("이전", page === 0, () => loadReviewHistories(page - 1));
+
+    const pageItem = document.createElement("li");
+    pageItem.className = "page-item disabled";
 
     const pageInfo = document.createElement("span");
-    pageInfo.style.alignSelf = "center";
-    pageInfo.style.padding = "0 10px";
+    pageInfo.className = "page-link";
     pageInfo.textContent = `${page + 1} / ${totalPages}`;
-    pagination.appendChild(pageInfo);
 
-    const nextBtn = document.createElement("button");
-    nextBtn.type = "button";
-    nextBtn.textContent = "다음 ▶";
-    nextBtn.className = "btn-secondary";
-    nextBtn.disabled = last;
-    nextBtn.style.opacity = last ? "0.5" : "1";
-    nextBtn.onclick = () => loadReviewHistories(page + 1);
-    pagination.appendChild(nextBtn);
+    pageItem.appendChild(pageInfo);
+    pagination.appendChild(pageItem);
+
+    appendControl("다음", last, () => loadReviewHistories(page + 1));
 }
