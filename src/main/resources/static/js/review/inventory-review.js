@@ -129,13 +129,17 @@ function openEventModal(inventoryId, zoneId, lastReviewAt) {
     document.getElementById("memoInput").value = "";
     document.querySelector('input[name="isOut"][value="false"]').checked = true;
 
-    apiFetch(`/api/core/environment-events`, {
+    const params = new URLSearchParams({
+        zoneId: zoneId
+    });
+
+    if (lastReviewAt && lastReviewAt !== 'null' && lastReviewAt !== 'undefined') {
+        params.append('lastReviewAt', lastReviewAt);
+    }
+
+    apiFetch(`/api/core/environment-events?${params.toString()}`, {
         method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            zoneId: zoneId,
-            lastReviewAt: lastReviewAt ? lastReviewAt : null
-        })
+        headers: { 'Content-Type': 'application/json' }
     })
         .then(res => res.json())
         .then(result => {
