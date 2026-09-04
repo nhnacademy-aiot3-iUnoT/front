@@ -1,44 +1,43 @@
-.container {
+.event-container {
     max-width: 1200px;
-    margin: 30px auto;
+    margin: 40px auto;
     padding: 30px;
-    background: #ffffff;
+    background: #fff;
     border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
 }
 
-h2 {
-    margin-top: 0;
-    color: #2c3e50;
-    font-size: 1.5rem;
-}
-
-.filter-section {
+.filter-box {
     display: flex;
     gap: 15px;
     margin-bottom: 25px;
     background: #f8f9fa;
     padding: 20px;
     border-radius: 8px;
-    align-items: center;
+    align-items: flex-end;
 }
 
-.filter-section label {
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.filter-group label {
     font-size: 13px;
     font-weight: 600;
     color: #555;
 }
 
-.filter-section select {
+.filter-group select {
     padding: 8px 12px;
     border: 1px solid #ddd;
     border-radius: 6px;
     background: #fff;
     font-size: 14px;
-    min-width: 200px;
 }
 
-.btn-primary {
+.btn-search {
     padding: 8px 20px;
     background: #2563eb;
     color: white;
@@ -49,33 +48,20 @@ h2 {
     height: 38px;
 }
 
-.btn-primary:hover {
+.btn-search:hover {
     background: #1d4ed8;
-}
-
-.btn-secondary {
-    padding: 6px 12px;
-    border: 1px solid #ddd;
-    background: #fff;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: 600;
-}
-
-.table-container {
-    overflow-x: auto;
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
-    margin-bottom: 20px;
+    margin-top: 10px;
 }
 
 th, td {
     padding: 12px 15px;
-    border-bottom: 1px solid #eee;
     text-align: left;
+    border-bottom: 1px solid #eee;
     font-size: 14px;
 }
 
@@ -89,11 +75,15 @@ tr:hover {
     background: #f8fafc;
 }
 
-.empty-data {
-    text-align: center;
-    color: #888;
-    padding: 20px;
+.badge-type {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
 }
+.type-temp { background: #fee2e2; color: #991b1b; }
+.type-humi { background: #e0f2fe; color: #0369a1; }
+.type-illum { background: #fef3c7; color: #92400e; }
 
 .pagination {
     display: flex;
