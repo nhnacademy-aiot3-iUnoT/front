@@ -117,11 +117,11 @@
 
                 <a class="page-button" th:if="${startPage > 0}" th:href="@{/inventories(search=${search},storage-id=${selectedStorageId},page=${startPage - 1},size=${pageSize})}">이전</a>
 
-                <a class="page-button" th:each="pageNum : ${#numbers.sequence(startPage,endPage)}" th:href="@{/inventories(search=${search},storage-id=${selectedStorageId},page=${startPage - 1},size=${pageSize})}"
+                <a class="page-button" th:each="pageNum : ${#numbers.sequence(startPage,endPage)}" th:href="@{/inventories(search=${search},storage-id=${selectedStorageId},page=${pageNum},size=${pageSize})}"
                     th:text="${pageNum + 1}" th:classappend="${pageNum == currentPage} ? ' active'" th:attr="aria-current=${pageNum == currentPage} ? 'page'">
                 </a>
 
-                <a class="page-button" th:if="${endPage + 1 < totalPages}" th:href="@{/inventories(search=${search},storage-id=${selectedStorageId},page=${startPage - 1},size=${pageSize})}">다음</a>
+                <a class="page-button" th:if="${endPage + 1 < totalPages}" th:href="@{/inventories(search=${search},storage-id=${selectedStorageId},page=${endPage + 1},size=${pageSize})}">다음</a>
             </div>
 
 

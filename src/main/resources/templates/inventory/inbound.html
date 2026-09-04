@@ -251,8 +251,8 @@
                     </div>
 
                     <div class="detail-item">
-                        <span>마약류 구분</span>
-                        <strong th:text="${medicine.narcoticKindCode == null ? '해당 없음' : medicine.narcoticKindCode}"></strong>
+                        <span>마약류 세부 분류</span>
+                        <strong th:text="${medicine.narcoticKindCode == null ? '해당 없음': (medicine.narcoticKindCode == '향정'? '향정신성의약품': medicine.narcoticKindCode)}"></strong>
                     </div>
                 </div>
             </section>

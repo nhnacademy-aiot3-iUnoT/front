@@ -116,8 +116,23 @@ public class InventoryController {
                 startPage + PAGE_GROUP_SIZE - 1,
                 totalPages - 1);
 
+        var medicineInfo = medicineInfoApiClient.getMedicine(packUnitId);
+        String narcoticKindCode = medicineInfo.narcoticKindCode();
 
-        model.addAttribute("medicineInfo",medicineInfoApiClient.getMedicine(packUnitId));
+        boolean isRestrictedNarcotic =
+                "마약".equals(narcoticKindCode)
+                        || "향정".equals(narcoticKindCode)
+                        || "향정신성의약품".equals(narcoticKindCode);
+
+        OrganizationRole role = organizationMemberApiClient.getRole().role();
+
+        model.addAttribute(
+                "canManageNarcotics",
+                role == OrganizationRole.ORG_OWNER
+                        || role == OrganizationRole.ORG_BOSS
+        );
+        model.addAttribute("isRestrictedNarcotic", isRestrictedNarcotic);
+        model.addAttribute("medicineInfo", medicineInfo);
         model.addAttribute("inventory",result);
         model.addAttribute("inventories",inventories.content());
 

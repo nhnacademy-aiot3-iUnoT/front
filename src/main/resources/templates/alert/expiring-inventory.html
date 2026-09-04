@@ -48,39 +48,135 @@
             </div>
         </div></div></div>
 
-        <div class="card">
-            <div class="table-responsive">
-                <table class="table table-vcenter table-striped table-hover card-table">
-                    <colgroup>
-                        <col style="width: 5%;">
-                        <col style="width: 10%;">
-                        <col style="width: 15%;">
-                        <col style="width: 35%;">
-                        <col style="width: 10%;">
-                        <col style="width: 10%;">
-                        <col style="width: 15%;">
-                    </colgroup>
-                    <thead>
-                    <tr>
-                        <th class="text-center">번호</th>
-                        <th>조직명</th>
-                        <th>창고 / 구역</th>
-                        <th>의약품명 (단위)</th>
-                        <th>LOT 번호</th>
-                        <th class="text-center">현재 수량</th>
-                        <th class="text-center">유통기한</th>
-                    </tr>
-                    </thead>
-                    <tbody id="inventory-table-body">
-                    <tr>
-                        <td colspan="7" style="text-align: center; color: #888; padding: 30px;">데이터를 불러오는 중입니다...</td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+            <div id="disposal-feedback"
+                 class="alert"
+                 role="alert"
+                 hidden></div>
 
-        <ul id="pagination" class="pagination m-0 justify-content-center"></ul>
+            <div class="card">
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    <div>
+                        <strong id="selected-count">0건 선택</strong>
+                        <span class="text-secondary ms-2">
+                        총 <span id="selected-total-quantity">0</span>개
+                    </span>
+                        <div class="text-secondary small mt-1">
+                            유통기한이 경과한 재고만 선택할 수 있습니다.
+                        </div>
+                    </div>
+
+                    <button id="dispose-selected-button"
+                            type="button"
+                            class="btn btn-danger"
+                            disabled>
+                        선택 재고 폐기하기
+                    </button>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-vcenter table-striped table-hover card-table">
+                        <colgroup>
+                            <col style="width: 4%;">
+                            <col style="width: 5%;">
+                            <col style="width: 10%;">
+                            <col style="width: 15%;">
+                            <col style="width: 31%;">
+                            <col style="width: 10%;">
+                            <col style="width: 10%;">
+                            <col style="width: 15%;">
+                        </colgroup>
+                        <thead>
+                        <tr>
+                            <th class="text-center">
+                                <input id="select-all-expired"
+                                       type="checkbox"
+                                       class="form-check-input"
+                                       aria-label="현재 페이지의 유통기한 경과 재고 전체 선택"
+                                       disabled>
+                            </th>
+                            <th class="text-center">번호</th>
+                            <th>조직명</th>
+                            <th>창고 / 구역</th>
+                            <th>의약품명 (단위)</th>
+                            <th>LOT 번호</th>
+                            <th class="text-center">현재 수량</th>
+                            <th class="text-center">유통기한</th>
+                        </tr>
+                        </thead>
+                        <tbody id="inventory-table-body">
+                        <tr>
+                            <td colspan="8"
+                                class="text-center text-secondary py-5">
+                                데이터를 불러오는 중입니다...
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <ul id="pagination"
+                class="pagination m-0 justify-content-center"></ul>
+
+            <div class="modal modal-blur fade"
+                 id="selected-disposal-confirm-modal"
+                 tabindex="-1"
+                 aria-labelledby="selected-disposal-confirm-title"
+                 aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3 class="modal-title"
+                                id="selected-disposal-confirm-title">
+                                선택 재고 폐기 확인
+                            </h3>
+                            <button type="button"
+                                    class="btn-close"
+                                    data-bs-dismiss="modal"
+                                    aria-label="닫기"></button>
+                        </div>
+
+                        <div class="modal-body">
+                            <div id="selected-disposal-modal-error"
+                                 class="alert alert-danger"
+                                 role="alert"
+                                 hidden></div>
+
+                            <p>
+                                선택한
+                                <strong id="confirm-selected-count">0건</strong>,
+                                총
+                                <strong id="confirm-selected-total-quantity">0개</strong>를
+                                폐기하시겠습니까?
+                            </p>
+
+                            <div class="alert alert-warning" role="alert">
+                                폐기 사유는 모두
+                                <strong>유통기한 만료</strong>로 기록되며,
+                                처리 후에는 되돌릴 수 없습니다.
+                            </div>
+
+                            <div id="selected-disposal-items"
+                                 class="border rounded p-3"
+                                 style="max-height: 240px; overflow-y: auto;">
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button"
+                                    class="btn btn-outline-secondary"
+                                    data-bs-dismiss="modal">
+                                취소
+                            </button>
+                            <button type="button"
+                                    id="confirm-selected-disposal-button"
+                                    class="btn btn-danger">
+                                선택 재고 폐기하기
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
