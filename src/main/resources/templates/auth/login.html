@@ -6,110 +6,113 @@
 
 <head>
     <title>로그인</title>
-    <link rel="stylesheet" th:href="@{/css/auth.css}">
 </head>
 <body>
-
 <div layout:fragment="content">
-    <div class="container vh-100 d-flex align-items-center justify-content-center">
-        <div class="card border-0 login-card">
-            <div class="card-body p-0">
-                <div class="row g-0 align-items-center">
-                    <div class="col-lg-5">
-                        <div class="brand-section d-flex flex-column justify-content-center align-items-center text-center pt-4 pb-5">
-                            <img th:src="@{/img/profile.png}" class="brand-character mb-3" alt="iUnoT">
+    <div class="container min-vh-100 d-flex align-items-center py-5">
+        <div class="row justify-content-center w-100 mx-0">
+            <div class="col-12 col-xl-9">
+                <div class="card border-0 shadow-lg overflow-hidden">
+                    <div class="card-body p-0">
+                        <div class="row g-0 align-items-stretch">
+                            <div class="col-lg-5">
+                                <div class="h-100 d-flex flex-column justify-content-center align-items-center text-center p-4 p-lg-5 bg-body-tertiary">
+                                    <img th:src="@{/img/profile.png}" class="img-fluid w-50 mb-3" alt="iUnoT">
+                                    <h1 class="fw-bold mb-2">iUnoT</h1>
+                                    <p class="text-secondary mb-0">의약품 환경 · 재고 관리 시스템</p>
+                                    <p class="text-muted small mt-2 mb-0">
+                                        온·습도, 유통기한, 재고를 하나의 플랫폼에서 관리하세요.
+                                    </p>
+                                </div>
+                            </div>
 
-                            <h1 class="fw-bold mb-2">
-                                iUnoT
-                            </h1>
+                            <div class="col-lg-7">
+                                <div class="p-4 p-lg-5">
+                                    <h1 class="fw-bold mb-4">로그인</h1>
 
-                            <p class="text-secondary mb-0">
-                                의약품 환경 · 재고 관리 시스템
-                            </p>
+                                    <div id="login-success-message"
+                                         class="alert alert-success"
+                                         role="alert"
+                                         th:if="${successMessage}"
+                                         th:text="${successMessage}"></div>
 
-                            <p class="text-muted small mt-2">
-                                온·습도, 유통기한, 재고를 하나의 플랫폼에서 관리하세요.
-                            </p>
-
-                        </div>
-
-                    </div>
-
-                    <div class="col-lg-7">
-                        <div class="login-section">
-                            <h1 class="fw-bold mb-4">로그인</h1>
-
-                            <div id="login-success-message"
-                                 class="alert alert-success"
-                                 role="alert"
-                                 th:if="${successMessage}"
-                                 th:text="${successMessage}"></div>
-
-                            <form th:action="@{/login}" th:object="${loginRequest}" method="post">
-                                <div class="mb-4">
-                                    <label class="form-label">
-                                        이메일
-                                    </label>
-                                    <input type="email"
-                                           id="email"
-                                           th:field="*{email}"
-                                           class="form-control form-control-lg rounded-3"
-                                           th:classappend="${#fields.hasErrors('email')} ? 'is-invalid'"
-                                           placeholder="test@example.com"
-                                            required>
-
-                                    <div class="invalid-feedback"
-                                         th:if="${#fields.hasErrors('email')}"
-                                         th:errors="*{email}">
-                                        이메일을 입력해주세요.
+                                    <div class="alert alert-warning"
+                                         role="alert"
+                                         th:if="${param.error != null and param.error[0] == 'invite'}">
+                                        초대 링크가 없습니다. 조직 관리자가 발송한 초대 링크를 통해 회원가입해주세요.
                                     </div>
-                                </div>
 
-                                <div class="mb-4">
-                                    <label class="form-label">
-                                        비밀번호
-                                        <span class="form-label-description">
-                                            <a th:href="@{/forgot-password}" class="text-secondary">비밀번호 찾기</a>
-                                        </span>
-                                    </label>
-                                    <input type="password"
-                                           id="password"
-                                           name="password"
-                                           class="form-control form-control-lg rounded-3"
-                                           th:classappend="${#fields.hasErrors('password')} ? 'is-invalid'"
-                                           placeholder="********"
-                                        required>
-
-                                    <div class="invalid-feedback"
-                                         th:if="${#fields.hasErrors('password')}"
-                                         th:errors="*{password}">
-                                        비밀번호를 입력해주세요.
+                                    <div class="alert alert-success"
+                                         role="alert"
+                                         th:if="${param.reactivated != null and successMessage == null}">
+                                        계정이 재활성화되었습니다. 다시 로그인해주세요.
                                     </div>
-                                </div>
-                                <button type="submit" class="btn btn-primary btn-lg w-100">
-                                    로그인
-                                </button>
 
-                                <div class="alert alert-light border mt-4 py-2 px-3">
-                                    <i class="ti ti-info-circle me-2"></i>
-                                    <small>
-                                        회원가입은 조직 관리자가 발송한 초대 링크를 통해서만 가능합니다.
-                                    </small>
+                                    <form id="login-form"
+                                          th:action="@{/login}"
+                                          th:object="${loginRequest}"
+                                          method="post">
+                                        <div class="mb-4">
+                                            <label class="form-label required" for="email">이메일</label>
+                                            <input type="email"
+                                                   id="email"
+                                                   th:field="*{email}"
+                                                   class="form-control form-control-lg"
+                                                   th:classappend="${#fields.hasErrors('email')} ? 'is-invalid'"
+                                                   placeholder="test@example.com"
+                                                   maxlength="254"
+                                                   autocomplete="username"
+                                                   required>
+                                            <div class="invalid-feedback"
+                                                 th:text="${#fields.hasErrors('email') ? #fields.errors('email')[0] : '이메일을 입력해주세요.'}">
+                                                이메일을 입력해주세요.
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-4">
+                                            <label class="form-label required" for="password">
+                                                비밀번호
+                                                <span class="form-label-description">
+                                                    <a th:href="@{/forgot-password}" class="text-secondary">비밀번호 찾기</a>
+                                                </span>
+                                            </label>
+                                            <input type="password"
+                                                   id="password"
+                                                   name="password"
+                                                   class="form-control form-control-lg"
+                                                   th:classappend="${#fields.hasErrors('password')} ? 'is-invalid'"
+                                                   placeholder="********"
+                                                   minlength="6"
+                                                   maxlength="64"
+                                                   autocomplete="current-password"
+                                                   required>
+                                            <div class="invalid-feedback"
+                                                 th:text="${#fields.hasErrors('password') ? #fields.errors('password')[0] : '비밀번호는 6자 이상 64자 이하여야 합니다.'}">
+                                                비밀번호는 6자 이상 64자 이하여야 합니다.
+                                            </div>
+                                        </div>
+
+                                        <button type="submit" class="btn btn-primary btn-lg w-100">로그인</button>
+
+                                        <div class="alert alert-light border mt-4 py-2 px-3">
+                                            <i class="ti ti-info-circle me-2"></i>
+                                            <small>회원가입은 조직 관리자가 발송한 초대 링크를 통해서만 가능합니다.</small>
+                                        </div>
+                                    </form>
                                 </div>
-                            </form>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <script th:if="${param.error != null and param.error[0] == 'invite'}">
-        alert('초대 링크가 없습니다.' + '\n' +
-            '조직 관리자가 발송한 초대 링크를 통해 회원가입해주세요.');
-    </script>
-    <script th:if="${param.reactivated != null and successMessage == null}">
-        alert('계정이 재활성화되었습니다. 다시 로그인해주세요.');
-    </script>
 </div>
+
+<th:block layout:fragment="script">
+    <script th:src="@{/js/common/validation.js}"></script>
+    <script th:src="@{/js/common/form.js}"></script>
+    <script th:src="@{/js/auth/auth-validation.js}"></script>
+</th:block>
 </body>
 </html>

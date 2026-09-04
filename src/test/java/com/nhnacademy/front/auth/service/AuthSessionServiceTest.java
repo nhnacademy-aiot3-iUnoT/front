@@ -57,30 +57,50 @@ class AuthSessionServiceTest {
     }
 
     @Test
-    void renewCallsAccountStoresRotatedTokensAndReturnsAccessToken() {
+    void renewCallsAccountAndStoresRotatedTokens(CapturedOutput output) {
         RefreshTokenRequest refreshRequest = new RefreshTokenRequest("old-refresh-token");
         LoginResponse tokens = new LoginResponse("new-access-token", "new-refresh-token");
+        given(refreshTokenCookieManager.resolve(request)).willReturn("old-refresh-token");
         given(authApiClient.refresh(refreshRequest)).willReturn(tokens);
 
-        String accessToken = authSessionService.renew(response, "old-refresh-token");
+        boolean renewed = authSessionService.renew(request, response);
 
-        assertThat(accessToken).isEqualTo("new-access-token");
+        assertThat(renewed).isTrue();
         then(accessTokenCookieManager).should().add(response, "new-access-token");
         then(refreshTokenCookieManager).should().add(response, "new-refresh-token");
+        assertThat(output)
+                .contains("event=refresh_token_rotation_started")
+                .contains("event=refresh_token_rotation_succeeded")
+                .doesNotContain("old-refresh-token")
+                .doesNotContain("new-access-token")
+                .doesNotContain("new-refresh-token");
+    }
+
+    @Test
+    void renewReturnsFalseWhenRefreshCookieIsMissing() {
+        given(refreshTokenCookieManager.resolve(request)).willReturn(null);
+
+        boolean renewed = authSessionService.renew(request, response);
+
+        assertThat(renewed).isFalse();
+        then(authApiClient).shouldHaveNoInteractions();
+        then(accessTokenCookieManager).shouldHaveNoInteractions();
     }
 
     @Test
     void renewRejectsIncompleteResponseBeforeWritingCookies() {
         RefreshTokenRequest refreshRequest = new RefreshTokenRequest("old-refresh-token");
+        given(refreshTokenCookieManager.resolve(request)).willReturn("old-refresh-token");
         given(authApiClient.refresh(refreshRequest))
                 .willReturn(new LoginResponse("new-access-token", ""));
 
-        assertThatThrownBy(() -> authSessionService.renew(response, "old-refresh-token"))
+        assertThatThrownBy(() -> authSessionService.renew(request, response))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("Token refresh response is incomplete");
 
         then(accessTokenCookieManager).shouldHaveNoInteractions();
-        then(refreshTokenCookieManager).shouldHaveNoInteractions();
+        then(refreshTokenCookieManager).should().resolve(request);
+        then(refreshTokenCookieManager).shouldHaveNoMoreInteractions();
     }
 
     @Test

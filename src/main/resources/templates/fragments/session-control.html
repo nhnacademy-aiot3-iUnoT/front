@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<body>
+<div th:fragment="control"
+     id="session-controls"
+     class="nav-item d-flex flex-row align-items-center gap-2 me-3"
+     th:attr="data-expires-at=${accessTokenExpiresAt},
+              data-duration-seconds=${accessTokenDurationSeconds},
+              data-refresh-url=@{/refresh},
+              data-login-url=@{/login}">
+    <span class="small text-secondary text-nowrap" title="액세스 토큰 남은 시간">
+        <i class="ti ti-clock me-1"></i>
+        <span id="session-timer">30:00</span>
+    </span>
+    <button type="button"
+            class="btn btn-outline-secondary btn-sm"
+            id="session-extend-button">
+        연장
+    </button>
+    <span id="session-extension-status"
+          class="visually-hidden"
+          role="status"
+          aria-live="polite"></span>
+</div>
+</body>
+</html>

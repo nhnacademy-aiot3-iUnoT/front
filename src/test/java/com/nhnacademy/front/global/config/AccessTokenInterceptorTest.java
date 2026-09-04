@@ -1,6 +1,5 @@
 package com.nhnacademy.front.global.config;
 
-import com.nhnacademy.front.global.security.RefreshTokenAutoRenewFilter;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -69,12 +68,12 @@ class AccessTokenInterceptorTest {
     }
 
     @Test
-    void downstreamCallUsesAccessTokenRenewedDuringCurrentRequest() throws Exception {
+    void downstreamCallUsesAccessTokenCookie() throws Exception {
         MockHttpServletRequest servletRequest = new MockHttpServletRequest();
-        servletRequest.setAttribute(
-                RefreshTokenAutoRenewFilter.REFRESHED_ACCESS_TOKEN_ATTRIBUTE,
-                "renewed-access-token"
-        );
+        servletRequest.setCookies(new jakarta.servlet.http.Cookie(
+                "access_token",
+                "access-token"
+        ));
         RequestContextHolder.setRequestAttributes(
                 new ServletRequestAttributes(servletRequest)
         );
@@ -87,6 +86,6 @@ class AccessTokenInterceptorTest {
         interceptor.intercept(outgoingRequest, body, execution);
 
         assertThat(headers.getFirst(HttpHeaders.AUTHORIZATION))
-                .isEqualTo("Bearer renewed-access-token");
+                .isEqualTo("Bearer access-token");
     }
 }

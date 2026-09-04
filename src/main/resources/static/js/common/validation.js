@@ -8,6 +8,10 @@ function isMaxLength(value, max) {
     return value.length <= max;
 }
 
+function isLengthInRange(value, min, max) {
+    return value.length >= min && value.length <= max;
+}
+
 function isEmail(value) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }

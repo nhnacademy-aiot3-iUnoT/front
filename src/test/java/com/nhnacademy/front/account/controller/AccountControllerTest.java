@@ -100,13 +100,30 @@ class AccountControllerTest {
         given(departmentApiClient.getMyDepartments())
                 .willReturn(List.of());
 
-        mockMvc.perform(get("/mypage"))
+        MvcResult result = mockMvc.perform(get("/mypage"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("account/account-info"))
                 .andExpect(model().attribute("accountInfoResponse", response))
                 .andExpect(model().attribute(
                         "nameRequest", new UpdateAccountNameRequest(response.name())
-                ));
+                ))
+                .andReturn();
+
+        Document document = Jsoup.parse(result.getResponse().getContentAsString());
+        assertThat(document.select("form#account-info-form input#name[required][maxlength=100]"))
+                .hasSize(1);
+        assertThat(document.select("script[src=/js/account/account-info.js]"))
+                .hasSize(1);
+        assertThat(document.select(
+                "#session-controls[data-duration-seconds=1800]"
+                        + "[data-refresh-url=/refresh][data-login-url=/login]"
+        )).hasSize(1);
+        assertThat(document.select("#session-timer")).hasSize(1);
+        assertThat(document.select("button#session-extend-button")).hasSize(1);
+        assertThat(document.select("form#session-logout-form[action=/logout][method=post]"))
+                .hasSize(1);
+        assertThat(document.select("script[src=/js/auth/session.js]"))
+                .hasSize(1);
 
         then(accountApiClient).should().getAccountInfo();
     }
@@ -307,10 +324,18 @@ class AccountControllerTest {
     @Test
     void passwordForm() throws Exception {
 
-        mockMvc.perform(get("/mypage/change-password"))
+        MvcResult result = mockMvc.perform(get("/mypage/change-password"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("account/change-password"))
-                .andExpect(model().attribute("changePasswordForm", new ChangePasswordFormRequest()));
+                .andExpect(model().attribute("changePasswordForm", new ChangePasswordFormRequest()))
+                .andReturn();
+
+        Document document = Jsoup.parse(result.getResponse().getContentAsString());
+        assertThat(document.select(
+                "form#change-password-form input[type=password][required][minlength=6][maxlength=64]"
+        )).hasSize(3);
+        assertThat(document.select("script[src=/js/account/change.js]"))
+                .hasSize(1);
     }
 
     @Test
@@ -405,9 +430,17 @@ class AccountControllerTest {
 
     @Test
     void withdrawPageIsRendered() throws Exception {
-        mockMvc.perform(get("/withdraw"))
+        MvcResult result = mockMvc.perform(get("/withdraw"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("account/withdraw"));
+                .andExpect(view().name("account/withdraw"))
+                .andReturn();
+
+        Document document = Jsoup.parse(result.getResponse().getContentAsString());
+        assertThat(document.select(
+                "form#withdraw-form input#password[required][minlength=6][maxlength=64]"
+        )).hasSize(1);
+        assertThat(document.select("script[src=/js/account/withdraw.js]"))
+                .hasSize(1);
     }
 
     @Test
@@ -416,12 +449,11 @@ class AccountControllerTest {
 
         mockMvc.perform(delete("/withdraw")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
+                .content("""
                                 {"password":"password"}
                                 """))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(view().name("redirect:/login"))
-                .andExpect(redirectedUrl("/login"));
+                .andExpect(status().isNoContent())
+                .andExpect(content().string(""));
 
         then(accountApiClient).should().withdraw(request);
         then(authSessionService).should().revoke(
@@ -434,12 +466,15 @@ class AccountControllerTest {
     void deleteAccountWithInvalidPasswordDoesNotCallDependencies() throws Exception {
         mockMvc.perform(delete("/withdraw")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
+                .content("""
                                 {"password":"12345"}
                                 """))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(view().name("redirect:/withdraw"))
-                .andExpect(redirectedUrl("/withdraw"));
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.error.code").value("VALIDATION_ERROR"))
+                .andExpect(jsonPath("$.error.message")
+                        .value("비밀번호는 6자 이상 64자 이하여야 합니다."));
 
         then(accountApiClient).shouldHaveNoInteractions();
         then(authSessionService).shouldHaveNoInteractions();
