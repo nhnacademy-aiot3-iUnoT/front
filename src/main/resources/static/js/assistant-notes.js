@@ -67,28 +67,64 @@
         return route(note);
     };
 
+    const SEVERITY_LABELS = {CRITICAL: '조치 필요', WARN: '주의', INFO: '참고'};
+    const OPERATION_LABELS = {INBOUND: '입고', OUTBOUND: '출고'};
+
+    const CATEGORY_LABELS = {
+        STORAGE_CONDITION: '보관 조건',
+        EXPIRY_ORDER: '유통기한',
+        EXPIRING_STOCK: '유통기한',
+        SCATTERED_STORAGE: '보관 위치',
+        LOW_STOCK: '재고 수량',
+    };
+
+    const chip = (className, text) => {
+        const element = document.createElement('span');
+        element.className = className;
+        element.textContent = text;
+
+        return element;
+    };
+
     const renderNote = (note) => {
         const href = hrefOf(note);
-        const element = document.createElement(href ? 'a' : 'div');
-        element.className = `chatbot-note severity-${(note.severity || 'INFO').toLowerCase()}`;
-        element.dataset.noteId = note.noteId;
+        const severity = (note.severity || 'INFO').toUpperCase();
+
+        const card = document.createElement('div');
+        card.className = `chatbot-note severity-${severity.toLowerCase()}`;
+        card.dataset.noteId = note.noteId;
+
+        const header = document.createElement('div');
+        header.className = 'chatbot-note-header';
+        header.appendChild(chip('chatbot-note-operation', OPERATION_LABELS[note.operation] || '점검'));
+        header.appendChild(chip('chatbot-note-badge', SEVERITY_LABELS[severity] || '참고'));
+        header.appendChild(chip('chatbot-note-category', CATEGORY_LABELS[note.findingType] || '재고 점검'));
+        header.appendChild(chip('chatbot-note-time', formatTime(note.createdAt)));
+        card.appendChild(header);
+
+        // 품목 정보는 서버가 준 값을 그대로 그린다. LLM 을 거치지 않은 부분이다.
+        const subject = document.createElement(href ? 'a' : 'div');
+        subject.className = 'chatbot-note-subject';
+        subject.appendChild(chip('chatbot-note-subject-title', note.subject || ''));
+
+        if (note.subjectDetail) {
+            subject.appendChild(chip('chatbot-note-subject-detail', note.subjectDetail));
+        }
+
+        if (href) {
+            subject.href = href;
+            subject.appendChild(chip('chatbot-note-subject-go', '재고 상세 보기 →'));
+        }
+
+        card.appendChild(subject);
 
         const body = document.createElement('p');
         body.className = 'chatbot-note-body';
         body.textContent = note.message;
-        element.appendChild(body);
-
-        const meta = document.createElement('span');
-        meta.className = 'chatbot-note-meta';
-        meta.textContent = href ? `${formatTime(note.createdAt)} · 재고 상세 보기` : formatTime(note.createdAt);
-        element.appendChild(meta);
-
-        if (href) {
-            element.href = href;
-        }
+        card.appendChild(body);
 
         // 최신 알림이 위로 오게 한다.
-        container.insertBefore(element, container.firstChild);
+        container.insertBefore(card, container.firstChild);
     };
 
     const formatTime = (createdAt) => {
