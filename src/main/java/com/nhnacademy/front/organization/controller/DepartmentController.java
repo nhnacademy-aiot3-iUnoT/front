@@ -65,6 +65,7 @@ public class DepartmentController {
         // 부서에 속한 저장소, 조직원 목록
         model.addAttribute("departmentStorages", page.storages());
         model.addAttribute("departmentMembers", page.members());
+        model.addAttribute("departmentTelegramChat", page.telegramChat());
 
         return "organization/department-info";
     }
