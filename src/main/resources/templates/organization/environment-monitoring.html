@@ -6,72 +6,85 @@
 <head>
     <meta charset="UTF-8">
     <title>환경 관리</title>
-    <link rel="stylesheet" th:href="@{/css/environment-monitoring.css}">
+    <link rel="stylesheet" th:href="@{/css/status.css}">
 </head>
 <body>
 
 <div layout:fragment="content">
-    <div class="env-page">
+    <div class="py-6">
 
-        <div class="env-page-header">
-            <h2>
-                <span class="env-org-prefix"
-                      th:if="${organizationName != null}"
-                      th:text="${organizationName + ' > '}"></span>
-                🌡️ 환경 관리
-            </h2>
-            <p class="env-page-desc">구역을 선택하면 해당 구역의 센서 상세 정보를 볼 수 있습니다.</p>
-        </div>
-
-        <!-- 저장소가 하나도 없을 때 -->
-        <div class="env-empty" th:if="${#lists.isEmpty(storageZones)}">
-            등록된 저장소가 없습니다.
-        </div>
-
-        <!-- 저장소별 카드 -->
-        <div class="env-storage-card" th:each="storage : ${storageZones}">
-
-            <div class="env-storage-header">
-                <h3 class="env-storage-name">
-                    📦 <span th:text="${storage.storageName}">저장소 이름</span>
-                </h3>
-                <span class="env-badge"
-                      th:classappend="${storage.storageStatus.name() == 'ACTIVE'} ? 'active' : 'inactive'"
-                      th:text="${storage.storageStatus.ko}">활성화</span>
-            </div>
-
-            <!-- 구역이 없는 저장소 -->
-            <p class="env-empty-zones" th:if="${#lists.isEmpty(storage.zones)}">
-                등록된 구역이 없습니다.
-            </p>
-
-            <!-- 구역 목록 -->
-            <div class="env-zone-grid" th:unless="${#lists.isEmpty(storage.zones)}">
-                <div class="env-zone-item" th:each="zone : ${storage.zones}">
-
-                    <div class="env-zone-top">
-                        <span class="env-zone-name" th:text="${zone.name}">구역 이름</span>
-                        <span class="env-badge"
-                              th:classappend="${zone.status.name() == 'ACTIVE'} ? 'active' : 'inactive'"
-                              th:text="${zone.status.ko}">활성화</span>
-                    </div>
-
-                    <div class="env-zone-bottom">
-                        <span class="env-zone-label">환경 상태</span>
-                        <span class="env-badge"
-                              th:classappend="${zone.envStatus.name() == 'NORMAL'}
-                                              ? 'env-normal'
-                                              : (${zone.envStatus.name() == 'WARNING'} ? 'env-warning' : 'env-danger')"
-                              th:text="${zone.envStatus.ko}">정상</span>
-                    </div>
-
-                    <a class="env-zone-go"
-                       th:href="@{/organizations/me/storages/{storageId}/zones/{zoneId}/sensorInfo(storageId=${storage.storageId}, zoneId=${zone.zoneId})}">
-                        센서 상세 보기 →
-                    </a>
+        <div class="page-header d-print-none mb-4">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h2 class="page-title">
+                        <span class="text-secondary fw-normal"
+                              th:if="${organizationName != null}"
+                              th:text="${organizationName + ' > '}"></span>
+                        환경 관리
+                    </h2>
+                    <div class="text-muted mt-1">구역을 선택하면 해당 구역의 센서 상세 정보를 볼 수 있습니다.</div>
                 </div>
             </div>
         </div>
+
+        <!-- 저장소가 하나도 없을 때 -->
+        <div class="card" th:if="${#lists.isEmpty(storageZones)}">
+            <div class="card-body text-center text-secondary py-5">
+                등록된 저장소가 없습니다.
+            </div>
+        </div>
+
+        <!-- 저장소별 카드 -->
+        <section class="card mb-4" th:each="storage : ${storageZones}">
+
+            <div class="card-header d-flex align-items-center justify-content-between gap-3">
+                <h3 class="card-title">
+                    <i class="ti ti-building-warehouse me-1"></i>
+                    <span th:text="${storage.storageName}">저장소 이름</span>
+                </h3>
+                <span class="badge status-badge"
+                      th:classappend="' status-' + ${storage.storageStatus.name().toLowerCase()}"
+                      th:text="${storage.storageStatus.ko}">활성화</span>
+            </div>
+
+            <div class="card-body">
+                <!-- 구역이 없는 저장소 -->
+                <p class="text-secondary mb-0" th:if="${#lists.isEmpty(storage.zones)}">
+                    등록된 구역이 없습니다.
+                </p>
+
+                <!-- 구역 목록 -->
+                <div class="row row-cards" th:unless="${#lists.isEmpty(storage.zones)}">
+                    <div class="col-12 col-md-6 col-xl-4" th:each="zone : ${storage.zones}">
+                        <article class="card h-100">
+                            <div class="card-body d-flex flex-column">
+                                <div class="d-flex align-items-start justify-content-between gap-3 mb-3">
+                                    <div>
+                                        <div class="subheader mb-1">ZONE</div>
+                                        <h4 class="card-title mb-0" th:text="${zone.name}">구역 이름</h4>
+                                    </div>
+                                    <span class="badge status-badge"
+                                          th:classappend="' status-' + ${zone.status.name().toLowerCase()}"
+                                          th:text="${zone.status.ko}">활성화</span>
+                                </div>
+
+                                <div class="d-flex align-items-center justify-content-between gap-2 mb-4">
+                                    <span class="text-secondary small">환경 상태</span>
+                                    <span class="badge status-badge"
+                                          th:classappend="' status-' + ${zone.envStatus.name().toLowerCase()}"
+                                          th:text="${zone.envStatus.ko}">정상</span>
+                                </div>
+
+                                <a class="btn btn-outline-primary mt-auto align-self-start"
+                                   th:href="@{/storages/{storageId}/zones/{zoneId}/sensorInfo(storageId=${storage.storageId}, zoneId=${zone.zoneId})}">
+                                    센서 상세 보기 <i class="ti ti-arrow-right ms-1"></i>
+                                </a>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </section>
     </div>
 </div>
 

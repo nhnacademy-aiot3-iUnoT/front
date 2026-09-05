@@ -26,6 +26,14 @@ public class MedicineEnvApiClient {
 
     }
 
+    public void createTypes(Long packageUnitId, MedicineEnvironmentRequest request){
+
+        gatewayClient.post(CORE_SERVICE + "/package-units/" + packageUnitId + "/medicine-environment-types",request);
+
+    }
+
+
+
     //환경유형 수정
     public void updateTypes(Long packageUnitId, MedicineEnvironmentRequest request){
 
@@ -33,10 +41,12 @@ public class MedicineEnvApiClient {
 
     }
 
-    // 환경유형 삭제
-    public void deleteTypes(Long standardId){
 
-        gatewayClient.delete(CORE_SERVICE + "/medicine-environment-standards/"+ standardId);
+
+    // 환경유형 삭제
+    public void deleteTypes(Long packUnitId){
+
+        gatewayClient.delete(CORE_SERVICE + "/package-units/" + packUnitId + "/medicine-environment-standards");
     }
 
 

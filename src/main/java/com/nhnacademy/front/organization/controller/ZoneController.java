@@ -50,7 +50,7 @@ public class ZoneController {
         model.addAttribute("sensorList", sensorList);
         model.addAttribute("canManage", canManage);
 
-        return "zone/detail";
+        return "zone/zone-detail";
     }
 
 

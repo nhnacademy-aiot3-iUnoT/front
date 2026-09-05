@@ -1,12 +1,13 @@
 package com.nhnacademy.front.account.client;
 
 import com.nhnacademy.front.account.dto.request.ChangeOwnPasswordRequest;
+import com.nhnacademy.front.account.dto.request.ReactivationConfirmRequest;
 import com.nhnacademy.front.account.dto.request.UpdateAccountNameRequest;
 import com.nhnacademy.front.account.dto.request.WithdrawAccountRequest;
 import com.nhnacademy.front.account.dto.response.AccountInfoResponse;
+import com.nhnacademy.front.account.dto.response.AccountResponse;
 import com.nhnacademy.front.account.dto.response.UpdateAccountResponse;
 import com.nhnacademy.front.global.client.GatewayClient;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -20,15 +21,29 @@ public class AccountApiClient {
         return backendApiClient.get(ACCOUNT_SERVICE + "/me", AccountInfoResponse.class);
     }
 
-    public void withdraw(@Valid WithdrawAccountRequest request) {
-        backendApiClient.delete(ACCOUNT_SERVICE + "/me");
+    public void requestReactivationVerification() {
+        backendApiClient.post(ACCOUNT_SERVICE + "/me/reactivation/verification");
     }
 
-    public UpdateAccountResponse changeName(@Valid UpdateAccountNameRequest request) {
+    public AccountResponse confirmReactivation(
+            ReactivationConfirmRequest request
+    ) {
+        return backendApiClient.post(
+                ACCOUNT_SERVICE + "/me/reactivation/confirm",
+                request,
+                AccountResponse.class
+        );
+    }
+
+    public void withdraw(WithdrawAccountRequest request) {
+        backendApiClient.delete(ACCOUNT_SERVICE + "/me", request);
+    }
+
+    public UpdateAccountResponse changeName(UpdateAccountNameRequest request) {
         return backendApiClient.put(ACCOUNT_SERVICE + "/me", request, UpdateAccountResponse.class);
     }
 
-    public UpdateAccountResponse changePassword(@Valid ChangeOwnPasswordRequest request) {
+    public UpdateAccountResponse changePassword(ChangeOwnPasswordRequest request) {
         return backendApiClient.put(ACCOUNT_SERVICE + "/me/pwd", request, UpdateAccountResponse.class);
     }
 

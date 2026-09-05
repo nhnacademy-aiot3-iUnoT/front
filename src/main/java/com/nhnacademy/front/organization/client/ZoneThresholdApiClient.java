@@ -21,7 +21,7 @@ public class ZoneThresholdApiClient {
 
         return gatewayClient.get(
                 uri,
-                new ParameterizedTypeReference<ApiResponse<List<ZoneThresholdInfoResponse>>>() {}
+                new ParameterizedTypeReference<>() {}
         );
     }
 

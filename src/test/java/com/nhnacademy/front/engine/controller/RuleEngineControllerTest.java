@@ -1,6 +1,7 @@
 package com.nhnacademy.front.engine.controller;
 
 import com.nhnacademy.front.engine.client.RuleEngineApiClient;
+import com.nhnacademy.front.organization.client.OrganizationApiClient;
 import com.nhnacademy.front.organization.client.StorageApiClient;
 import com.nhnacademy.front.organization.client.ZoneApiClient;
 import com.nhnacademy.front.organization.dto.EnvStatus;
@@ -39,6 +40,9 @@ class RuleEngineControllerTest {
     @MockitoBean
     private ZoneApiClient zoneApiClient;
 
+    @MockitoBean
+    private OrganizationApiClient organizationApiClient;
+
     @Test
     @DisplayName("환경 관리 화면에 저장소와 그 저장소의 구역이 함께 보인다.")
     void environmentMonitoring_RendersStoragesWithZones() throws Exception {
@@ -52,7 +56,7 @@ class RuleEngineControllerTest {
         ));
         given(zoneApiClient.getZones(2L)).willReturn(List.of());
 
-        mockMvc.perform(get("/organizations/me/environmentMonitoring"))
+        mockMvc.perform(get("/environmentMonitoring"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("organization/environment-monitoring"))
                 .andExpect(content().string(containsString("테스트조직")))
@@ -74,10 +78,10 @@ class RuleEngineControllerTest {
                 new ZoneInfoResponse(11L, 1L, "냉장구역", ZoneStatus.ACTIVE, EnvStatus.CRITICAL)
         ));
 
-        mockMvc.perform(get("/organizations/me/environmentMonitoring"))
+        mockMvc.perform(get("/environmentMonitoring"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString(
-                        "/organizations/me/storages/1/zones/11/sensorInfo"
+                        "/storages/1/zones/11/sensorInfo"
                 )));
     }
 
@@ -86,7 +90,7 @@ class RuleEngineControllerTest {
     void environmentMonitoring_WhenNoStorage_RendersEmptyMessage() throws Exception {
         given(storageApiClient.getStorages()).willReturn(List.of());
 
-        mockMvc.perform(get("/organizations/me/environmentMonitoring"))
+        mockMvc.perform(get("/environmentMonitoring"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("등록된 저장소가 없습니다.")));
     }

@@ -111,7 +111,7 @@
                     이전
                 </a>
 
-                <a th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}"
+                <a th:each="pageNum : ${#numbers.sequence(startPage, endPage)}"
                    th:href="@{/medicines(searchType=${medicineSearchRequest.searchType},
                    search=${medicineSearchRequest.search},
                    storageId=${selectedStorageId},
@@ -190,6 +190,14 @@
                     </select>
                     <p class="field-error" th:if="${#fields.hasErrors('zoneId')}" th:errors="*{zoneId}"></p>
 
+                    <input type="hidden"
+                           id="selected-zone-id" th:field="*{zoneId}">
+
+                    <p class="field-error"
+                       th:if="${#fields.hasErrors('zoneId')}"
+                       th:errors="*{zoneId}">
+                    </p>
+
                 </div>
 
             </div>
@@ -243,8 +251,8 @@
                     </div>
 
                     <div class="detail-item">
-                        <span>마약류 구분</span>
-                        <strong th:text="${medicine.narcoticKindCode == null ? '해당 없음' : medicine.narcoticKindCode}"></strong>
+                        <span>마약류 세부 분류</span>
+                        <strong th:text="${medicine.narcoticKindCode == null ? '해당 없음': (medicine.narcoticKindCode == '향정'? '향정신성의약품': medicine.narcoticKindCode)}"></strong>
                     </div>
                 </div>
             </section>
@@ -389,40 +397,51 @@
                     <legend>온도</legend>
 
                     <label for="min-temperature">최소</label>
-                    <input type="number" step="0.01" id="min-temperature" data-environment-min th:field="*{medicineEnvironmentRequest.minTemperature}">
+                    <input type="number" step="0.01" id="min-temperature" data-environment-min th:field="*{medicineEnvironmentRequest.minTemperature}" min="0">
                     <span>℃</span>
 
                     <span aria-hidden="true">-</span>
                     <label for="max-temperature">최대</label>
-                    <input type="number" step="0.01" id="max-temperature" data-environment-max th:field="*{medicineEnvironmentRequest.maxTemperature}">
+                    <input type="number" step="0.01" id="max-temperature" data-environment-max th:field="*{medicineEnvironmentRequest.maxTemperature}" min="0">
 
                     <span>℃</span>
+
                 </fieldset>
+
+
 
                 <fieldset class="environment-input-group" data-environment-input data-environment-type="HUMIDITY">
                     <legend>습도</legend>
 
                     <label for="min-humidity">최소</label>
-                    <input type="number" step="0.01" id="min-humidity" data-environment-min th:field="*{medicineEnvironmentRequest.minHumidity}">
+                    <input type="number" step="0.01" id="min-humidity" data-environment-min th:field="*{medicineEnvironmentRequest.minHumidity}" min="0" max="100">
                     <span>%</span>
                     <span aria-hidden="true">-</span>
                     <label for="max-humidity">최대</label>
-                    <input type="number" step="0.01" id="max-humidity" data-environment-max th:field="*{medicineEnvironmentRequest.maxHumidity}">
+                    <input type="number" step="0.01" id="max-humidity" data-environment-max th:field="*{medicineEnvironmentRequest.maxHumidity}" min="0" max="100">
                     <span>%</span>
 
                 </fieldset>
+
+
+
+
 
                 <fieldset class="environment-input-group" data-environment-input data-environment-type="ILLUMINATION">
                     <legend>조도</legend>
 
                     <label for="min-illuminance">최소</label>
-                    <input type="number" step="0.01" id="min-illuminance" data-environment-min th:field="*{medicineEnvironmentRequest.minIlluminance}">
+                    <input type="number" step="0.01" id="min-illuminance" data-environment-min th:field="*{medicineEnvironmentRequest.minIlluminance}" min="0">
                     <span>lx</span>
                     <span aria-hidden="true">-</span>
                     <label for="max-illuminance">최대</label>
-                    <input type="number" step="0.01" id="max-illuminance" data-environment-max th:field="*{medicineEnvironmentRequest.maxIlluminance}">
+                    <input type="number" step="0.01" id="max-illuminance" data-environment-max th:field="*{medicineEnvironmentRequest.maxIlluminance}" min="0">
                     <span>lx</span>
+
                 </fieldset>
+
+
+
             </div>
         </section>
 
@@ -434,9 +453,11 @@
 
            <div class="inbound-field-list">
                <div class="input-field">
-                   <label for="lot-number">제조번호</label>
+                   <label for="lot-number">제조번호
+                       <span aria-hidden="true">*</span>
+                   </label>
 
-                   <input type="text" id="lot-number" th:field="*{lotNumber}" maxlength="50" required>
+                   <input type="text" id="lot-number" th:field="*{lotNumber}" pattern="\S+" minlength="5" maxlength="50" required placeholder="(예시: lot-12345)">
                    <p class="field-error" th:if="${#fields.hasErrors('lotNumber')}" th:errors="*{lotNumber}"></p>
                </div>
 
@@ -444,11 +465,10 @@
                    <label for="expiration-date">실제 유통기한
                         <span aria-hidden="true">*</span>
                    </label>
-                   <input type="date" id="expiration-date" th:field="*{expirationDate}" required>
+                   <input type="date" id="expiration-date" th:field="*{expirationDate}" th:min="${today}" required>
 
                    <p class="field-error" th:if="${#fields.hasErrors('expirationDate')}" th:errors="*{expirationDate}"></p>
                </div>
-
 
                <div class="input-field">
                    <label for="quantity">
@@ -456,15 +476,33 @@
                        <span aria-hidden="true">*</span>
                    </label>
 
-                   <input type="number" id="quantity" th:field="*{quantity}" min="1" required>
+                   <input type="number" id="quantity" th:field="*{quantity}" min="1" required placeholder="200병">
 
                    <p class="field-error" th:if="${#fields.hasErrors('quantity')}" th:errors="*{quantity}"></p>
                </div>
 
+
+               <div class="input-field">
+                   <label for="transaction-type">
+                       입고유형
+                       <span aria-hidden="true">*</span>
+                   </label>
+
+                   <select id="transaction-type" th:field="*{transactionType}" required>
+                       <option value="">입고 유형을 선택해주세요.</option>
+                       <option value="INBOUND">일반 입고</option>
+                       <option value="TRANSFER_IN">이동 입고</option>
+                       <option value="CORRECTION_IN">정보정정 입고</option>
+                   </select>
+
+                   <p class="field-error" th:if="${#fields.hasErrors('transactionType')}" th:errors="*{transactionType}">
+
+                   </p>
+               </div>
+
+
                <div class="input-field memo-field">
                    <label for="memo">메모
-                       <span aria-hidden="true">*</span>
-
                    </label>
 
                    <textarea id="memo"
@@ -472,16 +510,16 @@
                              maxlength="255"
                              placeholder="입고 관련 특이사항을 입력해주세요."></textarea>
                </div>
-
-
            </div>
        </section>
     </div>
 
-
         <div class="form-actions">
+            <a class="back-button" th:href="@{/inventories}">이전</a>
             <button type="button" id="openSummaryButton" th:disabled="${medicine == null}">입고 등록</button>
+
         </div>
+
 
 
     </form>
@@ -526,13 +564,41 @@
             </div>
 
             <div class="summary-item">
+                <span>입고유형</span>
+                <strong id="summaryTransactionType"></strong>
+            </div>
+
+            <div class="summary-item">
                 <span>메모</span>
                 <strong id="summaryMemo"></strong>
             </div>
 
+
+            <div id="summaryEnvironmentSection" hidden>
+                <h3>의약품 환경 기준</h3>
+
+                <div class="summary-item" id="summaryTemperatureRow" hidden>
+                    <span>온도</span>
+                    <strong id="summaryTemperature"></strong>
+                </div>
+
+                <div class="summary-item" id="summaryHumidityRow" hidden>
+                    <span>습도</span>
+                    <strong id="summaryHumidity"></strong>
+                </div>
+
+                <div class="summary-item" id="summaryIlluminanceRow" hidden>
+                    <span>조도</span>
+                    <strong id="summaryIlluminance"></strong>
+                </div>
+            </div>
+
+
+
+
             <div class="model-actions">
             <button type="button" id="closeSummaryButton">
-                수정
+                이전
             </button>
 
             <button type="button" id="confirmInboundButton">

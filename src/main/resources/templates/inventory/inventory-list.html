@@ -14,15 +14,39 @@
 <div layout:fragment="content">
     <main class="inventory-page">
         <div class="page-heading">
-            <div>
-                <p class="breadcrumb">재고 관리 <span>/</span> 전체 재고</p>
-                <h1>전체 재고</h1>
-                <p class="description">조직에 등록된 의약품 재고와 보관 위치를 확인합니다.</p>
-            </div>
-<!--            <button type="button" class="primary-button">＋ 의약품 입고 등록</button>-->
-            <a th:href="@{/inventory}" class="primary-button">＋ 의약품 입고 등록</a>
-        </div>
 
+
+            <p class="breadcrumb">
+                <span class="breadcrumb-parent">재고 관리</span>
+                <span class="breadcrumb-separator">/</span>
+                <span class="breadcrumb-current" th:text="${isBoss ? '전체 재고' : '소속 부서 재고'}">전체 재고</span>
+            </p>
+
+            <p class="description"
+               th:text="${isBoss ? '조직 전체에 등록된 의약품 재고와 보관 위치를 확인합니다.'
+               : '소속 부서에 등록된 의약품 재고와 보관 위치를 확인합니다.'}">
+                의약품 재고와 보관 위치를 확인합니다.
+            </p>
+
+
+            <div class="department-scope" th:if="${!isBoss and departmentNames != null and !departmentNames.isEmpty()}">
+                <span class="scope-label">조회 부서</span>
+                <span class="department-chip" th:each="department : ${departmentNames}" th:text="${department}">약제부</span>
+            </div>
+
+
+
+            <div class="header-actions">
+                <a th:href="@{/inventories/under-reviews}" class="secondary-action-button">
+                    ⚠️ 환경 검토 대상 재고
+                </a>
+                <a th:href="@{/inventory}" class="primary-button">＋ 의약품 입고 등록</a>
+            </div>
+        </div>
+        <div class="alert alert-success"
+             th:if="${successMessage}"
+             th:text="${successMessage}">
+        </div>
         <section class="inventory-card">
             <form class="toolbar" method="get" th:action="@{/inventories}">
 
@@ -35,7 +59,7 @@
                     <select name="storage-id" class="storage-select">
 
                         <option value="">
-                            전체 저장소
+                            저장소 목록
                         </option>
                         <option th:each="item : ${storages}" th:value="${item.storageId}" th:text="${item.storageName}">
                         </option>
@@ -51,7 +75,7 @@
 
 
             <div class="table-wrap">
-                <table th:if="${inventories != null or !#lists.isEmpty(inventories)}">
+                <table th:if="${inventories != null and !#lists.isEmpty(inventories)}">
                     <thead>
                     <tr>
                         <th>의약품</th>
@@ -63,7 +87,17 @@
                     </thead>
                     <tbody>
                     <tr th:each="item : ${inventories}" class="inventory-row" th:data-storage-id="${item.storageId}" th:data-pack-unit-id="${item.packUnitId}">
-                        <td th:text="${item.productName}"></td>
+                        <td class="medicine">
+                            <strong th:text="${item.productName}">
+                                의약품명
+                            </strong>
+
+                            <small th:text="${item.packUnit}">
+                                포장단위
+                            </small>
+                        </td>
+
+
                         <td th:text="${item.itemCode}"></td>
                         <td th:text="${item.expirationDate}"></td>
                         <td th:text="${item.storageName}"></td>
@@ -78,11 +112,33 @@
 
             </div>
 
+
+            <div class="pagination" th:if="${totalPages != null and totalPages > 1}">
+
+                <a class="page-button" th:if="${startPage > 0}" th:href="@{/inventories(search=${search},storage-id=${selectedStorageId},page=${startPage - 1},size=${pageSize})}">이전</a>
+
+                <a class="page-button" th:each="pageNum : ${#numbers.sequence(startPage,endPage)}" th:href="@{/inventories(search=${search},storage-id=${selectedStorageId},page=${pageNum},size=${pageSize})}"
+                    th:text="${pageNum + 1}" th:classappend="${pageNum == currentPage} ? ' active'" th:attr="aria-current=${pageNum == currentPage} ? 'page'">
+                </a>
+
+                <a class="page-button" th:if="${endPage + 1 < totalPages}" th:href="@{/inventories(search=${search},storage-id=${selectedStorageId},page=${endPage + 1},size=${pageSize})}">다음</a>
+            </div>
+
+
+
         </section>
     </main>
 </div>
 <th:block layout:fragment="script">
     <script>
+        const successAlert =
+            document.querySelector(".inventory-page .alert-success");
+
+        if (successAlert) {
+            setTimeout(() => {
+                successAlert.remove();
+            }, 3000);
+        }
         document.querySelectorAll('tbody tr').forEach(row => {
 
             // 추후 경로 수정 필요
@@ -95,7 +151,6 @@
         });
     </script>
 </th:block>
-
 
 </body>
 </html>

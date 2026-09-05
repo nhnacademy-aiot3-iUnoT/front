@@ -4,11 +4,11 @@ import com.nhnacademy.front.organization.client.ThresholdZoneApiClient;
 import com.nhnacademy.front.organization.client.ZoneThresholdApiClient;
 import com.nhnacademy.front.organization.dto.response.ThresholdSpecResponse;
 import com.nhnacademy.front.organization.client.OrganizationMemberApiClient;
-import com.nhnacademy.front.organization.client.ZoneThresholdApiClient;
 import com.nhnacademy.front.organization.dto.OrganizationRole;
 import com.nhnacademy.front.organization.dto.response.OrganizationMemberRoleResponse;
 import com.nhnacademy.front.organization.dto.response.ZoneThresholdDetailResponse;
 
+import com.nhnacademy.front.organization.dto.response.ZoneThresholdInfoResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -30,6 +30,7 @@ public class ZoneThresholdController {
     private final ThresholdZoneApiClient thresholdZoneApiClient;
     private final OrganizationMemberApiClient organizationMemberApiClient;
 
+
     @GetMapping("/{zone-id}/zone-thresholds/{zone-threshold-id}")
     public String getZoneSensorDetail(
             @PathVariable(name = "zone-id") Long zoneId,
@@ -47,13 +48,13 @@ public class ZoneThresholdController {
         model.addAttribute("threshold", threshold);
         model.addAttribute("canManage", canManage);
 
-        return "zone-threshold/detail";
+        return "zone/zone-threshold-detail";
     }
 
 
     // 해당 구역의 임계 설정 찾기
 
-    @GetMapping("zones/{zone-id}/zone-thresholds")
+    @GetMapping("/{zone-id}/zone-thresholds")
     @ResponseBody
     public List<ThresholdSpecResponse> getThresholds(@PathVariable(name="zone-id")Long zoneId){
 

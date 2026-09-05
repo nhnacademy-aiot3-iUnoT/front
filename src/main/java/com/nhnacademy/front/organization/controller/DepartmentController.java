@@ -2,11 +2,11 @@ package com.nhnacademy.front.organization.controller;
 
 import com.nhnacademy.front.organization.client.DepartmentApiClient;
 import com.nhnacademy.front.organization.service.DepartmentPageService;
-import com.nhnacademy.front.organization.dto.response.*;
 import com.nhnacademy.front.organization.dto.request.DepartmentCreateRequest;
 import com.nhnacademy.front.organization.dto.request.DepartmentStatusUpdateRequest;
 import com.nhnacademy.front.organization.dto.request.DepartmentUpdateRequest;
 import com.nhnacademy.front.organization.dto.response.DepartmentListResponse;
+import com.nhnacademy.front.organization.client.OrganizationMemberApiClient;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import com.nhnacademy.front.organization.dto.response.DepartmentPageResponse;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -30,6 +31,8 @@ public class DepartmentController {
 
     private final DepartmentApiClient departmentApiClient;
     private final DepartmentPageService departmentPageService;
+    private final OrganizationMemberApiClient organizationMemberApiClient;
+    private static final String DEPARTMENT_LIST = "organization/department/department-list";
 
     @GetMapping
     public String departmentList(Model model) {
@@ -37,19 +40,23 @@ public class DepartmentController {
 
         model.addAttribute("departments", departments);
         model.addAttribute("departmentCreateRequest", new DepartmentCreateRequest());
-        return "organization/department-list";
+        model.addAttribute("memberRole", organizationMemberApiClient.getRole().role().name());
+        return DEPARTMENT_LIST;
     }
 
     @PostMapping
     public String createDepartment(@Valid @ModelAttribute("departmentCreateRequest") DepartmentCreateRequest request,
                                    BindingResult bindingResult,
-                                   Model model) {
+                                   Model model,
+                                   RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
             model.addAttribute("departments", departmentApiClient.getDepartments());
-            return "organization/department-list";
+            model.addAttribute("memberRole", organizationMemberApiClient.getRole().role().name());
+            return DEPARTMENT_LIST;
         }
 
         departmentApiClient.createDepartment(request);
+        redirectAttributes.addFlashAttribute("message", "생성되었습니다.");
         return "redirect:/departments";
     }
 
@@ -67,20 +74,22 @@ public class DepartmentController {
         model.addAttribute("departmentMembers", page.members());
         model.addAttribute("departmentTelegramChat", page.telegramChat());
 
-        return "organization/department-info";
+        return "organization/department/department-info";
     }
 
     @PutMapping("/{department-id}")
     public String updateDepartment(@PathVariable(name = "department-id") Long departmentId,
                                    @Valid @ModelAttribute("departmentUpdateRequest") DepartmentUpdateRequest request,
                                    BindingResult bindingResult,
-                                   Model model) {
+                                   Model model,
+                                   RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
             model.addAttribute("department", departmentApiClient.getDepartment(departmentId));
-            return "organization/department-info";
+            return "organization/department/department-info";
         }
 
         departmentApiClient.updateDepartment(departmentId, request);
+        redirectAttributes.addFlashAttribute("message", "수정되었습니다.");
         return "redirect:/departments/" + departmentId;
     }
 

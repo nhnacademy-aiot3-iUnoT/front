@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main-layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>부서 목록</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="py-6">
+        <div class="page-header d-print-none mb-4">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h1 class="page-title">부서 관리</h1>
+                    <div class="text-muted mt-1">조직의 부서를 관리합니다.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row row-cards">
+            <div th:classappend="${memberRole == 'ORG_MEMBER'} ? 'col-12' : 'col-lg-8'">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">부서 목록</h2>
+                    </div>
+
+                    <div class="list-group list-group-flush">
+                        <a th:each="department : ${departments}"
+                           th:href="@{/departments/{id}(id=${department.id})}"
+                           class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            <span class="fw-semibold"
+                                  th:text="${department.name}">
+                                부서명
+                            </span>
+                            <i class="ti ti-chevron-right text-muted"></i>
+                        </a>
+
+                        <div th:if="${#lists.isEmpty(departments)}"
+                             class="text-center text-muted py-4">
+                            등록된 부서가 없습니다.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <form th:if="${memberRole != 'ORG_MEMBER'}" th:action="@{/departments}"
+                      th:object="${departmentCreateRequest}" method="post" id="departmentCreateForm">
+                    <div class="card">
+                        <div class="card-header"><h3 class="card-title">부서 등록</h3></div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label for="name" class="form-label required">부서명</label>
+                                <input id="name" class="form-control" th:field="*{name}" maxlength="30"
+                                       placeholder="부서명을 입력하세요" required>
+                                <div class="invalid-feedback"></div>
+                                <div class="text-danger" th:errors="*{name}"></div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="description" class="form-label">소개</label>
+                                <textarea id="description" class="form-control" th:field="*{description}"
+                                          maxlength="255" rows="5" placeholder="부서 소개를 작성하세요"></textarea>
+                                <div class="invalid-feedback"></div>
+                                <div class="text-danger" th:errors="*{description}"></div>
+                            </div>
+                            <div class="d-flex justify-content-between mt-2">
+                                <div class="form-hint"></div>
+                                <small class="text-muted">
+                                    최대 255자
+                                </small>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent text-end">
+                            <button class="btn btn-primary" type="submit">등록</button>
+                        </div>
+                    </div>
+                </form>
+                <div th:if="${message}" class="alert alert-success mt-2" th:text="${message}"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<th:block layout:fragment="script">
+    <script th:src="@{/js/common/validation.js}"></script>
+    <script th:src="@{/js/common/form.js}"></script>
+    <script th:src="@{/js/common/field-validator.js}"></script>
+    <script th:src="@{/js/organization/department/department-create.js}"></script>
+</th:block>
+</body>
+</html>

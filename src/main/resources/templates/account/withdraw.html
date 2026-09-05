@@ -7,98 +7,92 @@
 <head>
     <meta charset="UTF-8">
     <title>회원탈퇴</title>
-    <link rel="stylesheet" th:href="@{/css/account.css}">
 </head>
 
 <body>
-
 <div layout:fragment="content">
-    <div class="account-page withdraw-page">
-        <div class="account-page-header">
-            <h1>회원탈퇴</h1>
-            <p>계정을 삭제하기 전에 안내사항을 확인해주세요.</p>
+    <div class="py-6">
+        <div class="page-header d-print-none mb-4">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h1 class="page-title">회원탈퇴</h1>
+                    <div class="text-muted mt-1">계정을 삭제하기 전에 안내사항을 확인해주세요.</div>
+                </div>
+            </div>
         </div>
-        <div class="row">
-            <div class="col-lg-8 col-xl-7 mx-auto">
-                <div class="card">
+
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-xl-7">
+                <form id="withdraw-form" class="card" th:action="@{/withdraw}" method="post">
                     <div class="card-header">
                         <div>
-                            <h3 class="card-title mb-1">회원탈퇴</h3>
-                            <p class="card-subtitle mb-0">
-                                탈퇴를 진행하려면 비밀번호를 입력해주세요.
-                            </p>
+                            <h2 class="card-title mb-1">회원탈퇴</h2>
+                            <p class="card-subtitle mb-0">탈퇴를 진행하려면 비밀번호를 입력해주세요.</p>
                         </div>
                     </div>
 
-                    <form id="withdraw-form" th:action="@{/}" method="post">
-                        <div class="card-body">
-                            <div class="alert alert-warning mb-4">
-                                <div class="d-flex">
-                                    <div>
-                                        <i class="ti ti-alert-triangle"></i>
-                                    </div>
-                                    <div class="ms-2">
-                                        <h4 class="alert-title">
-                                            회원탈퇴 안내
-                                        </h4>
-                                        <div class="text-secondary">
-                                            탈퇴 후에는 계정 정보를 복구할 수 없습니다.
-                                        </div>
-                                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-warning mb-4">
+                            <div class="d-flex">
+                                <i class="ti ti-alert-triangle fs-2"></i>
+                                <div class="ms-2">
+                                    <h3 class="alert-title">회원탈퇴 안내</h3>
+                                    <div class="text-secondary">탈퇴 후에는 계정 정보를 복구할 수 없습니다.</div>
                                 </div>
                             </div>
-
-                            <div>
-                                <label class="account-form-label mb-2" for="password">
-                                    비밀번호
-                                </label>
-                                <input type="password" id="password" class="form-control" name="password" placeholder="비밀번호를 입력해주세요." autocomplete="current-password" required></div>
                         </div>
 
-                        <div class="card-footer text-end">
-                            <a th:href="@{/mypage}" class="btn btn-outline-secondary">취소</a>
-                            <button type="button"
-                                    class="btn btn-danger ms-2"
-                                    id="withdraw-btn"
-                                    onclick="openWithdrawModal()">
-                                탈퇴 진행
-                            </button>
+                        <div class="mb-3">
+                            <label class="form-label required" for="password">비밀번호</label>
+                            <input type="password"
+                                   id="password"
+                                   class="form-control"
+                                   name="password"
+                                   placeholder="비밀번호를 입력해주세요."
+                                   autocomplete="current-password"
+                                   minlength="6"
+                                   maxlength="64"
+                                   required>
+                            <div class="invalid-feedback">비밀번호는 6자 이상 64자 이하여야 합니다.</div>
                         </div>
-                    </form>
-                </div>
+                    </div>
+
+                    <div class="card-footer d-flex justify-content-end gap-2">
+                        <a th:href="@{/mypage}" class="btn btn-outline-secondary">취소</a>
+                        <button type="submit" class="btn btn-danger" id="withdraw-btn">탈퇴 진행</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
-    <!-- 탈퇴 확정 Modal -->
-    <div class="modal modal-blur fade" id="withdrawModal" tabindex="-1" role="dialog">
+
+    <div class="modal modal-blur fade" id="withdrawModal" tabindex="-1" role="dialog"
+         aria-labelledby="withdraw-modal-title" aria-hidden="true">
         <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-status bg-danger"></div>
-
                 <div class="modal-header">
-                    <h5 class="modal-title">회원탈퇴 확인</h5>
-
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <h2 class="modal-title" id="withdraw-modal-title">회원탈퇴 확인</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
                 </div>
-
                 <div class="modal-body">
                     정말 탈퇴하시겠습니까?
                     <br>
-                    <span class="text-danger">
-                            탈퇴 후 계정 복구가 불가능합니다.
-                        </span>
+                    <span class="text-danger">탈퇴 후 계정 복구가 불가능합니다.</span>
                 </div>
-
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">취소</button>
-
-                    <button type="button" class="btn btn-danger" onclick="submitWithdraw()">탈퇴하기</button>
+                    <button type="button" class="btn btn-danger" id="withdraw-confirm-btn">탈퇴하기</button>
                 </div>
             </div>
         </div>
     </div>
-    <script th:src="@{/js/withdraw.js}"></script>
 </div>
 
+<th:block layout:fragment="script">
+    <script th:src="@{/js/common/validation.js}"></script>
+    <script th:src="@{/js/common/form.js}"></script>
+    <script th:src="@{/js/account/withdraw.js}"></script>
+</th:block>
 </body>
 </html>

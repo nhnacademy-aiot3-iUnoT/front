@@ -2,44 +2,67 @@ package com.nhnacademy.front.account.controller;
 
 import com.nhnacademy.front.account.client.AccountApiClient;
 import com.nhnacademy.front.account.dto.AccountRole;
+import com.nhnacademy.front.account.dto.AccountStatus;
 import com.nhnacademy.front.account.dto.request.ChangeOwnPasswordRequest;
 import com.nhnacademy.front.account.dto.request.ChangePasswordFormRequest;
+import com.nhnacademy.front.account.dto.request.ReactivationConfirmRequest;
 import com.nhnacademy.front.account.dto.request.UpdateAccountNameRequest;
 import com.nhnacademy.front.account.dto.request.WithdrawAccountRequest;
 import com.nhnacademy.front.account.dto.response.AccountInfoResponse;
 import com.nhnacademy.front.account.validator.PasswordFormValidator;
-import com.nhnacademy.front.global.security.AccessTokenCookieManager;
-import jakarta.servlet.http.HttpServletResponse;
-import com.nhnacademy.front.organization.client.OrganizationMemberApiClient;
+import com.nhnacademy.front.auth.service.AuthSessionService;
+import com.nhnacademy.front.global.config.InactiveAccountInterceptor;
+import com.nhnacademy.front.global.config.SecurityConfig;
+import com.nhnacademy.front.global.config.WebMvcConfig;
+import com.nhnacademy.front.global.error.ApiException;
+import com.nhnacademy.front.global.error.ErrorCode;
 import com.nhnacademy.front.organization.client.DepartmentApiClient;
-import com.nhnacademy.front.organization.dto.response.OrganizationMemberRoleResponse;
+import com.nhnacademy.front.organization.client.OrganizationMemberApiClient;
 import com.nhnacademy.front.organization.dto.OrganizationRole;
+import com.nhnacademy.front.organization.dto.response.OrganizationMemberRoleResponse;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.Test;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.validation.BindingResult;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static org.mockito.BDDMockito.willThrow;
 import static org.mockito.Mockito.never;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(AccountController.class)
-@Import(PasswordFormValidator.class)
+@AutoConfigureMockMvc(addFilters = false)
+@Import({
+        PasswordFormValidator.class,
+        WebMvcConfig.class,
+        InactiveAccountInterceptor.class
+})
 class AccountControllerTest {
 
     @Autowired
@@ -49,7 +72,7 @@ class AccountControllerTest {
     private AccountApiClient accountApiClient;
 
     @MockitoBean
-    private AccessTokenCookieManager cookieManager;
+    private AuthSessionService authSessionService;
 
     @MockitoBean
     private OrganizationMemberApiClient organizationMemberApiClient;
@@ -62,7 +85,13 @@ class AccountControllerTest {
     void info() throws Exception {
         LocalDateTime createdAt = LocalDateTime.of(2026, 8, 5, 12, 0);
         AccountInfoResponse response =
-                new AccountInfoResponse("test@test.com", "test", AccountRole.USER, createdAt);
+                new AccountInfoResponse(
+                        "test@test.com",
+                        "test",
+                        AccountRole.USER,
+                        AccountStatus.ACTIVE,
+                        createdAt
+                );
 
         given(accountApiClient.getAccountInfo())
                 .willReturn(response);
@@ -71,15 +100,175 @@ class AccountControllerTest {
         given(departmentApiClient.getMyDepartments())
                 .willReturn(List.of());
 
-        mockMvc.perform(get("/mypage"))
+        MvcResult result = mockMvc.perform(get("/mypage"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("account/account-info"))
                 .andExpect(model().attribute("accountInfoResponse", response))
                 .andExpect(model().attribute(
                         "nameRequest", new UpdateAccountNameRequest(response.name())
-                ));
+                ))
+                .andReturn();
+
+        Document document = Jsoup.parse(result.getResponse().getContentAsString());
+        assertThat(document.select("form#account-info-form input#name[required][maxlength=100]"))
+                .hasSize(1);
+        assertThat(document.select("script[src=/js/account/account-info.js]"))
+                .hasSize(1);
+        assertThat(document.select(
+                "#session-controls[data-duration-seconds=1800]"
+                        + "[data-refresh-url=/refresh][data-login-url=/login]"
+        )).hasSize(1);
+        assertThat(document.select("#session-timer")).hasSize(1);
+        assertThat(document.select("button#session-extend-button")).hasSize(1);
+        assertThat(document.select("form#session-logout-form[action=/logout][method=post]"))
+                .hasSize(1);
+        assertThat(document.select("script[src=/js/auth/session.js]"))
+                .hasSize(1);
 
         then(accountApiClient).should().getAccountInfo();
+    }
+
+    @Test
+    void inactiveAccountIsStillBlockedFromOtherAccountPages() throws Exception {
+        mockMvc.perform(get("/mypage")
+                        .principal(authentication(AccountStatus.INACTIVE)))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/reactivation"));
+
+        then(accountApiClient).shouldHaveNoInteractions();
+    }
+
+    @Test
+    void reactivationWithoutTokenShowsVerificationRequest() throws Exception {
+        ReactivationConfirmRequest request = new ReactivationConfirmRequest("");
+
+        MvcResult result = mockMvc.perform(get("/reactivation")
+                        .cookie(new Cookie("access_token", "inactive-token"))
+                        .principal(authentication(AccountStatus.INACTIVE)))
+                .andExpect(status().isOk())
+                .andExpect(view().name("account/reactivation"))
+                .andExpect(model().attribute("reactivationConfirmRequest", request))
+                .andReturn();
+
+        Document document = Jsoup.parse(result.getResponse().getContentAsString());
+        assertThat(document.select("form#reactivation-verification-form")).hasSize(1);
+        assertThat(document.select("form#reactivation-confirm-form")).isEmpty();
+
+        then(accountApiClient).shouldHaveNoInteractions();
+    }
+
+    @Test
+    void reactivationWithTokenShowsExplicitConfirmationForm() throws Exception {
+        String token = "a".repeat(64);
+        ReactivationConfirmRequest request = new ReactivationConfirmRequest(token);
+
+        MvcResult result = mockMvc.perform(get("/reactivation")
+                        .param("token", token)
+                        .principal(authentication(AccountStatus.INACTIVE)))
+                .andExpect(status().isOk())
+                .andExpect(view().name("account/reactivation"))
+                .andExpect(model().attribute("reactivationConfirmRequest", request))
+                .andReturn();
+
+        Document document = Jsoup.parse(result.getResponse().getContentAsString());
+        assertThat(document.select("form#reactivation-confirm-form")).hasSize(1);
+        assertThat(document.select(
+                "form#reactivation-confirm-form input[type=hidden][name=token][value=" + token + "]"
+        )).hasSize(1);
+        assertThat(document.select("form#reactivation-confirm-form button[type=submit]")).hasSize(1);
+
+        then(accountApiClient).shouldHaveNoInteractions();
+    }
+
+    @Test
+    void verificationRequestShowsAcceptedMessage() throws Exception {
+        mockMvc.perform(post("/reactivation/verification")
+                        .principal(authentication(AccountStatus.INACTIVE)))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name("redirect:/reactivation"))
+                .andExpect(redirectedUrl("/reactivation"))
+                .andExpect(flash().attribute(
+                        "successMessage",
+                        "인증 메일 발송 요청을 접수했습니다. 이메일을 확인해주세요."
+                ));
+
+        then(accountApiClient).should().requestReactivationVerification();
+    }
+
+    @Test
+    void verificationRequestFailureReturnsToSamePageWithMessage() throws Exception {
+        willThrow(new ApiException(ErrorCode.UNKNOWN, "메일 발송 요청에 실패했습니다."))
+                .given(accountApiClient)
+                .requestReactivationVerification();
+
+        mockMvc.perform(post("/reactivation/verification")
+                        .principal(authentication(AccountStatus.INACTIVE)))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/reactivation"))
+                .andExpect(flash().attribute(
+                        "errorMessage",
+                        "메일 발송 요청에 실패했습니다."
+                ));
+
+        then(accountApiClient).should().requestReactivationVerification();
+    }
+
+    @Test
+    void confirmReactivationDeletesAccessTokenAndRequiresLoginAgain() throws Exception {
+        ReactivationConfirmRequest request = new ReactivationConfirmRequest("a".repeat(64));
+
+        mockMvc.perform(post("/reactivation/confirm")
+                        .param("token", request.token())
+                        .principal(authentication(AccountStatus.INACTIVE)))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name("redirect:/login?reactivated"))
+                .andExpect(redirectedUrl("/login?reactivated"))
+                .andExpect(flash().attribute(
+                        "successMessage",
+                        "계정이 재활성화되었습니다. 다시 로그인해주세요."
+                ));
+
+        then(accountApiClient).should().confirmReactivation(request);
+        then(authSessionService).should().revoke(
+                any(HttpServletRequest.class),
+                any(HttpServletResponse.class)
+        );
+    }
+
+    @Test
+    void malformedReactivationTokenStaysOnSamePage() throws Exception {
+        mockMvc.perform(post("/reactivation/confirm")
+                        .param("token", "invalid-token")
+                        .principal(authentication(AccountStatus.INACTIVE)))
+                .andExpect(status().isOk())
+                .andExpect(view().name("account/reactivation"))
+                .andExpect(model().attributeHasFieldErrors(
+                        "reactivationConfirmRequest",
+                        "token"
+                ));
+
+        then(accountApiClient).shouldHaveNoInteractions();
+        then(authSessionService).shouldHaveNoInteractions();
+    }
+
+    @Test
+    void expiredReactivationTokenShowsClearErrorAndKeepsCookie() throws Exception {
+        ReactivationConfirmRequest request = new ReactivationConfirmRequest("a".repeat(64));
+        given(accountApiClient.confirmReactivation(request))
+                .willThrow(new ApiException(ErrorCode.A009, "Invalid verification token"));
+
+        mockMvc.perform(post("/reactivation/confirm")
+                        .param("token", request.token())
+                        .principal(authentication(AccountStatus.INACTIVE)))
+                .andExpect(status().isOk())
+                .andExpect(view().name("account/reactivation"))
+                .andExpect(model().attribute(
+                        "errorMessage",
+                        "인증 링크가 유효하지 않거나 만료되었습니다. 인증 메일을 다시 요청해주세요."
+                ));
+
+        then(accountApiClient).should().confirmReactivation(request);
+        then(authSessionService).shouldHaveNoInteractions();
     }
 
     @Test
@@ -101,6 +290,7 @@ class AccountControllerTest {
     void changeNameError() throws Exception {
         AccountInfoResponse response = new AccountInfoResponse(
                 "test@test.com", "기존 이름", AccountRole.USER,
+                AccountStatus.ACTIVE,
                 LocalDateTime.of(2026, 8, 5, 12, 0)
         );
         given(accountApiClient.getAccountInfo()).willReturn(response);
@@ -134,10 +324,18 @@ class AccountControllerTest {
     @Test
     void passwordForm() throws Exception {
 
-        mockMvc.perform(get("/mypage/change-password"))
+        MvcResult result = mockMvc.perform(get("/mypage/change-password"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("account/change-password"))
-                .andExpect(model().attribute("changePasswordForm", new ChangePasswordFormRequest()));
+                .andExpect(model().attribute("changePasswordForm", new ChangePasswordFormRequest()))
+                .andReturn();
+
+        Document document = Jsoup.parse(result.getResponse().getContentAsString());
+        assertThat(document.select(
+                "form#change-password-form input[type=password][required][minlength=6][maxlength=64]"
+        )).hasSize(3);
+        assertThat(document.select("script[src=/js/account/change.js]"))
+                .hasSize(1);
     }
 
     @Test
@@ -232,9 +430,17 @@ class AccountControllerTest {
 
     @Test
     void withdrawPageIsRendered() throws Exception {
-        mockMvc.perform(get("/withdraw"))
+        MvcResult result = mockMvc.perform(get("/withdraw"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("account/withdraw"));
+                .andExpect(view().name("account/withdraw"))
+                .andReturn();
+
+        Document document = Jsoup.parse(result.getResponse().getContentAsString());
+        assertThat(document.select(
+                "form#withdraw-form input#password[required][minlength=6][maxlength=64]"
+        )).hasSize(1);
+        assertThat(document.select("script[src=/js/account/withdraw.js]"))
+                .hasSize(1);
     }
 
     @Test
@@ -243,29 +449,45 @@ class AccountControllerTest {
 
         mockMvc.perform(delete("/withdraw")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
+                .content("""
                                 {"password":"password"}
                                 """))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(view().name("redirect:/login"))
-                .andExpect(redirectedUrl("/login"));
+                .andExpect(status().isNoContent())
+                .andExpect(content().string(""));
 
         then(accountApiClient).should().withdraw(request);
-        then(cookieManager).should().delete(any(HttpServletResponse.class));
+        then(authSessionService).should().revoke(
+                any(HttpServletRequest.class),
+                any(HttpServletResponse.class)
+        );
     }
 
     @Test
     void deleteAccountWithInvalidPasswordDoesNotCallDependencies() throws Exception {
         mockMvc.perform(delete("/withdraw")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
+                .content("""
                                 {"password":"12345"}
                                 """))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(view().name("redirect:/withdraw"))
-                .andExpect(redirectedUrl("/withdraw"));
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.error.code").value("VALIDATION_ERROR"))
+                .andExpect(jsonPath("$.error.message")
+                        .value("비밀번호는 6자 이상 64자 이하여야 합니다."));
 
         then(accountApiClient).shouldHaveNoInteractions();
-        then(cookieManager).shouldHaveNoInteractions();
+        then(authSessionService).shouldHaveNoInteractions();
+    }
+
+    private JwtAuthenticationToken authentication(AccountStatus status) {
+        Jwt jwt = Jwt.withTokenValue("token")
+                .header("alg", "RS256")
+                .subject(UUID.randomUUID().toString())
+                .issuedAt(Instant.now())
+                .expiresAt(Instant.now().plusSeconds(60))
+                .claim(SecurityConfig.ACCOUNT_STATUS_CLAIM, status.name())
+                .build();
+        return new JwtAuthenticationToken(jwt, List.of());
     }
 }

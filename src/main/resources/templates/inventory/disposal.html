@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main-layout}">
+<head>
+    <title>의약품 폐기 | iUnoT</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <main class="py-6">
+        <div class="page-header d-print-none mb-4">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h2 class="page-title">의약품 폐기</h2>
+                    <div class="text-muted mt-1">보관 중인 의약품의 폐기 수량과 사유를 등록합니다.</div>
+                </div>
+                <div class="col-auto">
+                    <a class="btn btn-outline-secondary" th:href="@{/inventories}">재고 목록</a>
+                </div>
+            </div>
+        </div>
+
+        <section class="card mt-5">
+            <div class="card-header">
+                <h2 class="card-title">폐기 정보</h2>
+            </div>
+            <form id="disposal-form"
+                  th:action="@{/inventories/{inventory-id}/disposal(inventory-id=${target.inventoryId})}"
+                  th:object="${disposalRequest}"
+                  method="post"
+                  novalidate>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">의약품</label>
+                        <div class="border rounded bg-secondary-lt p-3">
+                            <div class="fw-bold" th:text="${target.productName}">의약품명</div>
+                            <div class="small text-muted mt-1">
+                                <span th:text="${target.itemCode}">의약품 코드</span>
+                                <span> · </span>
+                                <span th:text="${target.lotNumber}">로트 번호</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">폐기 저장소</label>
+                        <div class="border rounded bg-secondary-lt p-3">
+                            <div class="fw-bold" th:text="${target.storageName}">저장소명</div>
+                            <div class="small text-muted mt-1">
+                                <span th:text="${target.zoneName}">구역명</span>
+                                <span> · 유통기한 </span>
+                                <span th:text="${target.expirationDate}">2026-12-31</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card card-sm bg-primary-lt border-0 mb-3">
+                        <div class="card-body d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-2 py-3">
+                            <span class="fw-semibold">폐기 가능 수량</span>
+                            <div class="d-flex align-items-center">
+                                <strong class="text-primary fs-3">
+                                    <span th:text="${target.currentQuantity}">0</span>
+                                    <span class="ms-1">개</span>
+                                </strong>
+                                <span class="text-muted mx-2">|</span>
+                                <span class="text-muted">포장 단위</span>
+                                <span class="fw-semibold ms-2" th:text="${target.packUnit}"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-warning" role="alert"
+                         th:if="${target.currentQuantity <= 0}">
+                        폐기 가능한 재고가 없습니다.
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-sm-6 mb-3">
+                            <label class="form-label" for="disposal-quantity">폐기 수량</label>
+                            <input id="disposal-quantity"
+                                   class="form-control"
+                                   th:classappend="${#fields.hasErrors('quantity')} ? ' is-invalid'"
+                                   type="number"
+                                   min="1"
+                                   th:max="${target.currentQuantity}"
+                                   th:field="*{quantity}"
+                                   placeholder="수량 입력"
+                                   required>
+                            <div class="invalid-feedback"></div>
+                            <div class="text-danger" th:errors="*{quantity}"></div>
+                        </div>
+
+                        <div class="col-sm-6 mb-3">
+                            <label class="form-label" for="disposal-reason">폐기 사유</label>
+                            <select id="disposal-reason"
+                                    class="form-select"
+                                    th:classappend="${#fields.hasErrors('reason')} ? ' is-invalid'"
+                                    th:field="*{reason}"
+                                    required>
+                                <option value="">폐기 사유 선택</option>
+                                <option value="EXPIRED">유통기한 만료</option>
+                                <option value="DETERIORATED">변질</option>
+                                <option value="OTHER">기타</option>
+                            </select>
+                            <div class="invalid-feedback"></div>
+                            <div class="text-danger" th:errors="*{reason}"></div>
+                        </div>
+                    </div>
+
+                    <div id="disposal-memo-group"
+                         class="mb-3 mt-3"
+                         th:hidden="${disposalRequest.reason != 'OTHER'}">
+                        <label class="form-label" for="disposal-memo">
+                            상세 사유
+                            <span class="text-danger">(기타 선택 시 필수)</span>
+                        </label>
+                        <textarea id="disposal-memo"
+                                  class="form-control"
+                                  th:classappend="${#fields.hasErrors('memo')} ? ' is-invalid'"
+                                  rows="3"
+                                  th:field="*{memo}"
+                                  th:disabled="${disposalRequest.reason != 'OTHER'}"
+                                  maxlength="100"
+                                  placeholder="구체적인 폐기 사유를 입력하세요."></textarea>
+                        <div class="invalid-feedback"></div>
+                        <div class="text-danger" th:errors="*{memo}"></div>
+                    </div>
+                </div>
+
+                <div class="card-footer py-3 d-flex justify-content-end">
+                    <button type="submit"
+                            class="btn btn-danger"
+                            th:disabled="${target.currentQuantity <= 0}">
+                        폐기 등록
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <div class="modal modal-blur fade"
+             id="disposal-confirm-modal"
+             tabindex="-1"
+             aria-labelledby="disposal-confirm-title"
+             aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="modal-title" id="disposal-confirm-title">폐기 처리 확인</h3>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>선택한 수량을 폐기하시겠습니까? 폐기 처리 후에는 되돌릴 수 없습니다.</p>
+                        <div class="border rounded bg-secondary-lt p-3">
+                            <div class="fw-bold" th:text="${target.productName}">의약품명</div>
+                            <div class="small text-muted mt-2">
+                                폐기 수량: <span id="confirm-disposal-quantity"></span>개
+                            </div>
+                            <div class="small text-muted mt-1">
+                                폐기 사유: <span id="confirm-disposal-reason"></span>
+                            </div>
+                            <div class="small text-muted mt-1" id="confirm-disposal-memo-row" hidden>
+                                상세 사유: <span id="confirm-disposal-memo"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">취소</button>
+                        <button type="button" id="confirm-disposal-button" class="btn btn-danger">폐기하기</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+<th:block layout:fragment="script">
+    <script th:src="@{/js/common/validation.js}"></script>
+    <script th:src="@{/js/common/form.js}"></script>
+    <script th:src="@{/js/common/field-validator.js}"></script>
+    <script th:src="@{/js/inventory/disposal.js}"></script>
+</th:block>
+</body>
+</html>

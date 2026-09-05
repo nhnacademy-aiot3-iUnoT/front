@@ -11,26 +11,43 @@
                 </a>
             </h1>
 
-            <div class="collapse navbar-collapse">
+            <button class="navbar-toggler" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#main-navbar"
+                    aria-controls="main-navbar" aria-expanded="false" aria-label="메뉴 열기">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="main-navbar">
                 <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
+                    <li class="nav-item dropdown nav-dropdown-hover">
                         <a th:href="@{/organizations/me}" class="nav-link active">조직관리</a>
+                        <ul class="dropdown-menu nav-dropdown-menu">
+                            <li><a class="dropdown-item" th:href="@{/organizations/me}">나의 조직</a></li>
+                            <li><a class="dropdown-item" th:href="@{/departments}">부서 목록</a></li>
+                        </ul>
                     </li>
 
                     <li class="nav-item">
                         <a th:href="@{/storages}" class="nav-link">저장소관리</a>
                     </li>
 
-                    <li class="nav-item">
+                    <li class="nav-item dropdown nav-dropdown-hover">
                         <a th:href="@{/inventories}" class="nav-link">재고관리</a>
+                        <ul class="dropdown-menu nav-dropdown-menu">
+                            <li><a class="dropdown-item" th:href="@{/inventories}">재고 목록</a></li>
+                            <li><a class="dropdown-item" th:href="@{/inventory}">입고 등록</a></li>
+                            <li><a class="dropdown-item" th:href="@{/expiring}">유통기한 임박 재고</a></li>
+                            <li><a class="dropdown-item" th:href="@{/stock-transactions}">입출고 내역</a></li>
+                        </ul>
                     </li>
 
                     <li class="nav-item">
-                        <a th:href="@{/organizations/me/environmentMonitoring}" class="nav-link">환경관리</a>
+                        <a th:href="@{/environmentMonitoring}" class="nav-link">환경관리</a>
                     </li>
                 </ul>
 
                 <div class="navbar-nav flex-row order-md-last">
+                    <div th:replace="~{fragments/session-control :: control}"></div>
 
                     <div class="nav-item me-3 position-relative">
                         <a href="/alerts" class="nav-link px-2 text-reset notification-link" title="알림함">
@@ -46,27 +63,23 @@
                         </button>
                     </div>
 
-                    <div class="nav-item dropdown">
-                        <a href="#" class="nav-link d-flex lh-1 text-reset p-0" data-bs-toggle="dropdown">
+                    <div class="nav-item profile-nav-item me-3">
+                        <a th:href="@{/mypage}" class="nav-link d-flex align-items-center lh-1 text-reset p-0" title="회원정보">
                             <span class="avatar avatar-sm">
                                 <i class="ti ti-user"></i>
                             </span>
-                            <div class="d-none d-xl-block ps-2"> 이름</div>
                         </a>
+                    </div>
 
-                        <div class="dropdown-menu dropdown-menu-end">
-                            <a class="dropdown-item" th:href="@{/mypage}">
-                                회원정보
-                            </a>
-                            <a class="dropdown-item" th:href="@{/organizations/me}">
-                                나의조직
-                            </a>
-                            <form th:action="@{/logout}" method="post">
-                                <button type="submit" class="dropdown-item">
-                                    로그아웃
-                                </button>
-                            </form>
-                        </div>
+                    <div class="nav-item">
+                        <form id="session-logout-form"
+                              th:action="@{/logout}"
+                              method="post"
+                              class="m-0">
+                            <button type="submit" class="btn btn-outline-secondary btn-sm">
+                                로그아웃
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>

@@ -1,14 +1,15 @@
 package com.nhnacademy.front.medicine.controller;
 
 import com.nhnacademy.front.global.dto.PageResponse;
+import com.nhnacademy.front.inventory.dto.request.InboundMedicineRequest;
 import com.nhnacademy.front.medicine.client.MedicineEnvApiClient;
 import com.nhnacademy.front.medicine.client.MedicineInfoApiClient;
 import com.nhnacademy.front.medicine.dto.EnvironmentType;
-import com.nhnacademy.front.inventory.dto.request.InboundMedicineRequest;
 import com.nhnacademy.front.medicine.dto.request.MedicineSearchRequest;
 import com.nhnacademy.front.medicine.dto.response.MedicineEnvironmentTypeResponse;
 import com.nhnacademy.front.medicine.dto.response.MedicineSearchResponse;
 import com.nhnacademy.front.organization.client.StorageApiClient;
+import com.nhnacademy.front.organization.client.ZoneThresholdApiClient;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +18,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Controller
@@ -29,6 +31,8 @@ public class MedicineSearchController {
     private final MedicineEnvApiClient medicineEnvApiClient;
     private final StorageApiClient storageApiClient;
     private static final String INBOUND_VIEW= "inventory/inbound";
+    private final ZoneThresholdApiClient zoneThresholdApiClient;
+
 
 
     // 의약품 조회
@@ -52,7 +56,9 @@ public class MedicineSearchController {
         model.addAttribute("selectedStorageId",storageId);
         model.addAttribute("selectedZoneId",zoneId);
 
-        model.addAttribute("inboundMedicineRequest",InboundMedicineRequest.from(null,zoneId));
+        model.addAttribute("inboundMedicineRequest", InboundMedicineRequest.from(null,zoneId));
+
+        model.addAttribute("today", LocalDate.now());
 
 
         if(bindingResult.hasErrors()){
@@ -64,11 +70,24 @@ public class MedicineSearchController {
 
         PageResponse<MedicineSearchResponse> medicines = medicineInfoApiClient.getMedicines(medicineSearchRequest,page,size);
 
+        int currentPage = medicines.page();
+        int totalPages = medicines.totalPages();
+
+        int pageGroupSize = 10;
+
+        int startPage = (currentPage / pageGroupSize) * pageGroupSize;
+
+        int endPage = totalPages == 0 ? 0 : Math.min(startPage + pageGroupSize -1,totalPages - 1);
+
+
+
         model.addAttribute("medicines",medicines);
         model.addAttribute("currentPage",medicines.page());
         model.addAttribute("totalPages",medicines.totalPages());
         model.addAttribute("pageSize",medicines.size());
 
+        model.addAttribute("startPage",startPage);
+        model.addAttribute("endPage",endPage);
 
 
         return INBOUND_VIEW;
