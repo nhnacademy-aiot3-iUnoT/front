@@ -141,6 +141,7 @@
 
         <form method="post"
               class="delete-environment-form"
+              th:if="${environmentTypes != null and #lists.isEmpty(environmentTypes)}"
               th:action="@{/pack-units/{packUnitId}/environment-standards(packUnitId=${packUnitId})}"
               onsubmit="return confirm('등록된 환경기준을 삭제하시겠습니까?');">
 
@@ -359,11 +360,11 @@
 
                 <div class="form-actions">
                     <button type="reset" class="secondary-button">
-                        기존값으로 초기화
+                        초기화
                     </button>
 
 
-                    <button type="submit" class="primary-button" th:text="${environmentTypes != null and !#lists.isEmpty(environmentTypes)} ? '변경사항 저장' : '환경기준 등록'">
+                    <button type="submit" class="primary-button" th:text="${environmentTypes != null and !#lists.isEmpty(environmentTypes) ? '변경사항 수정' : '환경기준 등록'}">
                         변경사항 저장
                     </button>
 

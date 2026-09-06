@@ -54,9 +54,7 @@ public class InboundMedicineRequest {
     )
     private String memo;
 
-    @Valid
-    private MedicineEnvironmentRequest medicineEnvironmentRequest =
-            MedicineEnvironmentRequest.empty();
+
 
     public static InboundMedicineRequest from(Long packageUnitId,Long zoneId) {
 
@@ -64,7 +62,6 @@ public class InboundMedicineRequest {
 
         request.setMedicinePackageUnitId(packageUnitId);
         request.setZoneId(zoneId);
-        request.setMedicineEnvironmentRequest(MedicineEnvironmentRequest.empty());
 
         return request;
     }

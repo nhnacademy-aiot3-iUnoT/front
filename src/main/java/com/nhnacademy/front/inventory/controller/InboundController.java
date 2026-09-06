@@ -58,7 +58,6 @@ public class InboundController {
                           ){
 
         log.info("request = {}", request);
-        log.info("medicineEnvironmentRequest = {}", request.getMedicineEnvironmentRequest());
 
         if(bindingResult.hasErrors()){
 
