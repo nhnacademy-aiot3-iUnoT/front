@@ -115,8 +115,6 @@ function renderPagination(pageData) {
     nextBtn.disabled = last;
     nextBtn.onclick = () => loadUnderReviewInventories(page + 1);
     pagination.appendChild(nextBtn);
-    nextBtn.onclick = () => loadUnderReviewInventories(page + 1);
-    pagination.appendChild(nextBtn);
 }
 
 // --- 4. 모달 제어 및 이벤트 내역 조회 (/api/core/environment-events) ---
