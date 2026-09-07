@@ -20,6 +20,7 @@ public record ReviewHistoryDetailResponse(
         String lotNumber,
         LocalDateTime createdAt,
         UUID reviewerId,
+        String reviewerName,
         Boolean isOut,
         Integer quantityAtReview,
         String memo,

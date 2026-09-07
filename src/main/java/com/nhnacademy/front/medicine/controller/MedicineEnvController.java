@@ -15,6 +15,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Controller
@@ -24,6 +25,7 @@ public class MedicineEnvController {
 
     private final MedicineEnvApiClient medicineEnvApiClient;
     private final MedicineInfoApiClient medicineInfoApiClient;
+    private static final int PAGE_GROUP_SIZE = 10;
     private static final String ENV_VIEW = "inventory/medicine-env";
     private static final String REDIRECT_INVENTORIES = "redirect:/inventories";
 
@@ -47,14 +49,27 @@ public class MedicineEnvController {
             return ENV_VIEW;
         }
 
-
         PageResponse<MedicineSearchResponse> medicines = medicineInfoApiClient.getMedicines(request,page,size);
+
+        int currentPage = medicines.page();
+        int totalPages = medicines.totalPages();
+
+        int startPage = (currentPage / PAGE_GROUP_SIZE) * PAGE_GROUP_SIZE;
+
+        int endPage = totalPages == 0 ? 0 : Math.min(
+                startPage + PAGE_GROUP_SIZE - 1,
+                totalPages - 1);
+
 
         model.addAttribute("medicineSearchRequest",request);
         model.addAttribute("medicines",medicines);
-        model.addAttribute("currentPage",medicines.page());
-        model.addAttribute("totalPages",medicines.totalPages());
+        model.addAttribute("currentPage",currentPage);
+        model.addAttribute("totalPages",totalPages);
         model.addAttribute("pageSize",medicines.size());
+
+        model.addAttribute("startPage",startPage);
+        model.addAttribute("endPage",endPage);
+
 
         return ENV_VIEW;
     }
@@ -66,18 +81,27 @@ public class MedicineEnvController {
     public String getStandards(@PathVariable(name="pack-unit-id")Long packUnitId,
                                Model model){
 
+        List<MedicineEnvironmentTypeResponse> environmentTypes = medicineEnvApiClient.getTypes(packUnitId)
+                        .stream()
+                                .sorted(Comparator.comparing(t ->
+                                        switch(t.type()){
+                                            case TEMPERATURE ->  1;
+                                            case HUMIDITY -> 2;
+                                            case ILLUMINANCE -> 3;
 
-        List<MedicineEnvironmentTypeResponse> environmentTypes = medicineEnvApiClient.getTypes(packUnitId);
+                                        }
+                                        )).toList();
 
 
         model.addAttribute("packUnitId",packUnitId);
+
+
         model.addAttribute("medicineEnvironmentRequest",new MedicineEnvironmentRequest());
         model.addAttribute("medicine",medicineInfoApiClient.getMedicine(packUnitId));
         model.addAttribute("environmentTypes",environmentTypes);
 
         return ENV_VIEW;
     }
-
 
 
     //환경기준 생성

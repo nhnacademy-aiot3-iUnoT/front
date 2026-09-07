@@ -1,29 +1,37 @@
 <!DOCTYPE html>
 <html lang="ko"
       xmlns:th="http://www.thymeleaf.org"
->
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main-layout}">
 <head>
-    <meta charset="UTF-8">
-    <title>의약품 입고</title>
-
-
+    <title>의약품 입고 | iUnoT</title>
     <link rel="stylesheet" th:href="@{/css/inbound.css}">
-
-    <script th:src="@{/js/inventory/inbound.js}"></script>
-
-
+    <script th:src="@{/js/inventory/inbound.js}" defer></script>
 </head>
 <body>
-
+<div layout:fragment="content">
 <main class="inbound-page">
+
+    <div class="page-header d-print-none mb-4">
+        <div class="row align-items-center">
+            <div class="col">
+                <div class="page-pretitle">재고 관리</div>
+                <h2 class="page-title">의약품 입고</h2>
+                <div class="text-muted mt-1">의약품을 검색하고 보관 위치와 입고 내역을 등록합니다.</div>
+            </div>
+            <div class="col-auto">
+                <a class="btn btn-outline-secondary" th:href="@{/inventories}">재고 목록</a>
+            </div>
+        </div>
+    </div>
 
     <section class="medicine-section">
         <header class="medicine-header">
             <span class="step-number">01</span>
 
             <div>
-                <h1>기본 입고 정보</h1>
-                <P>입고할 의약품을 검색하고 선택합니다.</P>
+                <h2>기본 입고 정보</h2>
+                <p>입고할 의약품을 검색하고 선택합니다.</p>
             </div>
         </header>
 
@@ -188,15 +196,9 @@
                     <select id="zone-id" th:field="*{zoneId}" th:data-selected-id="${selectedZoneId}" required disabled>
                         <option value="">먼저 저장소를 선택하세요.</option>
                     </select>
+
                     <p class="field-error" th:if="${#fields.hasErrors('zoneId')}" th:errors="*{zoneId}"></p>
 
-                    <input type="hidden"
-                           id="selected-zone-id" th:field="*{zoneId}">
-
-                    <p class="field-error"
-                       th:if="${#fields.hasErrors('zoneId')}"
-                       th:errors="*{zoneId}">
-                    </p>
 
                 </div>
 
@@ -383,70 +385,6 @@
 
             </section>
 
-<!--            환경 기준이 하나도 없을 때만 표시-->
-
-        <section class="environment-setting-section" th:if="${#lists.isEmpty(environments)}">
-
-            <h2>의약품 환경 기준 설정</h2>
-
-            <p>등록된 환경 기준이 없습니다. 필요한 기준만 입력하세요.</p>
-
-            <div class="environment-input-list">
-
-                <fieldset class="environment-input-group" data-environment-input data-environment-type="TEMPERATURE">
-                    <legend>온도</legend>
-
-                    <label for="min-temperature">최소</label>
-                    <input type="number" step="0.01" id="min-temperature" data-environment-min th:field="*{medicineEnvironmentRequest.minTemperature}" min="0">
-                    <span>℃</span>
-
-                    <span aria-hidden="true">-</span>
-                    <label for="max-temperature">최대</label>
-                    <input type="number" step="0.01" id="max-temperature" data-environment-max th:field="*{medicineEnvironmentRequest.maxTemperature}" min="0">
-
-                    <span>℃</span>
-
-                </fieldset>
-
-
-
-                <fieldset class="environment-input-group" data-environment-input data-environment-type="HUMIDITY">
-                    <legend>습도</legend>
-
-                    <label for="min-humidity">최소</label>
-                    <input type="number" step="0.01" id="min-humidity" data-environment-min th:field="*{medicineEnvironmentRequest.minHumidity}" min="0" max="100">
-                    <span>%</span>
-                    <span aria-hidden="true">-</span>
-                    <label for="max-humidity">최대</label>
-                    <input type="number" step="0.01" id="max-humidity" data-environment-max th:field="*{medicineEnvironmentRequest.maxHumidity}" min="0" max="100">
-                    <span>%</span>
-
-                </fieldset>
-
-
-
-
-
-                <fieldset class="environment-input-group" data-environment-input data-environment-type="ILLUMINATION">
-                    <legend>조도</legend>
-
-                    <label for="min-illuminance">최소</label>
-                    <input type="number" step="0.01" id="min-illuminance" data-environment-min th:field="*{medicineEnvironmentRequest.minIlluminance}" min="0">
-                    <span>lx</span>
-                    <span aria-hidden="true">-</span>
-                    <label for="max-illuminance">최대</label>
-                    <input type="number" step="0.01" id="max-illuminance" data-environment-max th:field="*{medicineEnvironmentRequest.maxIlluminance}" min="0">
-                    <span>lx</span>
-
-                </fieldset>
-
-
-
-            </div>
-        </section>
-
-
-<!--            입고 정보-->
 
        <section class="inbound-information-section">
            <h2>입고 정보</h2>
@@ -528,7 +466,7 @@
 
 
     <div id="summaryModal">
-        <div class="modal-content">
+        <div class="summary-panel">
 
             <h2>입고 정보 확인</h2>
             <p>입력한 정보를 확인해주세요.</p>
@@ -612,9 +550,7 @@
 
 
 </main>
-
+</div>
 </body>
-
-
 </html>
 

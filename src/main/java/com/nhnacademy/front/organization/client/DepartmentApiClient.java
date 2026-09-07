@@ -5,6 +5,7 @@ import com.nhnacademy.front.global.dto.ApiResponse;
 import com.nhnacademy.front.organization.dto.request.DepartmentCreateRequest;
 import com.nhnacademy.front.organization.dto.request.DepartmentStatusUpdateRequest;
 import com.nhnacademy.front.organization.dto.request.DepartmentUpdateRequest;
+import com.nhnacademy.front.organization.dto.response.DepartmentByStorageResponse;
 import com.nhnacademy.front.organization.dto.response.DepartmentCreateResponse;
 import com.nhnacademy.front.organization.dto.response.DepartmentInfoResponse;
 import com.nhnacademy.front.organization.dto.response.DepartmentListResponse;

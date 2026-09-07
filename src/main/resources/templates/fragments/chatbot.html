@@ -17,7 +17,18 @@
             </button>
         </div>
 
-        <div class="chatbot-messages" id="chatbot-messages">
+        <div class="chatbot-tabs" role="tablist">
+            <button type="button" class="chatbot-tab is-active" data-tab="chat" role="tab">대화</button>
+            <button type="button" class="chatbot-tab" data-tab="notes" role="tab">
+                점검<span class="chatbot-tab-badge" id="chatbot-notes-badge" hidden></span>
+            </button>
+        </div>
+
+        <div class="chatbot-notes" id="chatbot-notes" data-panel="notes" hidden>
+            <p class="chatbot-notes-empty" id="chatbot-notes-empty">최근 점검된 내용이 없습니다.</p>
+        </div>
+
+        <div class="chatbot-messages" id="chatbot-messages" data-panel="chat">
             <div class="chatbot-message assistant">
                 안녕하세요. 재고, 저장소, 구역에 대해 무엇이든 물어보세요.
             </div>
@@ -27,7 +38,7 @@
             </div>
         </div>
 
-        <form class="chatbot-input" id="chatbot-form">
+        <form class="chatbot-input" id="chatbot-form" data-panel="chat">
             <input id="chatbot-input" type="text" placeholder="메시지를 입력하세요" autocomplete="off">
             <button type="submit" aria-label="메시지 전송">
                 <i class="ti ti-send"></i>

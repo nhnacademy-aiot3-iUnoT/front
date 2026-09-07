@@ -89,7 +89,7 @@ class StockTransactionControllerTest {
                 .andExpect(content().string(Matchers.containsString("data-memo")))
                 .andExpect(content().string(Matchers.containsString("data-processed-by")))
                 .andExpect(content().string(Matchers.containsString("김약사")))
-                .andExpect(content().string(Matchers.containsString("유효기간 경과")));
+                .andExpect(content().string(Matchers.containsString("유통기한 만료")));
     }
 
     @Test
@@ -102,6 +102,28 @@ class StockTransactionControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string(Matchers.containsString("처리자")))
                 .andExpect(content().string(Matchers.containsString("김약사")));
+    }
+
+    @Test
+    @DisplayName("사유 코드를 한글로 바꿔 보여주고, 모르는 값은 그대로 둔다.")
+    void stockTransactions_TranslatesReason() throws Exception {
+        givenStoragesAndZones();
+        given(stockTransactionApiClient.search(
+                eq(1L), any(), any(), any(), any(), anyInt(), anyInt()))
+                .willReturn(new PageResponse<>(List.of(
+                        transaction("STORAGE_TRANSFER"), transaction("직접 입력한 사유")), 0, 20, 2L, 1, true));
+
+        mockMvc.perform(get("/stock-transactions"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(Matchers.containsString("저장소 이동")))
+                .andExpect(content().string(Matchers.containsString("직접 입력한 사유")))
+                .andExpect(content().string(Matchers.not(Matchers.containsString("STORAGE_TRANSFER"))));
+    }
+
+    private StockTransactionResponse transaction(String reason) {
+        return new StockTransactionResponse(
+                1L, "타이레놀정", "10정/PTP", TransactionType.OUTBOUND, 10,
+                reason, null, UUID.randomUUID(), "김약사", LocalDateTime.of(2026, 8, 10, 9, 20));
     }
 
     @Test
@@ -194,11 +216,11 @@ class StockTransactionControllerTest {
         return List.of(
                 new StockTransactionResponse(
                         1L, "타이레놀정", "10정/PTP", TransactionType.INBOUND, 120,
-                        "정기 입고", "8월 정기 발주분",
+                        "DISPENSING", "8월 정기 발주분",
                         UUID.randomUUID(), "김약사", LocalDateTime.of(2026, 8, 10, 9, 20)),
                 new StockTransactionResponse(
                         2L, "아모크라정", "20정/병", TransactionType.DISPOSAL, 8,
-                        "유효기간 경과", null,
+                        "EXPIRED", null,
                         UUID.randomUUID(), null, LocalDateTime.of(2026, 8, 12, 17, 30)));
     }
 }

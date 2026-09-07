@@ -1,38 +1,7 @@
-:root {
-    --canvas: #f7f8f6;
-    --surface: #ffffff;
-    --line: #e3e7e5;
-    --line-strong: #ccd4d0;
-    --ink: #2b3935;
-    --ink-soft: #74807c;
-    --teal: #08776a;
-    --teal-dark: #075f55;
-    --teal-soft: #e9f5f2;
-    --danger: #b64c48;
-    --danger-soft: #fff2f1;
-    --warning: #8b6417;
-    --warning-soft: #fff8e8;
-}
-
-* { box-sizing: border-box; }
-
-body {
-    margin: 0;
-    background: var(--canvas);
-    color: var(--ink);
-    font-family: Pretendard, "Noto Sans KR", Arial, sans-serif;
-    line-height: 1.5;
-}
-
-button,
-input,
-select,
-textarea { font: inherit; }
+/* 색상 토큰과 기본 요소 스타일은 theme.css 를 따른다. */
 
 .inbound-page {
-    width: min(1180px, calc(100% - 48px));
-    margin: 0 auto;
-    padding: 2rem 0 4rem;
+    padding-bottom: 2rem;
 }
 
 .medicine-section {
@@ -40,7 +9,7 @@ textarea { font: inherit; }
     border: 1px solid var(--line);
     border-radius: 14px;
     background: var(--surface);
-    box-shadow: 0 4px 20px #30403b0a;
+    box-shadow: var(--shadow);
 }
 
 .medicine-header,
@@ -51,7 +20,7 @@ textarea { font: inherit; }
     margin-bottom: 1.25rem;
 }
 
-.medicine-header h1,
+.medicine-header h2,
 .section-header h2 {
     margin: 0;
     font-size: 1.05rem;
@@ -199,16 +168,16 @@ textarea { font: inherit; }
     border-collapse: collapse;
 }
 
-th,
-td {
+.inbound-page th,
+.inbound-page td {
     padding: .85rem 1.25rem;
     border-bottom: 1px solid var(--line);
     text-align: left;
     white-space: nowrap;
 }
 
-th { background: var(--canvas); color: var(--ink-soft); font-size: .72rem; }
-td { color: var(--ink-soft); font-size: .8rem; }
+.inbound-page th { background: var(--canvas); color: var(--ink-soft); font-size: .72rem; }
+.inbound-page td { color: var(--ink-soft); font-size: .8rem; }
 .medicine-row { cursor: pointer; transition: background-color .15s ease; }
 .medicine-row:hover,
 .medicine-row:focus-visible { outline: none; background: var(--teal-soft); }
@@ -284,11 +253,11 @@ td { color: var(--ink-soft); font-size: .8rem; }
 
 .select-field label span,
 .input-field label span { color: var(--danger); }
-.select-field select:disabled { background: var(--canvas); color: #9aa39f; cursor: not-allowed; }
+.select-field select:disabled { background: var(--canvas); color: var(--ink-soft); cursor: not-allowed; }
 .field-error { margin: .35rem 0 0; color: var(--danger); font-size: .7rem; }
 
 .medicine-detail-section {
-    border-color: #cfe3dd;
+    border-color: var(--line);
     background: var(--teal-soft);
 }
 
@@ -308,7 +277,7 @@ td { color: var(--ink-soft); font-size: .8rem; }
 .detail-item {
     min-width: 0;
     padding: .8rem .9rem;
-    border: 1px solid #d4e6e1;
+    border: 1px solid var(--line);
     border-radius: 8px;
     background: var(--surface);
 }
@@ -347,7 +316,7 @@ td { color: var(--ink-soft); font-size: .8rem; }
     padding: 1rem;
     border: 1px solid var(--line);
     border-radius: 10px;
-    background: #fafbfa;
+    background: var(--canvas);
 }
 
 .environment-header {
@@ -390,7 +359,7 @@ td { color: var(--ink-soft); font-size: .8rem; }
 }
 
 .environment-range strong { color: var(--ink); text-align: right; }
-.environment-setting-section { background: #fbfcfb; }
+.environment-setting-section { background: var(--canvas); }
 .environment-setting-section > p { margin: -.65rem 0 1rem; color: var(--ink-soft); font-size: .75rem; }
 
 .environment-input-group {
@@ -464,7 +433,7 @@ td { color: var(--ink-soft); font-size: .8rem; }
 #summaryModal {
     position: fixed;
     inset: 0;
-    z-index: 1000;
+    z-index: 1055;
     display: none;
     align-items: center;
     justify-content: center;
@@ -475,7 +444,7 @@ td { color: var(--ink-soft); font-size: .8rem; }
 #summaryModal.is-open,
 #summaryModal.show,
 #summaryModal[aria-hidden="false"] { display: flex; }
-.modal-content {
+#summaryModal .summary-panel {
     width: min(520px, 100%);
     max-height: calc(100vh - 2rem);
     overflow-y: auto;
@@ -485,8 +454,8 @@ td { color: var(--ink-soft); font-size: .8rem; }
     box-shadow: 0 20px 60px rgba(25, 43, 37, .22);
 }
 
-.modal-content h2 { margin: 0; font-size: 1.1rem; }
-.modal-content > p { margin: .25rem 0 1.1rem; color: var(--ink-soft); font-size: .75rem; }
+#summaryModal .summary-panel h2 { margin: 0; font-size: 1.1rem; }
+#summaryModal .summary-panel > p { margin: .25rem 0 1.1rem; color: var(--ink-soft); font-size: .75rem; }
 .summary-item {
     display: flex;
     justify-content: space-between;
