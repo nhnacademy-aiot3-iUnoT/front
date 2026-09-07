@@ -2,10 +2,7 @@ package com.nhnacademy.front.organization.controller;
 
 import com.nhnacademy.front.inventory.client.StockThresholdApiClient;
 import com.nhnacademy.front.inventory.dto.response.StockThresholdInfoResponse;
-import com.nhnacademy.front.organization.client.DepartmentApiClient;
-import com.nhnacademy.front.organization.client.OrganizationMemberApiClient;
-import com.nhnacademy.front.organization.client.StorageApiClient;
-import com.nhnacademy.front.organization.client.ZoneApiClient;
+import com.nhnacademy.front.organization.client.*;
 import com.nhnacademy.front.organization.dto.OrganizationRole;
 import com.nhnacademy.front.organization.dto.response.*;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +25,7 @@ public class StorageController {
     private final ZoneApiClient zoneApiClient;
     private final StockThresholdApiClient stockThresholdApiClient;
     private final OrganizationMemberApiClient organizationMemberApiClient;
-    private final DepartmentApiClient departmentApiClient;
+    private final StorageDepartmentApiClient storageDepartmentApiClient;
 
     @GetMapping
     public String getStorages(
@@ -55,7 +52,7 @@ public class StorageController {
         StorageDetailResponse storage = storageApiClient.getStorage(storageId);
         List<ZoneInfoResponse> zoneList = zoneApiClient.getZones(storageId);
         List<StockThresholdInfoResponse> stockThresholdList = stockThresholdApiClient.getStockThresholds(storageId);
-        List<DepartmentByStorageResponse> departmentList = departmentApiClient.getDepartmentsByStorageId(storageId);
+        List<DepartmentByStorageResponse> departmentList = storageDepartmentApiClient.getDepartmentsByStorageId(storageId);
         OrganizationMemberRoleResponse roleResponse = organizationMemberApiClient.getRole();
         boolean canManage = (
                 roleResponse.role() == OrganizationRole.ORG_BOSS ||

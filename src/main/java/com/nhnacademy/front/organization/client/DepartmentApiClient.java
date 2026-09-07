@@ -36,13 +36,6 @@ public class DepartmentApiClient {
         return gatewayClient.get(CORE_SERVICE + "/me", new ParameterizedTypeReference<>() {});
     }
 
-    public List<DepartmentByStorageResponse> getDepartmentsByStorageId(Long storageId){
-        return gatewayClient.get(
-                CORE_SERVICE + "/storages/" + storageId + "/departments",
-                new ParameterizedTypeReference<>() {}
-        );
-    }
-
     public void updateDepartment(Long departmentId, DepartmentUpdateRequest request) {
         gatewayClient.put(CORE_SERVICE + "/" + departmentId, request);
     }
