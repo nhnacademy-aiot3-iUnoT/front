@@ -25,7 +25,6 @@ public class MedicineEnvironmentRequest {
     private BigDecimal maxIlluminance;
 
 
-
     @AssertTrue(message = "온도 최소값과 최대값 모두 입력해주세요.")
     public boolean isTempValid() {
         return isValid(minTemperature, maxTemperature);

@@ -102,7 +102,7 @@
                     이전
                 </a>
 
-                <a th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}"
+                <a th:each="pageNum : ${#numbers.sequence(startPage, endPage)}"
                    th:href="@{/pack-units(searchType=${medicineSearchRequest.searchType},
                    search=${medicineSearchRequest.search},
                    page=${pageNum},
@@ -131,12 +131,17 @@
 
 
     <section class="current-environment-section" th:if="${medicine != null}">
-        <div class="section-title">
-            <h3>환경기준 변경</h3>
-            <p>변경할 환경기준을 입력해 주세요.</p>
+        <div class="section-title current-environment-title">
+            <div class="section-title-text">
+
+                <h3>환경기준 변경</h3>
+                <p>변경할 환경기준을 입력해 주세요.</p>
+            </div>
+
 
         <form method="post"
               class="delete-environment-form"
+              th:if="${environmentTypes != null and #lists.isEmpty(environmentTypes)}"
               th:action="@{/pack-units/{packUnitId}/environment-standards(packUnitId=${packUnitId})}"
               onsubmit="return confirm('등록된 환경기준을 삭제하시겠습니까?');">
 
@@ -210,8 +215,7 @@
             <form method="post" class="environment-form" th:action="@{/pack-units/{packUnitId}/environment-standards(packUnitId=${packUnitId})}"
                 th:object="${medicineEnvironmentRequest}">
 
-                <input type="hidden" name="_method" value="put" th:if="${environmentTypes != null and
-                    !#lists.isEmpty(environmentTypes)}">
+                <input type="hidden" name="_method" value="put" th:if="${environmentTypes != null and !#lists.isEmpty(environmentTypes)}">
 
 
                 <div class="criteria-grid">
@@ -356,11 +360,11 @@
 
                 <div class="form-actions">
                     <button type="reset" class="secondary-button">
-                        기존값으로 초기화
+                        초기화
                     </button>
 
 
-                    <button type="submit" class="primary-button" th:text="${environmentTypes != null and !#lists.isEmpty(environmentTypes)} ? '변경사항 저장' : '환경기준 등록'">
+                    <button type="submit" class="primary-button" th:text="${environmentTypes != null and !#lists.isEmpty(environmentTypes) ? '변경사항 수정' : '환경기준 등록'}">
                         변경사항 저장
                     </button>
 
@@ -374,6 +378,11 @@
         </div>
 
     </section>
+
+
+        <a th:href="@{/inventories}" class="back-button">
+            이전
+        </a>
 
 
 
