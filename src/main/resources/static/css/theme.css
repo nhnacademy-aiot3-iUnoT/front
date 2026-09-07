@@ -363,6 +363,10 @@ a:hover {
     line-height: 1.65;
 }
 
+.ai-summary-body {
+    white-space: pre-line;
+}
+
 .alert-warning {
     --tblr-alert-color: var(--warning);
     --tblr-alert-bg: var(--warning-soft);
@@ -375,4 +379,16 @@ a:hover {
         padding: 1rem;
         border-radius: 12px;
     }
+}
+.dashboard-stock-link {
+    color: inherit;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.dashboard-stock-link:hover,
+.dashboard-stock-link:focus-visible {
+    color: var(--teal);
+    text-decoration: underline;
+    text-underline-offset: 3px;
 }

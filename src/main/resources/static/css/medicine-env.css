@@ -1,61 +1,5 @@
-:root {
-    --canvas: #f3f1eb;
-    --surface: #ffffff;
-    --line: #e3e7e5;
-    --line-strong: #ccd4d0;
-    --ink: #2b3935;
-    --ink-soft: #74807c;
-    --teal: #08776a;
-    --teal-dark: #075f55;
-    --teal-soft: #e9f5f2;
-    --danger: #b64c48;
-    --danger-soft: #fff2f1;
-    --warning: #8b6417;
-    --warning-soft: #fff8e8;
-}
-
-* { box-sizing: border-box; }
-
-body {
-    margin: 0;
-    background: var(--canvas);
-    color: var(--ink);
-    font-family: Pretendard, "Noto Sans KR", Arial, sans-serif;
-    line-height: 1.5;
-}
-
-button, input { font: inherit; }
-
-a {
-    color: inherit;
-}
-
 .environment-page {
-    width: calc(100% - 48px);
-    max-width: 1180px;
-    margin: 0 auto;
-    padding: 2rem 0 4rem;
-}
-
-.page-header { margin-bottom: 2rem; }
-.page-header .eyebrow {
-    margin: 0 0 .4rem;
-    color: var(--teal);
-    font-size: .75rem;
-    font-weight: 700;
-    letter-spacing: .06em;
-}
-.page-header h1 {
-    margin: 0;
-    color: var(--ink);
-    font-size: 1.75rem;
-    font-weight: 700;
-    letter-spacing: -.04em;
-}
-.page-header p:last-child {
-    margin: .5rem 0 0;
-    color: var(--ink-soft);
-    font-size: .9rem;
+    padding-bottom: 2rem;
 }
 
 .panel,
@@ -65,7 +9,7 @@ a {
     border: 1px solid var(--line);
     border-radius: 14px;
     background: var(--surface);
-    box-shadow: 0 4px 20px #30403b0a;
+    box-shadow: var(--shadow);
 }
 
 .section-heading,
@@ -146,9 +90,10 @@ a {
 .medicine-result-section > .section-heading > span { color: var(--teal); font-size: .75rem; font-weight: 700; }
 .medicine-result-section table { width: 100%; min-width: 760px; border-collapse: collapse; }
 .medicine-result-section { overflow-x: auto; }
-th, td { padding: .85rem 1.25rem; border-bottom: 1px solid var(--line); text-align: left; white-space: nowrap; }
-th { background: var(--canvas); color: var(--ink-soft); font-size: .75rem; font-weight: 600; }
-td { color: var(--ink-soft); font-size: .8rem; }
+.environment-page th,
+.environment-page td { padding: .85rem 1.25rem; border-bottom: 1px solid var(--line); text-align: left; white-space: nowrap; }
+.environment-page th { background: var(--canvas); color: var(--ink-soft); font-size: .75rem; font-weight: 600; }
+.environment-page td { color: var(--ink-soft); font-size: .8rem; }
 .medicine-row { cursor: pointer; transition: background-color .15s ease; }
 .medicine-row:hover,
 .medicine-row:focus-visible { outline: none; background: var(--teal-soft); }
@@ -179,7 +124,7 @@ td { color: var(--ink-soft); font-size: .8rem; }
     margin-bottom: 1.75rem;
     border: 1px solid var(--line);
     border-radius: 10px;
-    background: #f8faf8;
+    background: var(--canvas);
 }
 .current-environment-card { min-width: 0; padding: 1rem 1.15rem; }
 .current-environment-card + .current-environment-card { border-left: 1px solid var(--line); }
@@ -191,7 +136,7 @@ td { color: var(--ink-soft); font-size: .8rem; }
 .delete-environment-button,
 .environment-delete-button {
     padding: .3rem .55rem;
-    border: 1px solid #e2b6b3;
+    border: 1px solid var(--danger);
     border-radius: 7px;
     background: var(--surface);
     color: var(--danger);
@@ -288,7 +233,6 @@ td { color: var(--ink-soft); font-size: .8rem; }
 @media (max-width: 600px) {
     .environment-page { width: auto; padding: 1.5rem 1rem 3rem; }
     .panel, .current-environment-section { padding: 1.1rem; }
-    .page-header h1 { font-size: 1.45rem; }
     .search-input-group { grid-template-columns: 1fr; }
     .medicine-result-section { margin: 1rem -1.1rem -1.1rem; }
     .section-title { flex-direction: column; }

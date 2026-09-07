@@ -193,11 +193,12 @@ function renderTable(items, currentPage, size) {
 
         row.innerHTML = `
             <td class="text-center">
-                <input type="checkbox"
-                       class="form-check-input inventory-select"
-                       data-inventory-id="${item.inventoryId}"
-                       aria-label="${escapeHtml(item.medicineName)} 선택"
-                       ${expired ? "" : "disabled"}>
+                ${expired ? `
+                    <input type="checkbox"
+                           class="form-check-input inventory-select"
+                           data-inventory-id="${item.inventoryId}"
+                           aria-label="${escapeHtml(item.medicineName)} 선택">
+                ` : ""}
             </td>
             <td class="text-center text-secondary">
                 ${rowNumber}
@@ -210,9 +211,13 @@ function renderTable(items, currentPage, size) {
                 /
                 ${escapeHtml(item.zoneName || "-")}
             </td>
-            <td>
-                <strong>${escapeHtml(item.medicineName)}</strong>
-                (${escapeHtml(item.packUnitName || "")})
+            <td style="white-space: normal; overflow-wrap: anywhere;">
+                <strong class="d-block">
+                    ${escapeHtml(item.medicineName)}
+                </strong>
+                <span class="d-block text-secondary small fw-normal mt-1">
+                    ${escapeHtml(item.packUnitName || "-")}
+                </span>
             </td>
             <td>
                 ${escapeHtml(item.lotNumber || "-")}
@@ -222,27 +227,25 @@ function renderTable(items, currentPage, size) {
             </td>
             <td class="text-center
                        ${expired ? "text-danger fw-bold" : ""}">
-                ${escapeHtml(item.expirationDate)}
+                ${escapeHtml(getExpirationLabel(item.expirationDate))}
             </td>
         `;
 
-        const checkbox =
-            row.querySelector(".inventory-select");
+        const checkbox = row.querySelector(".inventory-select");
 
-        checkbox.addEventListener("click", event => {
-            event.stopPropagation();
-        });
+        if (checkbox) {
+            checkbox.addEventListener("click", event => {
+                event.stopPropagation();
+            });
 
-        checkbox.addEventListener("keydown", event => {
-            event.stopPropagation();
-        });
+            checkbox.addEventListener("keydown", event => {
+                event.stopPropagation();
+            });
 
-        checkbox.addEventListener("change", () => {
-            updateInventorySelection(
-                item,
-                checkbox.checked
-            );
-        });
+            checkbox.addEventListener("change", () => {
+                updateInventorySelection(item, checkbox.checked);
+            });
+        }
 
         row.addEventListener("click", () => {
             window.location.href = detailUrl;
@@ -600,6 +603,32 @@ function getTodayText() {
         String(today.getDate()).padStart(2, "0");
 
     return `${year}-${month}-${day}`;
+}
+function getExpirationLabel(expirationDate) {
+    if (!expirationDate) {
+        return "-";
+    }
+
+    const expiration = Date.parse(`${expirationDate}T00:00:00Z`);
+    const today = Date.parse(`${getTodayText()}T00:00:00Z`);
+
+    if (!Number.isFinite(expiration)) {
+        return "-";
+    }
+
+    const daysLeft = Math.round(
+        (expiration - today) / (24 * 60 * 60 * 1000)
+    );
+
+    if (daysLeft < 0) {
+        return "만료";
+    }
+
+    if (daysLeft === 0) {
+        return "오늘까지";
+    }
+
+    return `${daysLeft}일 전`;
 }
 
 function formatNumber(value) {

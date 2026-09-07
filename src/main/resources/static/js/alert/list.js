@@ -42,7 +42,7 @@ function loadAlerts(page = 0) {
                 <td class="text-center"><input type="checkbox" class="alert-checkbox" value="${item.alertId}"></td>
                 <td>${item.organizationName}</td>
                 <td><span class="badge status-badge status-warning">${formatAlertType(item.alertType)}</span></td>
-                <td>${item.message}</td>
+                <td class="alert-message"></td>
                 <td class="text-center text-secondary small">${formatDate(item.createdAt)}</td>
                 <td class="text-center">
                     <span class="badge status-badge ${item.isChecked ? 'status-inactive' : 'status-critical'}">
@@ -50,6 +50,22 @@ function loadAlerts(page = 0) {
                     </span>
                 </td>
             `;
+                const messageCell = tr.querySelector('.alert-message');
+
+                const targetUrl = {
+                    ENV_WARNING: '/inventories/under-reviews',
+                    EXPIRING: '/expiring'
+                }[item.alertType];
+
+                if (targetUrl) {
+                    const link = document.createElement('a');
+                    link.href = targetUrl;
+                    link.textContent = item.message;
+                    link.style.cursor = 'pointer';
+                    messageCell.appendChild(link);
+                } else {
+                    messageCell.textContent = item.message;
+                }
                 tbody.appendChild(tr);
             });
 
