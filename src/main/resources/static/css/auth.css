@@ -1,0 +1,55 @@
+.theme-toggle {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 9999;
+}
+
+.theme-toggle button {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+}
+
+body {
+    background: var(--canvas);
+}
+
+.login-card {
+    width: 100%;
+    max-width: 980px;
+    border-radius: 28px;
+    overflow: hidden;
+    background: var(--surface);
+    box-shadow: var(--shadow);
+}
+
+.brand-section {
+    height: 100%;
+    background: var(--surface);
+}
+
+.brand-character {
+    width: 280px;
+    max-width: 100%;
+}
+
+.form-control, .btn {
+    height: 54px;
+}
+
+.form-control::placeholder {
+    font-size: 16px;
+}
+
+.login-section {
+    padding: 4.5rem 3.5rem;
+}
+
+.login-notice {
+    color: var(--ink-soft);
+}
+
+.login-notice small {
+    color: inherit;
+}
