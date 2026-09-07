@@ -380,3 +380,15 @@ a:hover {
         border-radius: 12px;
     }
 }
+.dashboard-stock-link {
+    color: inherit;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.dashboard-stock-link:hover,
+.dashboard-stock-link:focus-visible {
+    color: var(--teal);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}

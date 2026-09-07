@@ -97,11 +97,14 @@ public class InventoryApiClient {
     }
 
     // 출고 처리
-    public void outbound(MedicineOutboundRequest request) {
-        gatewayClient.post(
-                CORE_SERVICE + "/inventories/outbound",
-                request
-        );
+    public void outbound(Long inventoryId, MedicineOutboundRequest request) {
+        String path = UriComponentsBuilder
+                .fromPath(CORE_SERVICE + "/inventories/{inventoryId}/outbound")
+                .buildAndExpand(inventoryId)
+                .encode()
+                .toUriString();
+
+        gatewayClient.post(path, request);
     }
 
 
