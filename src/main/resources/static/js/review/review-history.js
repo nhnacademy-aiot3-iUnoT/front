@@ -77,7 +77,7 @@ function renderHistoryTable(items) {
             <td class="text-secondary">${item.packUnit}</td>
             <td>${statusBadge}</td>
             <td class="text-secondary">${createdAtFormatted}</td>
-            <td class="text-secondary">${item.reviewerId}</td>
+            <td class="text-secondary">${item.reviewerName}</td>
             <td class="text-end">
                 <button type="button"
                         class="btn btn-sm btn-outline-secondary"
