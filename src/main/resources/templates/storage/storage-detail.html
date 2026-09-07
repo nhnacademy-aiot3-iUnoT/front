@@ -64,6 +64,15 @@
                         <div class="col-sm-3 text-muted">설명</div>
                         <div class="col-sm-9" th:text="${storage.description()}">설명 없음</div>
                     </div>
+                    <div class="row g-0 border-top px-3 py-3">
+                        <div class="col-sm-3 text-muted">소속 부서</div>
+                        <div class="col-sm-9">
+                            <span th:if="${#lists.isEmpty(departmentList)}" class="text-muted">소속 부서 없음</span>
+                            <div class="d-flex flex-wrap gap-1" th:unless="${#lists.isEmpty(departmentList)}">
+                                <span class="badge bg-blue-lt" th:each="dept : ${departmentList}" th:text="${dept.name}">부서이름</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
