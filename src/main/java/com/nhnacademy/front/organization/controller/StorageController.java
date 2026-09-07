@@ -2,14 +2,12 @@ package com.nhnacademy.front.organization.controller;
 
 import com.nhnacademy.front.inventory.client.StockThresholdApiClient;
 import com.nhnacademy.front.inventory.dto.response.StockThresholdInfoResponse;
+import com.nhnacademy.front.organization.client.DepartmentApiClient;
 import com.nhnacademy.front.organization.client.OrganizationMemberApiClient;
 import com.nhnacademy.front.organization.client.StorageApiClient;
 import com.nhnacademy.front.organization.client.ZoneApiClient;
 import com.nhnacademy.front.organization.dto.OrganizationRole;
-import com.nhnacademy.front.organization.dto.response.OrganizationMemberRoleResponse;
-import com.nhnacademy.front.organization.dto.response.StorageDetailResponse;
-import com.nhnacademy.front.organization.dto.response.StorageInfoResponse;
-import com.nhnacademy.front.organization.dto.response.ZoneInfoResponse;
+import com.nhnacademy.front.organization.dto.response.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -30,6 +28,7 @@ public class StorageController {
     private final ZoneApiClient zoneApiClient;
     private final StockThresholdApiClient stockThresholdApiClient;
     private final OrganizationMemberApiClient organizationMemberApiClient;
+    private final DepartmentApiClient departmentApiClient;
 
     @GetMapping
     public String getStorages(
@@ -56,6 +55,7 @@ public class StorageController {
         StorageDetailResponse storage = storageApiClient.getStorage(storageId);
         List<ZoneInfoResponse> zoneList = zoneApiClient.getZones(storageId);
         List<StockThresholdInfoResponse> stockThresholdList = stockThresholdApiClient.getStockThresholds(storageId);
+        List<DepartmentByStorageResponse> departmentList = departmentApiClient.getDepartmentsByStorageId(storageId);
         OrganizationMemberRoleResponse roleResponse = organizationMemberApiClient.getRole();
         boolean canManage = (
                 roleResponse.role() == OrganizationRole.ORG_BOSS ||
@@ -64,6 +64,7 @@ public class StorageController {
 
         model.addAttribute("storage", storage);
         model.addAttribute("zoneList", zoneList);
+        model.addAttribute("departmentList", departmentList);
         model.addAttribute("stockThresholdList", stockThresholdList);
         model.addAttribute("canManage", canManage);
 

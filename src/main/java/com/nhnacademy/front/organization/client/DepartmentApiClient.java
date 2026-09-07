@@ -5,6 +5,7 @@ import com.nhnacademy.front.global.dto.ApiResponse;
 import com.nhnacademy.front.organization.dto.request.DepartmentCreateRequest;
 import com.nhnacademy.front.organization.dto.request.DepartmentStatusUpdateRequest;
 import com.nhnacademy.front.organization.dto.request.DepartmentUpdateRequest;
+import com.nhnacademy.front.organization.dto.response.DepartmentByStorageResponse;
 import com.nhnacademy.front.organization.dto.response.DepartmentCreateResponse;
 import com.nhnacademy.front.organization.dto.response.DepartmentInfoResponse;
 import com.nhnacademy.front.organization.dto.response.DepartmentListResponse;
@@ -33,6 +34,13 @@ public class DepartmentApiClient {
 
     public List<DepartmentListResponse> getMyDepartments() {
         return gatewayClient.get(CORE_SERVICE + "/me", new ParameterizedTypeReference<>() {});
+    }
+
+    public List<DepartmentByStorageResponse> getDepartmentsByStorageId(Long storageId){
+        return gatewayClient.get(
+                CORE_SERVICE + "/storages/" + storageId + "/departments",
+                new ParameterizedTypeReference<>() {}
+        );
     }
 
     public void updateDepartment(Long departmentId, DepartmentUpdateRequest request) {
