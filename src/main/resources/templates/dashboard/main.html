@@ -216,7 +216,7 @@
             <div class="col-lg-7">
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">유통기한 임박 의약품</h3>
+                        <h3 class="card-title"><a th:href="@{/expiring}" class="dashboard-stock-link">유통기한 임박 의약품</a></h3>
                         <div class="card-actions d-flex gap-2" th:if="${expiring != null}">
                             <span class="badge bg-red-lt" th:text="'D-7 이내 ' + ${expiring.within7Count}">D-7</span>
                             <span class="badge bg-yellow-lt" th:text="'D-30 이내 ' + ${expiring.within30Count}">D-30</span>
@@ -246,9 +246,12 @@
                                     <div th:text="${item.storageName}">저장소</div>
                                     <div class="text-secondary small" th:text="${item.zoneName}">구역</div>
                                 </td>
-                                <td>
-                                    <strong th:text="${item.medicineName}">의약품명</strong>
-                                    <span class="text-secondary" th:text="'(' + ${item.packUnitName} + ')'">(단위)</span>
+                                <td style="white-space: normal; overflow-wrap: anywhere;">
+                                    <a class="dashboard-stock-link"
+                                       th:href="@{/storages/{storageId}/pack-units/{packUnitId}(storageId=${item.storageId},packUnitId=${item.medicinePackageUnitId})}">
+                                        <strong th:text="${item.medicineName}">의약품명</strong>
+                                    </a>
+                                    <span class="d-block text-secondary small fw-normal mt-1" th:text="${item.packUnitName}">포장단위</span>
                                 </td>
                                 <td class="text-secondary text-nowrap" th:text="${item.lotNumber} ?: '-'">LOT</td>
                                 <td class="text-end" th:text="${item.currentQuantity}">0</td>

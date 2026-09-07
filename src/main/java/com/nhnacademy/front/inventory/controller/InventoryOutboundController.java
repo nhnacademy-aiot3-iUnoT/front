@@ -81,7 +81,7 @@ public class InventoryOutboundController {
             return "inventory/outbound";
         }
 
-        inventoryApiClient.outbound(request);
+        inventoryApiClient.outbound(inventoryId, request);
 
         redirectAttributes.addFlashAttribute(
                 "successMessage",
