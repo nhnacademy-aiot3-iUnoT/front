@@ -363,6 +363,10 @@ a:hover {
     line-height: 1.65;
 }
 
+.ai-summary-body {
+    white-space: pre-line;
+}
+
 .alert-warning {
     --tblr-alert-color: var(--warning);
     --tblr-alert-bg: var(--warning-soft);
