@@ -1,0 +1,56 @@
+.landing-body{
+    background:var(--canvas);
+    color:var(--ink)}
+.landing-header{
+    border-color:var(--line)}
+.landing-logo,.landing-header nav a{
+    color:var(--ink)}
+.landing-login{
+    border-color:var(--line-strong);
+    color:var(--ink)!important}
+.landing-hero,.solution-section,.flow-section,.landing-cta{
+    border-color:var(--line)}
+.landing-hero h1,.section-intro h2,.flow-section h2,.landing-cta h2,.monitor-card h2{
+    color:var(--ink)}
+.landing-logo span,.eyebrow,.landing-hero h1 em,.flow-section h2 em,.solution-grid i,.flow-steps strong{
+    color:var(--teal)}
+.eyebrow span{
+    background:var(--teal)}
+.landing-hero p,.section-intro>p,.solution-grid p,.flow-steps p,.text-action{
+    color:var(--ink-soft)}
+.primary-action{
+    background:var(--teal);
+    color:#fff!important}
+.monitor-card{
+    background:var(--surface);
+    border-color:var(--line-strong);
+    box-shadow:22px 22px var(--mint)}
+.monitor-top,.chart-label small,.monitor-footer{
+    color:var(--ink-soft)}
+.status-line{
+    color:var(--ink);
+    border-color:var(--line)}
+.status-line span{
+    background:var(--teal);
+    box-shadow:0 0 12px var(--teal)}
+.chart-bars{
+    border-color:var(--line)}
+.chart-bars i{
+    background:var(--teal)}
+.solution-grid{
+    border-color:var(--line)}
+.solution-grid article{
+    border-color:var(--line)}
+.solution-grid article:hover{
+    background:var(--teal-soft)}
+.solution-grid b,.flow-steps>i{
+    color:var(--ink-soft)}
+.landing-footer{
+    color:var(--ink-soft);
+    border-color:var(--line)}
+.landing-footer b{
+    color:var(--ink)}
+@media(max-width:480px){
+    .monitor-card{
+        box-shadow:12px 12px var(--mint)}
+}

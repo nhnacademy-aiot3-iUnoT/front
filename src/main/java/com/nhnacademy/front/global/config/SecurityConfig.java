@@ -83,6 +83,7 @@ public class SecurityConfig {
                         ).permitAll()
                         .requestMatchers(
                                 "/login",
+                                "/",
                                 "/signup",
                                 "/check-email",
                                 "/forgot-password",

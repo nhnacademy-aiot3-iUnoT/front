@@ -41,7 +41,7 @@ public class DashboardController {
     private final StorageApiClient storageApiClient;
     private final ReportApiClient reportApiClient;
 
-    @GetMapping("/")
+    @GetMapping("/dashboard")
     public String dashboard(
             @RequestParam(required = false) Long departmentId,
             @RequestParam(required = false) Long storageId,
