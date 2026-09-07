@@ -9,6 +9,7 @@ public record DepartmentPageResponse(
         DepartmentInfoResponse department,
         OrganizationRole memberRole,
         List<StorageDepartmentResponse> storages,
-        List<OrganizationMemberResponse> members
+        List<OrganizationMemberResponse> members,
+        DepartmentTelegramChatResponse telegramChat
 ) {
 }
