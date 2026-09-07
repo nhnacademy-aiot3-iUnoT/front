@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="ko"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
@@ -8,47 +7,45 @@
 <head>
     <meta charset="UTF-8">
     <title>회원정보</title>
-    <link rel="stylesheet" th:href="@{/css/account.css}">
     <link rel="stylesheet" th:href="@{/css/status.css}">
 </head>
 
 <body>
 <div layout:fragment="content">
-
-    <div class="account-page">
-
-        <div class="account-page-header">
-            <h1>회원정보</h1>
-            <p>계정 정보를 확인하고 관리하세요.</p>
+    <div class="py-6">
+        <div class="page-header d-print-none mb-4">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h1 class="page-title">회원정보</h1>
+                    <div class="text-muted mt-1">계정 정보를 확인하고 관리하세요.</div>
+                </div>
+            </div>
         </div>
 
-        <div class="account-container">
-            <div class="account-grid">
-                <div class="account-main">
+        <div th:if="${successMessage}"
+             class="alert alert-success mb-4"
+             role="alert"
+             th:text="${successMessage}"></div>
 
-                    <section class="account-section">
-
-                        <h2 class="account-section-title">
-                            기본 정보
-                        </h2>
-
-                        <form th:action="@{/mypage}" th:method="put" th:object="${nameRequest}">
-                            <div class="account-panel">
-                                <div class="account-row">
-                                    <div class="account-label">
-                                        이메일
-                                    </div>
-                                    <div class="account-value"
-                                         th:text="${accountInfoResponse.email}">
-                                    </div>
+        <div class="page-content-panel">
+            <div class="row row-cards">
+                <div class="col-lg-7">
+                    <form id="account-info-form"
+                          th:action="@{/mypage}"
+                          th:method="put"
+                          th:object="${nameRequest}">
+                        <div class="card mb-4">
+                            <div class="card-header plain-card-title">
+                                <h2 class="card-title">기본 정보</h2>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="row g-0 border-bottom px-3 py-3 align-items-center">
+                                    <div class="col-sm-3 text-muted">이메일</div>
+                                    <div class="col-sm-9" th:text="${accountInfoResponse.email}"></div>
                                 </div>
-
-                                <div class="account-row">
-                                    <label class="account-label"
-                                           for="name">
-                                        이름
-                                    </label>
-                                    <div class="account-value">
+                                <div class="row g-0 border-bottom px-3 py-3 align-items-center">
+                                    <label class="col-sm-3 text-muted mb-2 mb-sm-0" for="name">이름</label>
+                                    <div class="col-sm-9 mb-3 mb-sm-0">
                                         <input type="text"
                                                id="name"
                                                class="form-control"
@@ -59,111 +56,94 @@
                                         <div class="invalid-feedback" th:errors="*{name}"></div>
                                     </div>
                                 </div>
-
-                                <div class="account-row">
-                                    <div class="account-label">
-                                        가입일
-                                    </div>
-                                    <div class="account-value"
-                                         th:text="${#temporals.format(accountInfoResponse.createdAt, 'yyyy-MM-dd')}">
-                                    </div>
+                                <div class="row g-0 px-3 py-3 align-items-center">
+                                    <div class="col-sm-3 text-muted">가입일</div>
+                                    <div class="col-sm-9"
+                                         th:text="${#temporals.format(accountInfoResponse.createdAt, 'yyyy-MM-dd')}"></div>
                                 </div>
                             </div>
-
                             <div class="text-end mt-3">
-                                <button type="submit"
-                                        class="btn btn-primary">
-                                    변경사항 저장
-                                </button>
+                                <button type="submit" class="btn btn-primary">변경사항 저장</button>
                             </div>
-                        </form>
-                    </section>
-                    <section class="account-section" th:if="${memberRole.role.name != 'ORG_BOSS'}">
-                        <h2 class="account-section-title">
-                            내 부서
-                        </h2>
-
-                        <div th:if="${#lists.isEmpty(departments) || departments == null}" class="mb-2">
-                             소속된 부서가 없습니다.
                         </div>
+                    </form>
 
-                        <span th:each="department : ${departments}" class="m-1">
-                            <a class="badge status-badge"
-                                  th:classappend="' status-' + ${department.status.name().toLowerCase()}"
-                                  th:text="${department.name}"
-                                  th:href="@{/departments/{department-id}(department-id=${department.id})}">
-                            </a>
-                        </span>
-                    </section>
+                    <div class="card" th:if="${memberRole.role.name != 'ORG_BOSS'}">
+                        <div class="card-header plain-card-title">
+                            <h2 class="card-title">내 부서</h2>
+                        </div>
+                        <div class="card-body p-3">
+                            <div th:if="${#lists.isEmpty(departments) || departments == null}"
+                                 class="text-muted">
+                                소속된 부서가 없습니다.
+                            </div>
+                            <span th:each="department : ${departments}" class="me-2 mb-2 d-inline-block">
+                                <a class="badge status-badge"
+                                   th:classappend="' status-' + ${department.status.name().toLowerCase()}"
+                                   th:text="${department.name}"
+                                   th:href="@{/departments/{department-id}(department-id=${department.id})}"></a>
+                            </span>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="account-side">
-                    <section class="account-section">
-                        <h2 class="account-section-title">
-                            보안
-                        </h2>
-
-                        <div class="account-panel">
-                            <div class="account-action-row">
+                <div class="col-lg-5">
+                    <div class="card mb-4">
+                        <div class="card-header plain-card-title">
+                            <h2 class="card-title">보안</h2>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="d-flex align-items-center justify-content-between gap-3 p-3">
                                 <div>
-                                    <div class="account-action-title">
-                                        비밀번호
-                                    </div>
-
-                                    <p class="account-action-description">
-                                        계정 비밀번호를 변경할 수 있습니다.
-                                    </p>
+                                    <div class="fw-semibold">비밀번호</div>
+                                    <p class="text-muted small mb-0 mt-1">계정 비밀번호를 변경할 수 있습니다.</p>
                                 </div>
-
                                 <a th:href="@{/mypage/change-password}"
-                                   class="btn btn-outline-secondary">
-                                    변경하기
-                                </a>
+                                   class="btn btn-outline-secondary">변경하기</a>
                             </div>
                         </div>
-                    </section>
+                    </div>
 
-                    <section class="account-section">
-                        <h2 class="account-section-title">
-                            위험 영역
-                        </h2>
-
-                        <div class="account-panel account-danger">
-                            <div class="account-action-row">
+                    <div class="card">
+                        <div class="card-header plain-card-title">
+                            <h2 class="card-title">알림</h2>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="d-flex align-items-center justify-content-between gap-3 p-3">
                                 <div>
-                                    <div class="account-action-title">
-                                        회원탈퇴
-                                    </div>
-
-                                    <p class="account-action-description">
-                                        탈퇴하면 계정 정보를 복구할 수 없습니다.
-                                    </p>
+                                    <div class="fw-semibold">환경 알림 설정</div>
+                                    <p class="text-muted small mb-0 mt-1">알림을 받을 메신저와 저장소·구역을 설정합니다.</p>
                                 </div>
-                                <a th:href="@{/withdraw}"
-                                   class="btn btn-outline-danger">
-                                    회원탈퇴
-                                </a>
+                                <a th:href="@{/mypage/notifications}"
+                                   class="btn btn-outline-secondary">설정하기</a>
                             </div>
                         </div>
-                    </section>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header plain-card-title">
+                            <h2 class="card-title text-danger">위험 영역</h2>
+                        </div>
+                        <div class="card-body p-0 border-danger bg-danger-lt">
+                            <div class="d-flex align-items-center justify-content-between gap-3 p-3">
+                                <div>
+                                    <div class="fw-semibold">회원탈퇴</div>
+                                    <p class="text-muted small mb-0 mt-1">탈퇴하면 계정 정보를 복구할 수 없습니다.</p>
+                                </div>
+                                <a th:href="@{/withdraw}" class="btn btn-outline-danger">회원탈퇴</a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <div id="success-message"
-         th:if="${successMessage}"
-         th:data-message="${successMessage}"
-         hidden>
-    </div>
-
-    <script>
-        const successMessage = document.getElementById("success-message");
-
-        if (successMessage) {
-            alert(successMessage.dataset.message);
-        }
-    </script>
 </div>
+
+<th:block layout:fragment="script">
+    <script th:src="@{/js/common/validation.js}"></script>
+    <script th:src="@{/js/common/form.js}"></script>
+    <script th:src="@{/js/account/account-info.js}"></script>
+</th:block>
 </body>
 </html>

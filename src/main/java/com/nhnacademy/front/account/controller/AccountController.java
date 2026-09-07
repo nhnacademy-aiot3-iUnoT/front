@@ -9,6 +9,7 @@ import com.nhnacademy.front.account.dto.request.WithdrawAccountRequest;
 import com.nhnacademy.front.account.dto.response.AccountInfoResponse;
 import com.nhnacademy.front.account.validator.PasswordFormValidator;
 import com.nhnacademy.front.auth.service.AuthSessionService;
+import com.nhnacademy.front.global.dto.ApiResponse;
 import com.nhnacademy.front.global.error.ApiException;
 import com.nhnacademy.front.global.error.ErrorCode;
 import com.nhnacademy.front.organization.client.DepartmentApiClient;
@@ -19,6 +20,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -174,21 +176,27 @@ public class AccountController {
     }
 
     @DeleteMapping("/withdraw")
-    public String deleteAccount(
+    public ResponseEntity<ApiResponse<Void>> deleteAccount(
             @Valid @RequestBody WithdrawAccountRequest request,
             BindingResult bindingResult,
             HttpServletRequest httpRequest,
             HttpServletResponse response
     ) {
         if (bindingResult.hasErrors()) {
-            return "redirect:/withdraw";
+            String message = bindingResult.getFieldErrors().stream()
+                    .findFirst()
+                    .map(error -> error.getDefaultMessage())
+                    .orElse("입력값을 확인해주세요.");
+
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.error("VALIDATION_ERROR", message));
         }
 
         accountApiClient.withdraw(request);
 
         authSessionService.revoke(httpRequest, response);
 
-        return "redirect:/login";
+        return ResponseEntity.noContent().build();
     }
 
     private String reactivationErrorMessage(ApiException exception) {

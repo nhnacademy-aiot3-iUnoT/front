@@ -3,15 +3,12 @@ package com.nhnacademy.front.inventory.controller;
 import com.nhnacademy.front.global.dto.PageResponse;
 import com.nhnacademy.front.inventory.client.InventoryApiClient;
 import com.nhnacademy.front.inventory.dto.response.InventoriesResponse;
-
 import com.nhnacademy.front.inventory.dto.response.InventoryDetailResponse;
 import com.nhnacademy.front.inventory.dto.response.InventoryInfoResponse;
 import com.nhnacademy.front.inventory.service.InventoryFrontService;
-
 import com.nhnacademy.front.medicine.client.MedicineInfoApiClient;
 import com.nhnacademy.front.organization.client.DepartmentApiClient;
 import com.nhnacademy.front.organization.client.OrganizationMemberApiClient;
-
 import com.nhnacademy.front.organization.dto.OrganizationRole;
 import com.nhnacademy.front.organization.dto.response.DepartmentListResponse;
 import lombok.RequiredArgsConstructor;
@@ -116,8 +113,23 @@ public class InventoryController {
                 startPage + PAGE_GROUP_SIZE - 1,
                 totalPages - 1);
 
+        var medicineInfo = medicineInfoApiClient.getMedicine(packUnitId);
+        String narcoticKindCode = medicineInfo.narcoticKindCode();
 
-        model.addAttribute("medicineInfo",medicineInfoApiClient.getMedicine(packUnitId));
+        boolean isRestrictedNarcotic =
+                "마약".equals(narcoticKindCode)
+                        || "향정".equals(narcoticKindCode)
+                        || "향정신성의약품".equals(narcoticKindCode);
+
+        OrganizationRole role = organizationMemberApiClient.getRole().role();
+
+        model.addAttribute(
+                "canManageNarcotics",
+                role == OrganizationRole.ORG_OWNER
+                        || role == OrganizationRole.ORG_BOSS
+        );
+        model.addAttribute("isRestrictedNarcotic", isRestrictedNarcotic);
+        model.addAttribute("medicineInfo", medicineInfo);
         model.addAttribute("inventory",result);
         model.addAttribute("inventories",inventories.content());
 

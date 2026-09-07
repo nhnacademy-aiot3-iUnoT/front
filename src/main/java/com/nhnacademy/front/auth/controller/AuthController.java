@@ -10,10 +10,12 @@ import com.nhnacademy.front.auth.dto.request.LoginRequest;
 import com.nhnacademy.front.auth.dto.request.ResetPasswordFormRequest;
 import com.nhnacademy.front.auth.dto.request.ResetPasswordRequest;
 import com.nhnacademy.front.auth.dto.request.ResetPasswordTokenRequest;
+import com.nhnacademy.front.auth.dto.request.SignupFormRequest;
 import com.nhnacademy.front.auth.dto.request.SignupRequest;
 import com.nhnacademy.front.auth.dto.response.LoginResponse;
 import com.nhnacademy.front.auth.service.AuthSessionService;
 import com.nhnacademy.front.auth.validator.PasswordResetFormValidator;
+import com.nhnacademy.front.auth.validator.SignupFormValidator;
 import com.nhnacademy.front.global.dto.ApiResponse;
 import com.nhnacademy.front.organization.client.InvitationApiClient;
 import com.nhnacademy.front.organization.client.OrganizationApiClient;
@@ -23,6 +25,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -44,6 +47,7 @@ public class AuthController {
 
     private final InvitationApiClient invitationApiClient;
     private final PasswordResetFormValidator passwordResetFormValidator;
+    private final SignupFormValidator signupFormValidator;
     private final AuthSessionService authSessionService;
 
     @GetMapping("/login")
@@ -109,6 +113,23 @@ public class AuthController {
         return "redirect:/login";
     }
 
+    @PostMapping("/refresh")
+    @ResponseBody
+    public ResponseEntity<Void> refresh(
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) {
+        try {
+            if (authSessionService.renew(request, response)) {
+                return ResponseEntity.noContent().build();
+            }
+        } catch (RuntimeException exception) {
+            // 연장 실패는 브라우저가 다시 로그인하도록 401로 응답한다.
+        }
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
     @GetMapping("/signup")
     public String signup(@RequestParam(required = false) String token, Model model) {
         if(token == null || token.isBlank()) {
@@ -119,7 +140,7 @@ public class AuthController {
 
         model.addAttribute(
                 "signupRequest",
-                new SignupRequest(token, "", "", "")
+                new SignupFormRequest(token, "", "", "", "")
         );
 
         return "auth/signup";
@@ -127,18 +148,24 @@ public class AuthController {
 
     @PostMapping("/signup")
     public String signupPost(
-            @Valid @ModelAttribute("signupRequest") SignupRequest request,
+            @Valid @ModelAttribute("signupRequest") SignupFormRequest request,
             BindingResult bindingResult
     ) {
+        signupFormValidator.validate(request, bindingResult);
+
         if (bindingResult.hasErrors()) {
             return "auth/signup";
         }
 
-        log.info("Signup Token: {}", request.inviteToken());
         log.info("Signup Email: {}", request.email());
         log.info("Signup Name: {}", request.name());
 
-        authApiClient.signup(request);
+        authApiClient.signup(new SignupRequest(
+                request.inviteToken(),
+                request.email(),
+                request.name(),
+                request.password()
+        ));
 
         return "redirect:/login";
     }
@@ -166,12 +193,12 @@ public class AuthController {
 
     @PostMapping("/pwd")
     public String passwordResetToken(
-            @Valid ResetPasswordTokenRequest request,
+            @Valid @ModelAttribute("resetPasswordTokenRequest") ResetPasswordTokenRequest request,
             BindingResult bindingResult,
             RedirectAttributes redirectAttributes
     ) {
         if (bindingResult.hasErrors()) {
-            return "redirect:/forgot-password";
+            return "auth/forgot-password";
         }
 
         authApiClient.passwordResetToken(request);

@@ -1,10 +1,16 @@
 const withdrawForm = document.getElementById("withdraw-form");
-const passwordInput = withdrawForm.querySelector('input[name="password"]');
+const passwordInput = withdrawForm?.querySelector('input[name="password"]');
 const withdrawModalElement = document.getElementById("withdrawModal");
-const submitButton = withdrawModalElement.querySelector(".btn-danger");
+const confirmButton = document.getElementById("withdraw-confirm-btn");
+
+if (!withdrawForm || !passwordInput || !withdrawModalElement || !confirmButton) {
+    throw new Error("회원탈퇴 폼을 찾을 수 없습니다.");
+}
 
 function openWithdrawModal() {
-    if (!withdrawForm.reportValidity()) {
+    clearError(passwordInput);
+
+    if (!validateWithdrawPassword() || !withdrawForm.reportValidity()) {
         passwordInput.focus();
         return;
     }
@@ -14,8 +20,25 @@ function openWithdrawModal() {
         .show();
 }
 
+function validateWithdrawPassword() {
+    let message = "";
+
+    if (!isRequired(passwordInput.value)) {
+        message = "비밀번호를 입력해주세요.";
+    } else if (!isLengthInRange(passwordInput.value, 6, 64)) {
+        message = "비밀번호는 6자 이상 64자 이하여야 합니다.";
+    }
+
+    if (message !== "") {
+        setError(passwordInput, message);
+        return false;
+    }
+
+    return true;
+}
+
 async function submitWithdraw() {
-    submitButton.disabled = true;
+    confirmButton.disabled = true;
 
     try {
         await submitRequest(passwordInput.value);
@@ -27,12 +50,10 @@ async function submitWithdraw() {
             .getOrCreateInstance(withdrawModalElement)
             .hide();
 
-        passwordInput.setCustomValidity(error.message);
-        passwordInput.reportValidity();
-        passwordInput.setCustomValidity("");
+        setError(passwordInput, error.message);
         passwordInput.select();
     } finally {
-        submitButton.disabled = false;
+        confirmButton.disabled = false;
     }
 }
 
@@ -45,7 +66,7 @@ async function submitRequest(password) {
         body: JSON.stringify({ password })
     });
 
-    if (!response.ok) {
+    if (response.status !== 204) {
         let message = "회원탈퇴에 실패했습니다.";
 
         try {
@@ -59,7 +80,13 @@ async function submitRequest(password) {
     }
 }
 
+passwordInput.addEventListener("input", () => {
+    clearError(passwordInput, "비밀번호는 6자 이상 64자 이하여야 합니다.");
+});
+
 withdrawForm.addEventListener("submit", event => {
     event.preventDefault();
     openWithdrawModal();
 });
+
+confirmButton.addEventListener("click", submitWithdraw);

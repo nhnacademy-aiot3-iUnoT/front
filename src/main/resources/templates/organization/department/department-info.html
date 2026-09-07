@@ -96,6 +96,49 @@
                 </div>
             </div>
         </div>
+
+        <div class="row row-cards mt-2" th:if="${memberRole.name != 'ORG_MEMBER'}">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">챗봇 단톡방</h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted">
+                            텔레그램 단톡방을 이 부서에 연결하면, 방에서 <code>/재고</code> 로 질문했을 때
+                            이 부서가 담당하는 저장소의 재고만 조회해 답합니다.
+                        </p>
+                        <div class="alert alert-info" role="alert">
+                            단톡방 번호를 모르면, 봇을 방에 초대한 뒤 방에서 <code>/재고 안녕</code> 이라고 보내보세요.
+                            봇이 번호를 알려줍니다.
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="telegram-chat-id" class="form-label required">단톡방 번호</label>
+                            <input id="telegram-chat-id" class="form-control" maxlength="255"
+                                   placeholder="예: -1001234567890"
+                                   th:value="${departmentTelegramChat != null} ? ${departmentTelegramChat.chatId} : ''">
+                            <div class="invalid-feedback"></div>
+                        </div>
+
+                        <label class="form-check form-switch">
+                            <input id="telegram-enabled" class="form-check-input" type="checkbox"
+                                   th:checked="${departmentTelegramChat == null} or ${departmentTelegramChat.enabled}">
+                            <span class="form-check-label">챗봇 사용</span>
+                        </label>
+
+                        <div th:if="${departmentTelegramChat == null}" class="text-muted mt-2">
+                            아직 연결된 단톡방이 없습니다.
+                        </div>
+                    </div>
+                    <div class="card-footer bg-transparent d-flex justify-content-end align-items-center gap-2">
+                        <button id="telegram-unlink" type="button" class="btn btn-outline-danger"
+                                th:if="${departmentTelegramChat != null}">연결 해제</button>
+                        <button id="telegram-save" type="button" class="btn btn-primary">저장</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 </body>

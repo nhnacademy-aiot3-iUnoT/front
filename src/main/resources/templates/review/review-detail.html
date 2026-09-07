@@ -33,7 +33,7 @@
                     <span th:unless="${reviewDetail.isOut}" style="color: #5cb85c; font-weight: bold;">정상 처리</span>
                 </div>
                 <div><strong>검토 일시:</strong> <span th:text="${#temporals.format(reviewDetail.createdAt, 'yyyy-MM-dd HH:mm:ss')}">일시</span></div>
-                <div><strong>검토자 ID:</strong> <span th:text="${reviewDetail.reviewerId}">UUID</span></div>
+                <div><strong>검토자:</strong> <span th:text="${reviewDetail.reviewerName}">이름</span></div>
             </div>
             <div class="memo-area">
                 <strong>검토 메모:</strong>

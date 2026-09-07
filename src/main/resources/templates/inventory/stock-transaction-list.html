@@ -126,7 +126,7 @@
                                      data-pack-unit=${item.packUnit},
                                      data-type=${item.transactionType.description},
                                      data-quantity=${item.quantity},
-                                     data-reason=${item.reason},
+                                     data-reason=${item.reasonText()},
                                      data-memo=${item.memo},
                                      data-processed-by=${item.processedByName},
                                      data-processed-at=${item.processedAt}">
@@ -142,7 +142,7 @@
                                 th:classappend="${item.isIncoming()} ? 'text-green' : 'text-red'"
                                 th:text="(${item.isIncoming()} ? '+' : '-') + ${item.quantity}">+120</td>
                             <td class="text-muted text-truncate" style="max-width: 200px;"
-                                th:text="${item.reason}">정기 입고</td>
+                                th:text="${item.reasonText()}">조제·처방 출고</td>
                             <td class="text-muted"
                                 th:text="${item.processedByName != null ? item.processedByName : '-'}">김약사</td>
                         </tr>

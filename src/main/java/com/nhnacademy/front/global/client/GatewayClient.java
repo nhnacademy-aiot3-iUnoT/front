@@ -93,6 +93,10 @@ public class GatewayClient {
         requestVoid(HttpMethod.DELETE, path, null);
     }
 
+    public void delete(String path, Object body) {
+        requestVoid(HttpMethod.DELETE, path, body);
+    }
+
     private <T> T request(HttpMethod method, String path, Object body, ParameterizedTypeReference<ApiResponse<T>> responseType) {
         ApiResponse<T> response = prepare(method, path, body)
                 .retrieve()

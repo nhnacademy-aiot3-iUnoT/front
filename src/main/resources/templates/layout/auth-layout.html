@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
     <meta charset="UTF-8">
     <title> iUnoT</title>
@@ -23,10 +25,10 @@
 </head>
 
 <body>
-<div class="theme-toggle">
+<div class="position-fixed top-0 end-0 z-3 m-3 m-md-4">
     <button
             type="button"
-            class="btn btn-icon btn-ghost-secondary"
+            class="btn btn-icon btn-ghost-secondary rounded-circle"
             id="theme-toggle">
 
         <i class="ti ti-moon fs-2 moon-icon"></i>
@@ -38,5 +40,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
 <script th:src="@{/js/theme.js}"></script>
+<th:block layout:fragment="script"></th:block>
 </body>
 </html>

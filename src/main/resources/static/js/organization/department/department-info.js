@@ -23,6 +23,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const memberSearch = document.querySelector('#member-search');
     const memberResults = document.querySelector('#member-search-results');
 
+    setupTelegramChat(departmentId);
+
     if (!storageSearch || !memberSearch) {
         return;
     }
@@ -131,6 +133,74 @@ document.addEventListener('DOMContentLoaded', () => {
             window.location.reload();
         });
         return row;
+    }
+
+    async function errorMessage(response, fallback) {
+        try {
+            const body = await response.json();
+            return body.message || fallback;
+        } catch (error) {
+            return fallback;
+        }
+    }
+
+    function setupTelegramChat(departmentId) {
+        const chatIdInput = document.querySelector('#telegram-chat-id');
+        const enabledInput = document.querySelector('#telegram-enabled');
+        const saveButton = document.querySelector('#telegram-save');
+        const unlinkButton = document.querySelector('#telegram-unlink');
+
+        if (!chatIdInput || !saveButton) {
+            return;
+        }
+
+        const url = `/departments/${departmentId}/telegram-chat`;
+
+        saveButton.addEventListener('click', async () => {
+            const chatId = chatIdInput.value.trim();
+
+            chatIdInput.classList.remove('is-invalid');
+            if (!chatId) {
+                chatIdInput.classList.add('is-invalid');
+                chatIdInput.parentElement.querySelector('.invalid-feedback').textContent =
+                    '단톡방 번호를 입력해주세요.';
+                return;
+            }
+
+            saveButton.disabled = true;
+            try {
+                const response = await fetch(url, {
+                    method: 'PUT',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({chatId, enabled: enabledInput.checked})
+                });
+
+                if (!response.ok) {
+                    alert(await errorMessage(response, '단톡방 연결에 실패했습니다.'));
+                    return;
+                }
+
+                window.location.reload();
+            } finally {
+                saveButton.disabled = false;
+            }
+        });
+
+        if (unlinkButton) {
+            unlinkButton.addEventListener('click', async () => {
+                if (!confirm('단톡방 연결을 해제하시겠습니까? 해당 방에서 챗봇이 동작하지 않습니다.')) {
+                    return;
+                }
+
+                const response = await fetch(url, {method: 'DELETE'});
+                if (!response.ok) {
+                    alert(await errorMessage(response, '단톡방 연결 해제에 실패했습니다.'));
+                    return;
+                }
+
+                window.location.reload();
+            });
+        }
     }
 
     function createStorageResult(storage) {

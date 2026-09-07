@@ -1,6 +1,7 @@
 package com.nhnacademy.front.organization.client;
 
 import com.nhnacademy.front.global.client.GatewayClient;
+import com.nhnacademy.front.organization.dto.response.DepartmentByStorageResponse;
 import com.nhnacademy.front.organization.dto.response.StorageDepartmentResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.ParameterizedTypeReference;
@@ -20,6 +21,13 @@ public class StorageDepartmentApiClient {
     public List<StorageDepartmentResponse> getStorages(Long departmentId) {
         return gatewayClient.get(
                 CORE_SERVICE + "/departments/" + departmentId + "/storages",
+                new ParameterizedTypeReference<>() {}
+        );
+    }
+
+    public List<DepartmentByStorageResponse> getDepartmentsByStorageId(Long storageId){
+        return gatewayClient.get(
+                CORE_SERVICE + "/storages/" + storageId + "/departments",
                 new ParameterizedTypeReference<>() {}
         );
     }

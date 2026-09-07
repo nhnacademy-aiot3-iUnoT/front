@@ -1,17 +1,5 @@
-.medicine-row {
-    cursor: pointer;
-    transition: background-color 0.15s ease;
-}
-
-.medicine-row:hover,
-.medicine-row:focus-visible {
-    background: var(--teal-soft);
-    outline: none;
-}
-
-
 :root {
-    --canvas: #f7f8f6;
+    --canvas: #f3f1eb;
     --surface: #ffffff;
     --line: #e3e7e5;
     --line-strong: #ccd4d0;
@@ -38,13 +26,18 @@ body {
 
 button, input { font: inherit; }
 
+a {
+    color: inherit;
+}
+
 .environment-page {
-    width: min(1180px, calc(100% - 48px));
+    width: calc(100% - 48px);
+    max-width: 1180px;
     margin: 0 auto;
     padding: 2rem 0 4rem;
 }
 
-.page-header { margin-bottom: 1.75rem; }
+.page-header { margin-bottom: 2rem; }
 .page-header .eyebrow {
     margin: 0 0 .4rem;
     color: var(--teal);
@@ -54,7 +47,9 @@ button, input { font: inherit; }
 }
 .page-header h1 {
     margin: 0;
+    color: var(--ink);
     font-size: 1.75rem;
+    font-weight: 700;
     letter-spacing: -.04em;
 }
 .page-header p:last-child {
@@ -84,7 +79,7 @@ button, input { font: inherit; }
 
 .section-heading > div { display: flex; align-items: center; gap: .75rem; }
 .section-heading h2,
-.section-title h3 { margin: 0; font-size: 1.05rem; }
+.section-title h3 { margin: 0; color: var(--ink); font-size: 1.05rem; font-weight: 700; }
 .section-heading p,
 .section-title p { margin: .2rem 0 0; color: var(--ink-soft); font-size: .78rem; }
 .step {
@@ -133,11 +128,17 @@ button, input { font: inherit; }
     background: var(--teal);
     color: #fff;
     font-size: .8rem;
-    font-weight: 700;
+    font-weight: 600;
     cursor: pointer;
+    transition: background-color .15s ease, border-color .15s ease, box-shadow .15s ease;
 }
 .search-input-group button:hover,
 .primary-button:hover { border-color: var(--teal-dark); background: var(--teal-dark); }
+.search-input-group button:focus-visible,
+.primary-button:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--teal-soft);
+}
 
 .medicine-result-section { margin: 1.25rem -1.5rem -1.5rem; border-top: 1px solid var(--line); }
 .medicine-result-section > .section-heading { margin: 0; padding: .85rem 1.25rem; align-items: center; }
@@ -146,7 +147,7 @@ button, input { font: inherit; }
 .medicine-result-section table { width: 100%; min-width: 760px; border-collapse: collapse; }
 .medicine-result-section { overflow-x: auto; }
 th, td { padding: .85rem 1.25rem; border-bottom: 1px solid var(--line); text-align: left; white-space: nowrap; }
-th { background: var(--canvas); color: var(--ink-soft); font-size: .72rem; }
+th { background: var(--canvas); color: var(--ink-soft); font-size: .75rem; font-weight: 600; }
 td { color: var(--ink-soft); font-size: .8rem; }
 .medicine-row { cursor: pointer; transition: background-color .15s ease; }
 .medicine-row:hover,
@@ -187,6 +188,7 @@ td { color: var(--ink-soft); font-size: .8rem; }
 .current-range { margin-top: .65rem; color: var(--ink); font-size: 1.2rem; font-weight: 700; }
 .current-range > span:last-child { color: var(--ink-soft); font-size: .75rem; font-weight: 500; }
 .current-environment-heading form { margin: 0; }
+.delete-environment-button,
 .environment-delete-button {
     padding: .3rem .55rem;
     border: 1px solid #e2b6b3;
@@ -197,6 +199,7 @@ td { color: var(--ink-soft); font-size: .8rem; }
     font-weight: 700;
     cursor: pointer;
 }
+.delete-environment-button:hover,
 .environment-delete-button:hover { border-color: var(--danger); background: var(--danger-soft); }
 
 .environment-edit-section { padding-top: 1.5rem; border-top: 1px solid var(--line); }
@@ -228,6 +231,42 @@ td { color: var(--ink-soft); font-size: .8rem; }
 .secondary-button { border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink-soft); }
 .secondary-button:hover { border-color: var(--teal); color: var(--teal); }
 
+.back-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+    margin-top: .5rem;
+    padding: .6rem 1rem;
+    border: 1px solid var(--line-strong);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--ink-soft);
+    font-size: .875rem;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: border-color .15s ease, color .15s ease, box-shadow .15s ease;
+}
+
+.back-button:visited {
+    color: var(--ink-soft);
+    text-decoration: none;
+}
+
+.back-button:hover {
+    border-color: var(--teal);
+    background: var(--surface);
+    color: var(--teal);
+    text-decoration: none;
+}
+
+.back-button:focus-visible {
+    border-color: var(--teal);
+    outline: none;
+    box-shadow: 0 0 0 3px var(--teal-soft);
+}
+
 .visually-hidden {
     position: absolute;
     width: 1px;
@@ -254,51 +293,5 @@ td { color: var(--ink-soft); font-size: .8rem; }
     .medicine-result-section { margin: 1rem -1.1rem -1.1rem; }
     .section-title { flex-direction: column; }
     .form-actions { flex-wrap: wrap; }
-}
-
-.current-environment-section {
-    position: relative;
-}
-
-.current-environment-section .section-title {
-    padding-right: 100px;
-    margin-bottom: 28px;
-}
-
-.current-environment-section {
-    position: relative;
-}
-
-.delete-environment-form {
-    position: absolute;
-    top: 24px;
-    right: 24px;
-    width: auto;
-    margin: 0;
-    padding: 0;
-    border: 0;
-    background: transparent;
-    box-shadow: none;
-}
-
-.delete-environment-form .delete-environment-button {
-    width: auto;
-    min-width: 0;
-    height: auto;
-    margin: 0;
-    padding: 8px 13px;
-    border: 1px solid #e7b3af;
-    border-radius: 8px;
-    background: #fff;
-    color: #bd5148;
-    font-size: 14px;
-    font-weight: 700;
-    line-height: 1.4;
-    cursor: pointer;
-}
-
-.delete-environment-form .delete-environment-button:hover {
-    border-color: #c94f46;
-    background: #fff4f3;
-    color: #a63830;
+    .back-button { width: 100%; }
 }

@@ -19,6 +19,7 @@ public class MedicineEnvApiClient {
 
 
     // ///api/core/medicine-environment/package-units/58581
+
     // 환경유형 조회
     public List<MedicineEnvironmentTypeResponse> getTypes(Long packageUnitId){
 
@@ -26,12 +27,13 @@ public class MedicineEnvApiClient {
 
     }
 
+
+    // 환경유형 생성
     public void createTypes(Long packageUnitId, MedicineEnvironmentRequest request){
 
-        gatewayClient.post(CORE_SERVICE + "/package-units/" + packageUnitId + "/medicine-environment-types",request);
+        gatewayClient.post(CORE_SERVICE + "/package-units/" + packageUnitId + "/medicine-environment-standards",request);
 
     }
-
 
 
     //환경유형 수정
@@ -40,7 +42,6 @@ public class MedicineEnvApiClient {
         gatewayClient.put(CORE_SERVICE + "/package-units/"+ packageUnitId + "/medicine-environment-standards",request);
 
     }
-
 
 
     // 환경유형 삭제

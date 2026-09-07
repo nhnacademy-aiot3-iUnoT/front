@@ -10,12 +10,14 @@ import com.nhnacademy.front.auth.dto.request.LoginRequest;
 import com.nhnacademy.front.auth.dto.request.ResetPasswordFormRequest;
 import com.nhnacademy.front.auth.dto.request.ResetPasswordRequest;
 import com.nhnacademy.front.auth.dto.request.ResetPasswordTokenRequest;
+import com.nhnacademy.front.auth.dto.request.SignupFormRequest;
 import com.nhnacademy.front.auth.dto.request.SignupRequest;
 import com.nhnacademy.front.auth.dto.response.CheckEmailResponse;
 import com.nhnacademy.front.auth.dto.response.LoginResponse;
 import com.nhnacademy.front.auth.service.AuthSessionService;
 import com.nhnacademy.front.auth.dto.response.SignupResponse;
 import com.nhnacademy.front.auth.validator.PasswordResetFormValidator;
+import com.nhnacademy.front.auth.validator.SignupFormValidator;
 import com.nhnacademy.front.organization.client.InvitationApiClient;
 import com.nhnacademy.front.organization.client.OrganizationApiClient;
 import jakarta.servlet.http.HttpServletRequest;
@@ -52,7 +54,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(AuthController.class)
 @AutoConfigureMockMvc(addFilters = false)
-@Import(PasswordResetFormValidator.class)
+@Import({PasswordResetFormValidator.class, SignupFormValidator.class})
 class AuthControllerTest {
 
     @Autowired
@@ -75,10 +77,20 @@ class AuthControllerTest {
 
     @Test
     void anonymousUserCanOpenLoginPage() throws Exception {
-        mockMvc.perform(get("/login"))
+        MvcResult result = mockMvc.perform(get("/login"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("auth/login"))
-                .andExpect(model().attribute("loginRequest", new LoginRequest()));
+                .andExpect(model().attribute("loginRequest", new LoginRequest()))
+                .andReturn();
+
+        Document document = Jsoup.parse(result.getResponse().getContentAsString());
+        assertThat(document.select("form#login-form input#email[required][maxlength=254]"))
+                .hasSize(1);
+        assertThat(document.select(
+                "form#login-form input#password[required][minlength=6][maxlength=64]"
+        )).hasSize(1);
+        assertThat(document.select("script[src=/js/auth/auth-validation.js]"))
+                .hasSize(1);
     }
 
     @Test
@@ -142,6 +154,23 @@ class AuthControllerTest {
     }
 
     @Test
+    void loginWithInvalidFieldsStaysOnLoginPage() throws Exception {
+        mockMvc.perform(post("/login")
+                        .param("email", "invalid-email")
+                        .param("password", "12345"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("auth/login"))
+                .andExpect(model().attributeHasFieldErrors(
+                        "loginRequest",
+                        "email",
+                        "password"
+                ));
+
+        then(authApiClient).shouldHaveNoInteractions();
+        then(authSessionService).shouldHaveNoInteractions();
+    }
+
+    @Test
     void adminIsRedirectedToAdminPageAfterLogin() throws Exception {
         AccountInfoResponse account = new AccountInfoResponse(
                 "admin@example.com",
@@ -184,6 +213,44 @@ class AuthControllerTest {
         );
     }
 
+    @Test
+    void refreshRotatesTokensAndReturnsNoContent() throws Exception {
+        given(authSessionService.renew(
+                any(HttpServletRequest.class),
+                any(HttpServletResponse.class)
+        )).willReturn(true);
+
+        mockMvc.perform(post("/refresh"))
+                .andExpect(status().isNoContent());
+
+        then(authSessionService).should().renew(
+                any(HttpServletRequest.class),
+                any(HttpServletResponse.class)
+        );
+    }
+
+    @Test
+    void refreshWithoutRefreshCookieReturnsUnauthorized() throws Exception {
+        given(authSessionService.renew(
+                any(HttpServletRequest.class),
+                any(HttpServletResponse.class)
+        )).willReturn(false);
+
+        mockMvc.perform(post("/refresh"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void refreshFailureReturnsUnauthorized() throws Exception {
+        given(authSessionService.renew(
+                any(HttpServletRequest.class),
+                any(HttpServletResponse.class)
+        )).willThrow(new IllegalStateException("refresh failed"));
+
+        mockMvc.perform(post("/refresh"))
+                .andExpect(status().isUnauthorized());
+    }
+
     private JwtAuthenticationToken authentication(AccountStatus status) {
         Jwt jwt = Jwt.withTokenValue("token")
                 .header("alg", "RS256")
@@ -197,13 +264,21 @@ class AuthControllerTest {
 
     @Test
     void signup() throws Exception {
-        mockMvc.perform(get("/signup")
+        MvcResult result = mockMvc.perform(get("/signup")
                         .param("token", "inviteToken"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("auth/signup"))
                 .andExpect(model().attribute(
                         "signupRequest",
-                        new SignupRequest("inviteToken", "", "", "")));
+                        new SignupFormRequest("inviteToken", "", "", "", "")))
+                .andReturn();
+
+        Document document = Jsoup.parse(result.getResponse().getContentAsString());
+        assertThat(document.select("form#signup-form input[name=confirmPassword]"
+                + "[required][minlength=6][maxlength=64]"))
+                .hasSize(1);
+        assertThat(document.select("script[src=/js/auth/signup.js]"))
+                .hasSize(1);
 
         then(invitationApiClient).should().verifyToken("inviteToken");
     }
@@ -233,7 +308,8 @@ class AuthControllerTest {
                         .param("inviteToken", request.inviteToken())
                         .param("email", request.email())
                         .param("name", request.name())
-                        .param("password", request.password()))
+                        .param("password", request.password())
+                        .param("confirmPassword", request.password()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name("redirect:/login"))
                 .andExpect(redirectedUrl("/login"));
@@ -256,7 +332,8 @@ class AuthControllerTest {
                         .param("inviteToken", request.inviteToken())
                         .param("email", request.email())
                         .param("name", request.name())
-                        .param("password", request.password()))
+                        .param("password", request.password())
+                        .param("confirmPassword", request.password()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name("redirect:/login"))
                 .andExpect(redirectedUrl("/login"));
@@ -270,14 +347,35 @@ class AuthControllerTest {
                         .param("inviteToken", "invite-token")
                         .param("email", "invalid-email")
                         .param("name", "")
-                        .param("password", "12345"))
+                        .param("password", "12345")
+                        .param("confirmPassword", ""))
                 .andExpect(status().isOk())
                 .andExpect(view().name("auth/signup"))
                 .andExpect(model().attributeHasFieldErrors(
                         "signupRequest",
                         "email",
                         "name",
-                        "password"));
+                        "password",
+                        "confirmPassword"));
+
+        then(authApiClient).shouldHaveNoInteractions();
+    }
+
+    @Test
+    void signupPostWithMismatchedPasswordsStaysOnSignupPage() throws Exception {
+        mockMvc.perform(post("/signup")
+                        .param("inviteToken", "invite-token")
+                        .param("email", "member@test.com")
+                        .param("name", "member")
+                        .param("password", "password")
+                        .param("confirmPassword", "different"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("auth/signup"))
+                .andExpect(model().attributeHasFieldErrorCode(
+                        "signupRequest",
+                        "confirmPassword",
+                        "passwordMismatch"
+                ));
 
         then(authApiClient).shouldHaveNoInteractions();
     }
@@ -319,10 +417,18 @@ class AuthControllerTest {
 
     @Test
     void forgotPassword() throws Exception {
-        mockMvc.perform(get("/forgot-password"))
+        MvcResult result = mockMvc.perform(get("/forgot-password"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("auth/forgot-password"))
-                .andExpect(model().attribute("resetPasswordTokenRequest", new ResetPasswordTokenRequest("")));
+                .andExpect(model().attribute("resetPasswordTokenRequest", new ResetPasswordTokenRequest("")))
+                .andReturn();
+
+        Document document = Jsoup.parse(result.getResponse().getContentAsString());
+        assertThat(document.select(
+                "form#forgot-password-form input#email[required][maxlength=254]"
+        )).hasSize(1);
+        assertThat(document.select("script[src=/js/auth/auth-validation.js]"))
+                .hasSize(1);
     }
 
     @Test
@@ -367,9 +473,12 @@ class AuthControllerTest {
 
         mockMvc.perform(post("/pwd")
                     .param("email", request.email()))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(view().name("redirect:/forgot-password"))
-                .andExpect(redirectedUrl("/forgot-password"));
+                .andExpect(status().isOk())
+                .andExpect(view().name("auth/forgot-password"))
+                .andExpect(model().attributeHasFieldErrors(
+                        "resetPasswordTokenRequest",
+                        "email"
+                ));
 
         then(authApiClient).shouldHaveNoInteractions();
     }
@@ -378,11 +487,19 @@ class AuthControllerTest {
     void resetPasswordForm() throws Exception {
         String token = "t".repeat(64);
 
-        mockMvc.perform(get("/pwd/{token}", token))
+        MvcResult result = mockMvc.perform(get("/pwd/{token}", token))
                 .andExpect(status().isOk())
                 .andExpect(view().name("auth/reset-password"))
                 .andExpect(model().attribute("resetPasswordForm", new ResetPasswordFormRequest()))
-                .andExpect(model().attribute("token", token));
+                .andExpect(model().attribute("token", token))
+                .andReturn();
+
+        Document document = Jsoup.parse(result.getResponse().getContentAsString());
+        assertThat(document.select(
+                "form#reset-password-form input[type=password][required][minlength=6][maxlength=64]"
+        )).hasSize(2);
+        assertThat(document.select("script[src=/js/auth/auth-validation.js]"))
+                .hasSize(1);
 
     }
 

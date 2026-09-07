@@ -36,7 +36,10 @@
                         <ul class="dropdown-menu nav-dropdown-menu">
                             <li><a class="dropdown-item" th:href="@{/inventories}">재고 목록</a></li>
                             <li><a class="dropdown-item" th:href="@{/inventory}">입고 등록</a></li>
+                            <li><a class="dropdown-item" th:href="@{/expiring}">유통기한 임박 재고</a></li>
                             <li><a class="dropdown-item" th:href="@{/stock-transactions}">입출고 내역</a></li>
+                            <li><a class="dropdown-item" th:href="@{/pack-units/environment-standards}">의약품 구역 임계값 설정</a></li>
+
                         </ul>
                     </li>
 
@@ -46,6 +49,7 @@
                 </ul>
 
                 <div class="navbar-nav flex-row order-md-last">
+                    <div th:replace="~{fragments/session-control :: control}"></div>
 
                     <div class="nav-item me-3 position-relative">
                         <a href="/alerts" class="nav-link px-2 text-reset notification-link" title="알림함">
@@ -70,7 +74,10 @@
                     </div>
 
                     <div class="nav-item">
-                        <form th:action="@{/logout}" method="post" class="m-0">
+                        <form id="session-logout-form"
+                              th:action="@{/logout}"
+                              method="post"
+                              class="m-0">
                             <button type="submit" class="btn btn-outline-secondary btn-sm">
                                 로그아웃
                             </button>

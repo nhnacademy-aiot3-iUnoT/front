@@ -57,9 +57,9 @@
                 </div>
 
                 <div class="meta-item">
-                    <span class="meta-label">마약류 구분</span>
+                    <span class="meta-label">마약류 세부 분류</span>
                     <span class="meta-value"
-                          th:text="${medicineInfo.narcoticKindCode == null ? '해당없음' : medicineInfo.narcoticKindCode}"></span>
+                          th:text="${medicineInfo.narcoticKindCode == null? '해당없음': (medicineInfo.narcoticKindCode == '향정'? '향정신성의약품': medicineInfo.narcoticKindCode)}"></span>
                 </div>
             </div>
 
@@ -73,7 +73,7 @@
                     <p class="text-secondary small mb-0">유통기한이 빠른 순으로 표시됩니다.</p>
                     <!--                    <h2 th:text="${inventory.storageName}">00저장소</h2>-->
                 </div>
-                <strong class="total-stock" th:text="|총 ${totalQuantity}정|">총 180정</strong>
+                <strong class="total-stock" th:text="|총 ${totalQuantity}개|">총 180정</strong>
             </div>
             <div class="stock-table-wrap">
                 <table class="stock-table">
@@ -96,45 +96,61 @@
 
                         <td>
                             <span class="status-badge normal"
+                                  th:if="${item.managementStatus.name() != 'NORMAL'
+                            or !item.expirationDate.isBefore(T(java.time.LocalDate).now())}"
                                   th:text="${item.managementStatus}">
-                                정상
+                            정상
                             </span>
-                            <span class="status-badge warning ms-1"
-                                  th:if="${item.expirationDate.isBefore(T(java.time.LocalDate).now())}">
-                                EXPIRED
+
+                            <span class="status-badge warning"
+                                  th:if="${item.expirationDate.isBefore(T(java.time.LocalDate).now())}"
+                                  th:classappend="${item.managementStatus.name() != 'NORMAL'} ? ' ms-1'">
+                                    EXPIRED
                             </span>
                         </td>
 
                         <td class="action-column">
                             <a th:if="${item.managementStatus.name() == 'NORMAL'
-                               and !item.expirationDate.isBefore(T(java.time.LocalDate).now())}"
+                                and !item.expirationDate.isBefore(T(java.time.LocalDate).now())
+                                and (!isRestrictedNarcotic or canManageNarcotics)}"
                                class="btn btn-sm btn-outline-primary"
                                th:href="@{/inventories/{inventory-id}/outbound(inventory-id=${item.inventoryId})}">
                                 출고
                             </a>
 
-                            <span th:if="${item.expirationDate.isBefore(T(java.time.LocalDate).now())}"
-                                  class="text-warning small">
-                                유통기한이 지난 재고는 출고할 수 없습니다.
+                            <span th:if="${item.expirationDate.isBefore(T(java.time.LocalDate).now())
+                                and (!isRestrictedNarcotic or canManageNarcotics)}"
+                                  class="text-warning small outbound-unavailable">
+                                유통기한 경과 재고는<br>
+                                출고할 수 없습니다.
                             </span>
 
                             <span th:if="${!item.expirationDate.isBefore(T(java.time.LocalDate).now())
-                                and item.managementStatus.name() == 'UNDER_REVIEW'}"
-                                  class="text-warning small">
-                                환경 검토 중인 재고는 출고할 수 없습니다.
+                                and item.managementStatus.name() == 'UNDER_REVIEW'
+                                and (!isRestrictedNarcotic or canManageNarcotics)}"
+                                  class="text-warning small outbound-unavailable">
+                                환경 검토 중인 재고는<br>
+                                출고할 수 없습니다.
                             </span>
 
                             <span th:if="${!item.expirationDate.isBefore(T(java.time.LocalDate).now())
                                 and item.managementStatus.name() != 'NORMAL'
-                                and item.managementStatus.name() != 'UNDER_REVIEW'}"
-                                  class="text-warning small">
-                                현재 상태에서는 출고할 수 없습니다.
+                                and item.managementStatus.name() != 'UNDER_REVIEW'
+                                and (!isRestrictedNarcotic or canManageNarcotics)}"
+                                  class="text-warning small outbound-unavailable">
+                                현재 상태에서는<br>
+                                출고할 수 없습니다.
                             </span>
 
-                            <a class="btn btn-sm btn-outline-danger"
+                            <a th:if="${!isRestrictedNarcotic or canManageNarcotics}"
+                               class="btn btn-sm btn-outline-danger"
                                th:href="@{/inventories/{inventory-id}/disposal(inventory-id=${item.inventoryId})}">
                                 폐기
                             </a>
+                            <span th:if="${isRestrictedNarcotic and !canManageNarcotics}"
+                                  class="text-warning small">
+                                    마약류 출고·폐기는 관리자만 가능합니다.
+                            </span>
                         </td>
                     </tr>
                     </tbody>
