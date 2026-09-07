@@ -305,7 +305,8 @@
                                       th:text="'주간 요약 · ' + ${reportPeriodStart} + ' ~ ' + ${reportPeriodEnd}">주간 요약</span>
                             </div>
 
-                            <span th:if="${weeklyReport != null and weeklyReport.aiSummary != null}"
+                            <span class="ai-summary-body d-block"
+                                  th:if="${weeklyReport != null and weeklyReport.aiSummary != null}"
                                   th:text="${weeklyReport.aiSummary}">요약 내용</span>
 
                             <span th:if="${weeklyReport != null and weeklyReport.aiSummary == null}"
