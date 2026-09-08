@@ -32,8 +32,8 @@
     <th:block th:unless="${#lists.isEmpty(storages)}">
         <div class="card">
             <!-- 검색 조건. 구역 탭을 눌러도 조건이 유지되도록 zone-id는 hidden으로 함께 넘긴다. -->
-            <div class="card-body border-bottom py-3">
-                <form method="get" th:action="@{/stock-transactions}" class="row g-2 align-items-end">
+            <div class="card-body border-bottom py-2">
+                <form method="get" th:action="@{/stock-transactions}" class="row g-2 align-items-start">
                     <input type="hidden" name="zone-id" th:value="${selectedZoneId}">
 
                     <div class="col-md-3">
@@ -64,17 +64,26 @@
                         </select>
                     </div>
 
-                    <div class="col-md-2">
-                        <label class="form-label">시작일</label>
-                        <input type="date" name="startDate" class="form-control" th:value="${startDate}">
+                    <!-- 무엇을 거르는지 표의 열 이름과 같은 말로 밝힌다. -->
+                    <div class="col-md-4">
+                        <label class="form-label" for="start-date">처리일시</label>
+                        <div class="input-group">
+                            <input type="date" id="start-date" name="startDate" class="form-control"
+                                   th:value="${startDate}" aria-label="처리일시 시작">
+                            <span class="input-group-text">~</span>
+                            <input type="date" id="end-date" name="endDate" class="form-control"
+                                   th:value="${endDate}" aria-label="처리일시 종료">
+                        </div>
                     </div>
 
-                    <div class="col-md-2">
-                        <label class="form-label">종료일</label>
-                        <input type="date" name="endDate" class="form-control" th:value="${endDate}">
-                    </div>
+                    <!-- 기간 버튼과 조회 버튼이 모두 오른쪽이라 한 줄로 합친다. -->
+                    <div class="col-12 d-flex flex-wrap align-items-center justify-content-end gap-2">
+                        <div class="btn-group btn-group-sm" role="group" aria-label="기간 선택">
+                            <button type="button" class="btn btn-outline-secondary" data-range="0">오늘</button>
+                            <button type="button" class="btn btn-outline-secondary" data-range="7">최근 7일</button>
+                            <button type="button" class="btn btn-outline-secondary" data-range="30">최근 30일</button>
+                        </div>
 
-                    <div class="col-12 d-flex gap-2 justify-content-end">
                         <a th:href="@{/stock-transactions(storage-id=${selectedStorageId}, zone-id=${selectedZoneId})}"
                            class="btn btn-link">초기화</a>
                         <button type="submit" class="btn btn-primary">
@@ -104,7 +113,7 @@
             </div>
 
             <th:block th:unless="${#lists.isEmpty(zones)}">
-                <div class="table-responsive">
+                <div class="table-responsive" th:unless="${#lists.isEmpty(transactions)}">
                     <table class="table table-vcenter card-table table-hover">
                         <thead>
                         <tr>
@@ -150,8 +159,20 @@
                     </table>
                 </div>
 
-                <div class="card-body text-center text-muted py-5" th:if="${#lists.isEmpty(transactions)}">
-                    조회된 재고 변동 내역이 없습니다.
+                <!-- 조건 때문에 비었는지 원래 없는지 구분되어야 한다.
+                     의약품명은 빈 폼을 제출해도 빈 문자열로 들어오므로 null 비교로는 부족하다. -->
+                <div class="card-body text-center text-muted py-4"
+                     th:if="${#lists.isEmpty(transactions)}"
+                     th:with="filtered=${!#strings.isEmpty(medicineName) or transactionType != null or startDate != null or endDate != null}">
+                    <th:block th:if="${filtered}">
+                        선택한 조건에 맞는 내역이 없습니다.
+                        <a class="d-block mt-2"
+                           th:href="@{/stock-transactions(storage-id=${selectedStorageId}, zone-id=${selectedZoneId})}">조건 초기화</a>
+                    </th:block>
+
+                    <th:block th:unless="${filtered}">
+                        아직 등록된 재고 변동 내역이 없습니다.
+                    </th:block>
                 </div>
 
                 <!-- 페이지네이션 -->
