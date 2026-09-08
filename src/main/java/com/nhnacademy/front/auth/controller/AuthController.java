@@ -110,7 +110,7 @@ public class AuthController {
     ) {
         authSessionService.revoke(request, response);
 
-        return "redirect:/login";
+        return "redirect:/";
     }
 
     @PostMapping("/refresh")

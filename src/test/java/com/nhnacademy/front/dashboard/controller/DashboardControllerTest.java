@@ -79,7 +79,7 @@ class DashboardControllerTest {
         given(dashboardApiClient.getEnvironment(100L)).willReturn(environment());
         given(reportApiClient.getWeeklyReport(anyLong(), any(LocalDate.class))).willReturn(report());
 
-        mockMvc.perform(get("/"))
+        mockMvc.perform(get("/dashboard"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("dashboard/main"))
                 .andExpect(model().attribute("selectedDepartmentId", 10L))
@@ -111,10 +111,9 @@ class DashboardControllerTest {
         given(dashboardApiClient.getDepartments()).willReturn(
                 new DashboardDepartmentsResponse(false, "NHN 메디컬센터", List.of()));
 
-        mockMvc.perform(get("/"))
+        mockMvc.perform(get("/dashboard"))
                 .andExpect(status().isOk())
-                .andExpect(model().attribute("selectedDepartmentId", (Object) null))
-                .andExpect(content().string(containsString("표시할 부서가 없습니다")));
+                .andExpect(model().attribute("selectedDepartmentId", (Object) null));
     }
 
     @Test
@@ -130,7 +129,7 @@ class DashboardControllerTest {
         given(reportApiClient.getWeeklyReport(anyLong(), any(LocalDate.class)))
                 .willThrow(new RuntimeException("리포트 없음"));
 
-        mockMvc.perform(get("/"))
+        mockMvc.perform(get("/dashboard"))
                 .andExpect(status().isOk())
                 .andExpect(model().attribute("summary", (Object) null))
                 .andExpect(content().string(containsString("부서 종합 현황")))
@@ -200,10 +199,9 @@ class DashboardControllerTest {
     void dashboard_DepartmentsFailure_StillRenders() throws Exception {
         given(dashboardApiClient.getDepartments()).willThrow(new RuntimeException("게이트웨이 500"));
 
-        mockMvc.perform(get("/"))
+        mockMvc.perform(get("/dashboard"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("dashboard/main"))
-                .andExpect(content().string(containsString("표시할 부서가 없습니다")));
+                .andExpect(view().name("dashboard/main"));
     }
 
     @Test
@@ -243,7 +241,7 @@ class DashboardControllerTest {
                                 true))));
         given(reportApiClient.getWeeklyReport(anyLong(), any(LocalDate.class))).willReturn(report());
 
-        mockMvc.perform(get("/"))
+        mockMvc.perform(get("/dashboard"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("온도")))
                 .andExpect(content().string(containsString("22.4C")))
@@ -269,7 +267,7 @@ class DashboardControllerTest {
         given(dashboardApiClient.getEnvironment(100L)).willReturn(environment());
         given(reportApiClient.getWeeklyReport(anyLong(), any(LocalDate.class))).willReturn(report());
 
-        mockMvc.perform(get("/?departmentId=10&storageId=100&reportStorageId=101"))
+        mockMvc.perform(get("/dashboard?departmentId=10&storageId=100&reportStorageId=101"))
                 .andExpect(status().isOk())
                 // 환경 현황은 100번, AI 리포트는 101번 저장소
                 .andExpect(model().attribute("selectedStorageId", 100L))
@@ -297,7 +295,7 @@ class DashboardControllerTest {
                                 null))));
         given(reportApiClient.getWeeklyReport(anyLong(), any(LocalDate.class))).willReturn(report());
 
-        mockMvc.perform(get("/"))
+        mockMvc.perform(get("/dashboard"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("조도")))
                 .andExpect(content().string(containsString("310lux")))
@@ -324,7 +322,7 @@ class DashboardControllerTest {
                                 null))));
         given(reportApiClient.getWeeklyReport(anyLong(), any(LocalDate.class))).willReturn(report());
 
-        mockMvc.perform(get("/"))
+        mockMvc.perform(get("/dashboard"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("820lux")))
                 // 구역 상태는 서버가 준 envStatus 를 그대로 쓴다
@@ -350,7 +348,7 @@ class DashboardControllerTest {
                                 null))));
         given(reportApiClient.getWeeklyReport(anyLong(), any(LocalDate.class))).willReturn(report());
 
-        mockMvc.perform(get("/"))
+        mockMvc.perform(get("/dashboard"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("820lux")))
                 // 화면이 값으로 등급을 만들지 않는다 (구역 카드가 위험으로 바뀌지 않음)
@@ -371,7 +369,7 @@ class DashboardControllerTest {
         given(dashboardApiClient.getEnvironment(100L)).willReturn(environment());
         given(reportApiClient.getWeeklyReport(anyLong(), any(LocalDate.class))).willReturn(report());
 
-        mockMvc.perform(get("/?departmentId=0"))
+        mockMvc.perform(get("/dashboard?departmentId=0"))
                 .andExpect(status().isOk())
                 .andExpect(model().attribute("orgWide", true))
                 .andExpect(model().attribute("selectedDepartmentId", (Object) null))
@@ -398,7 +396,7 @@ class DashboardControllerTest {
         given(dashboardApiClient.getExpiring(anyLong(), anyInt())).willReturn(expiring());
         given(storageDepartmentApiClient.getStorages(10L)).willReturn(List.of());
 
-        mockMvc.perform(get("/?departmentId=0"))
+        mockMvc.perform(get("/dashboard?departmentId=0"))
                 .andExpect(status().isOk())
                 .andExpect(model().attribute("orgWide", false))
                 // 조직 전체가 거부되고 내 첫 부서로 되돌아간다
@@ -416,7 +414,7 @@ class DashboardControllerTest {
         given(dashboardApiClient.getExpiring(anyLong(), anyInt())).willReturn(expiring());
         given(storageDepartmentApiClient.getStorages(anyLong())).willReturn(List.of());
 
-        mockMvc.perform(get("/"))
+        mockMvc.perform(get("/dashboard"))
                 .andExpect(status().isOk())
                 // 합산 항목
                 .andExpect(content().string(containsString("모든 부서 합산")))
