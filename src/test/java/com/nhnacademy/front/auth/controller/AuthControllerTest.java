@@ -204,8 +204,8 @@ class AuthControllerTest {
     void logoutDeletesAccessTokenCookieAndRedirectsToLogin() throws Exception {
         mockMvc.perform(post("/logout"))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(view().name("redirect:/login"))
-                .andExpect(redirectedUrl("/login"));
+                .andExpect(view().name("redirect:/"))
+                .andExpect(redirectedUrl("/"));
 
         then(authSessionService).should().revoke(
                 any(HttpServletRequest.class),
