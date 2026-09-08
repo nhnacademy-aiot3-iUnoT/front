@@ -50,7 +50,7 @@ public class MedicineSearchController {
                                Model model){
 
         // 오류나기 전 필요한 정보 갖고 있어야 함
-        model.addAttribute("storages",storageApiClient.getStorages());
+        model.addAttribute("storages", storageApiClient.getStoragesInbound());
         model.addAttribute("selectedStorageId",storageId);
         model.addAttribute("selectedZoneId",zoneId);
 
@@ -101,7 +101,7 @@ public class MedicineSearchController {
                               Model model){
 
 
-        model.addAttribute("storages",storageApiClient.getStorages());
+        model.addAttribute("storages", storageApiClient.getStoragesInbound());
         model.addAttribute("selectedStorageId",storageId);
         model.addAttribute("selectedZoneId",zoneId);
 

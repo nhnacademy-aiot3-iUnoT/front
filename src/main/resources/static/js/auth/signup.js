@@ -5,6 +5,8 @@ const passwordInput = document.getElementById("pwd");
 const confirmPasswordInput = document.getElementById("pwd-check");
 const nameInput = document.getElementById("name");
 const submitButton = document.getElementById("signup-submit");
+const passwordToggle = document.getElementById("password-toggle");
+const confirmPasswordToggle = document.getElementById("confirm-password-toggle");
 let verifiedEmail = null;
 let emailCheckPromise = null;
 
@@ -12,11 +14,34 @@ if (!signupForm
     || !emailInput
     || !emailCheckButton
     || !passwordInput
+    || !passwordToggle
+    || !confirmPasswordToggle
     || !confirmPasswordInput
     || !nameInput
     || !submitButton) {
     throw new Error("회원가입 폼을 찾을 수 없습니다.");
 }
+
+function configurePasswordToggle(input, toggle) {
+    const tooltip = bootstrap.Tooltip.getOrCreateInstance(toggle);
+
+    toggle.addEventListener("click", () => {
+        const isPasswordVisible = input.type === "text";
+        const tooltipText = isPasswordVisible ? "비밀번호 보기" : "비밀번호 숨기기";
+
+        input.type = isPasswordVisible ? "password" : "text";
+        toggle.setAttribute("aria-label", tooltipText);
+        toggle.setAttribute("aria-pressed", String(!isPasswordVisible));
+        toggle.setAttribute("data-bs-title", tooltipText);
+        tooltip.setContent({".tooltip-inner": tooltipText});
+        toggle.innerHTML = isPasswordVisible
+            ? `<i class="ti ti-eye" aria-hidden="true"></i>`
+            : `<i class="ti ti-eye-closed" aria-hidden="true"></i>`;
+    });
+}
+
+configurePasswordToggle(passwordInput, passwordToggle);
+configurePasswordToggle(confirmPasswordInput, confirmPasswordToggle);
 
 function validateSignupEmail() {
     const value = emailInput.value;

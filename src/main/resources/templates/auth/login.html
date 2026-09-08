@@ -77,16 +77,44 @@
                                                     <a th:href="@{/forgot-password}" class="text-secondary">비밀번호 찾기</a>
                                                 </span>
                                             </label>
-                                            <input type="password"
-                                                   id="password"
-                                                   name="password"
-                                                   class="form-control form-control-lg"
-                                                   th:classappend="${#fields.hasErrors('password')} ? 'is-invalid'"
-                                                   placeholder="********"
-                                                   minlength="6"
-                                                   maxlength="64"
-                                                   autocomplete="current-password"
-                                                   required>
+                                            <div class="position-relative">
+                                                <input type="password"
+                                                       id="password"
+                                                       name="password"
+                                                       class="form-control form-control-lg pe-5"
+                                                       th:classappend="${#fields.hasErrors('password')} ? 'is-invalid'"
+                                                       placeholder="********"
+                                                       minlength="6"
+                                                       maxlength="64"
+                                                       autocomplete="current-password"
+                                                       required>
+
+                                                <button type="button"
+                                                        id="password-toggle"
+                                                        class="btn btn-icon btn-ghost-secondary password-toggle-button position-absolute top-50 end-0 translate-middle-y me-2 z-1"
+                                                        aria-label="비밀번호 보기"
+                                                        aria-pressed="false"
+                                                        data-bs-toggle="tooltip"
+                                                        data-bs-placement="top"
+                                                        data-bs-title="비밀번호 보기">
+                                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                                         width="24"
+                                                         height="24"
+                                                         viewBox="0 0 24 24"
+                                                         fill="none"
+                                                         stroke="currentColor"
+                                                         stroke-width="2"
+                                                         stroke-linecap="round"
+                                                         stroke-linejoin="round"
+                                                         class="icon icon-tabler icons-tabler-outline icon-tabler-eye"
+                                                         aria-hidden="true">
+                                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                        <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"/>
+                                                        <path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"/>
+                                                    </svg>
+                                                </button>
+                                            </div>
+
                                             <div class="invalid-feedback"
                                                  th:text="${#fields.hasErrors('password') ? #fields.errors('password')[0] : '비밀번호는 6자 이상 64자 이하여야 합니다.'}">
                                                 비밀번호는 6자 이상 64자 이하여야 합니다.

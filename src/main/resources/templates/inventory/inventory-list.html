@@ -54,8 +54,10 @@
 
                         <option value="">
                             저장소 목록
-                        </option>
-                        <option th:each="item : ${storages}" th:value="${item.storageId}" th:text="${item.storageName}">
+                        <option th:each="item : ${storages}"
+                                th:value="${item.storageId}"
+                                th:text="${item.name}"
+                                th:selected="${selectedStorageId != null and item.storageId == selectedStorageId}">
                         </option>
 
                         </select>

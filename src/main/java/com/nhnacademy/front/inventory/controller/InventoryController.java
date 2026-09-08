@@ -12,6 +12,7 @@ import com.nhnacademy.front.organization.client.OrganizationMemberApiClient;
 import com.nhnacademy.front.organization.dto.OrganizationRole;
 import com.nhnacademy.front.organization.dto.response.DepartmentListResponse;
 import lombok.RequiredArgsConstructor;
+import com.nhnacademy.front.organization.client.StorageApiClient;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,7 +32,7 @@ public class InventoryController {
     private static final int PAGE_GROUP_SIZE = 10;
     private final OrganizationMemberApiClient organizationMemberApiClient;
     private final DepartmentApiClient departmentApiClient;
-
+    private final StorageApiClient storageApiClient;
 
 
     // 전체 재고 조회
@@ -71,7 +72,7 @@ public class InventoryController {
 
         model.addAttribute("inventories",result.content());
         // storages 해당 재고 저장소만 목록 조회
-        model.addAttribute("storages",inventoryFrontService.getStorageInfos(result.content()));
+        model.addAttribute("storages", storageApiClient.getStoragesInbound());
 
 
         model.addAttribute("currentPage",currentPage);
