@@ -1,13 +1,372 @@
 <!DOCTYPE html>
-<html lang="ko"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/main-layout}">
-<head>
-    <meta charset="UTF-8">
-    <title>테스트용</title>
-</head>
-<body class="d-flex flex-column min-vh-100">
-<div layout:fragment="content"></div>
-</body>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>
+            iUnoT — 의약품 운영을 하나로
+        </title>
+        <link href="https://cdn.jsdelivr.net/npm/@tabler/core/dist/css/tabler.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+        <link rel="stylesheet" th:href="@{/css/theme.css}">
+        <link rel="stylesheet" th:href="@{/css/landing.css}">
+        <link rel="stylesheet" th:href="@{/css/landing-theme.css}">
+    </head>
+    <body class="landing-body">
+        <div class="landing-shell">
+            <header class="landing-header">
+                <a class="landing-logo" href="/" aria-label="iUnoT 홈">
+                    iUnoT
+                    <span>
+                        .
+                    </span>
+                </a>
+                <nav aria-label="주요 메뉴">
+                    <a href="#solution">
+                        솔루션
+                    </a>
+                    <a href="#flow">
+                        운영 흐름
+                    </a>
+                    <a href="#ai-assistant">AI 챗봇</a>
+                    <a class="landing-login" href="/login">
+                        로그인
+                        <i class="ti ti-arrow-up-right">
+                        </i>
+                    </a>
+                </nav>
+            </header>
+            <main>
+                <section class="landing-hero">
+                    <div>
+                        <div class="eyebrow">
+                            <span>
+                            </span>
+                            PHARMACEUTICAL OPERATIONS
+                        </div>
+                        <h1>
+                            의약품 관리에,
+                            <br>
+                            <em>
+                                확실한 기준.
+                            </em>
+                        </h1>
+                        <p>
+                            입고부터 보관, 출고까지. 흩어져 있던 의약품 재고와 환경 정보를 한곳에서 확인하세요. 매일의 관리가 더 명확해집니다.
+                        </p>
+                        <div class="hero-actions">
+                            <a class="primary-action" href="/login">
+                                서비스 시작하기
+                                <i class="ti ti-arrow-right">
+                                </i>
+                            </a>
+                            <a class="text-action" href="#solution">
+                                무엇을 관리하나요?
+                                <i class="ti ti-arrow-down">
+                                </i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="hero-visual" aria-label="운영 화면 예시">
+                        <div class="monitor-card">
+                            <div class="monitor-top">
+                                iUnoT / OVERVIEW
+                                <i class="ti ti-dots">
+                                </i>
+                            </div>
+                            <h2>오늘의 운영 상태</h2>
+                            <div class="preview-label">서비스 화면 예시</div>
+                            <div class="status-line">
+                                <span>
+                                </span>
+                                모든 핵심 구역이 안정적으로 운영 중입니다.
+                            </div>
+                            <div class="preview-metrics">
+                                <div><span>보관 온도</span><strong>4.2<small> °C</small></strong><em>설정 범위 내</em></div>
+                                <div><span>상대 습도</span><strong>45<small> %</small></strong><em>설정 범위 내</em></div>
+                            </div>
+                            <div class="chart-label">
+                                환경 상태
+                                <small>
+                                    최근 24시간
+                                </small>
+                            </div>
+                            <div class="chart-bars">
+                                <i></i>
+                                <i></i>
+                                <i></i>
+                                <i></i>
+                                <i></i>
+                                <i></i>
+                                <i></i>
+                                <i></i>
+                                <i></i>
+                            </div>
+                            <div class="monitor-footer">
+                                온·습도 모니터링
+                                <span>
+                                    예시 데이터
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <div class="landing-capabilities" aria-label="주요 관리 영역">
+                    <span>매일의 운영을, 빈틈없이.</span>
+                    <strong><i class="ti ti-package" aria-hidden="true"></i> 의약품 재고</strong>
+                    <strong><i class="ti ti-temperature" aria-hidden="true"></i> 보관 환경</strong>
+                    <strong><i class="ti ti-bell" aria-hidden="true"></i> 이상 알림</strong>
+                    <strong><i class="ti ti-chart-line" aria-hidden="true"></i> 운영 리포트</strong>
+                </div>
+                <section id="solution" class="solution-section" aria-labelledby="solution-title">
+                    <div class="section-intro">
+                        <div>
+                            <div class="eyebrow">
+                                <span>
+                                </span>
+                                THE PLATFORM
+                            </div>
+                            <h2 id="solution-title">
+                                운영에 필요한 모든 것,
+                                <br>
+                                복잡하지 않게.
+                            </h2>
+                        </div>
+                        <p>
+                            조직을 세팅하는 순간부터 일일 운영과 사후 검토까지, 필요한 기능을 하나의 제품 안에 담았습니다.
+                        </p>
+                    </div>
+                    <div class="solution-grid">
+                        <article>
+                            <i class="ti ti-building-community">
+                            </i>
+                            <h3>
+                                조직과 권한
+                            </h3>
+                            <p>
+                                조직·부서·조직원을 구성하고 역할에 맞는 업무 환경을 만듭니다.
+                            </p>
+                            <b>
+                                01
+                            </b>
+                        </article>
+                        <article>
+                            <i class="ti ti-building-warehouse">
+                            </i>
+                            <h3>
+                                저장소와 구역
+                            </h3>
+                            <p>
+                                저장소, 구역, 센서와 환경 기준을 하나의 구조로 연결합니다.
+                            </p>
+                            <b>
+                                02
+                            </b>
+                        </article>
+                        <article>
+                            <i class="ti ti-temperature-sun">
+                            </i>
+                            <h3>
+                                환경 모니터링
+                            </h3>
+                            <p>
+                                온·습도 상태와 환경 이벤트를 확인하고 이상 상황에 대응합니다.
+                            </p>
+                            <b>
+                                03
+                            </b>
+                        </article>
+                        <article>
+                            <i class="ti ti-package">
+                            </i>
+                            <h3>
+                                재고 흐름
+                            </h3>
+                            <p>
+                                입고·출고·폐기와 변동 이력을 남겨 재고의 현재를 명확히 합니다.
+                            </p>
+                            <b>
+                                04
+                            </b>
+                        </article>
+                        <article>
+                            <i class="ti ti-bell-ringing">
+                            </i>
+                            <h3>
+                                알림과 대응
+                            </h3>
+                            <p>
+                                환경 이상과 유통기한 임박 품목을 필요한 사람에게 전달합니다.
+                            </p>
+                            <b>
+                                05
+                            </b>
+                        </article>
+                        <article>
+                            <i class="ti ti-chart-line">
+                            </i>
+                            <h3>
+                                리포트와 검토
+                            </h3>
+                            <p>
+                                운영 데이터를 돌아보고 다음 관리 기준을 더 나은 방향으로 세웁니다.
+                            </p>
+                            <b>
+                                06
+                            </b>
+                        </article>
+                    </div>
+                </section>
+                <section class="landing-detail" aria-labelledby="care-title">
+                    <div class="detail-copy">
+                        <div class="eyebrow"><span></span>FROM STOCK TO CARE</div>
+                        <h2 id="care-title">수량만 보는 재고에서,<br><em>상태까지 아는 관리로.</em></h2>
+                        <p>같은 의약품도 보관 위치와 유통기한은 다릅니다. 재고의 현재 상태부터 환경 이상 이후의 조치까지, 필요한 정보를 이어서 확인하세요.</p>
+                        <ul class="landing-feature-list">
+                            <li><i class="ti ti-barcode" aria-hidden="true"></i><div><h3>의약품별로, 보관 위치별로</h3><p>제품명과 품목기준코드로 검색하고 포장단위, 유통기한, 저장소와 수량을 확인합니다.</p></div></li>
+                            <li><i class="ti ti-temperature" aria-hidden="true"></i><div><h3>보관 환경을 함께 확인</h3><p>입고할 구역의 온도·습도·조도 관리 범위를 의약품의 환경 기준과 비교합니다.</p></div></li>
+                            <li><i class="ti ti-clipboard-check" aria-hidden="true"></i><div><h3>이상 발생 이후도 놓치지 않게</h3><p>환경 검토 대상 재고를 확인하고, 검토 의견과 폐기 처리 등 조치 내역을 남깁니다.</p></div></li>
+                        </ul>
+                    </div>
+                    <div class="care-preview">
+                        <div class="detail-preview-heading"><strong>환경 이벤트부터 후속 조치까지</strong><span>업무 흐름 예시</span></div>
+                        <ol class="care-timeline">
+                            <li><span class="care-step">01</span><div><small>MONITOR</small><h3>보관 구역의 환경 이상 확인</h3><p>구역별 센서와 설정된 환경 기준을 확인합니다.</p><span class="landing-pill warning">환경 이벤트</span></div></li>
+                            <li><span class="care-step">02</span><div><small>REVIEW</small><h3>영향받은 재고 검토</h3><p>마지막 검토 이후의 환경 이상 내역을 살펴봅니다.</p><span class="landing-pill">검토 대상 재고</span></div></li>
+                            <li><span class="care-step">03</span><div><small>RECORD</small><h3>판단과 조치 내용을 기록</h3><p>검토 의견과 처리 결과를 이력으로 관리합니다.</p><span class="landing-pill">검토 내역</span></div></li>
+                        </ol>
+                    </div>
+                </section>
+
+                <section class="landing-intelligence" aria-labelledby="intelligence-title">
+                    <div class="section-intro">
+                        <div><div class="eyebrow"><span></span>YOUR OPERATIONS ASSISTANT</div><h2 id="intelligence-title">찾는 시간을 줄이고,<br>판단에 집중하세요.</h2></div>
+                        <p>궁금한 재고는 대화로 찾아보고, 한 주의 운영은 리포트로 돌아보세요. 쌓인 데이터를 다음 업무에 활용할 수 있도록 돕습니다.</p>
+                    </div>
+                    <div class="intelligence-grid">
+                        <article id="ai-assistant" class="assistant-showcase" aria-labelledby="assistant-title">
+                            <div class="assistant-copy">
+                                <div class="eyebrow"><span></span>ASK iUnoT</div>
+                                <h3 id="assistant-title">재고가 궁금할 때,<br><em>한 문장이면 충분해요.</em></h3>
+                                <p>“곧 만료되는 재고가 있을까?”<br>여러 메뉴를 찾아다니기 전에 iUnoT에게 물어보세요. 필요한 재고 정보부터 다음 발주 준비까지 대화로 이어집니다.</p>
+                                <ul class="assistant-benefits">
+                                    <li><i class="ti ti-search" aria-hidden="true"></i><span><strong>찾고</strong> 의약품과 보관 위치로 재고 조회</span></li>
+                                    <li><i class="ti ti-clock" aria-hidden="true"></i><span><strong>확인하고</strong> 유통기한 임박·부족 재고 점검</span></li>
+                                    <li><i class="ti ti-chart-line" aria-hidden="true"></i><span><strong>준비하고</strong> 출고 이력에 기반한 발주 추천</span></li>
+                                </ul>
+                                <a class="primary-action" href="/login">로그인하고 대화 시작하기 <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
+                            </div>
+                            <div class="assistant-demo">
+                                <div class="assistant-demo-header"><span class="assistant-avatar"><i class="ti ti-message-chatbot" aria-hidden="true"></i></span><div><strong>iUnoT Assistant</strong><span>의약품 재고를 함께 살펴보는 AI</span></div><span class="assistant-example-label">대화 예시</span></div>
+                                <div class="assistant-messages" aria-live="polite" aria-atomic="true">
+                                    <div class="assistant-user-message" id="landing-chat-question">30일 이내에 유통기한이 끝나는 재고 알려줘</div>
+                                    <div class="assistant-answer">
+                                        <span class="assistant-answer-label"><i class="ti ti-sparkles" aria-hidden="true"></i> iUnoT</span>
+                                        <p id="landing-chat-answer">30일 이내 만료 예정인 재고를 확인했어요. 의약품과 보관 위치를 함께 살펴보세요.</p>
+                                        <div class="assistant-result"><span id="landing-chat-category">유통기한 임박 재고</span><strong id="landing-chat-result">예시 의약품 A · 냉장 저장소</strong><p id="landing-chat-detail">남은 유통기한 14일 · 현재 수량 24개</p></div>
+                                    </div>
+                                </div>
+                                <div class="assistant-prompts" role="group" aria-label="대화 예시 선택">
+                                    <span>궁금한 질문을 선택해 보세요</span>
+                                    <button type="button" aria-pressed="true" data-landing-chat="expiry">유통기한 임박 재고</button>
+                                    <button type="button" aria-pressed="false" data-landing-chat="stock">부족한 재고 확인</button>
+                                    <button type="button" aria-pressed="false" data-landing-chat="order">다음 주 발주 추천</button>
+                                </div>
+                                <p class="assistant-demo-note">기능 소개를 위한 가상 대화입니다. 실제 재고 조회는 로그인 후 이용할 수 있습니다.</p>
+                            </div>
+                        </article>
+                        <article class="intelligence-card intelligence-report">
+                            <div class="intelligence-icon"><i class="ti ti-report-analytics" aria-hidden="true"></i><span>AI 주간 리포트</span></div>
+                            <h3>한 주의 기록을, 다음 관리의 기준으로.</h3>
+                            <p>입고·사용·폐기 내역과 보관 환경 데이터를 한 주 단위로 집계합니다. AI 분석 요약과 상세 내역을 함께 보며 운영 흐름을 점검하세요.</p>
+                            <div class="report-preview" aria-label="주간 리포트 구성 예시">
+                                <div class="detail-preview-heading"><strong>WEEKLY REVIEW</strong><span>리포트 구성</span></div>
+                                <div class="report-categories"><span><i class="ti ti-package-import" aria-hidden="true"></i>입고</span><span><i class="ti ti-package-export" aria-hidden="true"></i>사용</span><span><i class="ti ti-trash" aria-hidden="true"></i>폐기</span></div>
+                                <div class="report-summary"><i class="ti ti-sparkles" aria-hidden="true"></i><div><strong>재고와 환경을 함께 요약</strong><p>구역별 환경 통계, 기준 이탈과 문 개폐 데이터를 함께 확인합니다.</p></div></div>
+                            </div>
+                        </article>
+                    </div>
+                </section>
+
+                <section id="flow" class="flow-section" aria-labelledby="flow-title">
+                    <div>
+                        <div class="eyebrow">
+                            <span>
+                            </span>
+                            ONE CONTINUOUS FLOW
+                        </div>
+                        <h2 id="flow-title">
+                            등록하고, 확인하고,
+                            <br>
+                            <em>
+                                대응하는 일
+                            </em>
+                            을 하나로.
+                        </h2>
+                    </div>
+                    <div class="flow-steps">
+                        <div>
+                            <strong>
+                                01
+                            </strong>
+                            <h3>
+                                구성
+                            </h3>
+                            <p>
+                                조직과 저장 환경을 등록합니다.
+                            </p>
+                        </div>
+                        <i class="ti ti-arrow-right">
+                        </i>
+                        <div>
+                            <strong>
+                                02
+                            </strong>
+                            <h3>
+                                관찰
+                            </h3>
+                            <p>
+                                환경과 재고 상태를 확인합니다.
+                            </p>
+                        </div>
+                        <i class="ti ti-arrow-right">
+                        </i>
+                        <div>
+                            <strong>
+                                03
+                            </strong>
+                            <h3>
+                                대응
+                            </h3>
+                            <p>
+                                알림과 이력으로 조치합니다.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+                <section class="landing-cta">
+                    <div>
+                        <div class="eyebrow">
+                            <span>
+                            </span>
+                            GET STARTED
+                        </div>
+                        <h2>
+                            더 나은 의약품 운영은
+                            <br>
+                            좋은 시야에서 시작됩니다.
+                        </h2>
+                    </div>
+                    <a class="primary-action" href="/login">
+                        iUnoT 시작하기
+                        <i class="ti ti-arrow-up-right">
+                        </i>
+                    </a>
+                </section>
+            </main>
+            <div th:replace="~{fragments/footer :: footer}"></div>
+        </div>
+        <script th:src="@{/js/landing.js}" defer></script>
+    </body>
 </html>
