@@ -37,14 +37,14 @@
                         <div class="dropdown-menu">
                             <a class="dropdown-item" th:if="${departments.orgAdmin}"
                                th:classappend="${orgWide} ? 'active' : ''"
-                               th:href="@{/(departmentId=0)}">조직 전체 (모든 부서 합산)</a>
+                               th:href="@{/dashboard(departmentId=0)}">조직 전체 (모든 부서 합산)</a>
 
                             <div class="dropdown-divider"
                                  th:if="${departments.orgAdmin and !#lists.isEmpty(departments.departments)}"></div>
 
                             <a class="dropdown-item" th:each="option : ${departments.options}"
                                th:classappend="${option.departmentId == selectedDepartmentId} ? 'active' : ''"
-                               th:href="@{/(departmentId=${option.departmentId})}"
+                               th:href="@{/dashboard(departmentId=${option.departmentId})}"
                                th:text="${option.name}">부서명</a>
                         </div>
                     </div>
@@ -101,7 +101,7 @@
                     <span class="badge status-badge status-critical"
                           th:text="'위험 ' + ${dangerZoneCount ?: 0}">위험 0</span>
 
-                    <form th:action="@{/}" method="get">
+                    <form th:action="@{/dashboard}" method="get">
                         <input type="hidden" name="departmentId"
                                th:value="${orgWide} ? 0 : ${selectedDepartmentId}">
                         <select name="storageId" class="form-select w-auto"
@@ -283,7 +283,7 @@
                     <div class="card-header">
                         <h3 class="card-title">AI 리포트</h3>
                         <div class="card-actions">
-                            <form th:action="@{/}" method="get">
+                            <form th:action="@{/dashboard}" method="get">
                                 <input type="hidden" name="departmentId"
                                        th:value="${orgWide} ? 0 : ${selectedDepartmentId}">
                                 <input type="hidden" name="storageId" th:value="${selectedStorageId}">
