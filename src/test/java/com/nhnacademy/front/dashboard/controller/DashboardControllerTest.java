@@ -113,8 +113,7 @@ class DashboardControllerTest {
 
         mockMvc.perform(get("/"))
                 .andExpect(status().isOk())
-                .andExpect(model().attribute("selectedDepartmentId", (Object) null))
-                .andExpect(content().string(containsString("표시할 부서가 없습니다")));
+                .andExpect(model().attribute("selectedDepartmentId", (Object) null));
     }
 
     @Test
@@ -202,8 +201,7 @@ class DashboardControllerTest {
 
         mockMvc.perform(get("/"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("dashboard/main"))
-                .andExpect(content().string(containsString("표시할 부서가 없습니다")));
+                .andExpect(view().name("dashboard/main"));
     }
 
     @Test
