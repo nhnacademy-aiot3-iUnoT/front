@@ -22,7 +22,6 @@ function loadStorages() {
                 result.data.forEach(storage => {
                     const option = document.createElement("option");
                     option.value = storage.storageId;
-                    // 저장소 이름만 표시하도록 수정
                     option.textContent = storage.name;
                     select.appendChild(option);
                 });
@@ -56,7 +55,6 @@ function renderInventoryTable(items) {
     const tbody = document.getElementById("inventoryTableBody");
     tbody.innerHTML = "";
 
-    // 데이터가 없을 때 명확하게 안내 문구 출력
     if (!items || items.length === 0) {
         tbody.innerHTML = `<tr><td colspan="8" class="text-center text-muted py-5">검토 대상 재고가 없습니다.</td></tr>`;
         return;
@@ -76,7 +74,7 @@ function renderInventoryTable(items) {
             <td>${lastReviewFormatted}</td>
             <td>
                 <button type="button" class="btn btn-primary btn-sm"
-                    onclick="openEventModal(${item.inventoryId}, ${item.zoneId}, '${item.lastReviewAt || ''}')">
+                    onclick="openEventModal(${item.inventoryId}, ${item.zoneId}, '${item.lastReviewAt || ''}', ${item.medicinePackageUnitId})">
                     검토하기
                 </button>
             </td>
@@ -92,9 +90,8 @@ function renderPagination(pageData) {
 
     const { page, totalPages, last } = pageData;
 
-    if (totalPages <= 1) return; // 페이지가 1개 이하면 페이징 숨김
+    if (totalPages <= 1) return;
 
-    // 이전 버튼
     const prevBtn = document.createElement("button");
     prevBtn.type = "button";
     prevBtn.textContent = "이전";
@@ -117,13 +114,17 @@ function renderPagination(pageData) {
     pagination.appendChild(nextBtn);
 }
 
-// --- 4. 모달 제어 및 이벤트 내역 조회 (/api/core/environment-events) ---
-function openEventModal(inventoryId, zoneId, lastReviewAt) {
+// --- 4. 모달 제어 및 환경 기준/이벤트 내역 조회 ---
+function openEventModal(inventoryId, zoneId, lastReviewAt, medicinePackageUnitId) {
     currentSelectedInventoryId = inventoryId;
 
     document.getElementById("memoInput").value = "";
     document.querySelector('input[name="isOut"][value="false"]').checked = true;
 
+    // 1. 해당 의약품의 환경 기준치 조회 및 렌더링
+    loadEnvironmentStandards(medicinePackageUnitId);
+
+    // 2. 환경 이벤트 내역 조회 파라미터 설정
     const params = new URLSearchParams({
         zoneId: zoneId
     });
@@ -153,6 +154,47 @@ function openEventModal(inventoryId, zoneId, lastReviewAt) {
         });
 }
 
+// 환경 기준치 조회 함수
+function loadEnvironmentStandards(medicinePackageUnitId) {
+    const tbody = document.getElementById("environmentStandardTableBody");
+    tbody.innerHTML = `<tr><td colspan="3" class="text-center text-muted py-2">기준 정보를 불러오는 중...</td></tr>`;
+
+    apiFetch(`/api/core/package-units/${medicinePackageUnitId}/medicine-environment-types`)
+        .then(res => res.json())
+        .then(result => {
+            if (result.success && Array.isArray(result.data)) {
+                renderEnvironmentStandardTable(result.data);
+            } else {
+                tbody.innerHTML = `<tr><td colspan="3" class="text-center text-muted py-2">설정된 환경 기준이 없습니다.</td></tr>`;
+            }
+        })
+        .catch(err => {
+            console.error("환경 기준 조회 실패:", err);
+            tbody.innerHTML = `<tr><td colspan="3" class="text-center text-danger py-2">기준 조회 실패</td></tr>`;
+        });
+}
+
+// 환경 기준치 테이블 렌더링 함수
+function renderEnvironmentStandardTable(standards) {
+    const tbody = document.getElementById("environmentStandardTableBody");
+    tbody.innerHTML = "";
+
+    if (!standards || standards.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="3" class="text-center text-muted py-3">이 의약품에 설정된 환경 기준이 없습니다.</td></tr>`;
+        return;
+    }
+
+    standards.forEach(std => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td>${std.type}</td>
+            <td>${std.min !== null && std.min !== undefined ? std.min : '-'}</td>
+            <td>${std.max !== null && std.max !== undefined ? std.max : '-'}</td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
 function closeEventModal() {
     bootstrap.Modal
         .getOrCreateInstance(document.getElementById("eventModal"))
@@ -171,7 +213,7 @@ function renderEventTable(events) {
     events.forEach(event => {
         const row = document.createElement("tr");
         row.innerHTML = `
-                        <td>${event.environmentType}</td>
+            <td>${event.environmentType}</td>
             <td>${event.breachType}</td>
             <td>${event.detectedValue}</td>
             <td>${event.thresholdValue}</td>
@@ -198,7 +240,7 @@ function submitInventoryReview() {
             if (res.ok) {
                 alert('검토가 정상적으로 처리되었습니다.');
                 closeEventModal();
-                loadUnderReviewInventories(currentPage); // 현재 페이지 유지하며 목록 새로고침
+                loadUnderReviewInventories(currentPage);
             } else {
                 alert('검토 처리에 실패했습니다.');
             }
