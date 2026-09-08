@@ -24,19 +24,12 @@
         STORAGE: (note) => `/storages/${note.targetId}`,
     };
 
-    const isPanelOpen = () => panel.classList.contains('is-open');
-    const isNotesTabActive = () =>
-        document.querySelector('.chatbot-tab[data-tab="notes"]')?.classList.contains('is-active');
-
     const showTab = (name) => {
         tabs.forEach((tab) => tab.classList.toggle('is-active', tab.dataset.tab === name));
         panel.querySelectorAll('[data-panel]').forEach((element) => {
             element.hidden = element.dataset.panel !== name;
         });
 
-        if (name === 'notes') {
-            markVisibleRead();
-        }
     };
 
     const updateBadges = (count) => {
@@ -94,6 +87,14 @@
         card.className = `chatbot-note severity-${severity.toLowerCase()}`;
         card.dataset.noteId = note.noteId;
 
+        const dismiss = document.createElement('button');
+        dismiss.type = 'button';
+        dismiss.className = 'chatbot-note-dismiss';
+        dismiss.setAttribute('aria-label', '알림 확인');
+        dismiss.textContent = '\u00d7';
+        dismiss.addEventListener('click', () => markRead(card));
+        card.appendChild(dismiss);
+
         const header = document.createElement('div');
         header.className = 'chatbot-note-header';
         header.appendChild(chip('chatbot-note-operation', OPERATION_LABELS[note.operation] || '점검'));
@@ -135,22 +136,35 @@
         return String(createdAt).replace('T', ' ').slice(5, 16);
     };
 
-    const markRead = async (noteId) => {
+    // 서버 처리가 실패하면 카드를 남겨 사용자가 다시 시도할 수 있게 한다.
+    const markRead = async (card) => {
         try {
-            await fetch(`/chatbot/notes/${noteId}/read`, {method: 'POST'});
+            const response = await fetch(`/chatbot/notes/${card.dataset.noteId}/read`, {method: 'POST'});
+
+            if (response.ok) {
+                removeCard(card);
+            }
         } catch (error) {
-            // 다음 폴링에서 다시 시도된다.
+            // 카드를 그대로 두는 것으로 충분하다.
         }
     };
 
-    const markVisibleRead = () => {
-        updateBadges(0);
-        container.querySelectorAll('.chatbot-note').forEach((note) => markRead(note.dataset.noteId));
+    const removeCard = (card) => {
+        rendered.delete(Number(card.dataset.noteId));
+        card.remove();
+
+        const remaining = container.querySelectorAll('.chatbot-note').length;
+
+        updateBadges(remaining);
+
+        if (emptyMessage) {
+            emptyMessage.hidden = remaining > 0;
+        }
     };
 
     const poll = async () => {
         try {
-            const response = await fetch('/chatbot/notes?unread=false');
+            const response = await fetch('/chatbot/notes?unread=true');
 
             if (!response.ok) {
                 return;
@@ -164,14 +178,19 @@
                 renderNote(note);
             });
 
+            // 다른 화면에서 확인된 알림은 응답에 없으므로 여기서도 치운다.
+            const ids = new Set(notes.map((note) => note.noteId));
+
+            container.querySelectorAll('.chatbot-note').forEach((card) => {
+                if (!ids.has(Number(card.dataset.noteId))) {
+                    removeCard(card);
+                }
+            });
+
+            updateBadges(notes.length);
+
             if (emptyMessage) {
                 emptyMessage.hidden = notes.length > 0;
-            }
-
-            if (isPanelOpen() && isNotesTabActive()) {
-                markVisibleRead();
-            } else {
-                updateBadges(body.unreadCount || 0);
             }
         } catch (error) {
             // 네트워크 오류로 폴링이 멈추면 안 된다.
