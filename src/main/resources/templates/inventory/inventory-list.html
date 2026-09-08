@@ -6,54 +6,51 @@
 
 <head>
     <title>전체 재고 | iUnoT</title>
-    <link rel="stylesheet" th:href="@{/css/inventory-design.css}">
 </head>
 <body>
 
 
 <div layout:fragment="content">
-    <main class="inventory-page">
-        <div class="page-heading">
-
-
-            <p class="breadcrumb">
-                <span class="breadcrumb-parent">재고 관리</span>
-                <span class="breadcrumb-separator">/</span>
-                <span class="breadcrumb-current" th:text="${isBoss ? '전체 재고' : '소속 부서 재고'}">전체 재고</span>
-            </p>
-
-            <p class="description"
+    <main class="py-4">
+        <div class="page-header d-print-none mb-4">
+            <div class="row align-items-center">
+                <div class="col">
+                    <div class="page-pretitle">재고 관리</div>
+                    <h2 class="page-title" th:text="${isBoss ? '전체 재고' : '소속 부서 재고'}">전체 재고</h2>
+                    <div class="text-secondary mt-1"
                th:text="${isBoss ? '조직 전체에 등록된 의약품 재고와 보관 위치를 확인합니다.'
                : '소속 부서에 등록된 의약품 재고와 보관 위치를 확인합니다.'}">
                 의약품 재고와 보관 위치를 확인합니다.
-            </p>
+                    </div>
 
-
-            <div class="department-scope" th:if="${!isBoss and departmentNames != null and !departmentNames.isEmpty()}">
-                <span class="scope-label">조회 부서</span>
-                <span class="department-chip" th:each="department : ${departmentNames}" th:text="${department}">약제부</span>
-            </div>
-
-
-
-            <div class="header-actions">
-                <a th:href="@{/inventory}" class="primary-button">의약품 입고 등록</a>
+                    <div class="mt-3" th:if="${!isBoss and departmentNames != null and !departmentNames.isEmpty()}">
+                        <span class="badge bg-teal-lt me-1" th:each="department : ${departmentNames}" th:text="${department}">약제부</span>
+                    </div>
+                </div>
+                <div class="col-auto">
+                    <a th:href="@{/inventory}" class="btn btn-primary">
+                        <i class="ti ti-package-import me-1"></i>의약품 입고 등록
+                    </a>
+                </div>
             </div>
         </div>
-        <div class="alert alert-success"
+        <div class="alert alert-success alert-dismissible mb-4"
              th:if="${successMessage}"
              th:text="${successMessage}">
         </div>
-        <section class="inventory-card">
-            <form class="toolbar" method="get" th:action="@{/inventories}">
-
-                <label class="search-box">
-                    <span>⌕</span>
-                    <input id="inventory-search" name="search" type="search" placeholder="의약품명 검색">
-                </label>
-                <div class="filters">
-                    <!-- dropdown -->
-                    <select name="storage-id" class="storage-select">
+        <section class="card">
+            <form class="card-header" method="get" th:action="@{/inventories}">
+                <div class="row g-2 w-100">
+                    <div class="col-12 col-md">
+                        <label class="visually-hidden" for="inventory-search">의약품명 검색</label>
+                        <div class="input-icon">
+                            <span class="input-icon-addon"><i class="ti ti-search"></i></span>
+                            <input id="inventory-search" name="search" type="search" class="form-control" placeholder="의약품명 검색">
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-auto">
+                        <label class="visually-hidden" for="storage-select">저장소 목록</label>
+                        <select id="storage-select" name="storage-id" class="form-select">
 
                         <option value="">
                             저장소 목록
@@ -61,18 +58,18 @@
                         <option th:each="item : ${storages}" th:value="${item.storageId}" th:text="${item.storageName}">
                         </option>
 
-                    </select>
-
-                    <button type="submit" class="search-button">
-                        검색
-                    </button>
-
+                        </select>
+                    </div>
+                    <div class="col-12 col-md-auto">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="ti ti-search me-1"></i>검색
+                        </button>
+                    </div>
                 </div>
             </form>
 
-
-            <div class="table-wrap">
-                <table th:if="${inventories != null and !#lists.isEmpty(inventories)}">
+            <div class="table-responsive">
+                <table class="table table-vcenter table-hover card-table" th:if="${inventories != null and !#lists.isEmpty(inventories)}">
                     <thead>
                     <tr>
                         <th>의약품</th>
@@ -83,13 +80,13 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr th:each="item : ${inventories}" class="inventory-row" th:data-storage-id="${item.storageId}" th:data-pack-unit-id="${item.packUnitId}">
-                        <td class="medicine">
-                            <strong th:text="${item.productName}">
+                    <tr th:each="item : ${inventories}" class="clickable-row" th:data-storage-id="${item.storageId}" th:data-pack-unit-id="${item.packUnitId}">
+                        <td>
+                            <strong class="d-block" th:text="${item.productName}">
                                 의약품명
                             </strong>
 
-                            <small th:text="${item.packUnit}">
+                            <small class="text-secondary" th:text="${item.packUnit}">
                                 포장단위
                             </small>
                         </td>
@@ -103,22 +100,25 @@
                     </tbody>
                 </table>
 
-                <p class="empty-message" th:if="${inventories == null or #lists.isEmpty(inventories)}">
+                <div class="card-body text-center text-secondary py-5" th:if="${inventories == null or #lists.isEmpty(inventories)}">
+                    <i class="ti ti-building-warehouse fs-1 d-block mb-2"></i>
                     조회된 재고가 없습니다.
-                </p>
+                </div>
 
             </div>
 
 
-            <div class="pagination" th:if="${totalPages != null and totalPages > 1}">
+            <div class="card-footer" th:if="${totalPages != null and totalPages > 1}">
+                <ul class="pagination m-0 justify-content-center">
 
-                <a class="page-button" th:if="${startPage > 0}" th:href="@{/inventories(search=${search},storage-id=${selectedStorageId},page=${startPage - 1},size=${pageSize})}">이전</a>
+                <li class="page-item" th:if="${startPage > 0}"><a class="page-link" th:href="@{/inventories(search=${search},storage-id=${selectedStorageId},page=${startPage - 1},size=${pageSize})}">이전</a></li>
 
-                <a class="page-button" th:each="pageNum : ${#numbers.sequence(startPage,endPage)}" th:href="@{/inventories(search=${search},storage-id=${selectedStorageId},page=${pageNum},size=${pageSize})}"
-                    th:text="${pageNum + 1}" th:classappend="${pageNum == currentPage} ? ' active'" th:attr="aria-current=${pageNum == currentPage} ? 'page'">
-                </a>
+                <li class="page-item" th:each="pageNum : ${#numbers.sequence(startPage,endPage)}" th:classappend="${pageNum == currentPage} ? ' active'"><a class="page-link" th:href="@{/inventories(search=${search},storage-id=${selectedStorageId},page=${pageNum},size=${pageSize})}"
+                    th:text="${pageNum + 1}" th:attr="aria-current=${pageNum == currentPage} ? 'page'">
+                </a></li>
 
-                <a class="page-button" th:if="${endPage + 1 < totalPages}" th:href="@{/inventories(search=${search},storage-id=${selectedStorageId},page=${endPage + 1},size=${pageSize})}">다음</a>
+                <li class="page-item" th:if="${endPage + 1 < totalPages}"><a class="page-link" th:href="@{/inventories(search=${search},storage-id=${selectedStorageId},page=${endPage + 1},size=${pageSize})}">다음</a></li>
+                </ul>
             </div>
 
 
@@ -129,7 +129,7 @@
 <th:block layout:fragment="script">
     <script>
         const successAlert =
-            document.querySelector(".inventory-page .alert-success");
+            document.querySelector(".alert-success");
 
         if (successAlert) {
             setTimeout(() => {

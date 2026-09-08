@@ -79,6 +79,7 @@
 body {
     background-color: var(--canvas);
     color: var(--ink);
+    font-family: Inter, system-ui, -apple-system, "Noto Sans KR", sans-serif;
 }
 
 .clickable-row {
@@ -175,8 +176,31 @@ a:hover {
 
 .table thead th {
     color: var(--ink-soft);
-    background-color: var(--surface);
+    background-color: var(--canvas);
     border-bottom-color: var(--line-strong);
+    padding: .9rem 1.25rem;
+    font-size: .75rem;
+    font-weight: 600;
+    letter-spacing: 0;
+}
+
+.table tbody td {
+    padding: .9rem 1.25rem;
+    color: var(--ink-soft);
+    font-size: .8rem;
+    font-weight: 400;
+}
+
+.table tbody td strong {
+    color: var(--ink);
+    font-weight: 600;
+}
+
+/* 테이블의 핵심 값은 선명하게, 설명·상태 값은 위의 보조색을 유지 */
+.table tbody tr.clickable-row > td:first-child,
+.table tbody td .fw-bold,
+.table tbody td .fw-semibold {
+    color: var(--ink);
 }
 
 .nav-tabs {
