@@ -117,7 +117,7 @@ public class MedicineEnvController {
 
         medicineEnvApiClient.createTypes(packUnitId,request);
 
-        return REDIRECT_INVENTORIES;
+        return "redirect:/pack-units/"+ packUnitId + "/environment-standards";
 
     }
 
@@ -135,7 +135,7 @@ public class MedicineEnvController {
 
         medicineEnvApiClient.updateTypes(packUnitId,request);
 
-        return REDIRECT_INVENTORIES;
+        return "redirect:/pack-units/"+ packUnitId + "/environment-standards";
 
     }
 
@@ -146,10 +146,8 @@ public class MedicineEnvController {
 
         medicineEnvApiClient.deleteTypes(packUnitId);
 
-        return REDIRECT_INVENTORIES;
+        return "redirect:/pack-units/"+ packUnitId + "/environment-standards";
     }
-
-
 
 
 
