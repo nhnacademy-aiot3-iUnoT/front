@@ -8,6 +8,9 @@ import com.nhnacademy.front.medicine.dto.request.MedicineEnvironmentRequest;
 import com.nhnacademy.front.medicine.dto.request.MedicineSearchRequest;
 import com.nhnacademy.front.medicine.dto.response.MedicineEnvironmentTypeResponse;
 import com.nhnacademy.front.medicine.dto.response.MedicineSearchResponse;
+import com.nhnacademy.front.organization.client.OrganizationMemberApiClient;
+import com.nhnacademy.front.organization.dto.OrganizationRole;
+import com.nhnacademy.front.organization.dto.response.OrganizationMemberRoleResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -25,6 +28,7 @@ public class MedicineEnvController {
 
     private final MedicineEnvApiClient medicineEnvApiClient;
     private final MedicineInfoApiClient medicineInfoApiClient;
+    private final OrganizationMemberApiClient organizationMemberApiClient;
     private static final int PAGE_GROUP_SIZE = 10;
     private static final String ENV_VIEW = "inventory/medicine-env";
     private static final String REDIRECT_INVENTORIES = "redirect:/inventories";
@@ -32,7 +36,10 @@ public class MedicineEnvController {
 
     @GetMapping("/environment-standards")
     public String standardForm(){
-
+        OrganizationMemberRoleResponse role = organizationMemberApiClient.getRole();
+        if(role.role() == OrganizationRole.ORG_MEMBER) {
+            return "redirect:/403";
+        }
         return ENV_VIEW;
     }
 

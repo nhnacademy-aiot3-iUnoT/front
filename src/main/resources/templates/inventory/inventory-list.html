@@ -21,14 +21,19 @@
                th:text="${isMember ?  '소속 부서에 등록된 의약품 재고와 보관 위치를 확인합니다.' : '조직 전체에 등록된 의약품 재고와 보관 위치를 확인합니다.'}">
                 의약품 재고와 보관 위치를 확인합니다.
                     </div>
-
-                    <div class="mt-3" th:if="${isMember and departmentNames != null and !departmentNames.isEmpty()}">
-                        <span class="badge bg-teal-lt me-1" th:each="department : ${departmentNames}" th:text="${department}">약제부</span>
+                    <div class="mt-2">
+                        <span class="text-secondary">
+                            총 <span class="fw-semibold" th:text="${totalElements}">0</span>건
+                        </span>
+                            <span class="mt-3" th:if="${isMember and departmentNames != null and !departmentNames.isEmpty()}">
+                            <span class="badge bg-teal-lt me-1" th:each="department : ${departmentNames}" th:text="${department}">약제부</span>
+                        </span>
                     </div>
                 </div>
-                <div class="col-auto">
+                <div class="col-auto text-end">
                     <a th:href="@{/inventory}" class="btn btn-primary">
-                        <i class="ti ti-package-import me-1"></i>의약품 입고 등록
+                        <i class="ti ti-package-import me-1"></i>
+                        의약품 입고 등록
                     </a>
                 </div>
             </div>
