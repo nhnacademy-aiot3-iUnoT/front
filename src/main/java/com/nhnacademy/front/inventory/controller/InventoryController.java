@@ -63,9 +63,9 @@ public class InventoryController {
                                 .toList();
 
 
-        boolean isBoss = organizationMemberApiClient.getRole().role() == OrganizationRole.ORG_BOSS;
+        boolean isMember = organizationMemberApiClient.getRole().role() == OrganizationRole.ORG_MEMBER;
 
-        model.addAttribute("isBoss",isBoss);
+        model.addAttribute("isMember",isMember);
         model.addAttribute("departmentNames",departmentNames);
 
 
