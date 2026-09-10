@@ -13,6 +13,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ApiException.class)
     public ModelAndView handle(ApiException e) {
 
+        if (ErrorCode.G002.equals(e.getErrorCode())) {
+            return new ModelAndView("redirect:/403");
+        }
+
         ModelAndView mav = new ModelAndView();
         mav.setViewName(VIEW);
 

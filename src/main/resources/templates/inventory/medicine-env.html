@@ -136,6 +136,10 @@
         <div class="section-title current-environment-title">
             <div class="section-title-text">
 
+                <span>선택한 의약품</span>
+                <h2 th:text="|${medicine.productName} ${medicine.packUnit}|">의약품명</h2>
+
+
                 <h3>환경기준 변경</h3>
                 <p>변경할 환경기준을 입력해 주세요.</p>
             </div>
@@ -143,7 +147,7 @@
 
         <form method="post"
               class="delete-environment-form"
-              th:if="${environmentTypes != null and #lists.isEmpty(environmentTypes)}"
+              th:if="${environmentTypes != null and !#lists.isEmpty(environmentTypes)}"
               th:action="@{/pack-units/{packUnitId}/environment-standards(packUnitId=${packUnitId})}"
               onsubmit="return confirm('등록된 환경기준을 삭제하시겠습니까?');">
 

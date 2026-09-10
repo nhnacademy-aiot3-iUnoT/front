@@ -9,6 +9,10 @@ import java.util.Arrays;
 @RequiredArgsConstructor
 public enum TransactionReason {
 
+    INBOUND("일반 입고"),
+    TRANSFER_IN("이동 입고"),
+    INFO_CORRECTION_IN("정보정정 입고"),
+
     DISPENSING("조제·처방 출고"),
     STORAGE_TRANSFER("저장소 이동"),
     RETURN_TO_SUPPLIER("공급처 반품"),
