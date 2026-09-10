@@ -55,7 +55,6 @@ public class MedicineSearchController {
         model.addAttribute("selectedZoneId",zoneId);
 
         model.addAttribute("inboundMedicineRequest", InboundMedicineRequest.from(null,zoneId));
-
         model.addAttribute("today", LocalDate.now());
 
 

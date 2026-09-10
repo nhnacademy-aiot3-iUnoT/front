@@ -22,13 +22,20 @@
                     <div class="text-muted mt-1">저장소와 소속 구역을 관리합니다.</div>
                 </div>
 
-                <div class="col-auto action-buttons" th:if="${canManage}">
-                    <button type="button" class="btn btn-outline-secondary" onclick="openEditModal()">수정</button>
-                    <button type="button" class="btn btn-outline-warning" th:text="${storage.status.name() == 'ACTIVE'} ? '비활성화' : '활성화'"
-                            th:attr="onclick=|toggleStorageStatus('${storage.storageId}', '${storage.status.name()}')|">상태변경</button>
-                    <button type="button" class="btn btn-outline-danger" th:attr="onclick=|deleteStorage('${storage.storageId}')|">삭제</button>
-                    <a th:href="@{/storages/{storageId}/reports/weekly(storageId=${storage.storageId})}" class="btn btn-primary">
-                        <i class="ti ti-report"></i>주간 리포트</a>
+                <div class="d-flex justify-content-end gap-2 action-buttons">
+                    <div th:if="${canManage}" class="d-flex gap-2">
+                        <button type="button" class="btn btn-outline-secondary" onclick="openEditModal()">수정</button>
+                        <button type="button" class="btn btn-outline-warning" th:text="${storage.status.name() == 'ACTIVE'} ? '비활성화' : '활성화'"
+                                th:attr="onclick=|toggleStorageStatus('${storage.storageId}', '${storage.status.name()}')|">
+                            상태변경
+                        </button>
+                        <button type="button" class="btn btn-outline-danger" th:attr="onclick=|deleteStorage('${storage.storageId}')|">삭제</button>
+                    </div>
+                    <a th:href="@{/storages/{storageId}/reports/weekly(storageId=${storage.storageId})}"
+                       class="btn btn-primary">
+                        <i class="ti ti-report"></i>
+                        주간 리포트
+                    </a>
                 </div>
             </div>
         </div>

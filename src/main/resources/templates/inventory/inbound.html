@@ -37,7 +37,7 @@
 
             <!--        의약품 제품명 / 품목기준 검색-->
 
-            <form method="get" th:action="@{/medicines}">
+        <form method="get" th:action="@{/medicines}" novalidate>
 
                 <div class="search-type">
                     <label>
@@ -151,8 +151,8 @@
 
 
 
-            <!--    2. 입고등록 폼-->
-            <form id="inbound-form" class="inbound-form" method="post" th:action="@{/inventory}" th:object="${inboundMedicineRequest}">
+<!--    2. 입고등록 폼-->
+    <form id="inbound-form" class="inbound-form" method="post" th:action="@{/inventory}" th:object="${inboundMedicineRequest}" novalidate>
 
                 <input type="hidden" th:field="*{medicinePackageUnitId}">
 
