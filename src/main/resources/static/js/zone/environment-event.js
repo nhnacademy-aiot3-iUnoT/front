@@ -1,3 +1,14 @@
+const environmentTypeMap = {
+    "TEMPERATURE": "온도",
+    "HUMIDITY": "습도",
+    "ILLUMINANCE": "조도"
+};
+
+const breachTypeMap = {
+    "ABOVE_MAX": "최대값 초과",
+    "BELOW_MIN": "최소값 미만"
+};
+
 document.addEventListener("DOMContentLoaded", () => {
     fetchEnvironmentEvents(0);
 });
@@ -50,10 +61,13 @@ function renderTable(contentList) {
 
         const typeBadgeClass = `status-${item.environmentType.toLowerCase()}`;
 
+        const environmentTypeKo = environmentTypeMap[item.environmentType] || item.environmentType;
+        const breachTypeKo = breachTypeMap[item.breachType] || item.breachType;
+
         tr.innerHTML = `
             <td>${item.environmentEventId}</td>
-            <td><span class="badge status-badge ${typeBadgeClass}">${item.environmentType}</span></td>
-            <td><strong>${item.breachType}</strong></td>
+            <td><span class="badge status-badge ${typeBadgeClass}">${environmentTypeKo}</span></td>
+            <td><strong>${breachTypeKo}</strong></td>
             <td>${item.detectedValue}</td>
             <td>${item.thresholdValue}</td>
             <td>${item.organizationName} > ${item.storageName} > ${item.zoneName}</td>
