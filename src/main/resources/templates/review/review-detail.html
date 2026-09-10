@@ -97,8 +97,8 @@
                 </thead>
                 <tbody>
                 <tr th:each="event : ${reviewDetail.environmentEvents}">
-                    <td class="fw-medium" th:text="${event.environmentType.ko}">온도</td>
-                    <td th:text="${event.breachType.ko}">상한 초과</td>
+                    <td class="fw-medium" th:text="${event.environmentType}">온도</td>
+                    <td th:text="${event.breachType}">상한 초과</td>
                     <td class="text-end fw-bold text-red" th:text="${event.detectedValue}">0</td>
                     <td class="text-end text-muted" th:text="${event.thresholdValue}">0</td>
                     <td class="text-muted"
