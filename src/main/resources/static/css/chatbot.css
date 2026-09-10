@@ -94,6 +94,8 @@
     border-radius: 10px;
     font-size: 0.8rem;
     line-height: 1.5;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
 }
 
 .chatbot-message.assistant {
