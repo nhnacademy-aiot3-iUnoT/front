@@ -47,6 +47,7 @@ public class InboundMedicineRequest {
 
     @NotNull(message = "입고 유형을 선택해주세요.")
     private TransactionType transactionType;
+    private boolean overwriteExpirationDate;
 
     @Size(
             max = 255,
