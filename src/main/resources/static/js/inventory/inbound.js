@@ -888,7 +888,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         expirationDate;
 
                     confirmButton.textContent =
-                        "정정 후 입고";
+                        "덮어쓰기";
                 }
             } catch (error) {
                 console.error(
