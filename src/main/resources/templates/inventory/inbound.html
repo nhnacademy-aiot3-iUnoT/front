@@ -10,79 +10,79 @@
 </head>
 <body>
 <div layout:fragment="content">
-    <main class="inbound-page">
+<main class="inbound-page">
 
-        <div class="page-header d-print-none mb-4 pt-4">
-            <div class="row align-items-center">
-                <div class="col">
-                    <div class="page-pretitle">재고 관리</div>
-                    <h2 class="page-title">의약품 입고</h2>
-                    <div class="text-muted mt-1">의약품을 검색하고 보관 위치와 입고 내역을 등록합니다.</div>
-                </div>
-                <div class="col-auto">
-                    <a class="btn btn-outline-secondary" th:href="@{/inventories}">재고 목록</a>
-                </div>
+    <div class="page-header d-print-none mb-4 pt-4">
+        <div class="row align-items-center">
+            <div class="col">
+                <div class="page-pretitle">재고 관리</div>
+                <h2 class="page-title">의약품 입고</h2>
+                <div class="text-muted mt-1">의약품을 검색하고 보관 위치와 입고 내역을 등록합니다.</div>
+            </div>
+            <div class="col-auto">
+                <a class="btn btn-outline-secondary" th:href="@{/inventories}">재고 목록</a>
             </div>
         </div>
+    </div>
 
-        <section class="medicine-section">
-            <header class="medicine-header">
-                <span class="step-number">01</span>
+    <section class="medicine-section">
+        <header class="medicine-header">
+            <span class="step-number">01</span>
 
-                <div>
-                    <h2>기본 입고 정보</h2>
-                    <p>입고할 의약품을 검색하고 선택합니다.</p>
-                </div>
-            </header>
+            <div>
+                <h2>기본 입고 정보</h2>
+                <p>입고할 의약품을 검색하고 선택합니다.</p>
+            </div>
+        </header>
 
-            <!--        의약품 제품명 / 품목기준 검색-->
+<!--        의약품 제품명 / 품목기준 검색-->
 
         <form method="get" th:action="@{/medicines}">
 
-                <div class="search-type">
-                    <label>
-                        <input type="radio" name="searchType" value="PRODUCT_NAME" checked>
-                        제품명 검색
-                    </label>
+            <div class="search-type">
+            <label>
+            <input type="radio" name="searchType" value="PRODUCT_NAME" checked>
+                제품명 검색
+            </label>
 
-                    <label>
-                        <input type="radio" name="searchType" value="ITEM_CODE">
-                        품목기준코드 검색
-                    </label>
+            <label>
+                <input type="radio" name="searchType" value="ITEM_CODE">
+                품목기준코드 검색
+            </label>
 
-                </div>
+            </div>
 
-                <div class="search-input-group">
-                    <label for="medicine-search" class="visually-hidden">
-                        의약품 검색어
-                    </label>
-                    <input type="search"  id="medicine-search" name="search" placeholder="제품명을 입력하세요." required>
-                    <button type="submit">검색</button>
-                </div>
-
-
-                <input type="hidden" id="search-storage-id" name="storageId" th:value="${selectedStorageId}">
-                <input type="hidden" id="search-zone-id" name="zoneId" th:value="${selectedZoneId}">
-
-            </form>
+            <div class="search-input-group">
+                <label for="medicine-search" class="visually-hidden">
+                    의약품 검색어
+                </label>
+                <input type="search"  id="medicine-search" name="search" placeholder="제품명을 입력하세요." required>
+                <button type="submit">검색</button>
+            </div>
 
 
+            <input type="hidden" id="search-storage-id" name="storageId" th:value="${selectedStorageId}">
+            <input type="hidden" id="search-zone-id" name="zoneId" th:value="${selectedZoneId}">
 
-            <!--        의약품 결과 조회-->
+        </form>
 
-            <section class="medicine-result-section" th:if="${medicines != null}">
 
-                <div class="section-heading">
-                    <h2>검색 결과</h2>
-                    <span th:text="|총 ${medicines.totalElements} 건|"></span>
-                </div>
 
-                <p class="empty-result" th:if="${#lists.isEmpty(medicines.content)}">
-                    검색 결과가 없습니다.
-                </p>
+<!--        의약품 결과 조회-->
 
-                <table th:if="${! #lists.isEmpty(medicines.content)}">
-                    <thead>
+        <section class="medicine-result-section" th:if="${medicines != null}">
+
+            <div class="section-heading">
+                <h2>검색 결과</h2>
+                <span th:text="|총 ${medicines.totalElements} 건|"></span>
+            </div>
+
+            <p class="empty-result" th:if="${#lists.isEmpty(medicines.content)}">
+                검색 결과가 없습니다.
+            </p>
+
+            <table th:if="${! #lists.isEmpty(medicines.content)}">
+                <thead>
                     <tr>
                         <th>품목기준코드</th>
                         <th>제품명</th>
@@ -91,9 +91,9 @@
 
                     </tr>
 
-                    </thead>
+                </thead>
 
-                    <tbody>
+                <tbody>
                     <tr th:each="item : ${medicines.content}" class="medicine-row" tabindex="0" role="link"
                         th:data-url="@{/medicine-pack-units/{packageUnitId}(packageUnitId=${item.packageUnitId})}">
                         <td th:text="${item.itemCode}"></td>
@@ -101,38 +101,38 @@
                         <td th:text="${item.companyName}"></td>
                         <td th:text="${item.packUnit}"></td>
                     </tr>
-                    </tbody>
+                </tbody>
 
-                </table>
+            </table>
 
 
-                <div class="pagination" th:if="${medicines != null and medicines.totalPages > 1}">
+            <div class="pagination" th:if="${medicines != null and medicines.totalPages > 1}">
 
-                    <a th:if="${currentPage >0}"
-                       th:href="@{/medicines(searchType=${medicineSearchRequest.searchType},
+                <a th:if="${currentPage >0}"
+                   th:href="@{/medicines(searchType=${medicineSearchRequest.searchType},
                    search=${medicineSearchRequest.search},
                    storageId=${selectedStorageId},
                    zoneId=${selectedZoneId},
                    page=${currentPage - 1},
                    size=${pageSize}
                    )}">
-                        이전
-                    </a>
+                    이전
+                </a>
 
-                    <a th:each="pageNum : ${#numbers.sequence(startPage, endPage)}"
-                       th:href="@{/medicines(searchType=${medicineSearchRequest.searchType},
+                <a th:each="pageNum : ${#numbers.sequence(startPage, endPage)}"
+                   th:href="@{/medicines(searchType=${medicineSearchRequest.searchType},
                    search=${medicineSearchRequest.search},
                    storageId=${selectedStorageId},
                    zoneId=${selectedZoneId},
                    page=${pageNum},
                    size=${pageSize}
                    )}"
-                       th:text="${pageNum + 1}"
-                       th:classappend="${pageNum == currentPage} ? ' active'">
-                    </a>
+                   th:text="${pageNum + 1}"
+                   th:classappend="${pageNum == currentPage} ? ' active'">
+                </a>
 
-                    <a th:if="${currentPage + 1 < totalPages}"
-                       th:href="@{/medicines(
+                <a th:if="${currentPage + 1 < totalPages}"
+                    th:href="@{/medicines(
                     searchType=${medicineSearchRequest.searchType},
                     search=${medicineSearchRequest.search},
                     storageId=${selectedStorageId},
@@ -140,416 +140,451 @@
                     page=${currentPage + 1},
                     size=${pageSize}
                     )}">
-                        다음
-                    </a>
+                    다음
+                </a>
 
-                </div>
+            </div>
 
 
 
-            </section>
+        </section>
 
 
 
 <!--    2. 입고등록 폼-->
     <form id="inbound-form" class="inbound-form" method="post" th:action="@{/inventory}" th:object="${inboundMedicineRequest}">
 
-                <input type="hidden" th:field="*{medicinePackageUnitId}">
-
-                <section class="storage-location-section">
-                    <header class="section-header">
-                        <span class="step-number">02</span>
-
-                        <div>
-                            <h2>보관 위치 및 환경 확인</h2>
-                            <p>소속 조직의 사용 가능한 저장소와 보관 구역만 표시됩니다.</p>
-                        </div>
-
-                        <span class="section-status">확인 필요</span>
-                    </header>
-
-
-                    <div class="location-select-list" th:if="${! #lists.isEmpty(storages)}">
-                        <div class="select-field">
-                            <label for="storage-id">
-                                저장소
-                                <span aria-hidden="true">*</span>
-                            </label>
-
-                            <select id="storage-id" name="storageId" th:data-selected-id="${selectedStorageId}" required>
-                                <option value="">
-                                    저장소를 선택하세요.
-                                </option>
-                                <option th:each="item : ${storages}" th:value="${item.storageId}" th:text="${item.name}" th:selected="${item.storageId == selectedStorageId}">
-                                </option>
-
-                            </select>
-
-                        </div>
-
-                        <div class="select-field">
-                            <label for="zone-id">
-                                구역
-                                <span aria-hidden="true">*</span>
-                            </label>
-
-                            <select id="zone-id" th:field="*{zoneId}" th:data-selected-id="${selectedZoneId}" required disabled>
-                                <option value="">먼저 저장소를 선택하세요.</option>
-                            </select>
-
-                            <p class="field-error" th:if="${#fields.hasErrors('zoneId')}" th:errors="*{zoneId}"></p>
-
-
-                        </div>
-
-                    </div>
-
-                    <p id="zone-message" role="status" hidden></p>
-
-                </section>
-
-
-                <!--        의약품 선택 시 의약품 o-->
-                <div class="medicine-selected-content" th:if="${medicine != null}">
-
-
-                    <section id="medicine-detail" class="medicine-detail-section">
-
-                        <h2>선택한 의약품</h2>
-
-                        <div class="detail-grid">
-
-                            <div class="detail-item">
-                                <span>제품명</span>
-                                <strong id="selectedProductName" th:text="${medicine.productName}">
-                                </strong>
-                            </div>
-
-                            <div class="detail-item">
-                                <span>품목기준코드</span>
-                                <strong th:text="${medicine.itemCode}"></strong>
-                            </div>
-
-                            <div class="detail-item">
-                                <span>업체명</span>
-                                <strong th:text="${medicine.companyName}">
-                                </strong>
-                            </div>
-
-                            <div class="detail-item">
-                                <span>보관방법</span>
-                                <strong th:text="${medicine.storageMethod}"></strong>
-
-                            </div>
-
-                            <div class="detail-item">
-                                <span>유효기간</span>
-                                <strong th:text="${medicine.validityPeriod}"></strong>
-                            </div>
-
-                            <div class="detail-item">
-                                <span>포장단위</span>
-                                <strong th:text="${medicine.packUnit}"></strong>
-                            </div>
-
-                            <div class="detail-item">
-                                <span>마약류 세부 분류</span>
-                                <strong th:text="${medicine.narcoticKindCode == null ? '해당 없음': (medicine.narcoticKindCode == '향정'? '향정신성의약품': medicine.narcoticKindCode)}"></strong>
-                            </div>
-                        </div>
-                    </section>
-
-
-
-                    <!--        환경 확인 결과    -->
-                    <section class="environment-section">
-                        <div class="environment-summary is-pending" id="environment-summary" role="status">
-
-                            <strong data-summary-title>보관 구역을 선택해 주세요.</strong>
-
-                            <span data-summary-description>구역을 선택하면 환경 기준 충족 여부를 확인할 수 있습니다.</span>
-                        </div>
-
-                        <div class="environment-list">
-
-
-                            <!--                   온도 -->
-                            <article class="environment-card" data-environment-type="TEMPERATURE">
-
-                                <div class="environment-header">
-                                    <span class="environment-unit">℃</span>
-
-                                    <h3>온도</h3>
-                                    <span class="environment-status" data-environment-status>구역 선택 전</span>
-                                </div>
-
-                                <div class="environment-range">
-                                    <span>구역 관리 범위</span>
-                                    <strong data-zone-range>구역을 선택하세요.</strong>
-                                </div>
-
-                                <div class="environment-range">
-                                    <span>의약품 허용 범위</span>
-
-                                    <strong th:if="${temperature == null}">
-                                        설정된 온도값이 없습니다.
-                                    </strong>
-
-                                    <strong th:if="${temperature != null}" th:attr="data-medicine-min=${temperature.min},data-medicine-max=${temperature.max}">
-                                        <span th:text="${temperature.min}"></span>
-                                        ~
-                                        <span th:text="${temperature.max}"></span>
-                                        ℃
-                                    </strong>
-
-                                </div>
-                            </article>
-
-
-                            <article class="environment-card" data-environment-type="HUMIDITY">
-                                <div class="environment-header">
-                                    <span class="environment-unit">%</span>
-
-                                    <h3>습도</h3>
-
-                                    <span class="environment-status" data-environment-status>
-                            구역 선택 전
-                        </span>
-                                </div>
-
-                                <div class="environment-range">
-                                    <span>구역 관리 범위</span>
-
-                                    <strong data-zone-range>
-                                        구역을 선택하세요.
-                                    </strong>
-                                </div>
-
-                                <div class="environment-range">
-                                    <span>의약품 허용 범위</span>
-
-                                    <strong th:if="${humidity == null}">
-                                        설정된 습도값이 없습니다.
-                                    </strong>
-
-                                    <strong th:if="${humidity != null}" th:attr="data-medicine-min=${humidity.min},data-medicine-max=${humidity.max}">
-                                        <span th:text="${humidity.min}"></span>
-                                        ~
-                                        <span th:text="${humidity.max}"></span>
-                                        %
-                                    </strong>
-
-
-                                </div>
-
-
-                            </article>
-
-                            <article class="environment-card" data-environment-type="ILLUMINATION">
-
-                                <div class="environment-header">
-                                    <span class="environment-unit">lx</span>
-                                    <h3>조도</h3>
-
-                                    <span class="environment-status" data-environment-status>
-                            구역 선택 전
-                        </span>
-                                </div>
-
-                                <div class="environment-range">
-                                    <span>구역 관리 범위</span>
-                                    <strong data-zone-range>
-                                        구역을 선택하세요.
-                                    </strong>
-                                </div>
-
-                                <div class="environment-range">
-                                    <span>의약품 허용 범위</span>
-
-                                    <strong th:if="${illuminance == null}">
-                                        설정된 조도값이 없습니다.
-                                    </strong>
-
-                                    <strong th:if="${illuminance != null}" th:attr="data-medicine-min=${illuminance.min},data-medicine-max=${illuminance.max}">
-                                        <span th:text="${illuminance.min}"></span>
-                                        ~
-                                        <span th:text="${illuminance.max}"></span>
-                                        lx
-                                    </strong>
-
-                                </div>
-
-                            </article>
-
-                        </div>
-
-                    </section>
-
-
-                    <section class="inbound-information-section">
-                        <h2>입고 정보</h2>
-
-                        <div class="inbound-field-list">
-                            <div class="input-field">
-                                <label for="lot-number">제조번호
-                                    <span aria-hidden="true">*</span>
-                                </label>
-
-                                <input type="text" id="lot-number" th:field="*{lotNumber}" pattern="\S+" minlength="5" maxlength="50" required placeholder="(예시: lot-12345)">
-                                <p class="field-error" th:if="${#fields.hasErrors('lotNumber')}" th:errors="*{lotNumber}"></p>
-                            </div>
-
-                            <div class="input-field">
-                                <label for="expiration-date">실제 유통기한
-                                    <span aria-hidden="true">*</span>
-                                </label>
-                                <input type="date" id="expiration-date" th:field="*{expirationDate}" th:min="${today}" required>
-
-                                <p class="field-error" th:if="${#fields.hasErrors('expirationDate')}" th:errors="*{expirationDate}"></p>
-                            </div>
-
-                            <div class="input-field">
-                                <label for="quantity">
-                                    입고수량
-                                    <span aria-hidden="true">*</span>
-                                </label>
-
-                                <input type="number" id="quantity" th:field="*{quantity}" min="1" required placeholder="200병">
-
-                                <p class="field-error" th:if="${#fields.hasErrors('quantity')}" th:errors="*{quantity}"></p>
-                            </div>
-
-
-                            <div class="input-field">
-                                <label for="transaction-type">
-                                    입고유형
-                                    <span aria-hidden="true">*</span>
-                                </label>
-
-                                <select id="transaction-type" th:field="*{transactionType}" required>
-                                    <option value="">입고 유형을 선택해주세요.</option>
-                                    <option value="INBOUND">일반 입고</option>
-                                    <option value="TRANSFER_IN">이동 입고</option>
-                                    <option value="INFO_CORRECTION_IN">정보정정 입고</option>
-                                </select>
-
-                                <p class="field-error" th:if="${#fields.hasErrors('transactionType')}" th:errors="*{transactionType}">
-
-                                </p>
-                            </div>
-
-
-                            <div class="input-field memo-field">
-                                <label for="memo">메모
-                                </label>
-
-                                <textarea id="memo"
-                                          th:field="*{memo}"
-                                          maxlength="255"
-                                          placeholder="입고 관련 특이사항을 입력해주세요."></textarea>
-                            </div>
-                        </div>
-                    </section>
+        <input type="hidden" th:field="*{medicinePackageUnitId}">
+        <input type="hidden"
+               id="overwrite-expiration-date"
+               th:field="*{overwriteExpirationDate}">
+
+        <section class="storage-location-section">
+            <header class="section-header">
+                <span class="step-number">02</span>
+
+                <div>
+                    <h2>보관 위치 및 환경 확인</h2>
+                    <p>소속 조직의 사용 가능한 저장소와 보관 구역만 표시됩니다.</p>
                 </div>
 
-                <div class="form-actions">
-                    <a class="back-button" th:href="@{/inventories}">이전</a>
-                    <button type="button" id="openSummaryButton" th:disabled="${medicine == null}">입고 등록</button>
+                <span class="section-status">확인 필요</span>
+            </header>
+
+
+            <div class="location-select-list" th:if="${! #lists.isEmpty(storages)}">
+                <div class="select-field">
+                    <label for="storage-id">
+                        저장소
+                        <span aria-hidden="true">*</span>
+                    </label>
+
+                    <select id="storage-id" name="storageId" th:data-selected-id="${selectedStorageId}" required>
+                        <option value="">
+                            저장소를 선택하세요.
+                        </option>
+                        <option th:each="item : ${storages}"
+                                th:value="${item.storageId}"
+                                th:text="${item.name}"
+                                th:selected="${item.storageId == selectedStorageId}"
+                                th:if="${item.status != null and item.status.name() == 'ACTIVE'}">
+                        </option>
+
+                    </select>
 
                 </div>
 
+                <div class="select-field">
+                    <label for="zone-id">
+                        구역
+                        <span aria-hidden="true">*</span>
+                    </label>
+
+                    <select id="zone-id" th:field="*{zoneId}" th:data-selected-id="${selectedZoneId}" required disabled>
+                        <option value="">먼저 저장소를 선택하세요.</option>
+                    </select>
+
+                    <p class="field-error" th:if="${#fields.hasErrors('zoneId')}" th:errors="*{zoneId}"></p>
 
 
-            </form>
+                </div>
+
+            </div>
+
+            <p id="zone-message" role="status" hidden></p>
 
         </section>
 
 
-        <div id="summaryModal">
-            <div class="summary-panel">
-
-                <h2>입고 정보 확인</h2>
-                <p>입력한 정보를 확인해주세요.</p>
-
-                <div class="summary-item">
-                    <span>제품명</span>
-                    <strong id="summaryProductName"></strong>
-                </div>
-
-                <div class="summary-item">
-                    <span>저장소</span>
-                    <strong id="summaryStorageName"></strong>
-                </div>
-
-                <div class="summary-item">
-                    <span>구역</span>
-                    <strong id="summaryZoneName"></strong>
-                </div>
-
-                <div class="summary-item">
-                    <span>제조번호</span>
-                    <strong id="summaryLotNumber"></strong>
-                </div>
-
-                <div class="summary-item">
-                    <span>유통기한</span>
-                    <strong id="summaryExpirationDate"></strong>
-                </div>
-
-                <div class="summary-item">
-                    <span>수량</span>
-                    <strong id="summaryQuantity"></strong>
-                </div>
-
-                <div class="summary-item">
-                    <span>입고유형</span>
-                    <strong id="summaryTransactionType"></strong>
-                </div>
-
-                <div class="summary-item">
-                    <span>메모</span>
-                    <strong id="summaryMemo"></strong>
-                </div>
+<!--        의약품 선택 시 의약품 o-->
+        <div class="medicine-selected-content" th:if="${medicine != null}">
 
 
-                <div id="summaryEnvironmentSection" hidden>
-                    <h3>의약품 환경 기준</h3>
+            <section id="medicine-detail"
+                     class="medicine-detail-section"
+                     th:attr="data-storage-method=${medicine.storageMethod}">
 
-                    <div class="summary-item" id="summaryTemperatureRow" hidden>
-                        <span>온도</span>
-                        <strong id="summaryTemperature"></strong>
+                <header class="medicine-summary-header">
+        <span class="medicine-summary-label">선택한 의약품</span>
+
+                    <h2 class="medicine-summary-title"
+                        id="selectedProductName"
+                        th:text="${medicine.productName}">
+                        의약품명
+                    </h2>
+
+                    <div class="medicine-summary-meta">
+            <span th:text="${medicine.itemCode}">품목기준코드</span>
+
+                        <span aria-hidden="true"> · </span>
+
+                        <span th:text="${medicine.companyName}">업체명</span>
+                    </div>
+                </header>
+
+                <dl class="medicine-summary-grid">
+                    <div class="medicine-summary-item">
+                        <dt>보관방법</dt>
+                        <dd th:text="${medicine.storageMethod}">보관방법</dd>
                     </div>
 
-                    <div class="summary-item" id="summaryHumidityRow" hidden>
-                        <span>습도</span>
-                        <strong id="summaryHumidity"></strong>
+                    <div class="medicine-summary-item">
+                        <dt>유효기간</dt>
+                        <dd th:text="${medicine.validityPeriod}">유효기간</dd>
                     </div>
 
-                    <div class="summary-item" id="summaryIlluminanceRow" hidden>
-                        <span>조도</span>
-                        <strong id="summaryIlluminance"></strong>
+                    <div class="medicine-summary-item">
+                        <dt>포장단위</dt>
+                        <dd th:text="${medicine.packUnit}">포장단위</dd>
+                    </div>
+
+                    <div class="medicine-summary-item">
+                        <dt>마약류 세부 분류</dt>
+                        <dd th:text="${medicine.narcoticKindCode == null? '해당 없음': (medicine.narcoticKindCode == '향정'? '향정신성의약품': medicine.narcoticKindCode)}">
+                            해당 없음
+                        </dd>
+                    </div>
+                </dl>
+                <div id="narcotic-permission-notice"
+                     class="narcotic-permission-notice"
+                     role="alert"
+                     tabindex="-1"
+                     th:if="${medicine.narcoticKindCode == '마약'or medicine.narcoticKindCode == '향정'or medicine.narcoticKindCode == '향정신성의약품'}">
+                    <span class="narcotic-permission-icon" aria-hidden="true">!</span>
+
+                    <div>
+                        <strong>관리자 권한이 필요한 의약품입니다.</strong>
+                        <p>마약류 및 향정신성의약품은 조직 소유자 또는 조직장만 입고할 수 있습니다.</p>
                     </div>
                 </div>
+            </section>
 
 
 
+<!--        환경 확인 결과    -->
+            <section class="environment-section">
+                <div class="environment-summary is-pending" id="environment-summary" role="status">
 
-                <div class="model-actions">
-                    <button type="button" id="closeSummaryButton">
-                        이전
-                    </button>
+                    <strong data-summary-title>보관 구역을 선택해 주세요.</strong>
 
-                    <button type="button" id="confirmInboundButton">
-                        입고 등록
-                    </button>
+                    <span data-summary-description>구역을 선택하면 환경 기준 충족 여부를 확인할 수 있습니다.</span>
                 </div>
 
-            </div>
+                <div class="environment-list">
+
+
+<!--                   온도 -->
+                <article class="environment-card" data-environment-type="TEMPERATURE">
+
+                    <div class="environment-header">
+                        <span class="environment-unit">℃</span>
+
+                        <h3>온도</h3>
+                        <span class="environment-status" data-environment-status>구역 선택 전</span>
+                    </div>
+
+                    <div class="environment-range">
+                        <span>구역 관리 범위</span>
+                        <strong data-zone-range>구역을 선택하세요.</strong>
+                    </div>
+
+                    <div class="environment-range">
+                        <span>등록된 비교 범위</span>
+
+                        <strong th:if="${temperature == null}">
+                            온도 기준이 등록되지 않았습니다.
+                        </strong>
+
+                        <strong th:if="${temperature != null}" th:attr="data-medicine-min=${temperature.min},data-medicine-max=${temperature.max}">
+                            <span th:text="${temperature.min}"></span>
+                            ~
+                            <span th:text="${temperature.max}"></span>
+                            ℃
+                        </strong>
+
+                    </div>
+                </article>
+
+
+                <article class="environment-card" data-environment-type="HUMIDITY">
+                    <div class="environment-header">
+                        <span class="environment-unit">%</span>
+
+                        <h3>습도</h3>
+
+                        <span class="environment-status" data-environment-status>
+                            구역 선택 전
+                        </span>
+                    </div>
+
+                    <div class="environment-range">
+                        <span>구역 관리 범위</span>
+
+                        <strong data-zone-range>
+                            구역을 선택하세요.
+                        </strong>
+                    </div>
+
+                    <div class="environment-range">
+                        <span>의약품 허용 범위</span>
+
+                    <strong th:if="${humidity == null}">
+                        습도 기준이 등록되지 않았습니다.
+                    </strong>
+
+                        <strong th:if="${humidity != null}"
+                                th:attr="data-medicine-min=${humidity.min},
+                         data-medicine-max=${humidity.max}">
+                            <span th:text="${humidity.min}"></span>
+                            ~
+                            <span th:text="${humidity.max}"></span>
+                            %
+                        </strong>
+
+
+                    </div>
+
+
+                </article>
+
+                <article class="environment-card" data-environment-type="ILLUMINATION">
+
+                    <div class="environment-header">
+                        <span class="environment-unit">lx</span>
+                        <h3>조도</h3>
+
+                        <span class="environment-status" data-environment-status>
+                            구역 선택 전
+                        </span>
+                    </div>
+
+                    <div class="environment-range">
+                        <span>구역 관리 범위</span>
+                        <strong data-zone-range>
+                            구역을 선택하세요.
+                        </strong>
+                    </div>
+
+                    <div class="environment-range">
+                        <span>등록된 비교 범위</span>
+
+                        <strong th:if="${illuminance == null}">
+                            조도 기준이 등록되지 않았습니다.
+                        </strong>
+
+                        <strong th:if="${illuminance != null}" th:attr="data-medicine-min=${illuminance.min},data-medicine-max=${illuminance.max}">
+                            <span th:text="${illuminance.min}"></span>
+                            ~
+                            <span th:text="${illuminance.max}"></span>
+                            lx
+                        </strong>
+
+                    </div>
+
+                </article>
+
+                </div>
+
+            </section>
+
+
+       <section class="inbound-information-section">
+           <h2>입고 정보</h2>
+
+           <div class="inbound-field-list">
+               <div class="input-field">
+                   <label for="lot-number">제조번호
+                       <span aria-hidden="true">*</span>
+                   </label>
+
+                   <input type="text" id="lot-number" th:field="*{lotNumber}" pattern="\S+" minlength="5" maxlength="50" required placeholder="(예시: lot-12345)">
+                   <p class="field-error" th:if="${#fields.hasErrors('lotNumber')}" th:errors="*{lotNumber}"></p>
+               </div>
+
+               <div class="input-field">
+                   <label for="expiration-date">실제 유통기한
+                        <span aria-hidden="true">*</span>
+                   </label>
+                   <input type="date" id="expiration-date" th:field="*{expirationDate}" th:min="${today}" required>
+
+                   <p class="field-error" th:if="${#fields.hasErrors('expirationDate')}" th:errors="*{expirationDate}"></p>
+               </div>
+
+               <div class="input-field">
+                   <label for="quantity">
+                       입고수량
+                       <span aria-hidden="true">*</span>
+                   </label>
+
+                   <input type="number" id="quantity" th:field="*{quantity}" min="1" required placeholder="200병">
+
+                   <p class="field-error" th:if="${#fields.hasErrors('quantity')}" th:errors="*{quantity}"></p>
+               </div>
+
+
+               <div class="input-field">
+                   <label for="transaction-type">
+                       입고유형
+                       <span aria-hidden="true">*</span>
+                   </label>
+
+                   <select id="transaction-type" th:field="*{transactionType}" required>
+                       <option value="">입고 유형을 선택해주세요.</option>
+                       <option value="INBOUND">일반 입고</option>
+                       <option value="TRANSFER_IN">이동 입고</option>
+                       <option value="INFO_CORRECTION_IN">정보정정 입고</option>
+                   </select>
+
+                   <p class="field-error"
+                      th:if="${#fields.hasErrors('transactionType')}">
+                       입고 유형을 다시 선택해주세요.
+                   </p>
+               </div>
+
+
+               <div class="input-field memo-field">
+                   <label for="memo">메모
+                   </label>
+
+                   <textarea id="memo"
+                             th:field="*{memo}"
+                             maxlength="255"
+                             placeholder="입고 관련 특이사항을 입력해주세요."></textarea>
+               </div>
+           </div>
+       </section>
+    </div>
+
+        <div class="form-actions">
+            <a class="back-button" th:href="@{/inventories}">이전</a>
+            <button type="button" id="openSummaryButton" th:disabled="${medicine == null}">입고 등록</button>
+
         </div>
 
 
 
-    </main>
+    </form>
+
+    </section>
+
+
+    <div id="summaryModal">
+        <div class="summary-panel">
+            <div id="lot-expiration-warning"
+                 class="alert alert-warning"
+                 role="alert"
+                 hidden>
+                <div>
+                    <strong>동일 제조번호의 기존 재고가 있습니다.</strong><br>
+                    기존 유통기한:
+                    <span id="existing-expiration-date"></span><br>
+                    입력한 유통기한:
+                    <span id="entered-expiration-date"></span><br>
+                    해당 구역 재고의 유통기한을 입력한 날짜로 변경하고 입고하시겠습니까?
+                </div>
+            </div>
+            <h2>입고 정보 확인</h2>
+            <p>입력한 정보를 확인해주세요.</p>
+
+            <div class="summary-item">
+                <span>제품명</span>
+                <strong id="summaryProductName"></strong>
+            </div>
+
+            <div class="summary-item">
+                <span>저장소</span>
+                <strong id="summaryStorageName"></strong>
+            </div>
+
+            <div class="summary-item">
+                <span>구역</span>
+                <strong id="summaryZoneName"></strong>
+            </div>
+
+            <div class="summary-item">
+                <span>제조번호</span>
+                <strong id="summaryLotNumber"></strong>
+            </div>
+
+            <div class="summary-item">
+                <span>유통기한</span>
+                <strong id="summaryExpirationDate"></strong>
+            </div>
+
+            <div class="summary-item">
+                <span>수량</span>
+                <strong id="summaryQuantity"></strong>
+            </div>
+
+            <div class="summary-item">
+                <span>입고유형</span>
+                <strong id="summaryTransactionType"></strong>
+            </div>
+
+            <div class="summary-item">
+                <span>메모</span>
+                <strong id="summaryMemo"></strong>
+            </div>
+
+
+            <div id="summaryEnvironmentSection" hidden>
+                <h3>의약품 환경 기준</h3>
+
+                <div class="summary-item" id="summaryTemperatureRow" hidden>
+                    <span>온도</span>
+                    <strong id="summaryTemperature"></strong>
+                </div>
+
+                <div class="summary-item" id="summaryHumidityRow" hidden>
+                    <span>습도</span>
+                    <strong id="summaryHumidity"></strong>
+                </div>
+
+                <div class="summary-item" id="summaryIlluminanceRow" hidden>
+                    <span>조도</span>
+                    <strong id="summaryIlluminance"></strong>
+                </div>
+            </div>
+
+
+
+
+            <div class="model-actions">
+            <button type="button" id="closeSummaryButton">
+                이전
+            </button>
+
+            <button type="button" id="confirmInboundButton">
+                입고 등록
+            </button>
+            </div>
+
+        </div>
+    </div>
+
+
+
+</main>
 </div>
 </body>
 </html>

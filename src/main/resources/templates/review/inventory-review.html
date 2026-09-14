@@ -24,7 +24,7 @@
                     <a class="btn btn-outline-secondary"
                        th:href="@{/inventories}">
                         <i class="ti ti-arrow-left me-1"></i>
-                        전체 재고 목록으로
+                        이전으로
                     </a>
 
                     <a class="btn btn-primary"
@@ -54,22 +54,21 @@
             </div>
 
             <div class="table-responsive">
-                <table class="table table-vcenter table-hover card-table">
+                <table class="table table-sm table-vcenter table-hover card-table">
                     <thead>
                     <tr>
-                        <th>제품명</th>
-                        <th>포장단위</th>
-                        <th>LOT 번호</th>
-                        <th>유통기한</th>
-                        <th>수량</th>
-                        <th>저장소 / 구역</th>
-                        <th>마지막 검토일</th>
-                        <th>관리</th>
+                        <th class="text-nowrap">의약품</th>
+                        <th class="text-nowrap">제조번호</th>
+                        <th class="text-nowrap">유통기한</th>
+                        <th class="text-nowrap">저장소 / 구역</th>
+                        <th class="text-nowrap">수량</th>
+                        <th class="text-nowrap">마지막 검토일</th>
+                        <th aria-label="검토 관리"></th>
                     </tr>
                     </thead>
                     <tbody id="inventoryTableBody">
                     <tr>
-                        <td colspan="8" class="text-center text-muted py-5">
+                        <td colspan="7" class="text-center text-muted py-5">
                             데이터를 불러오는 중입니다...
                         </td>
                     </tr>

@@ -291,7 +291,8 @@ tbody tr:last-child td {
 }
 
 .stock-table-wrap {
-    border-top: 1px solid var(--line);
+    border: 1px solid var(--line);
+    border-radius: 8px;
 }
 
 .stock-table {
@@ -305,12 +306,16 @@ tbody tr:last-child td {
 
 .stock-table th:first-child,
 .stock-table td:first-child {
-    padding-left: 0;
+    padding-left: 1rem;
 }
 
 .stock-table th:last-child,
 .stock-table td:last-child {
-    padding-right: 0;
+    padding-right: 1rem;
+}
+
+.stock-table tbody tr:last-child td {
+    border-bottom: 0;
 }
 
 .stock-table td strong {

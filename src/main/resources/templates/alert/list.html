@@ -17,8 +17,6 @@
                 <h1 class="page-title">알림 센터</h1>
             </div>
             <div class="col-auto">
-                <a th:href="@{/expiring}" class="btn btn-outline-secondary">
-                    <i class="ti ti-hourglass-high"></i>임박 재고 조회</a>
                 <button type="button" class="btn btn-outline-danger" th:if="${canManage}" onclick="deleteAllAlerts()">전체 삭제</button>
             </div>
         </div></div>
@@ -28,9 +26,9 @@
             <div class="card-body">
                 <div class="row g-2 align-items-end">
             <div class="col-md-4">
-                <label for="filter-alert-type" class="form-label">알림 타입</label>
+                <label for="filter-alert-type" class="form-label">알림 종류</label>
                 <select id="filter-alert-type" class="form-select" onchange="loadAlerts(0)">
-                    <option value="">전체 타입</option>
+                    <option value="">전체</option>
                     <option value="LOW_STOCK">재고 부족</option>
                     <option value="ENV_WARNING">환경 경고</option>
                     <option value="EXPIRING">유통기한 임박</option>
@@ -56,10 +54,10 @@
             <thead>
             <tr>
                 <th class="text-center">
-                    <input type="checkbox" id="select-all" onclick="toggleSelectAll(this)">
+                    <input type="checkbox" id="select-all" class="form-check-input" aria-label="현재 페이지 알림 전체 선택" onclick="toggleSelectAll(this)">
                 </th>
-                <th style="width: 120px;">조직 이름</th>
-                <th style="width: 130px;">타입</th>
+                <th style="width: 120px;">부서</th>
+                <th style="width: 130px;">알림 종류</th>
                 <th>메시지 내용</th>
                 <th class="text-center">발생 일시</th>
                 <th class="text-center">상태</th>

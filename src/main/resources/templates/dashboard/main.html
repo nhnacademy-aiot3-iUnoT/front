@@ -233,37 +233,36 @@
                     </div>
 
                     <div class="table-responsive" th:if="${expiring != null and !#lists.isEmpty(expiring.items)}">
-                        <table class="table table-vcenter card-table">
+                        <table class="table table-sm table-vcenter card-table dashboard-expiring-table">
                             <thead>
                             <tr>
-                                <th>저장소 / 구역</th>
-                                <th>의약품명 (단위)</th>
-                                <th>LOT</th>
-                                <th class="text-end">수량</th>
+                                <th>보관 위치</th>
+                                <th>의약품</th>
+                                <th>제조번호</th>
+                                <th class="text-center">수량</th>
                                 <th class="text-center">유통기한</th>
-                                <th class="text-center">잔여</th>
                             </tr>
                             </thead>
                             <tbody>
                             <tr th:each="item : ${expiring.items}">
-                                <td class="text-nowrap">
-                                    <div th:text="${item.storageName}">저장소</div>
-                                    <div class="text-secondary small" th:text="${item.zoneName}">구역</div>
+                                <td>
+                                    <div class="dashboard-expiring-location" th:text="${item.storageName}">저장소</div>
+                                    <div class="dashboard-expiring-location text-secondary small" th:text="${item.zoneName}">구역</div>
                                 </td>
-                                <td style="white-space: normal; overflow-wrap: anywhere;">
-                                    <a class="dashboard-stock-link"
-                                       th:href="@{/storages/{storageId}/pack-units/{packUnitId}(storageId=${item.storageId},packUnitId=${item.medicinePackageUnitId})}">
+                                <td class="dashboard-expiring-medicine">
+                                <a class="dashboard-stock-link" th:href="@{/storages/{storageId}/pack-units/{packUnitId}(storageId=${item.storageId},packUnitId=${item.medicinePackageUnitId})}">
                                         <strong th:text="${item.medicineName}">의약품명</strong>
-                                    </a>
+                                </a>
                                     <span class="d-block text-secondary small fw-normal mt-1" th:text="${item.packUnitName}">포장단위</span>
                                 </td>
-                                <td class="text-secondary text-nowrap" th:text="${item.lotNumber} ?: '-'">LOT</td>
-                                <td class="text-end" th:text="${item.currentQuantity}">0</td>
-                                <td class="text-center text-nowrap" th:text="${item.expirationDate}">2026-01-01</td>
+                                <td class="dashboard-expiring-lot text-nowrap"
+                                    th:text="${item.lotNumber} ?: '-'">제조번호</td>
+                                <td class="text-end text-nowrap" th:text="${item.currentQuantity}">0</td>
+
                                 <td class="text-center">
-                                    <span class="badge"
-                                          th:classappend="${item.urgent} ? 'bg-red-lt' : 'bg-yellow-lt'"
-                                          th:text="${item.ddayText}">D-0</span>
+                                    <div class="text-nowrap" th:text="${item.expirationDate}">2026-01-01</div>
+
+                                    <span class="badge mt-1" th:classappend="${item.urgent} ? 'bg-red-lt' : 'bg-yellow-lt'" th:text="${item.ddayText}">D-0</span>
                                 </td>
                             </tr>
                             </tbody>
