@@ -29,6 +29,7 @@
                   th:action="@{/inventories/{inventory-id}/disposal(inventory-id=${target.inventoryId})}"
                   th:object="${disposalRequest}"
                   method="post"
+                  th:attr="data-expiration-date=${target.expirationDate}"
                   novalidate>
                 <div class="card-body">
                     <div class="mb-3">
@@ -150,7 +151,19 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
                     </div>
                     <div class="modal-body">
-                        <p>선택한 수량을 폐기하시겠습니까? 폐기 처리 후에는 되돌릴 수 없습니다.</p>
+                        <p id="disposal-confirm-message">
+                            선택한 수량을 폐기하시겠습니까? 폐기 처리 후에는 되돌릴 수 없습니다.
+                        </p>
+                        <div id="expiration-warning"
+                             class="alert alert-warning mb-3"
+                             role="alert"
+                             hidden>
+                            <div>
+                                <strong>유통기한이 남아있는 재고입니다.</strong><br>
+                                유통기한은 <span id="confirm-expiration-date"></span>입니다.
+                                '유통기한 만료' 사유로 폐기하시겠습니까?
+                            </div>
+                        </div>
                         <div class="border rounded bg-secondary-lt p-3">
                             <div class="fw-bold" th:text="${target.productName}">의약품명</div>
                             <div class="small text-muted mt-2">

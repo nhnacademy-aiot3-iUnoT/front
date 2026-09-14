@@ -22,13 +22,20 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("confirm-disposal-memo-row");
     const confirmMemo =
         document.getElementById("confirm-disposal-memo");
+    const confirmMessage =
+        document.getElementById("disposal-confirm-message");
+    const expirationWarning =
+        document.getElementById("expiration-warning");
+    const confirmExpirationDate =
+        document.getElementById("confirm-expiration-date");
 
     // 확인 모달의 요소가 누락됐을 때 JavaScript 오류가 발생하지 않도록 막는다
     if (!form || !quantityInput || !reasonSelect
         || !memoGroup || !memoInput || !modalElement
         || !confirmButton || !confirmQuantity
         || !confirmReason || !confirmMemoRow
-        || !confirmMemo) {
+        || !confirmMemo || !expirationWarning
+        || !confirmExpirationDate || !confirmMessage) {
         return;
     }
 
@@ -42,6 +49,16 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!isOther) {
             memoInput.value = "";
         }
+    };
+
+    const getTodayText = () => {
+        const today = new Date();
+
+        return [
+            today.getFullYear(),
+            String(today.getMonth() + 1).padStart(2, "0"),
+            String(today.getDate()).padStart(2, "0")
+        ].join("-");
     };
 
     reasonSelect.addEventListener("change", () => {
@@ -105,6 +122,16 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!(quantityValid && reasonValid && memoValid)) {
             return;
         }
+
+        const expirationDate = form.dataset.expirationDate;
+        const isUnexpiredExpiredDisposal =
+            reasonSelect.value === "EXPIRED"
+            && expirationDate >= getTodayText();
+        confirmMessage.hidden = isUnexpiredExpiredDisposal;
+
+        expirationWarning.hidden = !isUnexpiredExpiredDisposal;
+        confirmExpirationDate.textContent =
+            isUnexpiredExpiredDisposal ? expirationDate : "";
 
         const selectedReason =
             reasonSelect.options[

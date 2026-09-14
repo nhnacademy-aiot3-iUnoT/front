@@ -140,7 +140,7 @@ async function loadExpiringInventories(page) {
             "inventory-table-body"
         ).innerHTML = `
             <tr>
-                <td colspan="8"
+                <td colspan="7"
                     class="text-center text-danger py-5">
                     ${escapeHtml(error.message)}
                 </td>
@@ -160,7 +160,7 @@ function renderTable(items, currentPage, size) {
     if (items.length === 0) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="8"
+                <td colspan="7"
                     class="text-center text-secondary py-5">
                     조건에 일치하는 재고가 없습니다.
                 </td>
@@ -204,12 +204,10 @@ function renderTable(items, currentPage, size) {
                 ${rowNumber}
             </td>
             <td>
-                ${escapeHtml(item.organizationName || "-")}
-            </td>
-            <td>
                 ${escapeHtml(item.storageName || "-")}
-                /
+            <span class="d-block text-secondary small mt-1">
                 ${escapeHtml(item.zoneName || "-")}
+            </span>
             </td>
             <td style="white-space: normal; overflow-wrap: anywhere;">
                 <strong class="d-block">
@@ -604,6 +602,7 @@ function getTodayText() {
 
     return `${year}-${month}-${day}`;
 }
+
 function getExpirationLabel(expirationDate) {
     if (!expirationDate) {
         return "-";

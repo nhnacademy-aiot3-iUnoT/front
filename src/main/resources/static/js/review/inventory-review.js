@@ -56,29 +56,51 @@ function renderInventoryTable(items) {
     tbody.innerHTML = "";
 
     if (!items || items.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" class="text-center text-muted py-5">검토 대상 재고가 없습니다.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-5">검토 대상 재고가 없습니다.</td></tr>`;
         return;
     }
 
     items.forEach(item => {
         const row = document.createElement("tr");
-        const lastReviewFormatted = item.lastReviewAt ? item.lastReviewAt.replace('T', ' ') : '-';
+        const lastReviewDate = item.lastReviewAt ? item.lastReviewAt.slice(0, 10) : '-';
+        const lastReviewTime = item.lastReviewAt ? item.lastReviewAt.slice(11, 19) : '';
 
-        row.innerHTML = `
-            <td>${item.productName}</td>
-            <td>${item.packUnit}</td>
-            <td>${item.lotNumber}</td>
-            <td>${item.expirationDate}</td>
-            <td>${item.currentQuantity}</td>
-            <td>${item.storageName} / ${item.zoneName}</td>
-            <td>${lastReviewFormatted}</td>
+            row.innerHTML = `
             <td>
-                <button type="button" class="btn btn-primary btn-sm"
+            <strong class="d-block">${item.productName}</strong>
+        <small class="d-block text-secondary">${item.packUnit}</small>
+    </td>
+
+        <td class="text-nowrap">${item.lotNumber}</td>
+
+        <td class="text-nowrap">${item.expirationDate}</td>
+
+        <td>
+            <strong class="d-block fw-normal text-nowrap">
+                ${item.storageName}
+            </strong>
+            <small class="d-block text-secondary text-nowrap">
+                ${item.zoneName}
+            </small>
+        </td>
+
+        <td class="text-nowrap">${item.currentQuantity}</td>
+
+        <td>
+            <span class="d-block text-nowrap">${lastReviewDate}</span>
+            <small class="d-block text-secondary text-nowrap">
+                ${lastReviewTime}
+            </small>
+        </td>
+
+        <td class="text-end text-nowrap">
+            <button type="button"
+                    class="btn btn-primary btn-sm"
                     onclick="openEventModal(${item.inventoryId}, ${item.zoneId}, '${item.lastReviewAt || ''}', ${item.medicinePackageUnitId})">
-                    검토하기
-                </button>
-            </td>
-        `;
+                검토하기
+            </button>
+        </td>
+            `;
         tbody.appendChild(row);
     });
 }

@@ -39,8 +39,8 @@ function loadAlerts(page = 0) {
                 }
 
                 tr.innerHTML = `
-                <td class="text-center"><input type="checkbox" class="alert-checkbox" value="${item.alertId}"></td>
-                <td>${item.organizationName}</td>
+                <td class="text-center"><input type="checkbox" class="form-check-input alert-checkbox" value="${item.alertId}" aria-label="알림 선택"></td>
+                <td><strong class="department-name">조회 중...</strong></td>
                 <td><span class="badge status-badge status-warning">${formatAlertType(item.alertType)}</span></td>
                 <td class="alert-message"></td>
                 <td class="text-center text-secondary small">${formatDate(item.createdAt)}</td>
@@ -66,6 +66,13 @@ function loadAlerts(page = 0) {
                 } else {
                     messageCell.textContent = item.message;
                 }
+                getDepartmentNames(item.message)
+                    .then(names => {
+                        tr.querySelector('.department-name').textContent = names;
+                    })
+                    .catch(() => {
+                        tr.querySelector('.department-name').textContent = '-';
+                    });
                 tbody.appendChild(tr);
             });
 
@@ -75,6 +82,63 @@ function loadAlerts(page = 0) {
         .catch(err => {
             console.error('알림 조회 실패:', err);
         });
+}
+let myDepartmentIdsPromise;
+const departmentNamesByStorage = new Map();
+
+async function getMyDepartmentIds() {
+    if (!myDepartmentIdsPromise) {
+        myDepartmentIdsPromise = apiFetch('/api/core/departments/me', {
+            method: 'GET'
+        })
+            .then(response => response.json())
+            .then(result => new Set(
+                (result.data || []).map(department => department.id)
+            ));
+    }
+
+    return myDepartmentIdsPromise;
+}
+
+async function getDepartmentNames(message) {
+    const storageName =
+        message?.match(/^\[([^\]]+)]/)?.[1]?.trim()
+        ?? message?.match(/^저장소:\s*(.+?)\s+의약품:/)?.[1]?.trim();
+
+    if (!storageName) return '-';
+
+    if (!departmentNamesByStorage.has(storageName)) {
+        departmentNamesByStorage.set(storageName, (async () => {
+            const [storageResponse, myDepartmentIds] = await Promise.all([
+                apiFetch(
+                    `/api/core/storages?name=${encodeURIComponent(storageName)}`,
+                    { method: 'GET' }
+                ),
+                getMyDepartmentIds()
+            ]);
+
+            const storageData = await storageResponse.json();
+            const storage = (storageData.data || [])
+                .find(item => item.name === storageName);
+
+            if (!storage) return '-';
+
+            const departmentResponse = await apiFetch(
+                `/api/core/storages/${storage.storageId}/departments`,
+                { method: 'GET' }
+            );
+            const departmentData = await departmentResponse.json();
+
+            return (departmentData.data || [])
+                .filter(department =>
+                    myDepartmentIds.has(department.departmentId)
+                )
+                .map(department => department.name)
+                .join(', ') || '-';
+        })());
+    }
+
+    return departmentNamesByStorage.get(storageName);
 }
 
 // 페이지네이션 버튼 동적 생성 로직

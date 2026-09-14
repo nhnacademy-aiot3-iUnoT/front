@@ -433,3 +433,51 @@ a:hover {
     text-decoration: underline;
     text-underline-offset: 3px;
 }
+
+.dashboard-expiring-table {
+    width: 100%;
+    table-layout: fixed;
+}
+
+.dashboard-expiring-table th:nth-child(1) {
+    width: 21%;
+}
+
+.dashboard-expiring-table th:nth-child(2) {
+    width: 30%;
+}
+
+.dashboard-expiring-table th:nth-child(3) {
+    width: 24%;
+}
+
+.dashboard-expiring-table th:nth-child(4) {
+    width: 8%;
+}
+.dashboard-expiring-table th:nth-child(5) {
+    width: 17%;
+}
+
+.dashboard-expiring-table th,
+.dashboard-expiring-table td {
+    padding-right: 0.5rem;
+    padding-left: 0.5rem;
+}
+.dashboard-expiring-table th:nth-child(2),
+.dashboard-expiring-table td:nth-child(2) {
+    padding-right: 0.25rem;
+}
+
+.dashboard-expiring-table th:nth-child(3),
+.dashboard-expiring-table td:nth-child(3) {
+    padding-left: 0.25rem;
+}
+
+.dashboard-expiring-location {
+    white-space: nowrap;
+}
+
+.dashboard-expiring-medicine {
+    white-space: normal;
+    overflow-wrap: anywhere;
+}

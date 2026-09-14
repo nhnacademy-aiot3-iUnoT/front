@@ -52,6 +52,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
 // 저장소를 선택하면 해당 저장소의 구역 목록만 JSON으로 조회
+    const medicineDetail = document.querySelector('#medicine-detail');
+    const storageTemperatureRange = parseTemperatureRange(medicineDetail?.dataset.storageMethod ?? '');
     const storageSelect = document.querySelector('#storage-id');
     const zoneSelect = document.querySelector('#zone-id');
     const selectedZoneInput = document.querySelector('#selected-zone-id');
@@ -121,7 +123,12 @@ document.addEventListener('DOMContentLoaded', () => {
             // ApiResponse를 반환하면 result.data를 사용한다.
             const zones = Array.isArray(result) ? result : result.data;
 
-            if (!Array.isArray(zones) || zones.length === 0) {
+            // 입고 화면에는 활성 구역만 표시
+            const activeZones = Array.isArray(zones)
+                ? zones.filter(zone => zone.status === 'ACTIVE')
+                : [];
+
+            if (activeZones.length === 0) {
                 resetZoneSelect('사용 가능한 보관 구역이 없습니다');
                 showZoneMessage('이 저장소에는 사용 가능한 보관 구역이 없습니다.');
                 return;
@@ -130,8 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
             zoneSelect.innerHTML = '';
             zoneSelect.appendChild(createOption('', '보관 구역을 선택하세요'));
 
-            zones.forEach((zone) => {
-                // ZoneInfoResponse의 실제 필드명이 id/zoneName이라면 아래 두 줄을 변경한다.
+            activeZones.forEach((zone) => {
                 const zoneId = zone.zoneId ?? zone.id;
                 const zoneName = zone.name ?? zone.zoneName;
 
@@ -232,7 +238,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    function updateAllEnvironmentCards(loadFailed = false) {
+    function updateAllEnvironmentCards(card, loadFailed) {
         document.querySelectorAll('.environment-card[data-environment-type]')
             .forEach((card) => updateExistingEnvironmentCard(card, loadFailed));
 
@@ -248,18 +254,33 @@ document.addEventListener('DOMContentLoaded', () => {
         const inputGroup = document.querySelector(
             `[data-environment-input][data-environment-type="${type}"]`
         );
+        // 별도로 등록된 온도 기준이 없을 때만 보관방법의 숫자 범위를 사용한다.
+        const storageMethodRange =
+            type === 'TEMPERATURE' && !medicineRange && !inputGroup
+                ? storageTemperatureRange
+                : null;
         const medicineMin = medicineRange
             ? toNumber(medicineRange.dataset.medicineMin)
-            : toNumber(inputGroup?.querySelector('[data-environment-min]')?.value);
+            : inputGroup
+                ? toNumber(
+                    inputGroup.querySelector('[data-environment-min]')?.value
+                )
+                : storageMethodRange?.min ?? null;
+
         const medicineMax = medicineRange
             ? toNumber(medicineRange.dataset.medicineMax)
-            : toNumber(inputGroup?.querySelector('[data-environment-max]')?.value);
+            : inputGroup
+                ? toNumber(
+                    inputGroup.querySelector('[data-environment-max]')?.value
+                )
+                : storageMethodRange?.max ?? null;
 
-        const hasNoMedicineCriterion = !medicineRange && !inputGroup;
+        const hasNoMedicineCriterion =
+            !medicineRange && !inputGroup && !storageMethodRange;
 
         // 기존 기준이 없는 경우 입력한 최소/최대 값을 위 환경 카드에 즉시 표시한다.
-        if (inputGroup) {
-            updateMedicineRangeText(card, type, medicineMin, medicineMax);
+        if (inputGroup || storageMethodRange) {
+            updateMedicineRangeText(card, type, medicineMin, medicineMax, Boolean(storageMethodRange));
         }
 
         updateEnvironmentDisplay(
@@ -282,7 +303,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateEnvironmentDisplay(group, type, medicineMin, medicineMax, loadFailed);
     }
 
-    function updateMedicineRangeText(card, type, medicineMin, medicineMax) {
+    function updateMedicineRangeText(card, type, medicineMin, medicineMax, fromStorageMethod = false) {
         const displayElement = card.querySelector('[data-medicine-range]')
             ?? card.querySelector('.environment-range:last-child strong');
 
@@ -297,8 +318,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const minText = medicineMin == null ? '-' : medicineMin;
         const maxText = medicineMax == null ? '-' : medicineMax;
+        const sourceText = fromStorageMethod ? ' · 보관방법 기준' : '';
 
-        displayElement.textContent = `${minText} ~ ${maxText} ${getEnvironmentUnit(type)}`;
+        displayElement.textContent = `${minText} ~ ${maxText} ${getEnvironmentUnit(type)}${sourceText}`;
     }
 
     function updateEnvironmentDisplay(
@@ -330,6 +352,11 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        if (medicineMin == null && medicineMax == null) {
+            setStatus(statusElement, '비교 기준 미등록', 'is-pending');
+            return;
+        }
+
         const threshold = selectedZoneThresholds.get(type);
 
         if (!threshold) {
@@ -349,15 +376,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         rangeElement.textContent = `${zoneMin} ~ ${zoneMax} ${unit}`;
-
-        if (medicineMin == null && medicineMax == null) {
-            setStatus(
-                statusElement,
-                hasNoMedicineCriterion ? '의약품 기준 없음' : '기준 입력 전',
-                'is-pending'
-            );
-            return;
-        }
 
         if (medicineMin == null || medicineMax == null) {
             setStatus(statusElement, '최소·최대 모두 입력', 'is-pending');
@@ -419,13 +437,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (statuses.includes('기준 충족')) {
             title.textContent = '선택한 보관 구역은 설정된 환경 기준을 충족합니다.';
-            description.textContent = '의약품에 설정된 환경 항목을 기준으로 비교했습니다.';
+            description.textContent = '보관방법 또는 별도로 등록된 수치 기준으로 비교했습니다.';
             summary.classList.add('is-satisfied');
             return;
         }
 
-        title.textContent = '비교할 수 있는 의약품 환경 기준이 없습니다.';
-        description.textContent = '환경 기준을 입력하거나 구역 임계값 설정을 확인해 주세요.';
+        title.textContent = '비교를 위한 환경 기준이 등록되지 않았습니다.';
+        description.textContent = '위 보관방법은 참고용 정보이며, 등록한 수치를 기준으로 사용합니다.';
         summary.classList.add('is-pending');
     }
 
@@ -610,9 +628,28 @@ document.addEventListener('DOMContentLoaded', () => {
         validateExpirationDate
     );
 
+    function parseTemperatureRange(storageMethod) {
+        if (!storageMethod) {
+            return null;
+        }
 
+        const match = storageMethod.match(
+            /(-?\d+(?:\.\d+)?)\s*(?:~|～|∼|–|—|-)\s*(-?\d+(?:\.\d+)?)\s*(?:℃|°C)/i
+        );
 
+        if (!match) {
+            return null;
+        }
 
+        const min = Number(match[1]);
+        const max = Number(match[2]);
+
+        if (!Number.isFinite(min) || !Number.isFinite(max) || min > max) {
+            return null;
+        }
+
+        return { min, max };
+    }
 
     function toNumber(value) {
         if (value == null || value === '') {
@@ -745,13 +782,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const openButton = document.getElementById("openSummaryButton");
     const closeButton = document.getElementById("closeSummaryButton");
     const confirmButton = document.getElementById("confirmInboundButton");
+    const overwriteExpirationInput = document.getElementById("overwrite-expiration-date");
+    const lotExpirationWarning = document.getElementById("lot-expiration-warning");
+    const existingExpirationDate = document.getElementById("existing-expiration-date");
+    const enteredExpirationDate = document.getElementById("entered-expiration-date");
 
 
 
 
-    if (form && modal && openButton && closeButton && confirmButton) {
+    if (form && modal && openButton && closeButton && confirmButton&& overwriteExpirationInput && lotExpirationWarning && existingExpirationDate && enteredExpirationDate) {
 
-        openButton.addEventListener("click", () => {
+        openButton.addEventListener("click", async () => {
 
             environmentValidators.forEach(validate => validate());
             validateExpirationDate();
@@ -788,7 +829,78 @@ document.addEventListener('DOMContentLoaded', () => {
             const memo =
                 form.querySelector("[name='memo']")?.value ?? "";
 
+            overwriteExpirationInput.value = "false";
+            lotExpirationWarning.hidden = true;
+            confirmButton.textContent = "입고 등록";
 
+            const medicinePackageUnitId =
+                form.querySelector(
+                    "[name='medicinePackageUnitId']"
+                )?.value ?? "";
+
+            const zoneId =
+                form.querySelector("[name='zoneId']")?.value ?? "";
+
+            const params = new URLSearchParams({
+                "medicine-package-unit-id":
+                medicinePackageUnitId,
+                "zone-id": zoneId,
+                "lot-number": lotNumber
+            });
+
+            try {
+                const response = await apiFetch(
+                    `/api/core/inventories/inbound/lot-expiration?${params}`
+                );
+
+                if (!response.ok) {
+                    const permissionNotice =
+                        document.getElementById("narcotic-permission-notice");
+
+                    if (response.status === 403 && permissionNotice) {
+                        permissionNotice.classList.add("is-denied");
+                        permissionNotice.scrollIntoView({
+                            behavior: "smooth",
+                            block: "center"
+                        });
+                        permissionNotice.focus({ preventScroll: true });
+                        return;
+                    }
+
+                    throw new Error(
+                        "기존 제조번호 조회에 실패했습니다."
+                    );
+                }
+
+                const body = await response.json();
+                const existing = body.data;
+
+                if (
+                    existing?.exists
+                    && existing.expirationDate !== expirationDate
+                ) {
+                    overwriteExpirationInput.value = "true";
+                    lotExpirationWarning.hidden = false;
+
+                    existingExpirationDate.textContent =
+                        existing.expirationDate;
+                    enteredExpirationDate.textContent =
+                        expirationDate;
+
+                    confirmButton.textContent =
+                        "덮어쓰기";
+                }
+            } catch (error) {
+                console.error(
+                    "기존 제조번호 조회 실패:",
+                    error
+                );
+
+                window.alert(
+                    "기존 제조번호 정보를 확인하지 못했습니다. 다시 시도해주세요."
+                );
+                return;
+            }
 
             document.getElementById("summaryProductName").textContent =
                 productName;
