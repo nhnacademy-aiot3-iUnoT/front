@@ -1,4 +1,5 @@
 let currentPage = 0; // 현재 페이지 번호 기억용
+const canManage = document.body.dataset.canManage === 'true';
 
 document.addEventListener('DOMContentLoaded', () => {
     // 최초 진입 시 0페이지 조회
@@ -88,7 +89,11 @@ const departmentNamesByStorage = new Map();
 
 async function getMyDepartmentIds() {
     if (!myDepartmentIdsPromise) {
-        myDepartmentIdsPromise = apiFetch('/api/core/departments/me', {
+        const departmentUrl = canManage
+            ? '/api/core/departments'
+            : '/api/core/departments/me';
+
+        myDepartmentIdsPromise = apiFetch(departmentUrl, {
             method: 'GET'
         })
             .then(response => response.json())

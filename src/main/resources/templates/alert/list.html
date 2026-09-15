@@ -8,7 +8,7 @@
     <title>알림 센터</title>
     <link rel="stylesheet" th:href="@{/css/status.css}">
 </head>
-<body>
+<body th:attr="data-can-manage=${canManage}">
 
 <div layout:fragment="content">
     <div class="py-6">
